@@ -103,6 +103,8 @@ class SecuPress_Scan_Login_Errors_Disclose extends SecuPress_Scan implements Sec
 
 		$messages = secupress_login_errors_disclose_get_messages( false );
 		$messages = '	' . implode( "<br />\n	", $messages ) . "<br />\n";
+		$wp_error = new WP_Error();
+		$wp_error->add( 'login_error', $messages );
 		/** This filter is documented in wp-login.php */
 		$messages = apply_filters( 'login_errors', $messages );
 

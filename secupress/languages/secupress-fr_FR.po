@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-03-04 10:26+0100\n"
-"PO-Revision-Date: 2025-03-04 10:27+0100\n"
+"POT-Creation-Date: 2025-03-07 15:00+0100\n"
+"PO-Revision-Date: 2025-03-07 15:01+0100\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -910,7 +910,7 @@ msgstr "Obtenez la version Pro pour exporter ce rapport dans un fichier PDF."
 msgid "Nothing to do here"
 msgstr "Rien à faire ici"
 
-#: free/admin/scanner-step-2.php:76 free/admin/scanner-step-2.php:213
+#: free/admin/scanner-step-2.php:76 free/admin/scanner-step-2.php:232
 #: free/admin/settings.php:232
 msgid "Fix it"
 msgstr "Corriger"
@@ -923,11 +923,15 @@ msgstr "Ignorer cette étape"
 msgid "Only checked items will be automatically fixed"
 msgstr "Seuls les éléments cochés seront corrigés automatiquement"
 
-#: free/admin/scanner-step-2.php:141
+#: free/admin/scanner-step-2.php:131
+msgid "Toggle check all"
+msgstr "(Dé)cocher tout"
+
+#: free/admin/scanner-step-2.php:160
 msgid "Toggle group check"
 msgstr "Inverser les coches"
 
-#: free/admin/scanner-step-2.php:153
+#: free/admin/scanner-step-2.php:172
 #, php-format
 msgid ""
 "The <a href=\"%s\" target=\"_blank\">Pro Version</a> is required to autofix "
@@ -936,7 +940,7 @@ msgstr ""
 "La <a href=\"%s\" target=\"_blank\">version Pro</a> est requise pour auto "
 "corriger les problèmes, corrigez les manuellement à la prochaine étape."
 
-#: free/admin/scanner-step-2.php:196
+#: free/admin/scanner-step-2.php:215
 #, php-format
 msgid ""
 "This feature and its fix are available in <a href=\"%s\" "
@@ -945,23 +949,23 @@ msgstr ""
 "Fonctionnalité et correctif disponibles dans la <a href=\"%s\" "
 "target=\"_blank\">version Pro</a>"
 
-#: free/admin/scanner-step-2.php:206
+#: free/admin/scanner-step-2.php:225
 msgid "Auto-fix this item"
 msgstr "Corriger automatiquement cet élément"
 
-#: free/admin/scanner-step-2.php:243 free/admin/settings.php:243
+#: free/admin/scanner-step-2.php:262 free/admin/settings.php:243
 msgid "Currently fixing&hellip;"
 msgstr "Correction en cours&hellip;"
 
-#: free/admin/scanner-step-2.php:244
+#: free/admin/scanner-step-2.php:263
 msgid "Please grab a cup of water, open a book and just wait a few minutes."
 msgstr "Prenez un verre d’eau, ouvrez un livre et patientez quelques minutes."
 
-#: free/admin/scanner-step-2.php:249
+#: free/admin/scanner-step-2.php:268
 msgid "Fixing&hellip;"
 msgstr "Correction en cours&hellip;"
 
-#: free/admin/scanner-step-2.php:251
+#: free/admin/scanner-step-2.php:270
 msgid ""
 "You will be automatically redirected to the next step,<br>if you are not "
 "within 3 minutes, please reload the page or ignore this step."
@@ -1283,7 +1287,7 @@ msgstr ""
 "Cela va changer les 8 clés de sécurité de votre installation.<br/>Vous "
 "devrez peut-être vous reconnecter."
 
-#: free/admin/settings.php:214 free/functions/common.php:1872
+#: free/admin/settings.php:214 free/functions/common.php:1873
 msgctxt "scan result"
 msgid "Good"
 msgstr "Bon"
@@ -1293,7 +1297,7 @@ msgctxt "scan result"
 msgid "Warning"
 msgstr "En attente"
 
-#: free/admin/settings.php:216 free/functions/common.php:1871
+#: free/admin/settings.php:216 free/functions/common.php:1872
 msgctxt "scan result"
 msgid "Bad"
 msgstr "Mauvais"
@@ -2744,6 +2748,7 @@ msgstr ""
 "avant de pouvoir réaliser ce scan."
 
 #: free/classes/scanners/class-secupress-scan-bad-old-plugins.php:84
+#: free/classes/scanners/class-secupress-scan-bad-old-themes.php:78
 #, php-format
 msgid ""
 "Your installation may contain old or closed plugins. The %sPRO version%s "
@@ -2955,14 +2960,6 @@ msgid "Sorry, the following theme could not be deleted: %s."
 msgid_plural "Sorry, the following themes could not be deleted: %s."
 msgstr[0] "Désolé, le thème suivant n’a pas pu être supprimé : %s."
 msgstr[1] "Désolé, les thèmes suivant n’ont pas pu être supprimés : %s."
-
-#: free/classes/scanners/class-secupress-scan-bad-old-themes.php:78
-msgid ""
-"Your installation may contain old or closed plugins. The PRO version will be "
-"more accurate."
-msgstr ""
-"Votre installation pourrait contenir des extensions anciennes ou fermées. La "
-"version PRO sera plus précise."
 
 #: free/classes/scanners/class-secupress-scan-bad-old-themes.php:81
 #, php-format
@@ -3322,12 +3319,13 @@ msgstr ""
 "Toutes les extensions connus pour être vulnérables ont été désactivées."
 
 #: free/classes/scanners/class-secupress-scan-bad-vuln-plugins.php:89
+#, php-format
 msgid ""
-"Your installation may contain vulnerable plugins. The PRO version will be "
-"more accurate."
+"Your installation may contain vulnerable plugins. The %sPRO version%s will "
+"be more accurate."
 msgstr ""
 "Votre installation pourrait contenir des extensions connues pour être "
-"vulnérables. La version PRO sera plus précise."
+"vulnérables. La %sversion PRO%s sera plus précise."
 
 #: free/classes/scanners/class-secupress-scan-bad-vuln-plugins.php:92
 #, php-format
@@ -5772,109 +5770,109 @@ msgstr "Raison : %s"
 msgid "Support ID: %s"
 msgstr "Support ID : %s"
 
-#: free/functions/common.php:1665
+#: free/functions/common.php:1666
 #, php-format
 msgid "SSL is not supported on HTTP PORT %s"
 msgstr "SSL n‘est pas supporté sur le port HTTP %s"
 
-#: free/functions/common.php:1671
+#: free/functions/common.php:1672
 msgid "SSL is not supported on this website."
 msgstr "SSL n‘est pas supporté sur ce site Web."
 
-#: free/functions/common.php:1826
+#: free/functions/common.php:1827
 msgctxt "User role"
 msgid "Administrator"
 msgstr "Administrateur"
 
-#: free/functions/common.php:1827
+#: free/functions/common.php:1828
 msgctxt "User role"
 msgid "Editor"
 msgstr "Éditeur"
 
-#: free/functions/common.php:1828
+#: free/functions/common.php:1829
 msgctxt "User role"
 msgid "Author"
 msgstr "Auteur"
 
-#: free/functions/common.php:1829
+#: free/functions/common.php:1830
 msgctxt "User role"
 msgid "Contributor"
 msgstr "Contributeur"
 
-#: free/functions/common.php:1830
+#: free/functions/common.php:1831
 msgctxt "User role"
 msgid "Subscriber"
 msgstr "Abonné"
 
-#: free/functions/common.php:1873
+#: free/functions/common.php:1874
 msgctxt "scan result"
 msgid "Pending"
 msgstr "En attente"
 
-#: free/functions/common.php:1874
+#: free/functions/common.php:1875
 msgctxt "scan result"
 msgid "Error"
 msgstr "Erreur"
 
-#: free/functions/common.php:1876
+#: free/functions/common.php:1877
 msgctxt "scanner item"
 msgid "New"
 msgstr "Nouveau"
 
-#: free/functions/common.php:1905
+#: free/functions/common.php:1906
 msgid "Fix done."
 msgstr "Correction effectuée."
 
-#: free/functions/common.php:1977 free/functions/modules.php:195
+#: free/functions/common.php:1978 free/functions/modules.php:195
 msgid "Banned IPs"
 msgstr "IPs bannies"
 
-#: free/functions/common.php:1981
+#: free/functions/common.php:1982
 msgid "Plugin Interactions"
 msgstr "Interactions des extensions"
 
-#: free/functions/common.php:1985
+#: free/functions/common.php:1986
 msgid "Theme Interactions"
 msgstr "Interactions des thèmes"
 
-#: free/functions/common.php:1989
+#: free/functions/common.php:1990
 msgid "ZIP Upload Attempts"
 msgstr "Tentatives de téléversement de ZIP"
 
-#: free/functions/common.php:1993
+#: free/functions/common.php:1994
 msgid "XMLRPC Intrusions"
 msgstr "Intrusions XML-RPC"
 
-#: free/functions/common.php:1997
+#: free/functions/common.php:1998
 msgid "Login Page"
 msgstr "Page de connexion"
 
-#: free/functions/common.php:2001
+#: free/functions/common.php:2002
 msgid "Login Attempts"
 msgstr "Tentatives de connexion"
 
-#: free/functions/common.php:2005
+#: free/functions/common.php:2006
 msgid "Password Spraying Attempts"
 msgstr "Tentatives de pulvérisation de mots de passe"
 
-#: free/functions/common.php:2009
+#: free/functions/common.php:2010
 msgid "User Actions"
 msgstr "Actions des comptes"
 
-#: free/functions/common.php:2013
+#: free/functions/common.php:2014
 msgid "Bad Robots"
 msgstr "Mauvais robots"
 
-#: free/functions/common.php:2017
+#: free/functions/common.php:2018
 msgid "Bad Request Content"
 msgstr "Mauvais contenu de requêtes"
 
-#: free/functions/common.php:2021
+#: free/functions/common.php:2022
 msgctxt "types of attacks"
 msgid "All"
 msgstr "Toutes"
 
-#: free/functions/common.php:2174
+#: free/functions/common.php:2175
 msgid "Plugin not found"
 msgstr "Extension non trouvée"
 
@@ -6170,12 +6168,12 @@ msgid "Forbid Bad Email Domains"
 msgstr "Interdire les mauvais domaines d'adresses e-mail"
 
 #: free/functions/modules.php:58
-#: free/modules/users-login/settings/blacklist-logins.php:89
+#: free/modules/users-login/settings/blacklist-logins.php:90
 msgid "Forbid Same Email Domain"
 msgstr "Interdire le même domaine d‘adresse e-mail"
 
 #: free/functions/modules.php:60
-#: free/modules/users-login/settings/blacklist-logins.php:128
+#: free/modules/users-login/settings/blacklist-logins.php:129
 msgid "Forbid User Enumeration"
 msgstr "Interdire l’énumération des comptes"
 
@@ -9888,16 +9886,16 @@ msgstr ""
 "registre MX), connus comme temporaires/poubelle ou adresses e-mail utilisées "
 "par des pirates seront bloqués."
 
-#: free/modules/users-login/settings/blacklist-logins.php:85
+#: free/modules/users-login/settings/blacklist-logins.php:86
 msgid "Yes, prevent users to be created with a bad email domain"
 msgstr "Oui, empêcher les comptes d‘être créés avec un mauvais domaine"
 
-#: free/modules/users-login/settings/blacklist-logins.php:94
+#: free/modules/users-login/settings/blacklist-logins.php:95
 #, php-format
 msgid "Yes, prevent users from registering with the domain name %s"
 msgstr "Oui, empêcher les comptes d‘être créés avec le domaine %s"
 
-#: free/modules/users-login/settings/blacklist-logins.php:96
+#: free/modules/users-login/settings/blacklist-logins.php:97
 msgid ""
 "Once activated, existing users with your domain name are \"Always allowed\", "
 "while new users are disallowed."
@@ -9905,15 +9903,15 @@ msgstr ""
 "Une fois activé, les comptes existants avec votre nom de domaine seront "
 "encore autorisés, alors que les nouveaux seront refusés."
 
-#: free/modules/users-login/settings/blacklist-logins.php:101
+#: free/modules/users-login/settings/blacklist-logins.php:102
 msgid "Forbid Bad Usernames"
 msgstr "Interdire les identifiants dangereux"
 
-#: free/modules/users-login/settings/blacklist-logins.php:106
+#: free/modules/users-login/settings/blacklist-logins.php:107
 msgid "Yes, prevent users from using disallowed usernames"
 msgstr "Oui, utiliser une liste d’identifiants interdits pour les comptes"
 
-#: free/modules/users-login/settings/blacklist-logins.php:110
+#: free/modules/users-login/settings/blacklist-logins.php:111
 #, php-format
 msgid ""
 "Your username contains the word \"%1$s\": %2$s. You must rename your account "
@@ -9922,42 +9920,42 @@ msgstr ""
 "Votre nom de compte contient le mot \"%1$s\" : %2$s. Vous devrez renommer "
 "votre compte après validation."
 
-#: free/modules/users-login/settings/blacklist-logins.php:111
+#: free/modules/users-login/settings/blacklist-logins.php:112
 #, php-format
 msgid "The existing account named «%s» is the only one allowed."
 msgstr "Le compte nommé «%s» existant sera le seul autorisé."
 
-#: free/modules/users-login/settings/blacklist-logins.php:113
+#: free/modules/users-login/settings/blacklist-logins.php:114
 #, php-format
 msgid "Forbid «%s» Usernames"
 msgstr "Interdire les identifiants «%s»"
 
-#: free/modules/users-login/settings/blacklist-logins.php:118
+#: free/modules/users-login/settings/blacklist-logins.php:119
 #, php-format
 msgid "Yes, also prevent the word «%s» from being used in any username"
 msgstr ""
 "Oui, empêcher le mot «%s» d'être utilisé dans n‘importe quel nom de compte"
 
-#: free/modules/users-login/settings/blacklist-logins.php:126
+#: free/modules/users-login/settings/blacklist-logins.php:127
 msgid "https://woocommerce.com/mobile/"
 msgstr "https://woocommerce.com/fr/mobile/"
 
-#: free/modules/users-login/settings/blacklist-logins.php:133
+#: free/modules/users-login/settings/blacklist-logins.php:134
 msgid "Yes, prevent user and author enumeration"
 msgstr "Oui, interdire l’énumération des comptes"
 
-#: free/modules/users-login/settings/blacklist-logins.php:135
+#: free/modules/users-login/settings/blacklist-logins.php:136
 #, php-format
 msgid ""
 "If you are using the %sWooCommerce Mobile App%s, do not activate this module."
 msgstr ""
 "Si vous utilisez %sl‘App Mobile WooCommerce%s, n‘activez pas le module."
 
-#: free/modules/users-login/settings/blacklist-logins.php:156
+#: free/modules/users-login/settings/blacklist-logins.php:157
 msgid "Lock the Default Role"
 msgstr "Verrouiller le rôle par défaut"
 
-#: free/modules/users-login/settings/blacklist-logins.php:157
+#: free/modules/users-login/settings/blacklist-logins.php:158
 msgid ""
 "Some attacks attempt to set the default role to <em>Administrator</em>. Lock "
 "the default role to prevent any future modifications."
@@ -9966,35 +9964,35 @@ msgstr ""
 "d’<em>Administrateur</em>. Verrouillez le rôle par défaut pour empêcher "
 "toute modification future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:162
+#: free/modules/users-login/settings/blacklist-logins.php:163
 msgid "Yes, prevent changes to the default role"
 msgstr "Oui, interdire la modification du rôle par défaut"
 
-#: free/modules/users-login/settings/blacklist-logins.php:164
+#: free/modules/users-login/settings/blacklist-logins.php:165
 #, php-format
 msgid "For information, the default role on this site is: %s"
 msgstr "Pour information, le rôle par défaut sur ce site est : %s"
 
-#: free/modules/users-login/settings/blacklist-logins.php:169
+#: free/modules/users-login/settings/blacklist-logins.php:170
 msgid "Which role would you like to Lock?"
 msgstr "Quel rôle verrouiller ?"
 
-#: free/modules/users-login/settings/blacklist-logins.php:178
+#: free/modules/users-login/settings/blacklist-logins.php:179
 msgid "To change the default role, you must first deactivate the module."
 msgstr ""
 "Pour changer le rôle par défaut, vous devez désactiver ce module en premier."
 
-#: free/modules/users-login/settings/blacklist-logins.php:194
+#: free/modules/users-login/settings/blacklist-logins.php:195
 msgid "You cannot lock the membership while allowing anyone can register."
 msgstr ""
 "Vous ne pouvez pas verrouiller les inscriptions maintenant car elles sont "
 "ouvertes."
 
-#: free/modules/users-login/settings/blacklist-logins.php:198
+#: free/modules/users-login/settings/blacklist-logins.php:199
 msgid "Lock the Membership Setting"
 msgstr "Verrouiller le réglage des inscriptions"
 
-#: free/modules/users-login/settings/blacklist-logins.php:199
+#: free/modules/users-login/settings/blacklist-logins.php:200
 msgid ""
 "Some attacks attempt to set the membership status to «Anyone can register». "
 "Lock the membership setting to «No» to prevent any future modifications."
@@ -10003,15 +10001,15 @@ msgstr ""
 "le monde peut s’inscrire». Verrouillez ce réglage sur «Non» et interdire "
 "toute modification future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:205
+#: free/modules/users-login/settings/blacklist-logins.php:206
 msgid "Yes, prevent changes to the membership status"
 msgstr "Oui, interdire la modification du statut des inscriptions"
 
-#: free/modules/users-login/settings/blacklist-logins.php:213
+#: free/modules/users-login/settings/blacklist-logins.php:214
 msgid "Lock the Admin Email"
 msgstr "Verrouiller l’e-mail de l’administration"
 
-#: free/modules/users-login/settings/blacklist-logins.php:214
+#: free/modules/users-login/settings/blacklist-logins.php:215
 msgid ""
 "Some attacks attempt to change the admin email. Lock the website’s admin "
 "email to prevent any future modifications."
@@ -10020,11 +10018,11 @@ msgstr ""
 "sur la leur. Verrouillez l’adresse e-mail pour interdire toute modification "
 "future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:219
+#: free/modules/users-login/settings/blacklist-logins.php:220
 msgid "Yes, prevent the modification of the admin email"
 msgstr "Oui, interdire la modification de l’e-mail de l’administration"
 
-#: free/modules/users-login/settings/blacklist-logins.php:221
+#: free/modules/users-login/settings/blacklist-logins.php:222
 #, php-format
 msgid "For information, the admin email on this site is: %s"
 msgstr ""
@@ -13914,6 +13912,13 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#~ msgid ""
+#~ "Your installation may contain old or closed plugins. The PRO version will "
+#~ "be more accurate."
+#~ msgstr ""
+#~ "Votre installation pourrait contenir des extensions anciennes ou fermées. "
+#~ "La version PRO sera plus précise."
 
 #~ msgid "The plugin <code>"
 #~ msgstr "L‘extension <code>"
