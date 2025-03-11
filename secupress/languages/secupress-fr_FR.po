@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-03-07 15:00+0100\n"
-"PO-Revision-Date: 2025-03-07 15:01+0100\n"
+"POT-Creation-Date: 2025-03-11 10:25+0100\n"
+"PO-Revision-Date: 2025-03-11 10:26+0100\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -1738,11 +1738,11 @@ msgstr ""
 msgid "Congratulations, your Pro version has been installed 🎉."
 msgstr "Félicitations, votre version Pro a été installée 🎉."
 
-#: free/classes/admin/class-secupress-admin-wp-background-process.php:779
+#: free/classes/admin/class-secupress-admin-wp-background-process.php:778
 msgid "Every Minute"
 msgstr "Toutes les minutes"
 
-#: free/classes/admin/class-secupress-admin-wp-background-process.php:781
+#: free/classes/admin/class-secupress-admin-wp-background-process.php:780
 #, php-format
 msgid "Every %d Minutes"
 msgstr "Toutes les %d minutes"
@@ -1798,9 +1798,9 @@ msgstr "Identifiant"
 #: free/functions/modules.php:778
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:65
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:66
-#: free/modules/users-login/callbacks.php:370
-#: free/modules/users-login/callbacks.php:376
-#: free/modules/users-login/callbacks.php:382
+#: free/modules/users-login/callbacks.php:371
+#: free/modules/users-login/callbacks.php:377
+#: free/modules/users-login/callbacks.php:383
 #: pro/modules/sensitive-data/plugins/hotlink.php:27
 #, php-format
 msgid "%s:"
@@ -5585,7 +5585,7 @@ msgid "Unlock link expired."
 msgstr "Lien de déverrouillage expiré."
 
 #: free/common.php:126 free/common.php:127
-#: free/modules/discloses/plugins/login-errors-disclose.php:33
+#: free/modules/discloses/plugins/login-errors-disclose.php:34
 #: free/modules/users-login/plugins/blacklist-logins.php:45
 #: free/modules/users-login/plugins/stop-user-enumeration.php:94
 #: free/modules/wordpress-core/plugins/wp-config-constant-repair.php:44
@@ -6173,7 +6173,7 @@ msgid "Forbid Same Email Domain"
 msgstr "Interdire le même domaine d‘adresse e-mail"
 
 #: free/functions/modules.php:60
-#: free/modules/users-login/settings/blacklist-logins.php:129
+#: free/modules/users-login/settings/blacklist-logins.php:142
 msgid "Forbid User Enumeration"
 msgstr "Interdire l’énumération des comptes"
 
@@ -6898,12 +6898,11 @@ msgstr "Protection anti-hameçonnage pour les comptes"
 
 #: free/modules/antispam/settings/antiphishing.php:10
 msgid ""
-"Adds a unique digit code to the user‘s profile, which is included in every "
-"email from this website, ensuring authenticity and safeguarding against "
-"phishing."
+"Adds a digit code to the user‘s profile, which is included in every email "
+"from this website, ensuring authenticity and safeguarding against phishing."
 msgstr ""
-"Ajoute un code numérique unique dans le profil des comptes, qui sera inclus "
-"dans chaque courrier de ce site Web, assurant son authenticité en protégeant "
+"Ajoute un code numérique dans le profil des comptes, qui sera inclus dans "
+"chaque courrier de ce site Web, assurant son authenticité en protégeant "
 "contre l'hameçonnage."
 
 #: free/modules/antispam/settings/antiphishing.php:11
@@ -7162,11 +7161,11 @@ msgstr ""
 msgid "Local"
 msgstr "Local"
 
-#: free/modules/discloses/plugins/login-errors-disclose.php:32
+#: free/modules/discloses/plugins/login-errors-disclose.php:33
 msgid "Authentication failed."
 msgstr "Authentification échouée."
 
-#: free/modules/discloses/plugins/login-errors-disclose.php:34
+#: free/modules/discloses/plugins/login-errors-disclose.php:35
 msgid "Incorrect data provided. Unable to proceed."
 msgstr "Donnée fournies incorrectes. Impossible de continuer."
 
@@ -9610,33 +9609,33 @@ msgstr ""
 msgid "The website was not redirected to the HTTPS protocol"
 msgstr "Le site Web n‘a pas été redirigé par le protocole HTTPS"
 
-#: free/modules/users-login/callbacks.php:370
-#: free/modules/users-login/callbacks.php:376
-#: free/modules/users-login/callbacks.php:382
+#: free/modules/users-login/callbacks.php:371
+#: free/modules/users-login/callbacks.php:377
+#: free/modules/users-login/callbacks.php:383
 #: free/modules/users-login/settings/move-login.php:82
 msgid "Move Login"
 msgstr "Déplacer la page de connexion"
 
-#: free/modules/users-login/callbacks.php:371
+#: free/modules/users-login/callbacks.php:372
 msgid "Please select your login page."
 msgstr "Choisissez votre page de connexion."
 
-#: free/modules/users-login/callbacks.php:377
+#: free/modules/users-login/callbacks.php:378
 #, php-format
 msgid "The slug %s is forbidden."
 msgid_plural "The slugs %s are forbidden."
 msgstr[0] "L’identifiant %s est interdit."
 msgstr[1] "Les identifiants %s sont interdits."
 
-#: free/modules/users-login/callbacks.php:383
+#: free/modules/users-login/callbacks.php:384
 msgid "The links can’t have the same slugs."
 msgstr "Les liens ne peuvent pas avoir le même identifiants."
 
-#: free/modules/users-login/callbacks.php:441
+#: free/modules/users-login/callbacks.php:442
 msgid "New login page"
 msgstr "Nouvelle page de connexion"
 
-#: free/modules/users-login/callbacks.php:443
+#: free/modules/users-login/callbacks.php:444
 msgid "New registration page"
 msgstr "Nouvelle page d’inscription"
 
@@ -9936,26 +9935,49 @@ msgid "Yes, also prevent the word «%s» from being used in any username"
 msgstr ""
 "Oui, empêcher le mot «%s» d'être utilisé dans n‘importe quel nom de compte"
 
-#: free/modules/users-login/settings/blacklist-logins.php:127
+#: free/modules/users-login/settings/blacklist-logins.php:128
+msgid "Rename the users nickname"
+msgstr "Renommer les noms affichés pour les comptes"
+
+#: free/modules/users-login/settings/blacklist-logins.php:129
+msgid ""
+"Any new user or updated user who has their nickname as the same as their "
+"login will be renamed"
+msgstr ""
+"Tout compte mis à jour ou nouvellement créé qui a son nom d'affichage "
+"identique à son identifiant sera renommé"
+
+#: free/modules/users-login/settings/blacklist-logins.php:134
+msgid "Yes, prevent user‘s login to be the same as their display name"
+msgstr ""
+"Oui, empêcher les comptes d‘avoir leur identifiant identique à leur nom "
+"d‘affichage"
+
+#: free/modules/users-login/settings/blacklist-logins.php:136
+#, php-format
+msgid "New nickname will look like this: \"%s\""
+msgstr "Les nouveaux noms ressemblent à ça : \"%s\""
+
+#: free/modules/users-login/settings/blacklist-logins.php:140
 msgid "https://woocommerce.com/mobile/"
 msgstr "https://woocommerce.com/fr/mobile/"
 
-#: free/modules/users-login/settings/blacklist-logins.php:134
+#: free/modules/users-login/settings/blacklist-logins.php:147
 msgid "Yes, prevent user and author enumeration"
 msgstr "Oui, interdire l’énumération des comptes"
 
-#: free/modules/users-login/settings/blacklist-logins.php:136
+#: free/modules/users-login/settings/blacklist-logins.php:149
 #, php-format
 msgid ""
 "If you are using the %sWooCommerce Mobile App%s, do not activate this module."
 msgstr ""
 "Si vous utilisez %sl‘App Mobile WooCommerce%s, n‘activez pas le module."
 
-#: free/modules/users-login/settings/blacklist-logins.php:157
+#: free/modules/users-login/settings/blacklist-logins.php:170
 msgid "Lock the Default Role"
 msgstr "Verrouiller le rôle par défaut"
 
-#: free/modules/users-login/settings/blacklist-logins.php:158
+#: free/modules/users-login/settings/blacklist-logins.php:171
 msgid ""
 "Some attacks attempt to set the default role to <em>Administrator</em>. Lock "
 "the default role to prevent any future modifications."
@@ -9964,35 +9986,35 @@ msgstr ""
 "d’<em>Administrateur</em>. Verrouillez le rôle par défaut pour empêcher "
 "toute modification future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:163
+#: free/modules/users-login/settings/blacklist-logins.php:176
 msgid "Yes, prevent changes to the default role"
 msgstr "Oui, interdire la modification du rôle par défaut"
 
-#: free/modules/users-login/settings/blacklist-logins.php:165
+#: free/modules/users-login/settings/blacklist-logins.php:178
 #, php-format
 msgid "For information, the default role on this site is: %s"
 msgstr "Pour information, le rôle par défaut sur ce site est : %s"
 
-#: free/modules/users-login/settings/blacklist-logins.php:170
+#: free/modules/users-login/settings/blacklist-logins.php:183
 msgid "Which role would you like to Lock?"
 msgstr "Quel rôle verrouiller ?"
 
-#: free/modules/users-login/settings/blacklist-logins.php:179
+#: free/modules/users-login/settings/blacklist-logins.php:192
 msgid "To change the default role, you must first deactivate the module."
 msgstr ""
 "Pour changer le rôle par défaut, vous devez désactiver ce module en premier."
 
-#: free/modules/users-login/settings/blacklist-logins.php:195
+#: free/modules/users-login/settings/blacklist-logins.php:208
 msgid "You cannot lock the membership while allowing anyone can register."
 msgstr ""
 "Vous ne pouvez pas verrouiller les inscriptions maintenant car elles sont "
 "ouvertes."
 
-#: free/modules/users-login/settings/blacklist-logins.php:199
+#: free/modules/users-login/settings/blacklist-logins.php:212
 msgid "Lock the Membership Setting"
 msgstr "Verrouiller le réglage des inscriptions"
 
-#: free/modules/users-login/settings/blacklist-logins.php:200
+#: free/modules/users-login/settings/blacklist-logins.php:213
 msgid ""
 "Some attacks attempt to set the membership status to «Anyone can register». "
 "Lock the membership setting to «No» to prevent any future modifications."
@@ -10001,15 +10023,15 @@ msgstr ""
 "le monde peut s’inscrire». Verrouillez ce réglage sur «Non» et interdire "
 "toute modification future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:206
+#: free/modules/users-login/settings/blacklist-logins.php:219
 msgid "Yes, prevent changes to the membership status"
 msgstr "Oui, interdire la modification du statut des inscriptions"
 
-#: free/modules/users-login/settings/blacklist-logins.php:214
+#: free/modules/users-login/settings/blacklist-logins.php:227
 msgid "Lock the Admin Email"
 msgstr "Verrouiller l’e-mail de l’administration"
 
-#: free/modules/users-login/settings/blacklist-logins.php:215
+#: free/modules/users-login/settings/blacklist-logins.php:228
 msgid ""
 "Some attacks attempt to change the admin email. Lock the website’s admin "
 "email to prevent any future modifications."
@@ -10018,11 +10040,11 @@ msgstr ""
 "sur la leur. Verrouillez l’adresse e-mail pour interdire toute modification "
 "future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:220
+#: free/modules/users-login/settings/blacklist-logins.php:233
 msgid "Yes, prevent the modification of the admin email"
 msgstr "Oui, interdire la modification de l’e-mail de l’administration"
 
-#: free/modules/users-login/settings/blacklist-logins.php:222
+#: free/modules/users-login/settings/blacklist-logins.php:235
 #, php-format
 msgid "For information, the admin email on this site is: %s"
 msgstr ""
