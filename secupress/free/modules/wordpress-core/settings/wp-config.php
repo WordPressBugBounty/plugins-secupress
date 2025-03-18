@@ -235,7 +235,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, create secure keys for my installation', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && ( defined( 'SECUPRESS_SALT_KEYS_ACTIVE' ) && SECUPRESS_SALT_KEYS_ACTIVE ) || ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) && SECUPRESS_SALT_KEYS_MODULE_ACTIVE ) ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && ( ( defined( 'SECUPRESS_SALT_KEYS_ACTIVE' ) && SECUPRESS_SALT_KEYS_ACTIVE ) || ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) && SECUPRESS_SALT_KEYS_MODULE_ACTIVE ) ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',

@@ -14,6 +14,14 @@ if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS )
 	return;
 }
 
+if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+	return;
+}
+
+if ( is_admin() ) {
+	return;
+}
+
 /**
  * Start a session if needed
  *
@@ -22,16 +30,24 @@ if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS )
  */
 function secupress_captcha_session() {
 	if ( session_status() === PHP_SESSION_NONE && ! headers_sent() ) {
-		session_start( [
-			'read_and_close' => true,
-		] );
+		session_start();
 		secupress_update_captcha_seed();
 	}
 }
-secupress_captcha_session();
-if ( ! session_id() ) {
-	define( 'SECUPRESS_CAPTCHA_NO_SESSION', true );
-	return; // No session, the captcha won't work.
+
+add_action( 'login_form_login', 'secupress_captcha_init' );
+/**
+ * Init only on login form
+ *
+ * @author Julio Potier
+ * @since 2.3.6
+ **/
+function secupress_captcha_init() {
+	secupress_captcha_session();
+	if ( ! session_id() ) {
+		// No session, the captcha won't work.
+		define( 'SECUPRESS_CAPTCHA_NO_SESSION', true );
+	}
 }
 
 /**
@@ -69,6 +85,10 @@ function secupress_captcha_key( $seed = 0 ) {
  */
 function secupress_can_display_captcha() {
 	global $pagenow;
+
+	if ( defined( 'SECUPRESS_CAPTCHA_NO_SESSION' ) && SECUPRESS_CAPTCHA_NO_SESSION ) {
+		return;
+	}
 
 	if ( ! is_multisite() ) {
 		// Only on the login form and the registration form.

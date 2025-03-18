@@ -180,7 +180,9 @@ function secupress_root_file_is_writable( $file ) {
  * Try to find the correct `wp-config.php` file, support one level up in filetree.
  *
  * @since 2.0 Add filter secupress.wpconfig_path to target another file with your constants
+ * @author Julio Potier
  * @since 1.0
+ * @author Grégory Viguier
  *
  * @hook secupress.wpconfig_filename
  * @param (string) $context Can be use for filtering
@@ -210,6 +212,7 @@ function secupress_find_wpconfig_path( $context = '' ) {
 		*/
 		return apply_filters( 'secupress.wpconfig_path', $config_file_alt, 'alt', $context );
 	}
+
 
 	// No writable file found.
 	return false;
@@ -263,7 +266,8 @@ function secupress_is_wpconfig_writable( $context = '' ) {
  * Comment a constant definition in the `wp-config.php` file (or any other file).
  * If `$marker` is provided, our definition will be also removed.
  *
- * @since 2.0 Julio Potier Change the return values to let a possible TRUE if these are WP defaults + remove $new_value param (unused and not the purpose)
+ * @since 2.0 Change the return values to let a possible TRUE if these are WP defaults + remove $new_value param (unused and not the purpose)
+ * @author Julio Potier
  * @since 1.2.2
  * @author Grégory Viguier
  *
@@ -706,6 +710,7 @@ function secupress_create_mu_plugin( $filename_part, $contents ) {
 			update_option( SECUPRESS_INSTALLED_MUPLUGINS, $mus );
 		}
 	}
+	return $done;
 }
 
 /**
@@ -757,6 +762,11 @@ function secupress_delete_mu_plugin( $filename ) {
 	$filename   = str_replace( [ WPMU_PLUGIN_DIR, '_secupress-', '_secupress_', '(secupress_', ').php', '.php' ], '', $filename );
 
 	$oldfile    = WPMU_PLUGIN_DIR . "/_secupress-{$filename}.php";
+	if ( file_exists( $oldfile ) ) {
+		$filesystem->delete( $oldfile );
+	}
+
+	$oldfile    = WPMU_PLUGIN_DIR . "/_secupress_{$filename}.php";
 	if ( file_exists( $oldfile ) ) {
 		$filesystem->delete( $oldfile );
 	}

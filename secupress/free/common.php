@@ -590,7 +590,6 @@ function secupress_add_salt_muplugin() {
 	if ( get_current_user_id() !== (int) $data['ID'] ) {
 		return;
 	}
-
 	secupress_delete_site_transient( 'secupress-add-salt-muplugin' );
 
 	// Create the MU plugin.
@@ -598,7 +597,7 @@ function secupress_add_salt_muplugin() {
 		$filesystem  = secupress_get_filesystem();
 		$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
 		$args        = array(
-			'{{PLUGIN_NAME}}' => SECUPRESS_PLUGIN_NAME,
+			'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
 			'{{HASH1}}'        => wp_generate_password( 64, true, true ),
 			'{{HASH2}}'        => wp_generate_password( 64, true, true ),
 		);
@@ -606,8 +605,12 @@ function secupress_add_salt_muplugin() {
 		$uniqid      = uniqid();
 		$file        = secupress_find_muplugin( '_secupress_salt_keys_' );
 		$file        = reset( $file );
-		secupress_delete_mu_plugin( $file );
-		if ( ! $alicia_keys || ! secupress_create_mu_plugin( 'salt_keys_' . $uniqid, $alicia_keys ) ) {
+		$created     = secupress_create_mu_plugin( 'salt_keys_' . $uniqid, $alicia_keys );
+		if ( file_exists( $file ) ) {
+			secupress_delete_mu_plugin( $file );
+		}
+		if ( ! $alicia_keys || ! $created ) {
+			var_dump($created);
 			return;
 		}
 	}

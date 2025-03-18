@@ -180,7 +180,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'warning',
-			'description' => defined( 'SECUPRESS_CAPTCHA_NO_SESSION' ) || ( (int) secupress_is_submodule_active( 'users-login', 'login-captcha' ) && ! session_id() ) ? __( 'It seems you have a PHP session issue, this module will not work correctly. There is nothing we can do here.', 'secupress' ) : '',
+			// 'description' => defined( 'SECUPRESS_CAPTCHA_NO_SESSION' ) || ( (int) secupress_is_submodule_active( 'users-login', 'login-captcha' ) && ! session_id() ) ? __( 'It seems you have a PHP session issue, this module will not work correctly. There is nothing we can do here.', 'secupress' ) : '',
 		),
 	),
 ) );

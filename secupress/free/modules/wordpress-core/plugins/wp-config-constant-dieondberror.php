@@ -51,6 +51,9 @@ add_action( 'secupress.plugins.deactivation', 'secupress_wpconfig_dieondberror_d
 function secupress_wpconfig_dieondberror_deactivation() {
 	secupress_wpconfig_modules_deactivation( 'dieondberror' );
 	$filename   = WP_CONTENT_DIR . '/db-error.php';
+	if ( ! file_exists( $filename ) ) {
+		return;
+	}
 	$content    = file_get_contents( $filename );
 	// Delete it only if it belongs to us!
 	if ( false !== strpos( $content, 'SecuPress' ) ) {

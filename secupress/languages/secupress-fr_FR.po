@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-03-11 10:25+0100\n"
-"PO-Revision-Date: 2025-03-11 10:26+0100\n"
+"POT-Creation-Date: 2025-03-18 15:53+0100\n"
+"PO-Revision-Date: 2025-03-18 15:59+0100\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -384,8 +384,8 @@ msgctxt "date"
 msgid "M dS, Y \\a\\t h:ia"
 msgstr "l j F Y \\à G:i:s"
 
-#: free/admin/functions/admin.php:141 pro/modules/file-system/callbacks.php:134
-#: pro/modules/file-system/callbacks.php:142
+#: free/admin/functions/admin.php:141 pro/modules/file-system/callbacks.php:136
+#: pro/modules/file-system/callbacks.php:144
 msgid "File Differences"
 msgstr "Différences entre les fichiers"
 
@@ -445,7 +445,7 @@ msgstr ""
 "D’autres fonctionnalités du pare-feu ajoutent un niveau additionnel de "
 "protection contre les attaques Internet."
 
-#: free/admin/functions/admin.php:246 free/modules/users-login/tools.php:419
+#: free/admin/functions/admin.php:246
 msgid "Logs"
 msgstr "les Buches"
 
@@ -557,7 +557,7 @@ msgstr ""
 
 #: free/admin/modal.php:70 free/admin/settings.php:294
 #: free/classes/settings/class-secupress-settings.php:1719
-#: free/modules/welcome/callbacks.php:397 pro/common.php:39 pro/common.php:132
+#: free/modules/welcome/callbacks.php:397 pro/common.php:39 pro/common.php:134
 msgctxt "link to website (Only FR or EN!)"
 msgid "support"
 msgstr "fr/support"
@@ -1372,7 +1372,7 @@ msgstr "Docs"
 msgid "Settings"
 msgstr "Réglages"
 
-#: free/admin/settings.php:430 pro/common.php:243
+#: free/admin/settings.php:430 pro/common.php:245
 msgctxt "Latest scans"
 msgid "M dS, Y \\a\\t h:ia"
 msgstr "l j F Y \\à G:i:s"
@@ -5168,7 +5168,7 @@ msgstr[1] "%s autres"
 #: free/classes/scanners/class-secupress-scan.php:1139
 #: free/classes/scanners/class-secupress-scan.php:1145
 #: free/classes/scanners/class-secupress-scan.php:1151
-#: free/functions/files.php:580
+#: free/functions/files.php:584
 msgid "The temporary directory could not be created."
 msgstr "Le dossier temporaire n’a pu être créé."
 
@@ -5586,6 +5586,7 @@ msgstr "Lien de déverrouillage expiré."
 
 #: free/common.php:126 free/common.php:127
 #: free/modules/discloses/plugins/login-errors-disclose.php:34
+#: free/modules/discloses/plugins/login-errors-disclose.php:36
 #: free/modules/users-login/plugins/blacklist-logins.php:45
 #: free/modules/users-login/plugins/stop-user-enumeration.php:94
 #: free/modules/wordpress-core/plugins/wp-config-constant-repair.php:44
@@ -5951,11 +5952,11 @@ msgstr "Extension indispensable"
 msgid "drop-in"
 msgstr "drop-in"
 
-#: free/functions/files.php:586
+#: free/functions/files.php:590
 msgid "The temporary file could not be created."
 msgstr "Le fichier temporaire n’a pu être créé."
 
-#: free/functions/files.php:1091
+#: free/functions/files.php:1101
 msgid "Could not create temporary file."
 msgstr "Impossible de créer le fichier temporaire."
 
@@ -6262,7 +6263,7 @@ msgid "Scripts Concatenation"
 msgstr "Concaténation des scripts"
 
 #: free/functions/modules.php:96
-#: free/modules/wordpress-core/settings/wp-config.php:47
+#: free/modules/wordpress-core/settings/wp-config.php:46
 msgid "Skip New Bundles"
 msgstr "Ignorer les nouveaux paquets"
 
@@ -6279,7 +6280,7 @@ msgid "File Edit"
 msgstr "Édition des fichiers"
 
 #: free/functions/modules.php:100
-#: free/modules/wordpress-core/settings/wp-config.php:142
+#: free/modules/wordpress-core/settings/wp-config.php:136
 msgid "Unfiltered Uploads"
 msgstr "Téléversements non filtrés"
 
@@ -6857,12 +6858,12 @@ msgstr ""
 "des tentatives de hameçonnage sur ce site Web. <a href=\"%s\">Ajouter mon "
 "code maintenant.</a>"
 
-#: free/modules/antispam/plugins/antiphishing.php:120
+#: free/modules/antispam/plugins/antiphishing.php:121
 #, php-format
 msgid "[Anti-Phishing Code:%s]"
 msgstr "[Code Anti-Hameçonnage :%s]"
 
-#: free/modules/antispam/plugins/antiphishing.php:139
+#: free/modules/antispam/plugins/antiphishing.php:140
 msgid ""
 "[Anti-Phishing: You can setup a personal code for more email security in "
 "your profile.]"
@@ -9713,30 +9714,30 @@ msgid_plural "Login failed, <strong>%d</strong> attempts left."
 msgstr[0] "Connexion impossible, <strong>%d</strong> tentative restante."
 msgstr[1] "Connexion impossible, <strong>%d</strong> tentatives restantes."
 
-#: free/modules/users-login/plugins/login-captcha.php:120
+#: free/modules/users-login/plugins/login-captcha.php:142
 msgid "Human Verification"
 msgstr "Vérification humaine"
 
-#: free/modules/users-login/plugins/login-captcha.php:151
-#: free/modules/users-login/plugins/login-captcha.php:198
+#: free/modules/users-login/plugins/login-captcha.php:173
+#: free/modules/users-login/plugins/login-captcha.php:220
 msgid "Too late, please try again."
 msgstr "Trop tard, veuillez réessayer."
 
-#: free/modules/users-login/plugins/login-captcha.php:152
+#: free/modules/users-login/plugins/login-captcha.php:174
 msgid "Verification Successful!"
 msgstr "Vérification réussie !"
 
-#: free/modules/users-login/plugins/login-captcha.php:153
+#: free/modules/users-login/plugins/login-captcha.php:175
 msgid "Please wait"
 msgstr "Patientez"
 
-#: free/modules/users-login/plugins/login-captcha.php:193
+#: free/modules/users-login/plugins/login-captcha.php:215
 #, php-format
 msgctxt "emoji item"
 msgid "Select the %s."
 msgstr "Sélectionnez %s."
 
-#: free/modules/users-login/plugins/login-captcha.php:303
+#: free/modules/users-login/plugins/login-captcha.php:325
 msgid "<strong>Error</strong>: The human verification is incorrect."
 msgstr "<strong>Erreur</strong> : La vérification humaine est incorrecte."
 
@@ -10190,14 +10191,6 @@ msgstr ""
 msgid "Yes, use a Captcha"
 msgstr "Oui, utiliser un Captcha"
 
-#: free/modules/users-login/settings/double-auth.php:183
-msgid ""
-"It seems you have a PHP session issue, this module will not work correctly. "
-"There is nothing we can do here."
-msgstr ""
-"Il semble que vous ayez un problème de session PHP, ce module ne "
-"fonctionnera pas correctement. Il n‘y a rien que nous puissions faire ici."
-
 #: free/modules/users-login/settings/double-auth.php:191
 msgid "<strong>Simple</strong> as a checkbox"
 msgstr "<strong>Simple</strong> comme une case à cocher"
@@ -10440,255 +10433,323 @@ msgid "Yes, enforce the use of strong passwords"
 msgstr "Oui, forcer l’utilisation des mots de passe forts"
 
 #: free/modules/users-login/tools.php:415
+msgctxt "emoji"
 msgid "One"
 msgstr "le Un"
 
 #: free/modules/users-login/tools.php:415
+msgctxt "emoji"
 msgid "Two"
 msgstr "le Deux"
 
 #: free/modules/users-login/tools.php:415
+msgctxt "emoji"
 msgid "Three"
 msgstr "le Trois"
 
 #: free/modules/users-login/tools.php:415
+msgctxt "emoji"
 msgid "Four"
 msgstr "le Quatre"
 
 #: free/modules/users-login/tools.php:415
+msgctxt "emoji"
 msgid "Five"
 msgstr "le Cinq"
 
 #: free/modules/users-login/tools.php:416
+msgctxt "emoji"
 msgid "Plus"
 msgstr "le Plus"
 
 #: free/modules/users-login/tools.php:416
+msgctxt "emoji"
 msgid "Minus"
 msgstr "le Moins"
 
 #: free/modules/users-login/tools.php:416
+msgctxt "emoji"
 msgid "Times"
 msgstr "la Croix"
 
 #: free/modules/users-login/tools.php:416
+msgctxt "emoji"
 msgid "Divided"
 msgstr "le Divisé"
 
 #: free/modules/users-login/tools.php:416
+msgctxt "emoji"
 msgid "Equal"
 msgstr "l‘Égal"
 
 #: free/modules/users-login/tools.php:417
+msgctxt "emoji"
 msgid "Spade"
 msgstr "le Pique"
 
 #: free/modules/users-login/tools.php:417
 #: free/modules/users-login/tools.php:419
+msgctxt "emoji"
 msgid "Clover"
 msgstr "le Trèfle"
 
 #: free/modules/users-login/tools.php:417
+msgctxt "emoji"
 msgid "Heart"
 msgstr "le Cœur"
 
 #: free/modules/users-login/tools.php:417
+msgctxt "emoji"
 msgid "Diamond"
 msgstr "le Carreau"
 
 #: free/modules/users-login/tools.php:417
+msgctxt "emoji"
 msgid "Square"
 msgstr "le Carré"
 
 #: free/modules/users-login/tools.php:418
+msgctxt "emoji"
 msgid "Dog"
 msgstr "le Chien"
 
 #: free/modules/users-login/tools.php:418
+msgctxt "emoji"
 msgid "Cat"
 msgstr "le Chat"
 
 #: free/modules/users-login/tools.php:418
+msgctxt "emoji"
 msgid "Monkey"
 msgstr "le Singe"
 
 #: free/modules/users-login/tools.php:418
+msgctxt "emoji"
 msgid "Pig"
 msgstr "le Cochon"
 
 #: free/modules/users-login/tools.php:418
+msgctxt "emoji"
 msgid "Lion"
 msgstr "le Lion"
 
 #: free/modules/users-login/tools.php:419
+msgctxt "emoji"
 msgid "Tree"
 msgstr "l‘Arbre"
 
 #: free/modules/users-login/tools.php:419
+msgctxt "emoji"
+msgid "Logs"
+msgstr "les Buches"
+
+#: free/modules/users-login/tools.php:419
+msgctxt "emoji"
 msgid "Leaf"
 msgstr "la Feuille"
 
 #: free/modules/users-login/tools.php:419
+msgctxt "emoji"
 msgid "Flower"
 msgstr "la Fleur"
 
 #: free/modules/users-login/tools.php:420
+msgctxt "emoji"
 msgid "Apple"
 msgstr "la Pomme"
 
 #: free/modules/users-login/tools.php:420
+msgctxt "emoji"
 msgid "Banana"
 msgstr "la Banane"
 
 #: free/modules/users-login/tools.php:420
+msgctxt "emoji"
 msgid "Lemon"
 msgstr "le Citron"
 
 #: free/modules/users-login/tools.php:420
+msgctxt "emoji"
 msgid "Grapes"
 msgstr "le Raisin"
 
 #: free/modules/users-login/tools.php:420
+msgctxt "emoji"
 msgid "Kiwi"
 msgstr "le Kiwi"
 
 #: free/modules/users-login/tools.php:421
+msgctxt "emoji"
 msgid "Chili"
 msgstr "le Piment"
 
 #: free/modules/users-login/tools.php:421
+msgctxt "emoji"
 msgid "Carrot"
 msgstr "la Carotte"
 
 #: free/modules/users-login/tools.php:421
+msgctxt "emoji"
 msgid "Corn"
 msgstr "le Maïs"
 
 #: free/modules/users-login/tools.php:421
+msgctxt "emoji"
 msgid "Avocado"
 msgstr "l‘Avocat"
 
 #: free/modules/users-login/tools.php:421
+msgctxt "emoji"
 msgid "Tomato"
 msgstr "la Tomate"
 
 #: free/modules/users-login/tools.php:422
+msgctxt "emoji"
 msgid "Robot"
 msgstr "le Robot"
 
 #: free/modules/users-login/tools.php:422
+msgctxt "emoji"
 msgid "Clown"
 msgstr "le Clown"
 
 #: free/modules/users-login/tools.php:422
+msgctxt "emoji"
 msgid "Ghost"
 msgstr "le Fantôme"
 
 #: free/modules/users-login/tools.php:422
+msgctxt "emoji"
 msgid "Alien"
 msgstr "l‘Alien"
 
 #: free/modules/users-login/tools.php:422
+msgctxt "emoji"
 msgid "Poo"
 msgstr "le Caca"
 
 #: free/modules/users-login/tools.php:423
+msgctxt "emoji"
 msgid "Bread"
 msgstr "le Pain"
 
 #: free/modules/users-login/tools.php:423
+msgctxt "emoji"
 msgid "Cheese"
 msgstr "le Fromage"
 
 #: free/modules/users-login/tools.php:423
+msgctxt "emoji"
 msgid "Steak"
 msgstr "la Viande"
 
 #: free/modules/users-login/tools.php:423
+msgctxt "emoji"
 msgid "Butter"
 msgstr "le Beurre"
 
 #: free/modules/users-login/tools.php:423
+msgctxt "emoji"
 msgid "Salad"
 msgstr "la Salade"
 
 #: free/modules/users-login/tools.php:424
+msgctxt "emoji"
 msgid "Taco"
 msgstr "le Taco"
 
 #: free/modules/users-login/tools.php:424
+msgctxt "emoji"
 msgid "Hotdog"
 msgstr "le Hotdog"
 
 #: free/modules/users-login/tools.php:424
+msgctxt "emoji"
 msgid "Pizza"
 msgstr "la Pizza"
 
 #: free/modules/users-login/tools.php:424
+msgctxt "emoji"
 msgid "Burger"
 msgstr "le Burger"
 
 #: free/modules/users-login/tools.php:424
+msgctxt "emoji"
 msgid "Fries"
 msgstr "les Frites"
 
 #: free/modules/users-login/tools.php:425
+msgctxt "emoji"
 msgid "Earth"
 msgstr "la Terre"
 
 #: free/modules/users-login/tools.php:425
+msgctxt "emoji"
 msgid "Stars"
 msgstr "les Étoiles"
 
 #: free/modules/users-login/tools.php:425
+msgctxt "emoji"
 msgid "Moon"
 msgstr "la Lune"
 
 #: free/modules/users-login/tools.php:425
+msgctxt "emoji"
 msgid "Sun"
 msgstr "le Soleil"
 
 #: free/modules/users-login/tools.php:425
+msgctxt "emoji"
 msgid "Comet"
 msgstr "la Comète"
 
 #: free/modules/users-login/tools.php:426
+msgctxt "emoji"
 msgid "Hat"
 msgstr "le Chapeau"
 
 #: free/modules/users-login/tools.php:426
+msgctxt "emoji"
 msgid "Hand"
 msgstr "la Main"
 
 #: free/modules/users-login/tools.php:426
+msgctxt "emoji"
 msgid "Eye"
 msgstr "l‘Oeil"
 
 #: free/modules/users-login/tools.php:426
+msgctxt "emoji"
 msgid "Glasses"
 msgstr "les Lunettes"
 
 #: free/modules/users-login/tools.php:426
+msgctxt "emoji"
 msgid "Car"
 msgstr "la Voiture"
 
 #: free/modules/users-login/tools.php:427
+msgctxt "emoji"
 msgid "House"
 msgstr "la Maison"
 
 #: free/modules/users-login/tools.php:427
+msgctxt "emoji"
 msgid "Piano"
 msgstr "le Piano"
 
 #: free/modules/users-login/tools.php:427
+msgctxt "emoji"
 msgid "Ball"
 msgstr "le Ballon"
 
 #: free/modules/users-login/tools.php:427
+msgctxt "emoji"
 msgid "Cookie"
 msgstr "le Cookie"
 
 #: free/modules/users-login/tools.php:427
+msgctxt "emoji"
 msgid "Star"
 msgstr "l‘Étoile"
 
@@ -11210,14 +11271,14 @@ msgstr "Quelles tables renommer ?"
 msgid "WordPress configuration file"
 msgstr "Fichier de configuration de WordPress"
 
-#: free/modules/wordpress-core/settings/wp-config.php:12
+#: free/modules/wordpress-core/settings/wp-config.php:13
 #, php-format
 msgid "The directory %s is not writable, so the constant cannot be modified."
 msgstr ""
 "Le dossier %s n‘est pas en écriture, les constantes ne peuvent être "
 "modifiées."
 
-#: free/modules/wordpress-core/settings/wp-config.php:17
+#: free/modules/wordpress-core/settings/wp-config.php:18
 #, php-format
 msgid "The %s file is not writable, so the constants cannot be modified."
 msgstr ""
@@ -11238,7 +11299,7 @@ msgstr ""
 "Oui, désactiver la concaténation des scripts pour empêcher la surcharge du "
 "serveur"
 
-#: free/modules/wordpress-core/settings/wp-config.php:48
+#: free/modules/wordpress-core/settings/wp-config.php:47
 msgid ""
 "Every time WordPress upgrades itself, it downloads the new <em>twentytheme-à-"
 "la-mode</em>"
@@ -11246,17 +11307,17 @@ msgstr ""
 "Chaque fois que WordPress se met à jour, cela télécharge le nouveau "
 "<em>twenty-thème-à-la-mode</em>"
 
-#: free/modules/wordpress-core/settings/wp-config.php:53
+#: free/modules/wordpress-core/settings/wp-config.php:52
 msgid "Yes, prevent core upgrades from downloading unnecessary bundled items"
 msgstr ""
 "Oui, empêcher les mises à jour du cœur de télécharger les éléments inclus "
 "non nécessaires"
 
-#: free/modules/wordpress-core/settings/wp-config.php:70
+#: free/modules/wordpress-core/settings/wp-config.php:68
 msgid "Debugging"
 msgstr "Débogage"
 
-#: free/modules/wordpress-core/settings/wp-config.php:71
+#: free/modules/wordpress-core/settings/wp-config.php:69
 msgid ""
 "In a standard production environment you should prevent errors from being "
 "displayed."
@@ -11264,15 +11325,15 @@ msgstr ""
 "Dans un environnement standard en production, vous devriez empêcher les "
 "erreurs d’être affichées."
 
-#: free/modules/wordpress-core/settings/wp-config.php:76
+#: free/modules/wordpress-core/settings/wp-config.php:74
 msgid "Yes, prevent my site from displaying errors"
 msgstr "Oui, empêcher mon site d'afficher les erreurs"
 
-#: free/modules/wordpress-core/settings/wp-config.php:94
+#: free/modules/wordpress-core/settings/wp-config.php:91
 msgid "Locations"
 msgstr "Adresses"
 
-#: free/modules/wordpress-core/settings/wp-config.php:95
+#: free/modules/wordpress-core/settings/wp-config.php:92
 msgid ""
 "In a standard production environment there is no need to relocate your site "
 "and home URLs."
@@ -11280,15 +11341,15 @@ msgstr ""
 "Dans un environnement standard en production, nul besoin de déplacer les "
 "adresses de votre site."
 
-#: free/modules/wordpress-core/settings/wp-config.php:100
+#: free/modules/wordpress-core/settings/wp-config.php:97
 msgid "Yes, prevent my site and home URLs from being relocated"
 msgstr "Oui, empêcher les adresses du site d’être déménagées"
 
-#: free/modules/wordpress-core/settings/wp-config.php:118
+#: free/modules/wordpress-core/settings/wp-config.php:113
 msgid "File editing"
 msgstr "Édition des fichiers"
 
-#: free/modules/wordpress-core/settings/wp-config.php:119
+#: free/modules/wordpress-core/settings/wp-config.php:114
 msgid ""
 "Nobody (not even administrators) should have the ability to edit plugin and "
 "theme files directly within the WordPress administration area."
@@ -11297,11 +11358,11 @@ msgstr ""
 "éditer les fichiers des extensions et thèmes directement depuis l‘interface "
 "de WordPress."
 
-#: free/modules/wordpress-core/settings/wp-config.php:124
+#: free/modules/wordpress-core/settings/wp-config.php:119
 msgid "Yes, disable the file editor"
 msgstr "Oui, désactiver l’éditeur de fichiers"
 
-#: free/modules/wordpress-core/settings/wp-config.php:143
+#: free/modules/wordpress-core/settings/wp-config.php:137
 msgid ""
 "Nobody (not even administrators) should be allowed to upload any type of "
 "file."
@@ -11309,15 +11370,15 @@ msgstr ""
 "Personne (pas même les responsables de l’administration) ne devrait pouvoir "
 "téléverser n’importe quels types de fichiers."
 
-#: free/modules/wordpress-core/settings/wp-config.php:148
+#: free/modules/wordpress-core/settings/wp-config.php:142
 msgid "Yes, filter file uploads"
 msgstr "Oui, filtrer les téléversements"
 
-#: free/modules/wordpress-core/settings/wp-config.php:166
+#: free/modules/wordpress-core/settings/wp-config.php:159
 msgid "Database Errors"
 msgstr "Erreur de base de données"
 
-#: free/modules/wordpress-core/settings/wp-config.php:167
+#: free/modules/wordpress-core/settings/wp-config.php:160
 msgid ""
 "Database errors shouldn’t be displayed on front-office to prevent attackers "
 "from accessing your database hostname, prefix, or table names."
@@ -11325,15 +11386,15 @@ msgstr ""
 "Les erreurs de base de données ne devraient pas s’afficher sur le front-"
 "office pour empêcher les attaques de lire votre hôte, préfixe, ou tables."
 
-#: free/modules/wordpress-core/settings/wp-config.php:172
+#: free/modules/wordpress-core/settings/wp-config.php:165
 msgid "Yes, hide any database details on front-office"
 msgstr "Oui, cacher toute erreur de base de données en front-office"
 
-#: free/modules/wordpress-core/settings/wp-config.php:190
+#: free/modules/wordpress-core/settings/wp-config.php:182
 msgid "Repairing Database"
 msgstr "Réparation de la base de données"
 
-#: free/modules/wordpress-core/settings/wp-config.php:191
+#: free/modules/wordpress-core/settings/wp-config.php:183
 msgid ""
 "In a standard production environment, your repair page should not be "
 "accessible."
@@ -11341,7 +11402,7 @@ msgstr ""
 "Dans un environnement standard en production, votre page de réparation ne "
 "devrait pas être disponible."
 
-#: free/modules/wordpress-core/settings/wp-config.php:196
+#: free/modules/wordpress-core/settings/wp-config.php:188
 #, php-format
 msgid ""
 "Yes, make the <a href=\"%s\" target=\"_blank\">Database Repair Page</a> "
@@ -11350,11 +11411,11 @@ msgstr ""
 "Oui, rendre la <a href=\"%s\" target=\"_blank\">Page de réparation de BDD</"
 "a> inaccessible"
 
-#: free/modules/wordpress-core/settings/wp-config.php:213
+#: free/modules/wordpress-core/settings/wp-config.php:204
 msgid "WordPress Cookie Default Name"
 msgstr "Nom par défaut du Cookie de WordPress"
 
-#: free/modules/wordpress-core/settings/wp-config.php:214
+#: free/modules/wordpress-core/settings/wp-config.php:205
 msgid ""
 "Every WordPress cookie contains a unique string, which can be guessed for "
 "any site. It‘s important not to reveal yours, as this makes it harder for "
@@ -11364,31 +11425,31 @@ msgstr ""
 "tous les sites. Ne révélez pas les vôtres, ce sera plus difficile pour "
 "certaines attaques de cibler cotre site."
 
-#: free/modules/wordpress-core/settings/wp-config.php:219
+#: free/modules/wordpress-core/settings/wp-config.php:210
 msgid "Yes, change the default value of the cookie to something random"
 msgstr "Oui, changer la valeur par défaut du cookie par une chaine aléatoire"
 
-#: free/modules/wordpress-core/settings/wp-config.php:224
+#: free/modules/wordpress-core/settings/wp-config.php:215
 msgid "[a random string]"
 msgstr "[chaine aléatoire]"
 
-#: free/modules/wordpress-core/settings/wp-config.php:228
+#: free/modules/wordpress-core/settings/wp-config.php:219
 msgid "Deactivating this module may require you to log back in."
 msgstr "La désactivation de ce module peut nécessiter une reconnexion."
 
-#: free/modules/wordpress-core/settings/wp-config.php:242
+#: free/modules/wordpress-core/settings/wp-config.php:231
 msgid "WordPress Security Keys"
 msgstr "Clés de sécurité WordPress"
 
-#: free/modules/wordpress-core/settings/wp-config.php:243
+#: free/modules/wordpress-core/settings/wp-config.php:232
 msgid "Create tamper-proof security keys for your installation."
 msgstr "Crée des clés de sécurité inviolables pour votre installation."
 
-#: free/modules/wordpress-core/settings/wp-config.php:248
+#: free/modules/wordpress-core/settings/wp-config.php:237
 msgid "Yes, create secure keys for my installation"
 msgstr "Oui, créer des clés sécurisées pour mon installation"
 
-#: free/modules/wordpress-core/settings/wp-config.php:253
+#: free/modules/wordpress-core/settings/wp-config.php:242
 #, php-format
 msgid ""
 "<strong>8 constants</strong> will be created in a must-use plugin, replacing "
@@ -11398,19 +11459,19 @@ msgstr ""
 "(mu-plugin) et celles dans votre fichier <code>%s</code> et base de données "
 "seront supprimées."
 
-#: free/modules/wordpress-core/settings/wp-config.php:257
+#: free/modules/wordpress-core/settings/wp-config.php:246
 msgid "Deactivating this module may require to log back in."
 msgstr "La désactivation de ce module peut nécessiter une reconnexion."
 
-#: free/modules/wordpress-core/settings/wp-config.php:268
+#: free/modules/wordpress-core/settings/wp-config.php:257
 msgid "Regenerate Secure Keys"
 msgstr "Regénérer des clés de sécurité"
 
-#: free/modules/wordpress-core/settings/wp-config.php:271
+#: free/modules/wordpress-core/settings/wp-config.php:260
 msgid "Regenerate the secure keys"
 msgstr "Générer de nouvelles clés de sécurité"
 
-#: free/modules/wordpress-core/settings/wp-config.php:279
+#: free/modules/wordpress-core/settings/wp-config.php:268
 #, php-format
 msgid ""
 "These options are disabled because the %1$s file is not writable. Please "
@@ -12103,12 +12164,12 @@ msgstr ""
 "version de %1$s. Le minimum requis est : <code>%2$s</code>. Merci de mettre "
 "à jour l‘extension en premier."
 
-#: pro/common.php:100
+#: pro/common.php:101
 #, php-format
 msgid "Empty content data from API with format %s."
 msgstr "Contenu des données de l‘API vide au format %s."
 
-#: pro/common.php:112
+#: pro/common.php:114
 #, php-format
 msgid ""
 "Undefined file format when downloading from API: %s<br>Expected ZIP or JSON."
@@ -12116,12 +12177,12 @@ msgstr ""
 "Format de fichier non défini après le téléchargement depuis l'API : "
 "%s<br>Attendu ZIP ou JSON."
 
-#: pro/common.php:120
+#: pro/common.php:122
 #, php-format
 msgid "The malware database file have been updated to version %s."
 msgstr "La base de virus a été mise à jour en version %s."
 
-#: pro/common.php:132
+#: pro/common.php:134
 #, php-format
 msgid ""
 "An error occurred while reading the malware database version. Please open a "
@@ -12130,7 +12191,7 @@ msgstr ""
 "Une erreur est survenue lors de la lecture de la version de la base de "
 "virus. Merci de créer un %sticket de support%s"
 
-#: pro/common.php:151
+#: pro/common.php:153
 msgid "Once Weekly"
 msgstr "Une fois par semaine"
 
@@ -12390,7 +12451,7 @@ msgctxt "verb"
 msgid "Download"
 msgstr "Télécharger"
 
-#: pro/modules/file-system/callbacks.php:143
+#: pro/modules/file-system/callbacks.php:145
 msgid ""
 "The differences can’t be displayed, the whole file will be displayed instead."
 msgstr ""
@@ -13934,6 +13995,13 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#~ msgid ""
+#~ "It seems you have a PHP session issue, this module will not work "
+#~ "correctly. There is nothing we can do here."
+#~ msgstr ""
+#~ "Il semble que vous ayez un problème de session PHP, ce module ne "
+#~ "fonctionnera pas correctement. Il n‘y a rien que nous puissions faire ici."
 
 #~ msgid ""
 #~ "Your installation may contain old or closed plugins. The PRO version will "

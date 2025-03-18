@@ -412,19 +412,19 @@ function secupress_email_domain_is_same( $email ) {
 function secupress_get_emojiset( $set = 'random' ) {
 	$sets              = [];
 
-	$sets['numbers']   = [ '1️⃣' => __( 'One', 'secupress' ),   '2️⃣' => __( 'Two', 'secupress' ),    '3️⃣' => __( 'Three', 'secupress' ),  '4️⃣' => __( 'Four', 'secupress' ),    '5️⃣' => __( 'Five', 'secupress' )   ];
-	$sets['maths']     = [ '➕' => __( 'Plus', 'secupress' ),  '➖' => __( 'Minus', 'secupress' ),  '✖️' => __( 'Times', 'secupress' ),  '➗' => __( 'Divided', 'secupress' ), '🟰' => __( 'Equal', 'secupress' )  ];
-	$sets['game']      = [ '♠️' => __( 'Spade', 'secupress' ), '♣️' => __( 'Clover', 'secupress' ), '♥️' => __( 'Heart', 'secupress' ),  '♦️' => __( 'Diamond', 'secupress' ), '◼️' => __( 'Square', 'secupress' ) ];
-	$sets['animals']   = [ '🐶' => __( 'Dog', 'secupress' ),   '🐱' => __( 'Cat', 'secupress' ),    '🐵' => __( 'Monkey', 'secupress' ), '🐷' => __( 'Pig', 'secupress' ),     '🦁' => __( 'Lion', 'secupress' )   ];
-	$sets['nature']    = [ '🌳' => __( 'Tree', 'secupress' ),  '🪵' => __( 'Logs', 'secupress' ),   '🍀' => __( 'Clover', 'secupress' ), '🍁' => __( 'Leaf', 'secupress' ),    '🌸' => __( 'Flower', 'secupress' ) ];
-	$sets['fruits']    = [ '🍎' => __( 'Apple', 'secupress' ), '🍌' => __( 'Banana', 'secupress' ), '🍋' => __( 'Lemon', 'secupress' ),  '🍇' => __( 'Grapes', 'secupress' ),  '🥝' => __( 'Kiwi', 'secupress' )   ];
-	$sets['vegeta']    = [ '🌶️' => __( 'Chili', 'secupress' ), '🥕' => __( 'Carrot', 'secupress' ), '🌽' => __( 'Corn', 'secupress' ),   '🥑' => __( 'Avocado', 'secupress' ), '🍅' => __( 'Tomato', 'secupress' ) ];
-	$sets['chars']     = [ '🤖' => __( 'Robot', 'secupress' ), '🤡' => __( 'Clown', 'secupress' ),  '👻' => __( 'Ghost', 'secupress' ),  '👽' => __( 'Alien', 'secupress' ),   '💩' => __( 'Poo', 'secupress' )    ];
-	$sets['food']      = [ '🍞' => __( 'Bread', 'secupress' ), '🧀' => __( 'Cheese', 'secupress' ), '🥩' => __( 'Steak', 'secupress' ),  '🧈' => __( 'Butter', 'secupress' ),  '🥗' => __( 'Salad', 'secupress' )  ];
-	$sets['ffood']     = [ '🌮' => __( 'Taco', 'secupress' ),  '🌭' => __( 'Hotdog', 'secupress' ), '🍕' => __( 'Pizza', 'secupress' ),  '🍔' => __( 'Burger', 'secupress' ),  '🍟' => __( 'Fries', 'secupress' )  ];
-	$sets['space']     = [ '🌍' => __( 'Earth', 'secupress' ), '✨' => __( 'Stars', 'secupress' ),  '🌜' => __( 'Moon', 'secupress' ),   '☀️' => __( 'Sun', 'secupress' ),     '☄️' => __( 'Comet', 'secupress' )  ];
-	$sets['objects']   = [ '🎩' => __( 'Hat', 'secupress' ),   '👋' => __( 'Hand', 'secupress' ),   '👁️' => __( 'Eye', 'secupress' ),    '👓' => __( 'Glasses', 'secupress' ), '🚗' => __( 'Car', 'secupress' )    ];
-	$sets['objects2']  = [ '🏠' => __( 'House', 'secupress' ), '🎹' => __( 'Piano', 'secupress' ),  '⚽️' => __( 'Ball', 'secupress' ),   '🍪' => __( 'Cookie', 'secupress' ),  '⭐️' => __( 'Star', 'secupress' )   ];
+	$sets['numbers']   = [ '1️⃣' => _x( 'One', 'emoji', 'secupress' ),   '2️⃣' => _x( 'Two', 'emoji', 'secupress' ),    '3️⃣' => _x( 'Three', 'emoji', 'secupress' ),  '4️⃣' => _x( 'Four', 'emoji', 'secupress' ),    '5️⃣' => _x( 'Five', 'emoji', 'secupress' )   ];
+	$sets['maths']     = [ '➕' => _x( 'Plus', 'emoji', 'secupress' ),  '➖' => _x( 'Minus', 'emoji', 'secupress' ),  '✖️' => _x( 'Times', 'emoji', 'secupress' ),  '➗' => _x( 'Divided', 'emoji', 'secupress' ), '🟰' => _x( 'Equal', 'emoji', 'secupress' )  ];
+	$sets['game']      = [ '♠️' => _x( 'Spade', 'emoji', 'secupress' ), '♣️' => _x( 'Clover', 'emoji', 'secupress' ), '♥️' => _x( 'Heart', 'emoji', 'secupress' ),  '♦️' => _x( 'Diamond', 'emoji', 'secupress' ), '◼️' => _x( 'Square', 'emoji', 'secupress' ) ];
+	$sets['animals']   = [ '🐶' => _x( 'Dog', 'emoji', 'secupress' ),   '🐱' => _x( 'Cat', 'emoji', 'secupress' ),    '🐵' => _x( 'Monkey', 'emoji', 'secupress' ), '🐷' => _x( 'Pig', 'emoji', 'secupress' ),     '🦁' => _x( 'Lion', 'emoji', 'secupress' )   ];
+	$sets['nature']    = [ '🌳' => _x( 'Tree', 'emoji', 'secupress' ),  '🪵' => _x( 'Logs', 'emoji', 'secupress' ),   '🍀' => _x( 'Clover', 'emoji', 'secupress' ), '🍁' => _x( 'Leaf', 'emoji', 'secupress' ),    '🌸' => _x( 'Flower', 'emoji', 'secupress' ) ];
+	$sets['fruits']    = [ '🍎' => _x( 'Apple', 'emoji', 'secupress' ), '🍌' => _x( 'Banana', 'emoji', 'secupress' ), '🍋' => _x( 'Lemon', 'emoji', 'secupress' ),  '🍇' => _x( 'Grapes', 'emoji', 'secupress' ),  '🥝' => _x( 'Kiwi', 'emoji', 'secupress' )   ];
+	$sets['vegeta']    = [ '🌶️' => _x( 'Chili', 'emoji', 'secupress' ), '🥕' => _x( 'Carrot', 'emoji', 'secupress' ), '🌽' => _x( 'Corn', 'emoji', 'secupress' ),   '🥑' => _x( 'Avocado', 'emoji', 'secupress' ), '🍅' => _x( 'Tomato', 'emoji', 'secupress' ) ];
+	$sets['chars']     = [ '🤖' => _x( 'Robot', 'emoji', 'secupress' ), '🤡' => _x( 'Clown', 'emoji', 'secupress' ),  '👻' => _x( 'Ghost', 'emoji', 'secupress' ),  '👽' => _x( 'Alien', 'emoji', 'secupress' ),   '💩' => _x( 'Poo', 'emoji', 'secupress' )    ];
+	$sets['food']      = [ '🍞' => _x( 'Bread', 'emoji', 'secupress' ), '🧀' => _x( 'Cheese', 'emoji', 'secupress' ), '🥩' => _x( 'Steak', 'emoji', 'secupress' ),  '🧈' => _x( 'Butter', 'emoji', 'secupress' ),  '🥗' => _x( 'Salad', 'emoji', 'secupress' )  ];
+	$sets['ffood']     = [ '🌮' => _x( 'Taco', 'emoji', 'secupress' ),  '🌭' => _x( 'Hotdog', 'emoji', 'secupress' ), '🍕' => _x( 'Pizza', 'emoji', 'secupress' ),  '🍔' => _x( 'Burger', 'emoji', 'secupress' ),  '🍟' => _x( 'Fries', 'emoji', 'secupress' )  ];
+	$sets['space']     = [ '🌍' => _x( 'Earth', 'emoji', 'secupress' ), '✨' => _x( 'Stars', 'emoji', 'secupress' ),  '🌜' => _x( 'Moon', 'emoji', 'secupress' ),   '☀️' => _x( 'Sun', 'emoji', 'secupress' ),     '☄️' => _x( 'Comet', 'emoji', 'secupress' )  ];
+	$sets['objects']   = [ '🎩' => _x( 'Hat', 'emoji', 'secupress' ),   '👋' => _x( 'Hand', 'emoji', 'secupress' ),   '👁️' => _x( 'Eye', 'emoji', 'secupress' ),    '👓' => _x( 'Glasses', 'emoji', 'secupress' ), '🚗' => _x( 'Car', 'emoji', 'secupress' )    ];
+	$sets['objects2']  = [ '🏠' => _x( 'House', 'emoji', 'secupress' ), '🎹' => _x( 'Piano', 'emoji', 'secupress' ),  '⚽️' => _x( 'Ball', 'emoji', 'secupress' ),   '🍪' => _x( 'Cookie', 'emoji', 'secupress' ),  '⭐️' => _x( 'Star', 'emoji', 'secupress' )   ];
 	
 	$sets  = apply_filters( 'secupress.plugins.emojisets', $sets );
 
