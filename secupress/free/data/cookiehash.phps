@@ -11,10 +11,10 @@
 
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-define( 'SECUPRESS_COOKIEHASH_MODULE_ACTIVE', true );
-
 if ( ! get_site_option( 'secupress_active_submodule_wp-config-constant-cookiehash' ) || defined( 'COOKIEHASH' ) ) {
 	return;
 }
+
+define( 'SECUPRESS_COOKIEHASH_MODULE_ACTIVE', true );
 
 define( 'COOKIEHASH', md5( __FILE__ . '{{HASH}}' ) );

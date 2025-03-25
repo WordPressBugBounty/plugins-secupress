@@ -28,7 +28,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, disable concatenated scripts to prevent server overload', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $active && defined( 'CONCATENATE_SCRIPTS' ) && ! CONCATENATE_SCRIPTS ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'CONCATENATE_SCRIPTS' ) && ! CONCATENATE_SCRIPTS && ! secupress_marker_exists_in_wpconfig( 'script_concat' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -50,7 +50,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, prevent core upgrades from downloading unnecessary bundled items', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $active && defined( 'CORE_UPGRADE_SKIP_NEW_BUNDLED' ) && CORE_UPGRADE_SKIP_NEW_BUNDLED ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'CORE_UPGRADE_SKIP_NEW_BUNDLED' ) && CORE_UPGRADE_SKIP_NEW_BUNDLED && ! secupress_marker_exists_in_wpconfig( 'skip_bundle' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -72,7 +72,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, prevent my site from displaying errors', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_DEBUG' ) && ! WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && ! WP_DEBUG_DISPLAY ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_DEBUG' ) && ! WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && ! WP_DEBUG_DISPLAY && ! secupress_marker_exists_in_wpconfig( 'debugging' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -95,7 +95,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, prevent my site and home URLs from being relocated', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'RELOCATE' ) && ! RELOCATE && defined( 'WP_SITEURL' ) && get_site_url() === WP_SITEURL && defined( 'WP_HOME' ) && get_home_url() === WP_HOME ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'RELOCATE' ) && ! RELOCATE && defined( 'WP_SITEURL' ) && get_site_url() === WP_SITEURL && defined( 'WP_HOME' ) && get_home_url() === WP_HOME && ! secupress_marker_exists_in_wpconfig( 'locations' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -117,7 +117,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, disable the file editor', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT && ! secupress_marker_exists_in_wpconfig( 'file_edit' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -140,7 +140,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, filter file uploads', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'ALLOW_UNFILTERED_UPLOADS' ) && ! ALLOW_UNFILTERED_UPLOADS ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'ALLOW_UNFILTERED_UPLOADS' ) && ! ALLOW_UNFILTERED_UPLOADS && ! secupress_marker_exists_in_wpconfig( 'unfiltered_uploads' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -163,7 +163,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, hide any database details on front-office', 'secupress' ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DIEONDBERROR' ) && ! DIEONDBERROR ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DIEONDBERROR' ) && ! DIEONDBERROR && ! secupress_marker_exists_in_wpconfig( 'dieondberror' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -186,7 +186,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => sprintf( __( 'Yes, make the <a href="%s" target="_blank">Database Repair Page</a> inaccessible', 'secupress' ), admin_url( 'maint/repair.php' ) ),
-	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_ALLOW_REPAIR' ) && ! WP_ALLOW_REPAIR ),
+	'disabled'          => ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_ALLOW_REPAIR' ) && ! WP_ALLOW_REPAIR && ! secupress_marker_exists_in_wpconfig( 'repair' ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
@@ -208,7 +208,7 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, change the default value of the cookie to something random', 'secupress' ),
-	'disabled'          => ! $mu_is_writable || ( ! $is_after_save && ! $active && defined( 'COOKIEHASH' ) && md5( get_site_option( 'siteurl' ) ) !== COOKIEHASH ),
+	'disabled'          => ! $mu_is_writable || ( ! $is_after_save && ! $active && defined( 'COOKIEHASH' ) && md5( get_site_option( 'siteurl' ) ) !== COOKIEHASH && ( ! secupress_muplugin_exists( 'cookiehash' ) && ! defined( 'SECUPRESS_COOKIEHASH_MODULE_ACTIVE' ) ) ),
 	'helpers'           => array(
 		array(
 			'type'        => 'description',

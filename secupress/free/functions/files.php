@@ -261,6 +261,59 @@ function secupress_is_wpconfig_writable( $context = '' ) {
 	return wp_is_writable( $wpconfig_filepath ) ? $wpconfig_filepath : false;
 }
 
+/**
+ * Check if a given muplugin is present in mu-plugins/ folder
+ *
+ * @since 2.3.7
+ * @author Julio Potier
+ * 
+ * @param (string) $filename_part
+ * 
+ * @return (bool) 
+ **/
+function secupress_muplugin_exists( $filename_part ) {
+	static $filename_parts;
+
+	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
+		return false;
+	}
+	if ( ! isset( $filename_parts ) ) {
+		$filename_parts = [];
+	}
+	$found_files = glob( WPMU_PLUGIN_DIR . "/{_secupress_{$filename_part}*,(secupress_{$filename_part}*}.php", GLOB_BRACE );
+
+	$filename_parts[ $filename_part ] = ! empty( $found_files );
+
+	return $filename_parts[ $filename_part ];
+
+}
+
+/**
+ * Check if a given marker is present in wpconfig file
+ *
+ * @since 2.3.7
+ * @author Julio Potier
+ * 
+ * @param (string) $marker
+ * 
+ * @return (bool) 
+ **/
+function secupress_marker_exists_in_wpconfig( $marker ) {
+	static $file_content   = '';
+
+	$wpconfig_filepath = secupress_is_wpconfig_writable();
+
+	if ( ! $wpconfig_filepath ) {
+		return false;
+	}
+
+	$filesystem       = secupress_get_filesystem();
+	if ( ! $file_content ) {
+		$file_content = $filesystem->get_contents( $wpconfig_filepath );
+	}
+
+	return preg_match( "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", $file_content );
+}
 
 /**
  * Comment a constant definition in the `wp-config.php` file (or any other file).
@@ -278,7 +331,8 @@ function secupress_is_wpconfig_writable( $context = '' ) {
  * @return (bool)
  */
 function secupress_comment_constant( $constant, $wpconfig_filepath = false, $marker = false ) {
-	static $file_content = '';
+	static $file_content   = '';
+
 	if ( ! $wpconfig_filepath ) {
 		$wpconfig_filepath = secupress_is_wpconfig_writable();
 
@@ -287,7 +341,7 @@ function secupress_comment_constant( $constant, $wpconfig_filepath = false, $mar
 		}
 	}
 
-	$filesystem   = secupress_get_filesystem();
+	$filesystem       = secupress_get_filesystem();
 	if ( ! $file_content ) {
 		$file_content = $filesystem->get_contents( $wpconfig_filepath );
 	}
@@ -519,7 +573,7 @@ function secupress_replace_content( $file, $old_content, $new_content, $skip_san
 		return false;
 	}
 
-	$filesystem = secupress_get_filesystem();
+	$filesystem   = secupress_get_filesystem();
 	if ( ! $file_content ) {
 		$file_content = $filesystem->get_contents( $file );
 	}

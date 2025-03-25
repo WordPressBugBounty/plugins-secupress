@@ -576,10 +576,12 @@ add_filter( 'register_url', 'secupress_register_url_redirect' );
 /**
  * Fordib the redirection on the registration URL if not logged-in, you have to know the correct new page
  *
- * @param (string) $url The register_url from WP.
  * @since 1.4
- * @return (string) $url
  * @author Julio Potier
+ * 
+ * @param (string) $url The register_url from WP.
+ * 
+ * @return (string) $url
  **/
 function secupress_register_url_redirect( $url ) {
 	if ( ! is_user_logged_in() ) {
@@ -589,4 +591,26 @@ function secupress_register_url_redirect( $url ) {
 		}
 	}
 	return $url;
+}
+
+add_filter( 'wp_login_errors', 'secupress_register_errors' );
+/**
+ * Only displays the error and not the login form, seriously WP...
+ *
+ * @since 2.3.7
+ * @author Julio Potier
+ * 
+ * @param (WP_Error) $errors
+ * @return (WP_Error) $errors
+ **/
+function secupress_register_errors( $errors ) {
+	if ( isset( $_REQUEST['action'] ) && 'registration_disabled' === $_REQUEST['action'] ) {
+		if ( isset( $_REQUEST['reauth'] ) ) {
+			wp_clear_auth_cookie();
+		}
+		login_header( __( 'Log In', 'secupress' ), '', $errors );
+		login_footer();
+		die();
+	}
+	return $errors;
 }

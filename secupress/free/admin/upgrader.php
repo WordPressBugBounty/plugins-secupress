@@ -242,11 +242,6 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 
 		secupress_remove_old_plugin_file( SECUPRESS_MODULES_PATH . 'addons/settings/backup.php' ); // Deleted settings.
 
-		if ( secupress_has_pro() ) {
-			secupress_remove_old_plugin_file( SECUPRESS_PRO_MODULES_PATH . 'file-system/plugins/bad-file-extensions.php' );
-		}
-		
-
 		if ( secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-dieondberror' ) ) { // We need to create the dropin file
 			secupress_deactivate_submodule( 'wordpress-core', 'wp-config-constant-dieondberror' );
 			secupress_activate_submodule( 'wordpress-core', 'wp-config-constant-dieondberror' );
@@ -309,6 +304,18 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 		$api_key_content = str_replace( base64_encode( SECUPRESS_WEB_MAIN ), base64_encode( home_url() ), $api_key_content );
 		$filesystem->put_contents( SECUPRESS_PATH . 'defines.php', $api_key_content, FS_CHMOD_FILE );
 
+	}
+	// < 2.3.7
+	if ( version_compare( $actual_version, '2.3.7', '<' ) ) {
+		$value = secupress_get_module_option( 'bbq-headers_user-agents-list', secupress_firewall_bbq_headers_user_agents_list_default(), 'firewall' );
+		$value = str_replace( 'c99, ', '', $value );
+		secupress_update_module_option( 'bbq-headers_user-agents-list', $value, 'firewall' );
+
+		// Rewrite the new htaccess rules to allow sandbox requests
+		if ( secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' ) ) {
+			secupress_deactivate_submodule( 'sensitive-data', 'bad-url-access' );
+			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
+		}
 	}
 }
 
