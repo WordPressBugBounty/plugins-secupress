@@ -317,6 +317,14 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 		}
 	}
+	// < 2.3.8
+	if ( version_compare( $actual_version, '2.3.8', '<' ) ) {
+		// Rewrite the new htaccess rules to allow sandbox requests, again
+		if ( secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' ) ) {
+			secupress_deactivate_submodule( 'sensitive-data', 'bad-url-access' );
+			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
+		}
+	}
 }
 
 

@@ -107,16 +107,20 @@ function secupress_get_not_installed_plugins_list( $type = '' ) {
 		return [];
 	}
 
-	$ins_plugins    = get_site_option( SECUPRESS_INSTALLED_PLUGINS );
-	$mus_plugins    = _secupress_get_not_installed_muplugins_list();
+	$ins_plugins     = get_site_option( SECUPRESS_INSTALLED_PLUGINS );
+	if ( ! $ins_plugins ) {
+		$ins_plugins = [];
+	}
+
+	$mus_plugins     = _secupress_get_not_installed_muplugins_list();
 	if ( ! $ins_plugins && ! $mus_plugins ) {
 		return [];
 	}
-	$plugins        = [];
-	$get_plugins    = get_plugins();
-	$plugins['all'] = array_diff_key( $get_plugins, $ins_plugins );
+	$plugins         = [];
+	$get_plugins     = get_plugins();
+	$plugins['all']  = array_diff_key( $get_plugins, $ins_plugins );
 
-	$plugins['mu']  = $mus_plugins;
+	$plugins['mu']   = $mus_plugins;
 
 	if ( isset( $plugins[ $type ] ) ) {
 		return $plugins[ $type ];

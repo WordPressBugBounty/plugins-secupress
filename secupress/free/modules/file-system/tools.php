@@ -4,6 +4,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * Get file extensions that are allowed in the uploads folder.
  *
+ * @since 2.3.8 xml, xls
  * @since 2.2.6
  * @author Julio Potier
  *
@@ -25,6 +26,8 @@ function secupress_get_allowed_extensions() {
 	$exts['svg']      = 1;
 	$exts['md']       = 1;
 	$exts['log']      = 1;
+	$exts['xml']      = 1; // sitemaps
+	$exts['xsl']      = 1; // sitemaps
 	/**
 	* Filter the allowed extensions for the module "bad file extentions"
 	* @param (string) $exts

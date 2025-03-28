@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-03-18 15:53+0100\n"
-"PO-Revision-Date: 2025-03-18 15:59+0100\n"
+"POT-Creation-Date: 2025-03-28 10:24+0100\n"
+"PO-Revision-Date: 2025-03-28 10:25+0100\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -1550,7 +1550,7 @@ msgctxt "hidden text"
 msgid "Give us five stars"
 msgstr "Donnez nous les 5 étoiles"
 
-#: free/admin/upgrader.php:271
+#: free/admin/upgrader.php:266
 msgid ""
 "The modules for `No Theme Activation`, `No Theme Deletion` have been "
 "consolidated into the `No Theme Actions` module."
@@ -1558,7 +1558,7 @@ msgstr ""
 "Les modules `Activation des thèmes`, `Suppression des thèmes` ont été "
 "consolidés dans le module `Actions sur les thèmes`."
 
-#: free/admin/upgrader.php:298
+#: free/admin/upgrader.php:293
 msgid ""
 "The modules for `No Plugin Activation`, `No Plugin Deactivation`, and `No "
 "Plugin Deletion` have been consolidated into the `No Plugin Actions` module."
@@ -1566,66 +1566,66 @@ msgstr ""
 "Les modules `Activation des extensions`, `Suppression des extensions` ont "
 "été consolidés dans le module `Actions sur les extensions`."
 
-#: free/admin/upgrader.php:375
+#: free/admin/upgrader.php:390
 msgid "Plugin Installation"
 msgstr "Nombre d’installations"
 
-#: free/admin/upgrader.php:504
+#: free/admin/upgrader.php:519
 msgid "Full Changelog"
 msgstr "Changelog complet"
 
-#: free/admin/upgrader.php:512
+#: free/admin/upgrader.php:527
 msgid "Install Update Now"
 msgstr "Installer la mise à jour"
 
-#: free/admin/upgrader.php:516
+#: free/admin/upgrader.php:531
 msgid "Get SecuPress Pro Now!"
 msgstr "Obtenez SecuPress Pro !"
 
-#: free/admin/upgrader.php:523
+#: free/admin/upgrader.php:538
 msgid "Requires WordPress Version:"
 msgstr "Requiert WordPress version :"
 
-#: free/admin/upgrader.php:525 free/admin/upgrader.php:528
+#: free/admin/upgrader.php:540 free/admin/upgrader.php:543
 #, php-format
 msgid "%s or higher"
 msgstr "%s ou plus"
 
-#: free/admin/upgrader.php:531 free/modules/addons/tools.php:151
+#: free/admin/upgrader.php:546 free/modules/addons/tools.php:151
 msgid "Compatible up to:"
 msgstr "Compatible jusque :"
 
-#: free/admin/upgrader.php:534
+#: free/admin/upgrader.php:549
 msgid "Active Installations:"
 msgstr "Installation actives :"
 
-#: free/admin/upgrader.php:537 free/modules/addons/tools.php:40
+#: free/admin/upgrader.php:552 free/modules/addons/tools.php:40
 msgctxt "Active plugin installations"
 msgid "1+ Million"
 msgstr "1+ million d'"
 
-#: free/admin/upgrader.php:539
+#: free/admin/upgrader.php:554
 msgctxt "Active plugin installations"
 msgid "Less Than 10"
 msgstr "Moins de 10"
 
-#: free/admin/upgrader.php:544
+#: free/admin/upgrader.php:559
 msgid "Average Rating"
 msgstr "Note moyenne"
 
-#: free/admin/upgrader.php:546
+#: free/admin/upgrader.php:561
 #, php-format
 msgid "(based on %s rating)"
 msgid_plural "(based on %s ratings)"
 msgstr[0] "(basée sur %s vote)"
 msgstr[1] "(basée sur %s votes)"
 
-#: free/admin/upgrader.php:572
+#: free/admin/upgrader.php:587
 #, php-format
 msgid "What’s new in SecuPress %s"
 msgstr "Quoi de neuf dans SecuPress %s"
 
-#: free/admin/upgrader.php:573
+#: free/admin/upgrader.php:588
 msgid "Or read full changelog on secupress.me"
 msgstr "Ou lisez tout le journal des modifications sur secupress.me"
 
@@ -5168,7 +5168,7 @@ msgstr[1] "%s autres"
 #: free/classes/scanners/class-secupress-scan.php:1139
 #: free/classes/scanners/class-secupress-scan.php:1145
 #: free/classes/scanners/class-secupress-scan.php:1151
-#: free/functions/files.php:584
+#: free/functions/files.php:638
 msgid "The temporary directory could not be created."
 msgstr "Le dossier temporaire n’a pu être créé."
 
@@ -5591,6 +5591,7 @@ msgstr "Lien de déverrouillage expiré."
 #: free/modules/users-login/plugins/stop-user-enumeration.php:94
 #: free/modules/wordpress-core/plugins/wp-config-constant-repair.php:44
 #: pro/admin/ajax-post-callbacks.php:22
+#: pro/modules/users-login/plugins/password-expiration.php:148
 #: pro/modules/users-login/plugins/sessions-control.php:395
 #: pro/modules/users-login/plugins/sessions-control.php:434
 #: pro/modules/users-login/plugins/sessions-control.php:518
@@ -5952,11 +5953,11 @@ msgstr "Extension indispensable"
 msgid "drop-in"
 msgstr "drop-in"
 
-#: free/functions/files.php:590
+#: free/functions/files.php:644
 msgid "The temporary file could not be created."
 msgstr "Le fichier temporaire n’a pu être créé."
 
-#: free/functions/files.php:1101
+#: free/functions/files.php:1155
 msgid "Could not create temporary file."
 msgstr "Impossible de créer le fichier temporaire."
 
@@ -8824,47 +8825,47 @@ msgstr ""
 "Oui, <strong>restreindre</strong> toute mise à jour de thèmes, extensions, "
 "traductions et cœur de WordPress en forçant l’utilisation du FTP"
 
-#: free/modules/plugins-themes/tools.php:426
+#: free/modules/plugins-themes/tools.php:430
 msgid "Themes & Plugins Upload Disabled"
 msgstr "Téléversement des thèmes et extensions désactivé"
 
-#: free/modules/plugins-themes/tools.php:429
+#: free/modules/plugins-themes/tools.php:433
 msgid "Direct File Writing (direct)"
 msgstr "Écriture directe des fichiers (direct)"
 
-#: free/modules/plugins-themes/tools.php:430
+#: free/modules/plugins-themes/tools.php:434
 msgid "Secure Shell 2 (ssh2)"
 msgstr "Shell Sécurisé v2 (ssh2)"
 
-#: free/modules/plugins-themes/tools.php:431
+#: free/modules/plugins-themes/tools.php:435
 msgid "File Transfert Protocol Extension (ftpext)"
 msgstr "Protocole de Transfert de Fichiers (ftpext)"
 
-#: free/modules/plugins-themes/tools.php:432
+#: free/modules/plugins-themes/tools.php:436
 msgid "File Transfert Protocol with Sockets (ftpsockets)"
 msgstr "Protocole de Transfert de Fichiers avec Sockets (ftpsockets)"
 
-#: free/modules/plugins-themes/tools.php:530
+#: free/modules/plugins-themes/tools.php:534
 msgid "Clear (de)activation attempts"
 msgstr "Nettoyer les tentatives de (dés)activation"
 
-#: free/modules/plugins-themes/tools.php:533
+#: free/modules/plugins-themes/tools.php:537
 msgid "Clear deleted plugins"
 msgstr "Nettoyer les extensions supprimées"
 
-#: free/modules/plugins-themes/tools.php:628
+#: free/modules/plugins-themes/tools.php:632
 msgid "Download Failed from wp.org"
 msgstr "Échec de téléchargement depuis wp.prg"
 
-#: free/modules/plugins-themes/tools.php:629
+#: free/modules/plugins-themes/tools.php:633
 msgid "Plugin Error on wp.org"
 msgstr "Erreur dans l‘extension sur wp.org"
 
-#: free/modules/plugins-themes/tools.php:630
+#: free/modules/plugins-themes/tools.php:634
 msgid "Plugin Not Found on wp.org"
 msgstr "Extension non trouvée sur wp.org"
 
-#: free/modules/plugins-themes/tools.php:672
+#: free/modules/plugins-themes/tools.php:676
 #, php-format
 msgid "Plugin reinstallation results: %s"
 msgstr "Résultats de la réinstallation des extensions÷ %s"
@@ -9268,16 +9269,16 @@ msgstr ""
 "d‘ici vous pouvez modifier la base de ces pages. Les comptes ayant accès à "
 "leur page de profil peuvent choisir leur propre identifiant."
 
-#: free/modules/sensitive-data/tools.php:239
+#: free/modules/sensitive-data/tools.php:237
 msgid "Profile URL Slug"
 msgstr "Identifiant de profil"
 
-#: free/modules/sensitive-data/tools.php:243
+#: free/modules/sensitive-data/tools.php:241
 #, php-format
 msgid "Leave empty for default value: %s"
 msgstr "Laisser vide pour obtenir la valeur par défaut : %s"
 
-#: free/modules/sensitive-data/tools.php:291
+#: free/modules/sensitive-data/tools.php:289
 msgid ""
 "<strong>Error</strong>: There was an error updating the author slug. Please "
 "try again."
@@ -9285,7 +9286,7 @@ msgstr ""
 "<strong>Erreur</strong> : Une erreur est survenue lors de la mise à jour de "
 "l'identifiant de profil. Merci de recommencer."
 
-#: free/modules/sensitive-data/tools.php:295
+#: free/modules/sensitive-data/tools.php:293
 msgid ""
 "<strong>Error</strong>: This profile URL slug is already registered. Please "
 "choose another one."
@@ -9754,6 +9755,16 @@ msgstr "Cette page n’existe pas, a été déplacée ou vous n’y avez pas acc
 msgid "<strong>Error</strong>: User registration is currently not allowed."
 msgstr ""
 "<strong>Erreur</strong> : L’inscription n’est actuellement pas autorisée."
+
+#: free/modules/users-login/plugins/move-login.php:611
+#: pro/modules/users-login/plugins/otp-auth.php:141
+#: pro/modules/users-login/plugins/otp-auth.php:642
+#: pro/modules/users-login/plugins/otp-auth.php:875
+#: pro/modules/users-login/plugins/otp-auth.php:1037
+#: pro/modules/users-login/plugins/passwordless.php:216
+#: pro/modules/users-login/tools.php:276
+msgid "Log In"
+msgstr "Connexion"
 
 #: free/modules/users-login/plugins/same-email-domain.php:36
 msgid "<strong>Error</strong>: The email address is not correct."
@@ -12848,15 +12859,6 @@ msgid "Password Reset"
 msgstr "Réinitialisation du mot de passe"
 
 #: pro/modules/users-login/plugins/otp-auth.php:141
-#: pro/modules/users-login/plugins/otp-auth.php:642
-#: pro/modules/users-login/plugins/otp-auth.php:875
-#: pro/modules/users-login/plugins/otp-auth.php:1037
-#: pro/modules/users-login/plugins/passwordless.php:216
-#: pro/modules/users-login/tools.php:276
-msgid "Log In"
-msgstr "Connexion"
-
-#: pro/modules/users-login/plugins/otp-auth.php:141
 msgid "Continue"
 msgstr "Continuer"
 
@@ -13386,12 +13388,49 @@ msgstr ""
 "responsable de l‘administration à l'adresse ###ADMIN_EMAIL### pour obtenir "
 "de l'aide."
 
-#: pro/modules/users-login/plugins/password-expiration.php:99
+#: pro/modules/users-login/plugins/password-expiration.php:112
 #, php-format
 msgid "Your password expired, please <a href=\"%s\">choose a new one</a>."
 msgstr ""
 "Votre mot de passe a expiré, merci d’en <a href=\"%s\">choisir un nouveau</"
 "a>."
+
+#: pro/modules/users-login/plugins/password-expiration.php:151
+#: pro/modules/users-login/plugins/strong-passwords.php:347
+msgid "Password required"
+msgstr "Mot de passe requis"
+
+#: pro/modules/users-login/plugins/password-expiration.php:153
+msgid "Please enter a strong password."
+msgstr "Merci d’entrer un mot de passe fort."
+
+#: pro/modules/users-login/plugins/password-expiration.php:155
+msgid "Please enter a new password."
+msgstr "Entrez votre mot de passe."
+
+#: pro/modules/users-login/plugins/password-expiration.php:173
+#: pro/modules/users-login/plugins/password-expiration.php:189
+msgid "Please renew your password"
+msgstr "Merci de renouveler votre mot de passe"
+
+#: pro/modules/users-login/plugins/password-expiration.php:177
+#, php-format
+msgid ""
+"Your current password has expired. You must renew it to access the "
+"administration area. Until then, you retain access <a href=\"%s\">to the "
+"site</a>."
+msgstr ""
+"Votre mot de passe actuel a expiré. Vous ne pourrez plus visiter "
+"l’administration tant que vous ne l’aurez pas renouvelé. Mais vous avez "
+"toujours accès <a href=\"%s\">au site</a>."
+
+#: pro/modules/users-login/plugins/password-expiration.php:183
+msgid "New Password:"
+msgstr "Nouveau mot de passe:"
+
+#: pro/modules/users-login/plugins/password-expiration.php:217
+msgid "Your new password has been set."
+msgstr "Votre nouveau mot de passe a été sauvegardé."
 
 #: pro/modules/users-login/plugins/passwordless.php:218
 msgctxt "or Log In using a password"
@@ -13686,10 +13725,6 @@ msgstr "<strong>Erreur</strong> : Merci d’entrer un mot de passe fort."
 #: pro/modules/users-login/plugins/strong-passwords.php:312
 msgid "Too much time has elapsed between the first step and now."
 msgstr "Trop de temps est passé depuis le début de la procédure."
-
-#: pro/modules/users-login/plugins/strong-passwords.php:347
-msgid "Password required"
-msgstr "Mot de passe requis"
 
 #: pro/modules/users-login/plugins/strong-passwords.php:383
 msgid "Password Strength Security Update"

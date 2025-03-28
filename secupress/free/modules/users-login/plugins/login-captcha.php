@@ -330,7 +330,9 @@ function secupress_manage_captcha( $object ) {
 	$real_timer    = (int) ( time() - $captcha_timer );
 	$timer_equals  = $real_timer >= 3 && $real_timer <= 60;
 	$running       = false;
-	session_destroy();
+	if ( session_status() !== PHP_SESSION_NONE ) {
+		session_destroy();
+	}
 	secupress_captcha_session();
 	if ( $hash_equals && $timer_equals ) {
 		return $object;

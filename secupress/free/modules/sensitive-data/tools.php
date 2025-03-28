@@ -80,10 +80,8 @@ function _secupress_bad_url_access_allowed_urls_sanitize( $urls ) {
 		$joker = strpos( $url, '*' );
 		$url   = explode( '?', $url );
 		$url   = rtrim( reset( $url ), '*' );
-		$path  = realpath( ABSPATH . str_replace( home_url( '/' ), '', $url ) );
-		if ( ! file_exists( $path ) || is_link( $path ) ) {
-			continue;
-		}
+		$path  = ABSPATH . str_replace( home_url( '/' ), '', $url );
+
 		if ( ! $joker && is_dir( $path ) && file_exists( $path . '/index.php' ) && ! in_array( $url . '/index.php', $urls ) ) {
 			$_urls[] = $url . 'index.php';
 		}
