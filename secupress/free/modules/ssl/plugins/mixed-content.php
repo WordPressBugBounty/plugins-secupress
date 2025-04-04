@@ -18,7 +18,9 @@ defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
 add_action( 'admin_init', 'secupress_ssl_mixed_content_fix_start' );
 add_action( 'init', 'secupress_ssl_mixed_content_fix_start' );
 function secupress_ssl_mixed_content_fix_start() {
-	ob_start( 'secupress_ssl_mixed_content_fix' );
+	if ( ! preg_match( '/\.(xsl|xml)$/i', secupress_get_current_url() ) ) {
+		ob_start( 'secupress_ssl_mixed_content_fix' );
+	}
 }
 
 /**

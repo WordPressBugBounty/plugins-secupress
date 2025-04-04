@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-03-28 10:24+0100\n"
-"PO-Revision-Date: 2025-03-28 10:25+0100\n"
+"POT-Creation-Date: 2025-04-03 09:29+0200\n"
+"PO-Revision-Date: 2025-04-03 09:30+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -6259,12 +6259,12 @@ msgstr "Préfixe de la base de données"
 #: free/functions/modules.php:95
 #: free/modules/wordpress-core/plugins/wp-config-constant-script-concat.php:48
 #: free/modules/wordpress-core/plugins/wp-config-constant-script-concat.php:86
-#: free/modules/wordpress-core/settings/wp-config.php:24
+#: free/modules/wordpress-core/settings/wp-config.php:25
 msgid "Scripts Concatenation"
 msgstr "Concaténation des scripts"
 
 #: free/functions/modules.php:96
-#: free/modules/wordpress-core/settings/wp-config.php:46
+#: free/modules/wordpress-core/settings/wp-config.php:48
 msgid "Skip New Bundles"
 msgstr "Ignorer les nouveaux paquets"
 
@@ -6281,7 +6281,7 @@ msgid "File Edit"
 msgstr "Édition des fichiers"
 
 #: free/functions/modules.php:100
-#: free/modules/wordpress-core/settings/wp-config.php:136
+#: free/modules/wordpress-core/settings/wp-config.php:142
 msgid "Unfiltered Uploads"
 msgstr "Téléversements non filtrés"
 
@@ -11296,7 +11296,7 @@ msgstr ""
 "Le fichier %s n‘est pas en écriture, les constantes ne peuvent être "
 "modifiées."
 
-#: free/modules/wordpress-core/settings/wp-config.php:25
+#: free/modules/wordpress-core/settings/wp-config.php:26
 msgid ""
 "Prevent scripts and styles concatenation in admin area to prevent a Deny of "
 "Service (DoS)"
@@ -11304,13 +11304,26 @@ msgstr ""
 "Empêcher la concaténation des scripts et styles dans l‘administration pour "
 "éviter le Déni de Service (DoS)"
 
-#: free/modules/wordpress-core/settings/wp-config.php:30
+#: free/modules/wordpress-core/settings/wp-config.php:31
 msgid "Yes, disable concatenated scripts to prevent server overload"
 msgstr ""
 "Oui, désactiver la concaténation des scripts pour empêcher la surcharge du "
 "serveur"
 
-#: free/modules/wordpress-core/settings/wp-config.php:47
+#: free/modules/wordpress-core/settings/wp-config.php:36
+#: free/modules/wordpress-core/settings/wp-config.php:59
+#: free/modules/wordpress-core/settings/wp-config.php:82
+#: free/modules/wordpress-core/settings/wp-config.php:106
+#: free/modules/wordpress-core/settings/wp-config.php:129
+#: free/modules/wordpress-core/settings/wp-config.php:153
+#: free/modules/wordpress-core/settings/wp-config.php:177
+#: free/modules/wordpress-core/settings/wp-config.php:201
+#: free/modules/wordpress-core/settings/wp-config.php:224
+#: free/modules/wordpress-core/settings/wp-config.php:252
+msgid "Already done your way."
+msgstr "Déjà fait à votre façon."
+
+#: free/modules/wordpress-core/settings/wp-config.php:49
 msgid ""
 "Every time WordPress upgrades itself, it downloads the new <em>twentytheme-à-"
 "la-mode</em>"
@@ -11318,17 +11331,17 @@ msgstr ""
 "Chaque fois que WordPress se met à jour, cela télécharge le nouveau "
 "<em>twenty-thème-à-la-mode</em>"
 
-#: free/modules/wordpress-core/settings/wp-config.php:52
+#: free/modules/wordpress-core/settings/wp-config.php:54
 msgid "Yes, prevent core upgrades from downloading unnecessary bundled items"
 msgstr ""
 "Oui, empêcher les mises à jour du cœur de télécharger les éléments inclus "
 "non nécessaires"
 
-#: free/modules/wordpress-core/settings/wp-config.php:68
+#: free/modules/wordpress-core/settings/wp-config.php:71
 msgid "Debugging"
 msgstr "Débogage"
 
-#: free/modules/wordpress-core/settings/wp-config.php:69
+#: free/modules/wordpress-core/settings/wp-config.php:72
 msgid ""
 "In a standard production environment you should prevent errors from being "
 "displayed."
@@ -11336,15 +11349,15 @@ msgstr ""
 "Dans un environnement standard en production, vous devriez empêcher les "
 "erreurs d’être affichées."
 
-#: free/modules/wordpress-core/settings/wp-config.php:74
+#: free/modules/wordpress-core/settings/wp-config.php:77
 msgid "Yes, prevent my site from displaying errors"
 msgstr "Oui, empêcher mon site d'afficher les erreurs"
 
-#: free/modules/wordpress-core/settings/wp-config.php:91
+#: free/modules/wordpress-core/settings/wp-config.php:95
 msgid "Locations"
 msgstr "Adresses"
 
-#: free/modules/wordpress-core/settings/wp-config.php:92
+#: free/modules/wordpress-core/settings/wp-config.php:96
 msgid ""
 "In a standard production environment there is no need to relocate your site "
 "and home URLs."
@@ -11352,15 +11365,15 @@ msgstr ""
 "Dans un environnement standard en production, nul besoin de déplacer les "
 "adresses de votre site."
 
-#: free/modules/wordpress-core/settings/wp-config.php:97
+#: free/modules/wordpress-core/settings/wp-config.php:101
 msgid "Yes, prevent my site and home URLs from being relocated"
 msgstr "Oui, empêcher les adresses du site d’être déménagées"
 
-#: free/modules/wordpress-core/settings/wp-config.php:113
+#: free/modules/wordpress-core/settings/wp-config.php:118
 msgid "File editing"
 msgstr "Édition des fichiers"
 
-#: free/modules/wordpress-core/settings/wp-config.php:114
+#: free/modules/wordpress-core/settings/wp-config.php:119
 msgid ""
 "Nobody (not even administrators) should have the ability to edit plugin and "
 "theme files directly within the WordPress administration area."
@@ -11369,11 +11382,11 @@ msgstr ""
 "éditer les fichiers des extensions et thèmes directement depuis l‘interface "
 "de WordPress."
 
-#: free/modules/wordpress-core/settings/wp-config.php:119
+#: free/modules/wordpress-core/settings/wp-config.php:124
 msgid "Yes, disable the file editor"
 msgstr "Oui, désactiver l’éditeur de fichiers"
 
-#: free/modules/wordpress-core/settings/wp-config.php:137
+#: free/modules/wordpress-core/settings/wp-config.php:143
 msgid ""
 "Nobody (not even administrators) should be allowed to upload any type of "
 "file."
@@ -11381,15 +11394,15 @@ msgstr ""
 "Personne (pas même les responsables de l’administration) ne devrait pouvoir "
 "téléverser n’importe quels types de fichiers."
 
-#: free/modules/wordpress-core/settings/wp-config.php:142
+#: free/modules/wordpress-core/settings/wp-config.php:148
 msgid "Yes, filter file uploads"
 msgstr "Oui, filtrer les téléversements"
 
-#: free/modules/wordpress-core/settings/wp-config.php:159
+#: free/modules/wordpress-core/settings/wp-config.php:166
 msgid "Database Errors"
 msgstr "Erreur de base de données"
 
-#: free/modules/wordpress-core/settings/wp-config.php:160
+#: free/modules/wordpress-core/settings/wp-config.php:167
 msgid ""
 "Database errors shouldn’t be displayed on front-office to prevent attackers "
 "from accessing your database hostname, prefix, or table names."
@@ -11397,15 +11410,15 @@ msgstr ""
 "Les erreurs de base de données ne devraient pas s’afficher sur le front-"
 "office pour empêcher les attaques de lire votre hôte, préfixe, ou tables."
 
-#: free/modules/wordpress-core/settings/wp-config.php:165
+#: free/modules/wordpress-core/settings/wp-config.php:172
 msgid "Yes, hide any database details on front-office"
 msgstr "Oui, cacher toute erreur de base de données en front-office"
 
-#: free/modules/wordpress-core/settings/wp-config.php:182
+#: free/modules/wordpress-core/settings/wp-config.php:190
 msgid "Repairing Database"
 msgstr "Réparation de la base de données"
 
-#: free/modules/wordpress-core/settings/wp-config.php:183
+#: free/modules/wordpress-core/settings/wp-config.php:191
 msgid ""
 "In a standard production environment, your repair page should not be "
 "accessible."
@@ -11413,7 +11426,7 @@ msgstr ""
 "Dans un environnement standard en production, votre page de réparation ne "
 "devrait pas être disponible."
 
-#: free/modules/wordpress-core/settings/wp-config.php:188
+#: free/modules/wordpress-core/settings/wp-config.php:196
 #, php-format
 msgid ""
 "Yes, make the <a href=\"%s\" target=\"_blank\">Database Repair Page</a> "
@@ -11422,11 +11435,11 @@ msgstr ""
 "Oui, rendre la <a href=\"%s\" target=\"_blank\">Page de réparation de BDD</"
 "a> inaccessible"
 
-#: free/modules/wordpress-core/settings/wp-config.php:204
+#: free/modules/wordpress-core/settings/wp-config.php:213
 msgid "WordPress Cookie Default Name"
 msgstr "Nom par défaut du Cookie de WordPress"
 
-#: free/modules/wordpress-core/settings/wp-config.php:205
+#: free/modules/wordpress-core/settings/wp-config.php:214
 msgid ""
 "Every WordPress cookie contains a unique string, which can be guessed for "
 "any site. It‘s important not to reveal yours, as this makes it harder for "
@@ -11436,31 +11449,31 @@ msgstr ""
 "tous les sites. Ne révélez pas les vôtres, ce sera plus difficile pour "
 "certaines attaques de cibler cotre site."
 
-#: free/modules/wordpress-core/settings/wp-config.php:210
+#: free/modules/wordpress-core/settings/wp-config.php:219
 msgid "Yes, change the default value of the cookie to something random"
 msgstr "Oui, changer la valeur par défaut du cookie par une chaine aléatoire"
 
-#: free/modules/wordpress-core/settings/wp-config.php:215
+#: free/modules/wordpress-core/settings/wp-config.php:224
 msgid "[a random string]"
 msgstr "[chaine aléatoire]"
 
-#: free/modules/wordpress-core/settings/wp-config.php:219
+#: free/modules/wordpress-core/settings/wp-config.php:228
 msgid "Deactivating this module may require you to log back in."
 msgstr "La désactivation de ce module peut nécessiter une reconnexion."
 
-#: free/modules/wordpress-core/settings/wp-config.php:231
+#: free/modules/wordpress-core/settings/wp-config.php:241
 msgid "WordPress Security Keys"
 msgstr "Clés de sécurité WordPress"
 
-#: free/modules/wordpress-core/settings/wp-config.php:232
+#: free/modules/wordpress-core/settings/wp-config.php:242
 msgid "Create tamper-proof security keys for your installation."
 msgstr "Crée des clés de sécurité inviolables pour votre installation."
 
-#: free/modules/wordpress-core/settings/wp-config.php:237
+#: free/modules/wordpress-core/settings/wp-config.php:247
 msgid "Yes, create secure keys for my installation"
 msgstr "Oui, créer des clés sécurisées pour mon installation"
 
-#: free/modules/wordpress-core/settings/wp-config.php:242
+#: free/modules/wordpress-core/settings/wp-config.php:252
 #, php-format
 msgid ""
 "<strong>8 constants</strong> will be created in a must-use plugin, replacing "
@@ -11470,19 +11483,19 @@ msgstr ""
 "(mu-plugin) et celles dans votre fichier <code>%s</code> et base de données "
 "seront supprimées."
 
-#: free/modules/wordpress-core/settings/wp-config.php:246
+#: free/modules/wordpress-core/settings/wp-config.php:256
 msgid "Deactivating this module may require to log back in."
 msgstr "La désactivation de ce module peut nécessiter une reconnexion."
 
-#: free/modules/wordpress-core/settings/wp-config.php:257
+#: free/modules/wordpress-core/settings/wp-config.php:267
 msgid "Regenerate Secure Keys"
 msgstr "Regénérer des clés de sécurité"
 
-#: free/modules/wordpress-core/settings/wp-config.php:260
+#: free/modules/wordpress-core/settings/wp-config.php:270
 msgid "Regenerate the secure keys"
 msgstr "Générer de nouvelles clés de sécurité"
 
-#: free/modules/wordpress-core/settings/wp-config.php:268
+#: free/modules/wordpress-core/settings/wp-config.php:278
 #, php-format
 msgid ""
 "These options are disabled because the %1$s file is not writable. Please "

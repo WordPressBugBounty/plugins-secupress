@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
 Tested up to: 6.7.2
 Requires PHP: 7.0
-Stable tag: 2.3.8
+Stable tag: 2.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,12 +185,10 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.8 =
-* 28 March 2025
-* Improvement: Password Lifespan Module: It's now mandatory to renew your password if expired.
-* Fix: Allow .xml/.xsl in bad url access module (hello sitemaps) + allow non existing files to be added (hello redirections)
-* Fix: Prevent a possible error on Actions on plugins, not allowing to deactivate the module.
-* Fix: Add a condition before destroying the session.
+= 2.3.9 =
+* 04 April 2025
+* Improvement: Better UX on wp-config module
+* Fix: Allow .xml/.xsl also from URLs, not just content
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.
