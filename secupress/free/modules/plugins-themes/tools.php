@@ -680,22 +680,29 @@ add_action( 'wp_ajax_secupress_reinstall_plugins', 'secupress_reinstall_plugins_
 /**
  * Handle the ajax plugin reinstallation
  *
- * @author Julio Potier
+ * @since 2.3.10 array_intersect_key to prevent installation of non already present plugins + current_user_can() for missing security check
  * @since 2.2.6
+ * @author Julio Potier
  **/
 function secupress_reinstall_plugins_admin_ajax_cb() {
-	if ( ! isset( $_GET['action'] ) || ! check_ajax_referer( $_GET['action'] ) ) {
+	if ( ! isset( $_GET['action'] ) || 'secupress_reinstall_plugins' !== $_GET['action'] || ! check_ajax_referer( $_GET['action'] ) || ! current_user_can( 'install_plugins' ) ) {
 		wp_die( -1, 403 );
+	}
+	if ( ! $get_plugins = secupress_cache_data( 'get_plugins' ) ) {
+		$get_plugins    = get_plugins();
+		unset( $get_plugins[ 'secupress-pro/secupress-pro.php' ] );
+		secupress_cache_data( 'get_plugins', $get_plugins );
 	}
 	$plugins = [];
 	if ( isset( $_GET['plugins'] ) ) {
 		if ( is_array( $_GET['plugins'] ) ) {
-			$plugins = $_GET['plugins'];
+			$plugins   = $_GET['plugins'];
 		} else {
 			$plugins[] = $_GET['plugins'];
 		}
 	}
 	$plugins = array_flip( $plugins );
+	$plugins = array_intersect_key( $get_plugins, $plugins );
+
 	wp_send_json_success( secupress_reinstall_plugins( $plugins ) );
 }
-
