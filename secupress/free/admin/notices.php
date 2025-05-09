@@ -374,3 +374,28 @@ function secupress_updates_message( $plugin_data, $new_plugin_data ) {
 		echo '</div>';
 	}
 }
+
+add_action( 'admin_init', 'secupress_active_plugins_error' );
+/**
+ * If the constant SECUPRESS_ACTIVE_PLUGINS_ERROR is set, we got a problem.
+ *
+ * @since 2.3.11
+ * @author Julio Potier
+ **/
+function secupress_active_plugins_error() {
+	if ( ! defined( 'SECUPRESS_ACTIVE_PLUGINS_ERROR' ) || ! SECUPRESS_ACTIVE_PLUGINS_ERROR ) {
+		return;
+	}
+	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to the %sModule page%s or %sread the documentation%s.', 'secupress' ), 
+				secupress_tag_me( __( 'Plugin Actions', 'secupress' ), 'strong' ), 
+				sprintf( '<a href="%s">', 
+					esc_url( secupress_admin_url( 'modules', 'plugins-themes#row-plugins_actions' ) )
+				), 
+				'</a>',
+				sprintf( '<a href="%s">', 
+					esc_url( __( 'https://docs.secupress.me/article/233-plugin-actions', 'secupress' ) )
+				), 
+				'</a>',
+				);
+	secupress_add_notice( $message, 'error', 'active-plugins-error' );
+}

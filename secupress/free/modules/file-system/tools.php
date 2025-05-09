@@ -4,6 +4,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * Get file extensions that are allowed in the uploads folder.
  *
+ * @since 2.3.12 Remove all filters in MS, we need all the correct
  * @since 2.3.8 xml, xls
  * @since 2.2.6
  * @author Julio Potier
@@ -11,6 +12,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  * @return (array)
  */
 function secupress_get_allowed_extensions() {
+	remove_all_filters( 'upload_mimes' );
 	$exts             = get_allowed_mime_types();
 	$exts['htm|html'] = 1;
 	$exts['js']       = 1;

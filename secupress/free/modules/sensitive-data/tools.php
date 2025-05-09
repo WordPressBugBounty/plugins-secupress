@@ -116,7 +116,7 @@ function secupress_bad_url_access_sort_urls() {
 		$urls  = array_map( 'trim', explode( "\n", $urls ) );
 	}
 	if ( empty( $urls ) ) {
-		return $urls;
+		return [ 'files' => [], 'content' => [], 'folders' => [] ];
 	}
 	$_urls     = [];
 	$_content  = secupress_server_is_ssl() ? str_replace( 'http://', 'https://', WP_CONTENT_URL ) : WP_CONTENT_URL;

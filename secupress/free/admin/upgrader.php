@@ -567,7 +567,7 @@ exit;
 }
 
 if ( ! secupress_is_white_label() ) {
-	//// add_action( 'admin_notices', 'secupress_display_whats_new' );
+	add_action( 'admin_notices', 'secupress_display_whats_new' );
 	/**
 	 * Display a "what's new" notice when not in WhiteLabel and user has the correct capa
 	 *
@@ -584,12 +584,11 @@ if ( ! secupress_is_white_label() ) {
 			return;
 		}
 
-		$title    = sprintf( '<strong>' . __( 'What’s new in SecuPress %s', 'secupress' ) . '</strong>', SECUPRESS_VERSION );
-		$readmore = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-		$newitems = [ 	//__( '.', 'secupress' ),
-						// __( 'New Vulnerable Themes and Plugins API', 'secupress' ),
-						// __( 'New GeoIP API', 'secupress' ),
-						// __( 'New Sessions Details', 'secupress' ),
+		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
+		$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+		$blogpost  = __( 'https://secupress.me/blog/secupress-v2-3/', 'secupress' );
+		$newitems  = [ 	
+						sprintf( __( 'So many things have changed, read our dedicated blogpost %sSecuPress v2.3 aka Starboost%s!', 'secupress' ), sprintf( '<a href="%s" target="_blank">', $blogpost ), '</a>' ),
 					];
 		if ( ! empty( $newitems ) ) {
 			$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';

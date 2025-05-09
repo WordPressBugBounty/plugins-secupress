@@ -4,22 +4,50 @@
  * Description: Display all plugins that have been hidden and highlight them inthe plugins list
  * Main Module: plugins_themes
  * Author: SecuPress
- * Version: 2.2.6
+ * Version: 2.3.12
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
 
 add_action( 'admin_head-plugins.php', 'secupress_plugin_show_all_force_all_plugins_view_pre_current_active_plugins' );
 add_filter( 'views_plugins', 'secupress_plugin_show_all_force_all_plugins_view_pre_current_active_plugins' );
+/**
+ * Force the plugins page to show all plugins
+ *
+ * @since 2.3.12 Add "pre_current_active_plugins" filter
+ * @since 2.2.6
+ * @author Julio Potier
+ * 
+ * @return (int|null) $value
+ **/
 function secupress_plugin_show_all_force_all_plugins_view_pre_current_active_plugins( $dummy ) {
 	global $wp_list_table;
+
+	$backgroundColor          = secupress_get_module_option( 'plugins_show-all-color', '#FAC898', 'plugins-themes' );
+	$legend                   =  ' <span style="font-size:large;color:' . esc_attr( $backgroundColor ) .'">&#x25A0;</span>';
+
+	// Handle the "pre_current_active_plugins" filter
+	$wp_list_table_backup     = $wp_list_table->items;
+	$all_plugins_non_filtered = array_keys( $wp_list_table->items );
+	do_action( 'pre_current_active_plugins', $wp_list_table->items );
+	$all_plugins_filtered     = array_keys( $wp_list_table->items );
+	remove_all_actions( 'pre_current_active_plugins' );
+	$wp_list_table->items     = $wp_list_table_backup;
+	$removed_plugins          = array_diff( $all_plugins_non_filtered, $all_plugins_filtered );
+	foreach( $removed_plugins as $slug ) {
+		$css = "<style type='text/css'>
+			[data-plugin='$slug'] * {
+			background-color: $backgroundColor !important;
+		}</style>";
+		secupress_cache_data( 'plugins_show-all-notice', 'pre_current_active_plugins' );
+		secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'pre_current_active_plugins' ) ) . $legend . $css, 'error', 'pre_current_active_plugins-tab-' . md5( $css ) );
+	}
 
 	$pre_current_active_plugins[] = $wp_list_table->items;
 	if ( ! isset( $pre_current_active_plugins[1] ) ) {
 		return $dummy;
 	}
-	$backgroundColor          = secupress_get_module_option( 'plugins_show-all-color', '#FAC898', 'plugins-themes' );
-	$legend                   =  ' <span style="font-size:large;color:' . esc_attr( $backgroundColor ) .'">&#x25A0;</span>';
+
 	$removed_plugins          = array_diff_key( $pre_current_active_plugins[0], $pre_current_active_plugins[1] );
 	foreach( $removed_plugins as $slug => $data ) {
 		$css = "<style type='text/css'>
@@ -94,6 +122,7 @@ function secupress_plugin_show_all_force_all_plugins_view() {
 		secupress_cache_data( 'plugins_show-all-notice', 'all_plugins' );
 		secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'all_plugins' ) ) . $legend . $css, 'error', 'all_plugins-tab-' . md5( $css ) );
 	}
+
 	// Handle the "plugins_list" filter
 	$all_plugins_filtered     = array_keys( apply_filters( 'plugins_list', ['mustuse'=>get_mu_plugins()] )['mustuse'] );
 	remove_all_filters( 'plugins_list' );

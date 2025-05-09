@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 define( 'SECUPRESS_INSTALLED_PLUGINS'       , '_secupress_installed_plugins' );
 define( 'SECUPRESS_INSTALLED_MUPLUGINS'     , '_secupress_installed_muplugins' );
 define( 'SECUPRESS_ACTIVE_PLUGINS'          , '_secupress_active_plugins' );
+
 if ( is_multisite() ) {
 	define( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK'  , '_secupress_active_plugins_network' );
 	add_filter( 'pre_site_option_active_sitewide_plugins', 'secupress_no_action_filter_active_plugins_network' );
@@ -37,8 +38,13 @@ add_filter( 'pre_option_active_plugins', 'secupress_no_action_filter_active_plug
  * @author Julio Potier
  * @return (array) $active_plugins
  **/
-function secupress_no_action_filter_active_plugins() {
-	return get_option( SECUPRESS_ACTIVE_PLUGINS, [] );
+function secupress_no_action_filter_active_plugins( $pre ) {
+	$plugins = get_option( SECUPRESS_ACTIVE_PLUGINS, [] );
+	if ( [] === $plugins ) {
+		define( 'SECUPRESS_ACTIVE_PLUGINS_ERROR', true );
+		return $pre;
+	}
+	return $plugins;
 }
 
 /**

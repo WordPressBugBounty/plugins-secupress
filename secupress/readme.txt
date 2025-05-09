@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
 Tested up to: 6.7.2
 Requires PHP: 7.0
-Stable tag: 2.3.10
+Stable tag: 2.3.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,9 +185,13 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.10 =
-* 28 April 2025
-* Security Fix: Missing Authorization to Authenticated (Subscriber+) Arbitrary Plugin Installation (Thanks to Wordfence)
+= 2.3.12 =
+* 09 May 2025
+* Fix Multisite: In "Bad Url Access" was missing some file extensions in htaccess.
+* Fix: Warning: Undefined array key "folders" in secupress-pro/pro/modules/sensitive-data/plugins/bad-url-access.php on line 248
+* Fix: Some settings in pro were not correctly saved
+* Improvement: "/me/" is now allowed in module "Prevent User Listing" in rest api
+* Improvement: Add "pre_current_active_plugins" filter for Display All Plugins module
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.

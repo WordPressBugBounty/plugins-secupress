@@ -6,6 +6,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * Wrapper for the 3 next plugins functions
  *
+ * @since 2.3.11 return []
  * @since 2.2.6
  * @author Julio Potier
  * 
@@ -43,7 +44,7 @@ function secupress_get_bad_plugins( $type ) {
 			return secupress_get_notupdated_plugins();
 		break;
 	}
-	return false;
+	return [];
 }
 
 /**
@@ -58,7 +59,7 @@ function secupress_get_bad_plugins( $type ) {
  */
 function secupress_get_removed_plugins() {
 	$plugins = get_site_option( SECUPRESS_CLOSED_PLUGINS );
-	return $plugins ?? [];
+	return is_array( $plugins ) ? $plugins : [];
 }
 
 /**
@@ -73,7 +74,7 @@ function secupress_get_removed_plugins() {
  */
 function secupress_get_notupdated_plugins() {
 	$plugins = get_site_option( SECUPRESS_OLD_PLUGINS );
-	return $plugins ?? [];
+	return is_array( $plugins ) ? $plugins : [];
 }
 
 

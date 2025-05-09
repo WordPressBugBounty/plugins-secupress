@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-04-03 09:29+0200\n"
-"PO-Revision-Date: 2025-04-03 09:30+0200\n"
+"POT-Creation-Date: 2025-05-09 17:54+0200\n"
+"PO-Revision-Date: 2025-05-09 17:54+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -15,17 +15,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-Basepath: ..\n"
-"X-Poedit-KeywordsList: _x:1,2c;__;_e;_ex:1,2c;_n:1,2;_nx:1,2;esc_html__;"
-"esc_html_e;esc_attr__;esc_attr_e;_n_noop:1,2;_nx_noop:4c,1,2;esc_attr_x;"
-"esc_html_x\n"
+"X-Poedit-KeywordsList: "
+"_x:1,2c;__;_e;_ex:1,2c;_n:1,2;_nx:1,2;esc_html__;esc_html_e;esc_attr__;esc_attr_e;_n_noop:1,2;_nx_noop:4c,1,2;esc_attr_x;esc_html_x\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Textdomain-Support: yes\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: node_modules\n"
 
-#: free/activation.php:22
+#: free/activation.php:30
 msgid ""
 "Please be informed that your website experienced downtime due to a database "
 "error. We are pleased to report that the issue has been resolved and your "
@@ -35,7 +34,7 @@ msgstr ""
 "erreur de base de données. Le problème a été résolu et votre site est de "
 "nouveau opérationnel."
 
-#: free/activation.php:160
+#: free/activation.php:174
 #: free/classes/scanners/class-secupress-scan-bad-file-extensions.php:114
 #: free/classes/scanners/class-secupress-scan-bad-url-access.php:106
 #: free/classes/scanners/class-secupress-scan-directory-listing.php:93
@@ -51,22 +50,22 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture. Merci d’ajouter ces lignes au "
 "début du fichier : %2$s"
 
-#: free/activation.php:219
+#: free/activation.php:233
 #, php-format
 msgid "In %s:"
 msgstr "Dans %s :"
 
-#: free/activation.php:241
+#: free/activation.php:255
 #, php-format
 msgid "Remove all existing %s tags."
 msgstr "Supprimer toutes les balises %s."
 
-#: free/activation.php:259
+#: free/activation.php:273
 #, php-format
 msgid "Add the following: %s"
 msgstr "Ajouter ce qui suit : %s"
 
-#: free/activation.php:265
+#: free/activation.php:279
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please edit this file, following these "
@@ -75,7 +74,7 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture. Merci d’éditer le fichier comme "
 "indiqué : %2$s"
 
-#: free/activation.php:281
+#: free/activation.php:295
 #, php-format
 msgid ""
 "Since your %1$s file cannot be edited directly, please add the following in "
@@ -84,7 +83,7 @@ msgstr ""
 "Puisque votre fichier %1$s ne peut pas être édité. Merci d’ajouter ceci dans "
 "votre fichier : %2$s"
 
-#: free/activation.php:353 pro/activation.php:217
+#: free/activation.php:367 pro/activation.php:217
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit it manually. "
@@ -93,7 +92,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devrez l’éditer "
 "manuellement. Merci de supprimer toutes les règles entre %2$s et %3$s."
 
-#: free/activation.php:397
+#: free/activation.php:411
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit the file manually. "
@@ -102,7 +101,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devrez l’éditer "
 "manuellement. Merci de supprimer tous les nœuds avec %2$s."
 
-#: free/activation.php:426 free/functions/modules.php:657
+#: free/activation.php:440 free/functions/modules.php:657
 #, php-format
 msgid ""
 "Your server runs <strong>Nginx</strong>. You have to edit the configuration "
@@ -113,7 +112,7 @@ msgstr ""
 "éditer votre fichier de configuration manuellement. Merci de supprimer les "
 "règles entre %1$s et %2$s dans le fichier %3$s."
 
-#: free/activation.php:475
+#: free/activation.php:489
 msgid "OK, got it!"
 msgstr "Ok j’ai compris !"
 
@@ -465,12 +464,12 @@ msgstr "Veuillez réessayer."
 msgid "WordPress Failure Notice"
 msgstr "Avertissement d’échec de WordPress"
 
-#: free/admin/functions/modules.php:118
+#: free/admin/functions/modules.php:119
 #, php-format
 msgid "will deactivate the plugin %s."
 msgstr "cela désactivera l’extension %s."
 
-#: free/admin/functions/modules.php:139
+#: free/admin/functions/modules.php:140
 #, php-format
 msgid ""
 "You cannot use this feature now because you are using the plugin %s. Please "
@@ -479,7 +478,7 @@ msgstr ""
 "Vous ne pouvez pas utiliser cette fonctionnalité maintenant car vous avez "
 "l’extension %s. Merci de la désactiver."
 
-#: free/admin/functions/modules.php:141
+#: free/admin/functions/modules.php:142
 #, php-format
 msgid "Open the %s settings page"
 msgstr "Ouvrir les réglages de l’extension %s"
@@ -557,7 +556,7 @@ msgstr ""
 
 #: free/admin/modal.php:70 free/admin/settings.php:294
 #: free/classes/settings/class-secupress-settings.php:1719
-#: free/modules/welcome/callbacks.php:397 pro/common.php:39 pro/common.php:134
+#: free/modules/welcome/callbacks.php:397 pro/common.php:39 pro/common.php:143
 msgctxt "link to website (Only FR or EN!)"
 msgid "support"
 msgstr "fr/support"
@@ -811,6 +810,27 @@ msgid "Please read these special notes for this update, version %1$s - %2$s"
 msgstr ""
 "Merci de lire ces notes spécifiques à la mise à jour de la version %1$s du "
 "%2$s"
+
+#: free/admin/notices.php:389
+#, php-format
+msgid ""
+"There is an issue with the %s module. It will not be active until the "
+"problem is fixed.<br>Go to the %sModule page%s or %sread the documentation%s."
+msgstr ""
+"Il y a un problème avec le module %s. Il ne sera pas actif tant que cela ne "
+"sera pas corrigé.<br>Allez dans la %spage du module%s ou %slisez la "
+"documentation%s."
+
+#: free/admin/notices.php:390 free/functions/modules.php:76
+#: free/modules/plugins-themes/plugins/plugin-installation.php:13
+#: free/modules/plugins-themes/settings/plugins.php:15
+#: free/modules/plugins-themes/settings/plugins.php:19
+msgid "Plugin Actions"
+msgstr "Action des extensions"
+
+#: free/admin/notices.php:396
+msgid "https://docs.secupress.me/article/233-plugin-actions"
+msgstr "https://fr.docs.secupress.me/article/234-actions-sur-les-extensions"
 
 #: free/admin/scanner-step-1-all.php:19
 msgid "Go to module settings"
@@ -1372,7 +1392,7 @@ msgstr "Docs"
 msgid "Settings"
 msgstr "Réglages"
 
-#: free/admin/settings.php:430 pro/common.php:245
+#: free/admin/settings.php:430 pro/common.php:254
 msgctxt "Latest scans"
 msgid "M dS, Y \\a\\t h:ia"
 msgstr "l j F Y \\à G:i:s"
@@ -1622,12 +1642,25 @@ msgstr[1] "(basée sur %s votes)"
 
 #: free/admin/upgrader.php:587
 #, php-format
-msgid "What’s new in SecuPress %s"
-msgstr "Quoi de neuf dans SecuPress %s"
+msgid "What’s new in SecuPress %s%s"
+msgstr "Quoi de neuf dans SecuPress %s%s"
 
 #: free/admin/upgrader.php:588
 msgid "Or read full changelog on secupress.me"
 msgstr "Ou lisez tout le journal des modifications sur secupress.me"
+
+#: free/admin/upgrader.php:589
+msgid "https://secupress.me/blog/secupress-v2-3/"
+msgstr "https://secupress.me/fr/blog/secupress-v2-3/"
+
+#: free/admin/upgrader.php:591
+#, php-format
+msgid ""
+"So many things have changed, read our dedicated blogpost %sSecuPress v2.3 "
+"aka Starboost%s!"
+msgstr ""
+"Beaucoup de choses ont changés, lisez notre article : %sSecuPress v2.3 aka "
+"Starboost%s!"
 
 #: free/classes/admin/class-secupress-admin-notices.php:257
 msgctxt "verb"
@@ -5404,13 +5437,13 @@ msgstr "Rôles"
 
 #: free/classes/settings/class-secupress-settings.php:287
 #: free/classes/settings/class-secupress-settings.php:293
-#: free/modules/users-login/settings/double-auth.php:146
-#: free/modules/users-login/settings/double-auth.php:152
+#: free/modules/users-login/settings/double-auth.php:166
+#: free/modules/users-login/settings/double-auth.php:172
 msgid "Affected Roles"
 msgstr "Rôles affectés"
 
 #: free/classes/settings/class-secupress-settings.php:288
-#: free/modules/users-login/settings/double-auth.php:147
+#: free/modules/users-login/settings/double-auth.php:167
 msgid "Which roles does this module affect?"
 msgstr "Quels rôles doivent être affectés pour ce module ?"
 
@@ -5588,7 +5621,7 @@ msgstr "Lien de déverrouillage expiré."
 #: free/modules/discloses/plugins/login-errors-disclose.php:34
 #: free/modules/discloses/plugins/login-errors-disclose.php:36
 #: free/modules/users-login/plugins/blacklist-logins.php:45
-#: free/modules/users-login/plugins/stop-user-enumeration.php:94
+#: free/modules/users-login/plugins/stop-user-enumeration.php:101
 #: free/modules/wordpress-core/plugins/wp-config-constant-repair.php:44
 #: pro/admin/ajax-post-callbacks.php:22
 #: pro/modules/users-login/plugins/password-expiration.php:148
@@ -6209,13 +6242,6 @@ msgstr "Surveillez les de près"
 #, php-format
 msgid "Disallow %s uploads"
 msgstr "Interdire l’envoi des %s"
-
-#: free/functions/modules.php:76
-#: free/modules/plugins-themes/plugins/plugin-installation.php:13
-#: free/modules/plugins-themes/settings/plugins.php:15
-#: free/modules/plugins-themes/settings/plugins.php:19
-msgid "Plugin Actions"
-msgstr "Action des extensions"
 
 #: free/functions/modules.php:77
 msgid "Show All Plugins"
@@ -8448,13 +8474,14 @@ msgstr "Tentatives de suppression"
 msgid "You do not have sufficient permissions to install plugins on this site."
 msgstr "Vous n’avez pas la permission d’installer des extensions sur ce site."
 
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:32
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:95
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:43
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:60
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:123
 #, php-format
 msgid "The plugin %s has been hidden ! (using the WP Filter %s)"
 msgstr "L‘extension %s a été masquée ! (avec le filtre WP %s)"
 
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:67
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:95
 #, php-format
 msgid ""
 "The <strong>Must-Use</strong> tab has been hidden! (using the WP Filter %s)"
@@ -8462,7 +8489,7 @@ msgstr ""
 "L‘onglet des extensions <strong>Indispensables</strong> a été masquée ! "
 "(avec le Filtre WP %s)"
 
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:81
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:109
 #, php-format
 msgid ""
 "The <strong>Drop-in</strong> tab has been hidden! (using the WP Filter %s)"
@@ -8470,17 +8497,17 @@ msgstr ""
 "L‘onglet des extensions <strong>Avancées</strong> a été masquée ! (avec le "
 "Filtre WP %s)"
 
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:113
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:142
 #, php-format
 msgid "The must-use plugin %s has been hidden ! (using the WP Filter %s)"
 msgstr "L‘extension indispensable %s a été masquée ! (avec le filtre WP %s)"
 
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:158
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:187
 #, php-format
 msgid "The plugin %s has been hidden! (using CSS)"
 msgstr "L‘extension %s a été masquée ! (avec une CSS)"
 
-#: free/modules/plugins-themes/plugins/plugin-show-all.php:216
+#: free/modules/plugins-themes/plugins/plugin-show-all.php:245
 #, php-format
 msgid "The plugin %s has been hidden! (using JS)"
 msgstr "L‘extension %s a été masquée ! (avec du JS)"
@@ -8825,47 +8852,47 @@ msgstr ""
 "Oui, <strong>restreindre</strong> toute mise à jour de thèmes, extensions, "
 "traductions et cœur de WordPress en forçant l’utilisation du FTP"
 
-#: free/modules/plugins-themes/tools.php:430
+#: free/modules/plugins-themes/tools.php:431
 msgid "Themes & Plugins Upload Disabled"
 msgstr "Téléversement des thèmes et extensions désactivé"
 
-#: free/modules/plugins-themes/tools.php:433
+#: free/modules/plugins-themes/tools.php:434
 msgid "Direct File Writing (direct)"
 msgstr "Écriture directe des fichiers (direct)"
 
-#: free/modules/plugins-themes/tools.php:434
+#: free/modules/plugins-themes/tools.php:435
 msgid "Secure Shell 2 (ssh2)"
 msgstr "Shell Sécurisé v2 (ssh2)"
 
-#: free/modules/plugins-themes/tools.php:435
+#: free/modules/plugins-themes/tools.php:436
 msgid "File Transfert Protocol Extension (ftpext)"
 msgstr "Protocole de Transfert de Fichiers (ftpext)"
 
-#: free/modules/plugins-themes/tools.php:436
+#: free/modules/plugins-themes/tools.php:437
 msgid "File Transfert Protocol with Sockets (ftpsockets)"
 msgstr "Protocole de Transfert de Fichiers avec Sockets (ftpsockets)"
 
-#: free/modules/plugins-themes/tools.php:534
+#: free/modules/plugins-themes/tools.php:535
 msgid "Clear (de)activation attempts"
 msgstr "Nettoyer les tentatives de (dés)activation"
 
-#: free/modules/plugins-themes/tools.php:537
+#: free/modules/plugins-themes/tools.php:538
 msgid "Clear deleted plugins"
 msgstr "Nettoyer les extensions supprimées"
 
-#: free/modules/plugins-themes/tools.php:632
+#: free/modules/plugins-themes/tools.php:633
 msgid "Download Failed from wp.org"
 msgstr "Échec de téléchargement depuis wp.prg"
 
-#: free/modules/plugins-themes/tools.php:633
+#: free/modules/plugins-themes/tools.php:634
 msgid "Plugin Error on wp.org"
 msgstr "Erreur dans l‘extension sur wp.org"
 
-#: free/modules/plugins-themes/tools.php:634
+#: free/modules/plugins-themes/tools.php:635
 msgid "Plugin Not Found on wp.org"
 msgstr "Extension non trouvée sur wp.org"
 
-#: free/modules/plugins-themes/tools.php:676
+#: free/modules/plugins-themes/tools.php:677
 #, php-format
 msgid "Plugin reinstallation results: %s"
 msgstr "Résultats de la réinstallation des extensions÷ %s"
@@ -10079,7 +10106,7 @@ msgstr "Authentification"
 
 #: free/modules/users-login/settings/double-auth.php:14
 #: free/modules/users-login/settings/double-auth.php:28
-#: free/modules/users-login/settings/double-auth.php:62
+#: free/modules/users-login/settings/double-auth.php:109
 msgid "Use a Two-Factor Authentication"
 msgstr "Utiliser une Double Authentification"
 
@@ -10104,43 +10131,27 @@ msgstr "Oui, utiliser la méthode <strong>PasswordLess</strong> (ancienne)"
 msgid "Yes, use the <strong>OTP Auth App</strong> method"
 msgstr "Oui, utiliser la méthode <strong>Auth OTP App</strong>"
 
-#: free/modules/users-login/settings/double-auth.php:56
-msgctxt "method"
-msgid "(recommended)"
-msgstr "(recommandée)"
-
-#: free/modules/users-login/settings/double-auth.php:72
-msgid "COMING SOON!"
-msgstr "BIENTÔT !"
-
-#: free/modules/users-login/settings/double-auth.php:78
-msgid "Receive alerts for OTP Auth App usage."
-msgstr "Recevoir des alertes pour l'utilisation de l‘OTP."
-
-#: free/modules/users-login/settings/double-auth.php:79
-msgid ""
-"Yes, allow users to receive an email notification whenever someone logs into "
-"their account"
-msgstr ""
-"Oui, permettre aux comptes de recevoir un courriel de notification quand "
-"quelqu‘un se connecte sur leur compte"
-
-#: free/modules/users-login/settings/double-auth.php:87
-#: free/modules/users-login/settings/double-auth.php:102
-msgid "Users can disable this feature in their profile."
-msgstr "Les membres peuvent désactiver cette fonction dans leur profil."
-
-#: free/modules/users-login/settings/double-auth.php:93
-msgid "Allow login using mobile sessions"
-msgstr "Autoriser les connexions via sessions mobile"
-
-#: free/modules/users-login/settings/double-auth.php:94
-msgid "Yes, allow a user to use their existing mobile session"
-msgstr ""
-"Oui, permettre aux comptes d‘utiliser leur session sur mobile pour se "
-"connecter"
-
 #: free/modules/users-login/settings/double-auth.php:113
+msgid "Yes, use the <strong>PasswordLess</strong> method"
+msgstr "Oui, utiliser la méthode <strong>PasswordLess</strong>"
+
+#: free/modules/users-login/settings/double-auth.php:118
+msgid ""
+"Users will just have to enter their email address when log in, then click on "
+"a link in the email they receive."
+msgstr ""
+"Les comptes affectés devront fournir leur adresse e-mail pour se connecter, "
+"puis cliquer sur un lien dans le courriel reçu."
+
+#: free/modules/users-login/settings/double-auth.php:122
+msgid ""
+"This module will not work until validated by a link sent to your email "
+"address when you activated it."
+msgstr ""
+"Ce module ne fonctionnera que quand il aura été validé par le lien qui vous "
+"a été envoyé par courriel durant son activation."
+
+#: free/modules/users-login/settings/double-auth.php:133
 msgid ""
 "This module will not function until you validate it by clicking a link sent "
 "to your email address during activation."
@@ -10148,20 +10159,12 @@ msgstr ""
 "Ce module ne fonctionnera que quand il aura été validé par le lien qui vous "
 "a été envoyé par courriel durant son activation."
 
-#: free/modules/users-login/settings/double-auth.php:113
+#: free/modules/users-login/settings/double-auth.php:133
 #, php-format
 msgid "Need to <a href=\"%s\">resend the validation email</a>?"
 msgstr "Besoin de <a href=\"%s\">renvoyer une validation par courriel</a> ?"
 
-#: free/modules/users-login/settings/double-auth.php:123
-msgid ""
-"Affected users will have to provide their email address, then click on a "
-"link in their mailbox to log in."
-msgstr ""
-"Les comptes affectés devront fournir leur adresse e-mail pour se connecter, "
-"puis cliquer sur un lien dans le courriel reçu."
-
-#: free/modules/users-login/settings/double-auth.php:132
+#: free/modules/users-login/settings/double-auth.php:152
 msgid ""
 "Affected users will have to provide their email address, then enter a unique "
 "numeric code to log in. They also need to set up a mobile app to use it."
@@ -10170,7 +10173,7 @@ msgstr ""
 "code numérique unique pour se connecter. Ils auront aussi besoin d'une app "
 "mobile pour l‘utiliser."
 
-#: free/modules/users-login/settings/double-auth.php:141
+#: free/modules/users-login/settings/double-auth.php:161
 msgid ""
 "We recommend you to activate at least the <a href=\"#row-password-"
 "policy_strong_passwords\">Force Strong Password</a> module below."
@@ -10178,19 +10181,19 @@ msgstr ""
 "Nous recommandons d‘activer au moins le module <a href=\"#row-password-"
 "policy_strong_passwords\">Forcer les mots de passe forts</a> ci-dessous."
 
-#: free/modules/users-login/settings/double-auth.php:157
+#: free/modules/users-login/settings/double-auth.php:177
 msgid "Future roles will be automatically selected"
 msgstr "Les nouveaux rôles seront automatiquement sélectionnés"
 
-#: free/modules/users-login/settings/double-auth.php:162
+#: free/modules/users-login/settings/double-auth.php:182
 msgid "Select at least 1 role"
 msgstr "Sélectionnez 1 rôle minimum"
 
-#: free/modules/users-login/settings/double-auth.php:172
+#: free/modules/users-login/settings/double-auth.php:192
 msgid "Enable our CAPTCHA v2 on login page"
 msgstr "Utiliser notre CAPTCHA v2 sur la page de connexion"
 
-#: free/modules/users-login/settings/double-auth.php:173
+#: free/modules/users-login/settings/double-auth.php:193
 msgid ""
 "This CAPTCHA will prevent the login form from being submitted if its rule "
 "isn’t respected."
@@ -10198,23 +10201,23 @@ msgstr ""
 "Ce CAPTCHA interdit que le formulaire de connexion soit envoyé si sa règle "
 "n’est pas respectée."
 
-#: free/modules/users-login/settings/double-auth.php:179
+#: free/modules/users-login/settings/double-auth.php:199
 msgid "Yes, use a Captcha"
 msgstr "Oui, utiliser un Captcha"
 
-#: free/modules/users-login/settings/double-auth.php:191
+#: free/modules/users-login/settings/double-auth.php:211
 msgid "<strong>Simple</strong> as a checkbox"
 msgstr "<strong>Simple</strong> comme une case à cocher"
 
-#: free/modules/users-login/settings/double-auth.php:191
+#: free/modules/users-login/settings/double-auth.php:211
 msgid "<strong>Challenge</strong> with Emojis"
 msgstr "<strong>Défi</strong> avec des Émojis"
 
-#: free/modules/users-login/settings/double-auth.php:199
+#: free/modules/users-login/settings/double-auth.php:219
 msgid "The box will check itself after 3 sec."
 msgstr "La case se coche après 3 secondes."
 
-#: free/modules/users-login/settings/double-auth.php:208
+#: free/modules/users-login/settings/double-auth.php:228
 msgid "Random"
 msgstr "Aléatoire"
 
@@ -11503,8 +11506,8 @@ msgid ""
 "article/152-apply-write-rights-to-files\">Need help?</a>"
 msgstr ""
 "Ces options sont désactivées car le fichier %1$s n’est pas en écriture. "
-"Merci d’appliquer les droits %2$s sur ce fichier. <a href=\"https://fr.docs."
-"secupress.me/article/153-appliquer-les-droits-decriture-sur-des-"
+"Merci d’appliquer les droits %2$s sur ce fichier. <a href=\"https://"
+"fr.docs.secupress.me/article/153-appliquer-les-droits-decriture-sur-des-"
 "fichiers\">Besoin d’aide ?</a>"
 
 #: free/modules/wordpress-core/tools.php:16
@@ -12188,12 +12191,12 @@ msgstr ""
 "version de %1$s. Le minimum requis est : <code>%2$s</code>. Merci de mettre "
 "à jour l‘extension en premier."
 
-#: pro/common.php:101
+#: pro/common.php:110
 #, php-format
 msgid "Empty content data from API with format %s."
 msgstr "Contenu des données de l‘API vide au format %s."
 
-#: pro/common.php:114
+#: pro/common.php:123
 #, php-format
 msgid ""
 "Undefined file format when downloading from API: %s<br>Expected ZIP or JSON."
@@ -12201,12 +12204,12 @@ msgstr ""
 "Format de fichier non défini après le téléchargement depuis l'API : "
 "%s<br>Attendu ZIP ou JSON."
 
-#: pro/common.php:122
+#: pro/common.php:131
 #, php-format
 msgid "The malware database file have been updated to version %s."
 msgstr "La base de virus a été mise à jour en version %s."
 
-#: pro/common.php:134
+#: pro/common.php:143
 #, php-format
 msgid ""
 "An error occurred while reading the malware database version. Please open a "
@@ -12215,7 +12218,7 @@ msgstr ""
 "Une erreur est survenue lors de la lecture de la version de la base de "
 "virus. Merci de créer un %sticket de support%s"
 
-#: pro/common.php:153
+#: pro/common.php:162
 msgid "Once Weekly"
 msgstr "Une fois par semaine"
 
@@ -12516,7 +12519,7 @@ msgid_plural "Found Signatures: "
 msgstr[0] "Signature trouvée : "
 msgstr[1] "Signatures trouvées : "
 
-#: pro/modules/firewall/callbacks.php:81
+#: pro/modules/firewall/callbacks.php:86
 msgid ""
 "You cannot block your own country, it has been removed from the disallowed "
 "list."
@@ -12524,7 +12527,7 @@ msgstr ""
 "Vous ne pouvez pas bloquer votre propre pays, il a été retiré de la liste "
 "des pays indésirables."
 
-#: pro/modules/firewall/callbacks.php:88
+#: pro/modules/firewall/callbacks.php:93
 msgid ""
 "You cannot block your own country, it has been added to the allowed list."
 msgstr ""
@@ -13796,17 +13799,17 @@ msgstr ""
 msgid "[%s] Password Changed"
 msgstr "[%s] Mot de passe changé"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:76
-#: pro/modules/users-login/plugins/user-creation-protection.php:795
+#: pro/modules/users-login/plugins/user-creation-protection.php:79
+#: pro/modules/users-login/plugins/user-creation-protection.php:798
 msgid "Role"
 msgstr "Rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:190
+#: pro/modules/users-login/plugins/user-creation-protection.php:193
 #, php-format
 msgid "[%s] Activate an administrator account"
 msgstr "[%s] Activer un compte administrateur"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:191
+#: pro/modules/users-login/plugins/user-creation-protection.php:194
 msgid ""
 "A user has been designated as `administrator` on your website. Please visit "
 "the users page to approve or delete their account: "
@@ -13814,107 +13817,107 @@ msgstr ""
 "Un compte a été désigné comme `administrateur` sur votre site Web. Merci de "
 "visiter la page des comptes pour approuver ou supprimer ce compte : "
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:223
+#: pro/modules/users-login/plugins/user-creation-protection.php:226
 msgid "Sorry, you are not allowed to grant `Super Admin` to this user."
 msgstr ""
 "Désolé, vous ne pouvez pas accorder le rôle `Super Admin` sur ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:224
+#: pro/modules/users-login/plugins/user-creation-protection.php:227
 msgid "Sorry, you are not allowed to revoke `Super Admin` to this user."
 msgstr ""
 "Désolé, vous ne pouvez pas révoquer le rôle `Super Admin`sur ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:225
+#: pro/modules/users-login/plugins/user-creation-protection.php:228
 msgid "Sorry, you are not allowed to edit this user."
 msgstr "Désolé, vous ne pouvez pas éditer ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:459
+#: pro/modules/users-login/plugins/user-creation-protection.php:462
 msgid "Pending User"
 msgid_plural "Pending Users"
 msgstr[0] "Compte en attente"
 msgstr[1] "Comptes en attente"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:469
+#: pro/modules/users-login/plugins/user-creation-protection.php:472
 msgid "Fake User"
 msgid_plural "Fake Users"
 msgstr[0] "Faux compte"
 msgstr[1] "Faux comptes"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:650
+#: pro/modules/users-login/plugins/user-creation-protection.php:653
 msgid "Fake Users"
 msgstr "Faux comptes"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:688
-#: pro/modules/users-login/plugins/user-creation-protection.php:701
+#: pro/modules/users-login/plugins/user-creation-protection.php:691
+#: pro/modules/users-login/plugins/user-creation-protection.php:704
 #, php-format
 msgctxt "user role"
 msgid "Activate as `%s`"
 msgstr "Activer comme `%s`"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:690
+#: pro/modules/users-login/plugins/user-creation-protection.php:693
 msgctxt "verb"
 msgid "Activate without role"
 msgstr "Activer sans rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:699
-#: pro/modules/users-login/plugins/user-creation-protection.php:710
+#: pro/modules/users-login/plugins/user-creation-protection.php:702
+#: pro/modules/users-login/plugins/user-creation-protection.php:713
 #, php-format
 msgctxt "user role"
 msgid "Downgrade as `%s`"
 msgstr "Rétrograder en `%s`"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:710
+#: pro/modules/users-login/plugins/user-creation-protection.php:713
 msgid "No role"
 msgstr "Aucun rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:741
-#: pro/modules/users-login/plugins/user-creation-protection.php:771
+#: pro/modules/users-login/plugins/user-creation-protection.php:744
+#: pro/modules/users-login/plugins/user-creation-protection.php:774
 msgid "User updated"
 msgstr "Compte mis à jour"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:796
+#: pro/modules/users-login/plugins/user-creation-protection.php:799
 msgid "Reason"
 msgstr "Raison"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:860
+#: pro/modules/users-login/plugins/user-creation-protection.php:863
 msgctxt "the user"
 msgid "Not Exist"
 msgstr "N‘existe pas"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:865
+#: pro/modules/users-login/plugins/user-creation-protection.php:868
 msgctxt "the user"
 msgid "Not Administrator"
 msgstr "Non administrateur"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:870
+#: pro/modules/users-login/plugins/user-creation-protection.php:873
 msgid "Too Short Pass Hash"
 msgstr "Hash du pass court"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:875
+#: pro/modules/users-login/plugins/user-creation-protection.php:878
 msgid "No Registration Date"
 msgstr "Pas de date d’inscription"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:880
+#: pro/modules/users-login/plugins/user-creation-protection.php:883
 msgid "Missing user_nicename"
 msgstr "`user_nicename` manquant"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:885
+#: pro/modules/users-login/plugins/user-creation-protection.php:888
 msgid "Missing Metadata"
 msgstr "Métadonnée manquante"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:890
+#: pro/modules/users-login/plugins/user-creation-protection.php:893
 msgid "Wrong Metadata Value"
 msgstr "Mauvaise valeur de métadonnée"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:895
+#: pro/modules/users-login/plugins/user-creation-protection.php:898
 msgid "Same Email Domain"
 msgstr "Domaine e-mail identique"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:900
+#: pro/modules/users-login/plugins/user-creation-protection.php:903
 msgid "Wrong Email MX"
 msgstr "Mauvais registre MX"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:905
+#: pro/modules/users-login/plugins/user-creation-protection.php:908
 msgid "Wrong Email Address"
 msgstr "Mauvaise adresse e-mail"
 
@@ -14043,6 +14046,34 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#~ msgctxt "method"
+#~ msgid "(recommended)"
+#~ msgstr "(recommandée)"
+
+#~ msgid "COMING SOON!"
+#~ msgstr "BIENTÔT !"
+
+#~ msgid "Receive alerts for OTP Auth App usage."
+#~ msgstr "Recevoir des alertes pour l'utilisation de l‘OTP."
+
+#~ msgid ""
+#~ "Yes, allow users to receive an email notification whenever someone logs "
+#~ "into their account"
+#~ msgstr ""
+#~ "Oui, permettre aux comptes de recevoir un courriel de notification quand "
+#~ "quelqu‘un se connecte sur leur compte"
+
+#~ msgid "Users can disable this feature in their profile."
+#~ msgstr "Les membres peuvent désactiver cette fonction dans leur profil."
+
+#~ msgid "Allow login using mobile sessions"
+#~ msgstr "Autoriser les connexions via sessions mobile"
+
+#~ msgid "Yes, allow a user to use their existing mobile session"
+#~ msgstr ""
+#~ "Oui, permettre aux comptes d‘utiliser leur session sur mobile pour se "
+#~ "connecter"
 
 #~ msgid ""
 #~ "It seems you have a PHP session issue, this module will not work "
@@ -14300,9 +14331,9 @@ msgstr ""
 #~ "Check if your installation contains backed up <code>wp-config.php</code> "
 #~ "files like <code>wp-config.bak</code>, <code>wp-config.old</code> etc."
 #~ msgstr ""
-#~ "Vérifie si votre installation contient des sauvegardes de <code>wp-config."
-#~ "php</code> comme <code>wp-config.bak</code>, <code>wp-config.old</code> "
-#~ "etc."
+#~ "Vérifie si votre installation contient des sauvegardes de <code>wp-"
+#~ "config.php</code> comme <code>wp-config.bak</code>, <code>wp-config.old</"
+#~ "code> etc."
 
 #~ msgid ""
 #~ "Sorry, the backed up <code>wp-config.php</code> file could not be renamed."
@@ -14944,13 +14975,6 @@ msgstr ""
 #~ "PHP cachés ou malicieux sur une erreur 404 page non trouvée."
 
 #~ msgid ""
-#~ "So many things have changed, read our blog post: <a href=\"https://"
-#~ "secupress.me/blog/secupress-v2-0\">SecuPress v2.0 aka Python</a>."
-#~ msgstr ""
-#~ "Beaucoup de choses ont changés, lisez notre article : <a href=\"https://"
-#~ "secupress.me/fr/blog/secupress-v2-0\">SecuPress v2.0 aka Python</a>."
-
-#~ msgid ""
 #~ "Based on our Daily Security Monitoring, notices will be displayed for "
 #~ "themes newly detected as vulnerable."
 #~ msgstr ""
@@ -15295,8 +15319,8 @@ msgstr ""
 
 #, php-format
 #~ msgid ""
-#~ "The %s file is not writable, read more about <a href=\"http://codex."
-#~ "wordpress.org/Changing_File_Permissions\" target=\"_blank\">writing "
+#~ "The %s file is not writable, read more about <a href=\"http://"
+#~ "codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">writing "
 #~ "permissions</a>."
 #~ msgstr ""
 #~ "Le fichier %s n’est pas en écriture, obtenez plus d’informations sur les "
@@ -15846,9 +15870,6 @@ msgstr ""
 
 #~ msgid "View options"
 #~ msgstr "Options"
-
-#~ msgid "https://secupress.me/pricing/?from=secupress-plugin"
-#~ msgstr "https://secupress.me/fr/tarifs/?from=secupress-plugin"
 
 #~ msgid ""
 #~ "Disconnect any user in one click, or even every logged in user (except "

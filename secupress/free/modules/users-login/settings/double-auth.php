@@ -51,6 +51,7 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 		}
 	}
 	// Let the possibility to continue using PasswordLess until your switch for OTP ;)
+/* //// redo
 	if ( array_search( 'passwordless', $is_plugin_active ) !== false ) {
 		$type   = 'radioboxes';
 		$values['otp-auth'] .= ' ' . _x( '(recommended)', 'method', 'secupress' );
@@ -58,6 +59,7 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 		$type   = 'checkboxes';
 		unset( $values['passwordless'] );
 	}
+
 	$this->add_field( array(
 		'title'             => __( 'Use a Two-Factor Authentication', 'secupress' ),
 		'label_for'         => $field_name,
@@ -103,6 +105,26 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 			),
 		),
 	) );
+*/
+
+	$this->add_field( array(
+		'title'             => __( 'Use a Two-Factor Authentication', 'secupress' ),
+		'name'              => $field_name,
+		'plugin_activation' => true,
+		'type'              => 'checkbox',
+		'label'             => __( 'Yes, use the <strong>PasswordLess</strong> method', 'secupress' ),
+		'value'             => (int) secupress_is_submodule_active( 'users-login', 'passwordless' ),
+		'helpers'           => array(
+			array(
+				'type'        => 'description',
+				'description' => __( 'Users will just have to enter their email address when log in, then click on a link in the email they receive.', 'secupress' ),
+			),
+			array(
+				'type'        => 'warning',
+				'description' => ! secupress_is_submodule_active( 'users-login', 'passwordless' ) || secupress_get_option( 'secupress_passwordless_activation_validation' ) ? '' : __( 'This module will not work until validated by a link sent to your email address when you activated it.', 'secupress' ),
+			),
+		),
+	) );
 
 	if ( secupress_is_submodule_active( 'users-login', 'passwordless' ) && ! secupress_get_option( 'secupress_passwordless_activation_validation' ) ) {
 		$resend_link_url = wp_nonce_url( admin_url( 'admin-post.php?action=send_passwordless_validation_link' ), 'send_passwordless_validation_link' );
@@ -115,15 +137,15 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 		) );
 	}
 	// Use this filters like the next blocks are helpers
-	if ( apply_filters( 'secupress.settings.help', 'passwordless_info', $field_name . '_passwordless', 'description' ) ) {
-		$this->add_field( array(
-			'name'         => 'passwordless_info',
-			'depends'      => $field_name . '_passwordless',
-			'type'         => 'html',
-			'value'        => '<span class="dashicons dashicons-editor-help"></span>' . __( 'Affected users will have to provide their email address, then click on a link in their mailbox to log in.', 'secupress' ) . '<hr>',
-			'move_item'    => '.secupress-field-double-auth_type_passwordless',
-		) );
-	}
+	// if ( apply_filters( 'secupress.settings.help', 'passwordless_info', $field_name . '_passwordless', 'description' ) ) {
+	// 	$this->add_field( array(
+	// 		'name'         => 'passwordless_info',
+	// 		'depends'      => $field_name . '_passwordless',
+	// 		'type'         => 'html',
+	// 		'value'        => '<span class="dashicons dashicons-editor-help"></span>' . __( 'Affected users will have to provide their email address, then click on a link in their mailbox to log in.', 'secupress' ) . '<hr>',
+	// 		'move_item'    => '.secupress-field-double-auth_type_passwordless',
+	// 	) );
+	// }
 	if ( apply_filters( 'secupress.settings.help', 'otp-auth_info', $field_name . '_otp-auth', 'description' ) ) {
 		$this->add_field( array(
 			'name'         => 'otp-auth_info',

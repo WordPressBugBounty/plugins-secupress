@@ -9,26 +9,40 @@ add_action( 'secupress.loaded', 'secupress_db_error_delete_file' );
 /**
  * Delete the file .secupress_db_down_flag if exists and send an email to inform the admin
  *
- * @author Julio Potier
  * @since 2.2.6
+ * @author Julio Potier
  **/
 function secupress_db_error_delete_file() {
 	if ( ! is_admin() ) {
 		return;
 	}
+
 	$fname = ABSPATH . '/.secupress_db_down_flag';
-	if ( file_exists( $fname ) ) {
-		@unlink( $fname );
-		secupress_add_notice( __( 'Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress' ), 'updated', '' );
+
+	if ( ! file_exists( $fname ) ) {
+		return;
+	}
+
+	$content   = file_get_contents( $fname );
+	$file_time = (int) $content;
+	if ( $file_time > 0 && $file_time > ( time() - ( HOUR_IN_SECONDS * 4 ) ) ) {
+		secupress_add_notice(
+			__('Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress'),
+			'updated',
+			''
+		);
+
+		unlink($fname);
 	}
 }
+
 
 register_activation_hook( SECUPRESS_FILE, 'secupress_activation' );
 /**
  * Tell WP what to do when the plugin is activated.
  *
- * @author Grégory Viguier
  * @since 1.0
+ * @author Grégory Viguier
  */
 function secupress_activation() {
 	// Make sure we have our toys.
