@@ -267,7 +267,7 @@ if ( $active ) {
 		'title'       => __( 'Regenerate Secure Keys', 'secupress' ),
 		'type'        => 'html',
 		'depends'     => $this->get_field_name( 'saltkeys' ),
-		'description' => '<a href="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress-regen-keys' ), 'secupress-regen-keys' ) . '"' . ' id="secupress-regen-keys" class="button secupress-button button-small">' . __( 'Regenerate the secure keys', 'secupress' ) . '</a>'
+		'value'       => '<a href="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress-regen-keys' ), 'secupress-regen-keys' ) . '"' . ' id="secupress-regen-keys" class="button secupress-button button-small">' . __( 'Regenerate the secure keys', 'secupress' ) . '</a>'
 	) );
 }
 

@@ -16,16 +16,22 @@ define( 'SECUPRESS_INSTALLED_MUPLUGINS'     , '_secupress_installed_muplugins' )
 define( 'SECUPRESS_ACTIVE_PLUGINS'          , '_secupress_active_plugins' );
 
 if ( is_multisite() ) {
-	define( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK'  , '_secupress_active_plugins_network' );
+	define( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK'  , '_secupress_active_sitewide_plugins' );
 	add_filter( 'pre_site_option_active_sitewide_plugins', 'secupress_no_action_filter_active_plugins_network' );
 	/**
 	 * Return our active plugins list
 	 *
+	 * @since 2.2.6
 	 * @author Julio Potier
 	 * @return (array) $active_plugins
 	 **/
-	function secupress_no_action_filter_active_plugins_network() {
-		return get_site_option( SECUPRESS_ACTIVE_PLUGINS_NETWORK, [] );
+	function secupress_no_action_filter_active_plugins_network( $pre ) {
+		$plugins = get_option( SECUPRESS_ACTIVE_PLUGINS_NETWORK, null );
+		if ( is_null( $plugins ) ) {
+			defined( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK_ERROR' ) || define( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK_ERROR', true );
+			return $pre;
+		}
+		return $plugins;
 	}
 }
 define( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING', true );
@@ -35,13 +41,14 @@ add_filter( 'pre_option_active_plugins', 'secupress_no_action_filter_active_plug
 /**
  * Return our active plugins list
  *
+ * @since 2.2.6
  * @author Julio Potier
  * @return (array) $active_plugins
  **/
 function secupress_no_action_filter_active_plugins( $pre ) {
-	$plugins = get_option( SECUPRESS_ACTIVE_PLUGINS, [] );
-	if ( [] === $plugins ) {
-		define( 'SECUPRESS_ACTIVE_PLUGINS_ERROR', true );
+	$plugins = get_option( SECUPRESS_ACTIVE_PLUGINS, null );
+	if ( is_null( $plugins ) ) {
+		defined( 'SECUPRESS_ACTIVE_PLUGINS_ERROR' ) || define( 'SECUPRESS_ACTIVE_PLUGINS_ERROR', true );
 		return $pre;
 	}
 	return $plugins;
@@ -50,8 +57,9 @@ function secupress_no_action_filter_active_plugins( $pre ) {
 /**
  * @see secupress_get_not_installed_plugins_list()
  *
- * @author Julio Potier
  * @since 2.2.6
+ * @author Julio Potier
+ * @return (array) $plugins
  **/
 function _secupress_get_not_installed_plugins_list_all() {
 	$ins_plugins = get_site_option( SECUPRESS_INSTALLED_PLUGINS );

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-05-09 17:54+0200\n"
-"PO-Revision-Date: 2025-05-09 17:54+0200\n"
+"POT-Creation-Date: 2025-05-18 17:45+0200\n"
+"PO-Revision-Date: 2025-05-18 17:46+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -24,7 +24,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: node_modules\n"
 
-#: free/activation.php:30
+#: free/activation.php:27
 msgid ""
 "Please be informed that your website experienced downtime due to a database "
 "error. We are pleased to report that the issue has been resolved and your "
@@ -34,14 +34,14 @@ msgstr ""
 "erreur de base de données. Le problème a été résolu et votre site est de "
 "nouveau opérationnel."
 
-#: free/activation.php:174
+#: free/activation.php:171
 #: free/classes/scanners/class-secupress-scan-bad-file-extensions.php:114
 #: free/classes/scanners/class-secupress-scan-bad-url-access.php:106
 #: free/classes/scanners/class-secupress-scan-directory-listing.php:93
 #: free/classes/scanners/class-secupress-scan-discloses.php:102
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:91
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:96
-#: free/functions/modules.php:709
+#: free/functions/modules.php:713
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please add the following lines at the "
@@ -50,22 +50,22 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture. Merci d’ajouter ces lignes au "
 "début du fichier : %2$s"
 
-#: free/activation.php:233
+#: free/activation.php:230
 #, php-format
 msgid "In %s:"
 msgstr "Dans %s :"
 
-#: free/activation.php:255
+#: free/activation.php:252
 #, php-format
 msgid "Remove all existing %s tags."
 msgstr "Supprimer toutes les balises %s."
 
-#: free/activation.php:273
+#: free/activation.php:270
 #, php-format
 msgid "Add the following: %s"
 msgstr "Ajouter ce qui suit : %s"
 
-#: free/activation.php:279
+#: free/activation.php:276
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please edit this file, following these "
@@ -74,7 +74,7 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture. Merci d’éditer le fichier comme "
 "indiqué : %2$s"
 
-#: free/activation.php:295
+#: free/activation.php:292
 #, php-format
 msgid ""
 "Since your %1$s file cannot be edited directly, please add the following in "
@@ -83,7 +83,7 @@ msgstr ""
 "Puisque votre fichier %1$s ne peut pas être édité. Merci d’ajouter ceci dans "
 "votre fichier : %2$s"
 
-#: free/activation.php:367 pro/activation.php:217
+#: free/activation.php:364 pro/activation.php:217
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit it manually. "
@@ -92,7 +92,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devrez l’éditer "
 "manuellement. Merci de supprimer toutes les règles entre %2$s et %3$s."
 
-#: free/activation.php:411
+#: free/activation.php:408
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit the file manually. "
@@ -101,7 +101,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devrez l’éditer "
 "manuellement. Merci de supprimer tous les nœuds avec %2$s."
 
-#: free/activation.php:440 free/functions/modules.php:657
+#: free/activation.php:437 free/functions/modules.php:657
 #, php-format
 msgid ""
 "Your server runs <strong>Nginx</strong>. You have to edit the configuration "
@@ -112,7 +112,7 @@ msgstr ""
 "éditer votre fichier de configuration manuellement. Merci de supprimer les "
 "règles entre %1$s et %2$s dans le fichier %3$s."
 
-#: free/activation.php:489
+#: free/activation.php:486
 msgid "OK, got it!"
 msgstr "Ok j’ai compris !"
 
@@ -556,7 +556,7 @@ msgstr ""
 
 #: free/admin/modal.php:70 free/admin/settings.php:294
 #: free/classes/settings/class-secupress-settings.php:1719
-#: free/modules/welcome/callbacks.php:397 pro/common.php:39 pro/common.php:143
+#: free/modules/welcome/callbacks.php:397 pro/common.php:40
 msgctxt "link to website (Only FR or EN!)"
 msgid "support"
 msgstr "fr/support"
@@ -1392,7 +1392,7 @@ msgstr "Docs"
 msgid "Settings"
 msgstr "Réglages"
 
-#: free/admin/settings.php:430 pro/common.php:254
+#: free/admin/settings.php:430 pro/common.php:257
 msgctxt "Latest scans"
 msgid "M dS, Y \\a\\t h:ia"
 msgstr "l j F Y \\à G:i:s"
@@ -1586,74 +1586,74 @@ msgstr ""
 "Les modules `Activation des extensions`, `Suppression des extensions` ont "
 "été consolidés dans le module `Actions sur les extensions`."
 
-#: free/admin/upgrader.php:390
+#: free/admin/upgrader.php:398
 msgid "Plugin Installation"
 msgstr "Nombre d’installations"
 
-#: free/admin/upgrader.php:519
+#: free/admin/upgrader.php:527
 msgid "Full Changelog"
 msgstr "Changelog complet"
 
-#: free/admin/upgrader.php:527
+#: free/admin/upgrader.php:535
 msgid "Install Update Now"
 msgstr "Installer la mise à jour"
 
-#: free/admin/upgrader.php:531
+#: free/admin/upgrader.php:539
 msgid "Get SecuPress Pro Now!"
 msgstr "Obtenez SecuPress Pro !"
 
-#: free/admin/upgrader.php:538
+#: free/admin/upgrader.php:546
 msgid "Requires WordPress Version:"
 msgstr "Requiert WordPress version :"
 
-#: free/admin/upgrader.php:540 free/admin/upgrader.php:543
+#: free/admin/upgrader.php:548 free/admin/upgrader.php:551
 #, php-format
 msgid "%s or higher"
 msgstr "%s ou plus"
 
-#: free/admin/upgrader.php:546 free/modules/addons/tools.php:151
+#: free/admin/upgrader.php:554 free/modules/addons/tools.php:151
 msgid "Compatible up to:"
 msgstr "Compatible jusque :"
 
-#: free/admin/upgrader.php:549
+#: free/admin/upgrader.php:557
 msgid "Active Installations:"
 msgstr "Installation actives :"
 
-#: free/admin/upgrader.php:552 free/modules/addons/tools.php:40
+#: free/admin/upgrader.php:560 free/modules/addons/tools.php:40
 msgctxt "Active plugin installations"
 msgid "1+ Million"
 msgstr "1+ million d'"
 
-#: free/admin/upgrader.php:554
+#: free/admin/upgrader.php:562
 msgctxt "Active plugin installations"
 msgid "Less Than 10"
 msgstr "Moins de 10"
 
-#: free/admin/upgrader.php:559
+#: free/admin/upgrader.php:567
 msgid "Average Rating"
 msgstr "Note moyenne"
 
-#: free/admin/upgrader.php:561
+#: free/admin/upgrader.php:569
 #, php-format
 msgid "(based on %s rating)"
 msgid_plural "(based on %s ratings)"
 msgstr[0] "(basée sur %s vote)"
 msgstr[1] "(basée sur %s votes)"
 
-#: free/admin/upgrader.php:587
+#: free/admin/upgrader.php:595
 #, php-format
 msgid "What’s new in SecuPress %s%s"
 msgstr "Quoi de neuf dans SecuPress %s%s"
 
-#: free/admin/upgrader.php:588
+#: free/admin/upgrader.php:596
 msgid "Or read full changelog on secupress.me"
 msgstr "Ou lisez tout le journal des modifications sur secupress.me"
 
-#: free/admin/upgrader.php:589
+#: free/admin/upgrader.php:597
 msgid "https://secupress.me/blog/secupress-v2-3/"
 msgstr "https://secupress.me/fr/blog/secupress-v2-3/"
 
-#: free/admin/upgrader.php:591
+#: free/admin/upgrader.php:599
 #, php-format
 msgid ""
 "So many things have changed, read our dedicated blogpost %sSecuPress v2.3 "
@@ -1826,9 +1826,9 @@ msgstr "Identifiant"
 #: free/classes/common/class-secupress-logs.php:1380
 #: free/classes/common/class-secupress-logs.php:1384
 #: free/functions/modules.php:627 free/functions/modules.php:641
-#: free/functions/modules.php:654 free/functions/modules.php:706
-#: free/functions/modules.php:734 free/functions/modules.php:764
-#: free/functions/modules.php:778
+#: free/functions/modules.php:654 free/functions/modules.php:710
+#: free/functions/modules.php:739 free/functions/modules.php:770
+#: free/functions/modules.php:785
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:65
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:66
 #: free/modules/users-login/callbacks.php:371
@@ -2251,7 +2251,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-bad-old-themes.php:95
 #: free/classes/scanners/class-secupress-scan-bad-url-access.php:112
 #: free/classes/scanners/class-secupress-scan-bad-user-agent.php:78
-#: free/classes/scanners/class-secupress-scan-bad-usernames.php:74
+#: free/classes/scanners/class-secupress-scan-bad-usernames.php:75
 #: free/classes/scanners/class-secupress-scan-bad-vuln-plugins.php:110
 #: free/classes/scanners/class-secupress-scan-chmods.php:113
 #: free/classes/scanners/class-secupress-scan-core-update.php:77
@@ -2503,6 +2503,8 @@ msgstr "Active la protection %1$s du module %2$s."
 
 #: free/classes/scanners/class-secupress-scan-bad-file-extensions.php:68
 #: free/classes/scanners/class-secupress-scan-bad-file-extensions.php:95
+#: pro/modules/sensitive-data/plugins/bad-file-extensions.php:45
+#: pro/modules/sensitive-data/plugins/bad-file-extensions.php:68
 msgid "Bad File Extensions"
 msgstr "Mauvaises extensions de fichiers"
 
@@ -2589,7 +2591,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-discloses.php:104
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:93
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:98
-#: free/functions/modules.php:748
+#: free/functions/modules.php:753
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please add the following lines inside the "
@@ -3288,6 +3290,18 @@ msgstr[1] "<strong>%1$s</strong> comptes ont un identifiant interdit : %2$s"
 
 #: free/classes/scanners/class-secupress-scan-bad-usernames.php:68
 #, php-format
+msgid "<strong>%1$s user</strong> has the same display name as login: %2$s"
+msgid_plural ""
+"<strong>%1$s users</strong> have the same display name as login: %2$s"
+msgstr[0] ""
+"<strong>%1$s compte</strong> a un nom d‘affichage comme son identifiant : "
+"%2$s"
+msgstr[1] ""
+"<strong>%1$s comptes</strong> ont un nom d‘affichage comme leur "
+"identifiant : %2$s"
+
+#: free/classes/scanners/class-secupress-scan-bad-usernames.php:69
+#, php-format
 msgid "<strong>%1$s user</strong> has the same nickname as login: %2$s"
 msgid_plural ""
 "<strong>%1$s users</strong> have the same nickname as login: %2$s"
@@ -3296,7 +3310,7 @@ msgstr[0] ""
 msgstr[1] ""
 "<strong>%1$s comptes</strong> ont un pseudo comme leur identifiant : %2$s"
 
-#: free/classes/scanners/class-secupress-scan-bad-usernames.php:70
+#: free/classes/scanners/class-secupress-scan-bad-usernames.php:71
 msgid ""
 "The module is already activated. Let’s give your users some time to change "
 "their username."
@@ -3304,7 +3318,7 @@ msgstr ""
 "Le module est déjà activé. Laissons du temps à vos membres de changer leur "
 "nom."
 
-#: free/classes/scanners/class-secupress-scan-bad-usernames.php:91
+#: free/classes/scanners/class-secupress-scan-bad-usernames.php:92
 msgid "https://docs.secupress.me/article/133-bad-username-scan"
 msgstr ""
 "https://fr.docs.secupress.me/article/30-scan-des-mauvais-noms-d-utilisateur"
@@ -3659,7 +3673,7 @@ msgstr ""
 "des fichiers dans les dossiers ne peut pas être faite automatiquement."
 
 #: free/classes/scanners/class-secupress-scan-directory-listing.php:95
-#: free/functions/modules.php:739
+#: free/functions/modules.php:744
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please remove any previous %2$s tag and add "
@@ -5437,13 +5451,13 @@ msgstr "Rôles"
 
 #: free/classes/settings/class-secupress-settings.php:287
 #: free/classes/settings/class-secupress-settings.php:293
-#: free/modules/users-login/settings/double-auth.php:166
-#: free/modules/users-login/settings/double-auth.php:172
+#: free/modules/users-login/settings/double-auth.php:168
+#: free/modules/users-login/settings/double-auth.php:174
 msgid "Affected Roles"
 msgstr "Rôles affectés"
 
 #: free/classes/settings/class-secupress-settings.php:288
-#: free/modules/users-login/settings/double-auth.php:167
+#: free/modules/users-login/settings/double-auth.php:169
 msgid "Which roles does this module affect?"
 msgstr "Quels rôles doivent être affectés pour ce module ?"
 
@@ -5625,10 +5639,10 @@ msgstr "Lien de déverrouillage expiré."
 #: free/modules/wordpress-core/plugins/wp-config-constant-repair.php:44
 #: pro/admin/ajax-post-callbacks.php:22
 #: pro/modules/users-login/plugins/password-expiration.php:148
-#: pro/modules/users-login/plugins/sessions-control.php:395
-#: pro/modules/users-login/plugins/sessions-control.php:434
-#: pro/modules/users-login/plugins/sessions-control.php:518
-#: pro/modules/users-login/plugins/sessions-control.php:572
+#: pro/modules/users-login/plugins/sessions-control.php:397
+#: pro/modules/users-login/plugins/sessions-control.php:436
+#: pro/modules/users-login/plugins/sessions-control.php:520
+#: pro/modules/users-login/plugins/sessions-control.php:574
 #: pro/modules/users-login/plugins/strong-passwords.php:342
 msgid "Something went wrong."
 msgstr "Quelque chose s’est mal passé."
@@ -5990,7 +6004,7 @@ msgstr "drop-in"
 msgid "The temporary file could not be created."
 msgstr "Le fichier temporaire n’a pu être créé."
 
-#: free/functions/files.php:1155
+#: free/functions/files.php:1157
 msgid "Could not create temporary file."
 msgstr "Impossible de créer le fichier temporaire."
 
@@ -6592,7 +6606,7 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture, vous devrez l’éditer manuellement. "
 "Merci de supprimer les règles avec %2$s du fichier %1$s."
 
-#: free/functions/modules.php:767
+#: free/functions/modules.php:773
 #, php-format
 msgid ""
 "Your server runs <strong>Nginx</strong>. You have to edit the configuration "
@@ -6602,7 +6616,7 @@ msgstr ""
 "votre fichier de configuration manuellement. Merci d’ajouter le code suivant "
 "dans le fichier %1$s : %2$s"
 
-#: free/functions/modules.php:779
+#: free/functions/modules.php:786
 msgid ""
 "It seems your server does not use <strong>Apache</strong>, <strong>Nginx</"
 "strong>, nor <strong>IIS7</strong>. This module won’t work."
@@ -6769,7 +6783,7 @@ msgstr "Oui, envoyer un rapport journalier"
 
 #: free/modules/alerts/settings/event-alerts.php:12
 msgid "Notify me for important events"
-msgstr "(basée sur %s vote)"
+msgstr "Recevoir les notifications des évènements importants"
 
 #: free/modules/alerts/settings/event-alerts.php:17
 msgid "Yes, alert me"
@@ -7408,7 +7422,7 @@ msgid "Referers List"
 msgstr "Liste des référents"
 
 #: free/modules/firewall/settings/bbq-headers.php:60
-#: free/modules/sensitive-data/settings/content-protect.php:460
+#: free/modules/sensitive-data/settings/content-protect.php:466
 msgid "One URL per line."
 msgstr "Une adresse par ligne."
 
@@ -7537,20 +7551,20 @@ msgstr ""
 "La détection d’une visite est basée sur l’adresse IP, c’est très efficace "
 "contre les attaques automatisées."
 
-#: free/modules/firewall/settings/geoip-system.php:41
+#: free/modules/firewall/settings/geoip-system.php:42
 #, php-format
 msgid ""
-"This module will store GeoIP data in the database, incresing its size for "
+"This module will store GeoIP data in your database, increasing its size for "
 "approximately %dMB."
 msgstr ""
-"Ce module va enregistrer les données des GeoIP dans la base de données, "
-"l’augmentant ainsi d’environ %dMo."
+"Ce module va enregistrer des données GeoIP dans votre base de données, "
+"l’augmentant d’environ %dMo."
 
-#: free/modules/firewall/settings/geoip-system.php:47
+#: free/modules/firewall/settings/geoip-system.php:48
 msgid "SEO bots GeoIP bypass"
 msgstr "Laisser passer les robots SEO"
 
-#: free/modules/firewall/settings/geoip-system.php:48
+#: free/modules/firewall/settings/geoip-system.php:49
 msgid ""
 "SEO bots are allowed to visit your website even if they are coming from a "
 "blocked country."
@@ -7558,11 +7572,11 @@ msgstr ""
 "Les robots SEO sont autorisés à visiter votre site même s'ils viennent d’un "
 "pays bloqué."
 
-#: free/modules/firewall/settings/geoip-system.php:54
+#: free/modules/firewall/settings/geoip-system.php:55
 msgid "Yes, still block SEO bots with GeoIP blocking"
 msgstr "Oui, bloquer quand même les robots SEO avec la GeoIP"
 
-#: free/modules/firewall/settings/geoip-system.php:58
+#: free/modules/firewall/settings/geoip-system.php:59
 msgid ""
 "If you block like the USA, any SEO bots will be blocked (Google?), keep this "
 "in mind."
@@ -7570,40 +7584,40 @@ msgstr ""
 "Si vous bloquez les USA par exemple, les robots SEO (Google ?) seraient "
 "bloqués, gardez ça en tête."
 
-#: free/modules/firewall/settings/geoip-system.php:62
+#: free/modules/firewall/settings/geoip-system.php:63
 msgid "We recommand to let this setting deactivated."
 msgstr "Nous recommandons de laisser ce paramètre désactivé."
 
-#: free/modules/firewall/settings/geoip-system.php:68
+#: free/modules/firewall/settings/geoip-system.php:69
 msgid "Which countries?"
 msgstr "Quels pays ?"
 
-#: free/modules/firewall/settings/geoip-system.php:69
+#: free/modules/firewall/settings/geoip-system.php:70
 msgid "Add or remove countries you want to manage for your website."
 msgstr ""
 "Ajouter ou supprimer les pays que vous souhaitez gérer pour votre site."
 
-#: free/modules/firewall/settings/geoip-system.php:76
+#: free/modules/firewall/settings/geoip-system.php:77
 msgid "Not installed yet"
 msgstr "Pas encore installé"
 
-#: free/modules/firewall/settings/geoip-system.php:78
+#: free/modules/firewall/settings/geoip-system.php:79
 #: free/modules/plugins-themes/settings/plugins.php:128
 #: free/modules/plugins-themes/settings/themes.php:60
 msgid "Manual Update"
 msgstr "Mises à jour manuelles"
 
-#: free/modules/firewall/settings/geoip-system.php:82
+#: free/modules/firewall/settings/geoip-system.php:83
 msgid "Update the GeoIP database now"
 msgstr "Mettre à jour la base GeoIP"
 
-#: free/modules/firewall/settings/geoip-system.php:82
+#: free/modules/firewall/settings/geoip-system.php:83
 #: free/modules/plugins-themes/settings/plugins.php:132
 #: free/modules/plugins-themes/settings/themes.php:64
 msgid "Save changes first"
 msgstr "Enregistrez les modifications d’abord"
 
-#: free/modules/firewall/settings/geoip-system.php:86
+#: free/modules/firewall/settings/geoip-system.php:87
 #, php-format
 msgid ""
 "The GeoIP database will update everyday automatically.<br />If you encounter "
@@ -8961,23 +8975,23 @@ msgstr "Notification de fin de travail"
 msgid "Scanner Module"
 msgstr "Module du scanner"
 
-#: free/modules/sensitive-data/callbacks.php:173
+#: free/modules/sensitive-data/callbacks.php:178
 msgid "a taxonomy"
 msgstr "une taxonomie"
 
-#: free/modules/sensitive-data/callbacks.php:175
+#: free/modules/sensitive-data/callbacks.php:180
 msgid "a custom post type"
 msgstr "un type de contenu personnalisé"
 
-#: free/modules/sensitive-data/callbacks.php:178
+#: free/modules/sensitive-data/callbacks.php:183
 msgid "a page"
 msgstr "une page"
 
-#: free/modules/sensitive-data/callbacks.php:181
+#: free/modules/sensitive-data/callbacks.php:186
 msgid "a post"
 msgstr "un article"
 
-#: free/modules/sensitive-data/callbacks.php:186
+#: free/modules/sensitive-data/callbacks.php:191
 #, php-format
 msgid ""
 "<strong>Error</strong>: This author page base is already used for %s. Please "
@@ -9101,8 +9115,8 @@ msgstr ""
 #: free/modules/sensitive-data/settings/content-protect.php:326
 #: free/modules/sensitive-data/settings/content-protect.php:377
 #: free/modules/sensitive-data/settings/content-protect.php:384
-#: free/modules/sensitive-data/settings/content-protect.php:480
-#: free/modules/sensitive-data/settings/content-protect.php:487
+#: free/modules/sensitive-data/settings/content-protect.php:486
+#: free/modules/sensitive-data/settings/content-protect.php:493
 #, php-format
 msgid "Your %s file is not writable. Please add the following code to it:"
 msgstr ""
@@ -9114,7 +9128,7 @@ msgstr ""
 #: free/modules/sensitive-data/settings/content-protect.php:275
 #: free/modules/sensitive-data/settings/content-protect.php:332
 #: free/modules/sensitive-data/settings/content-protect.php:390
-#: free/modules/sensitive-data/settings/content-protect.php:493
+#: free/modules/sensitive-data/settings/content-protect.php:499
 msgctxt "rewrite rules"
 msgid "Rules"
 msgstr "Règles"
@@ -9163,7 +9177,7 @@ msgstr "Oui, interdire l’accès à la divulgation des modules PHP"
 #: free/modules/sensitive-data/settings/content-protect.php:256
 #: free/modules/sensitive-data/settings/content-protect.php:313
 #: free/modules/sensitive-data/settings/content-protect.php:371
-#: free/modules/sensitive-data/settings/content-protect.php:474
+#: free/modules/sensitive-data/settings/content-protect.php:480
 #, php-format
 msgid "You need to add the following code to your %s file:"
 msgstr "Vous avez besoin d’ajouter le code suivant dans votre fichier %s :"
@@ -9236,14 +9250,40 @@ msgstr ""
 "des informations sensibles et aider les attaques."
 
 #: free/modules/sensitive-data/settings/content-protect.php:449
-msgid "Yes, restrict access to these URLs and files"
-msgstr "Oui, interdire l’accès à ces URLs et fichiers"
+msgid ""
+"Yes, block a list of <strong>disallowed</strong> URLs from WP core "
+"<em>(legacy)</em>"
+msgstr ""
+"Oui, bloquer une liste d‘URLs <strong>interdites</strong> depuis le cœur de "
+"WP <em>(ancien)</em>"
+
+#: free/modules/sensitive-data/settings/content-protect.php:449
+msgid ""
+"Yes, only <strong>allow</strong> a list of URLs from WP core <em>(new)</em>"
+msgstr ""
+"Oui, <strong>autoriser seulement</strong> une liste d‘URLs depuis le cœur de "
+"WP <em>(nouveau)</em>"
 
 #: free/modules/sensitive-data/settings/content-protect.php:453
-msgid "Allowed URLs"
-msgstr "URLs autorisées"
+msgid ""
+"• <strong>Disallowing</strong> does not require any configuration, but is "
+"less effective.<br>• <strong>Allowing</strong> may require a special "
+"configuration but is way more effective.<br>If you encounter any issue that "
+"you cannot resolve with the <strong>Custom allowed URLs</strong> field "
+"below, roll back to <strong>Disallowed</strong>."
+msgstr ""
+"• <strong>Interdire</strong> ne requiert pas de configuration, mais est "
+"moins efficace.<br>• <strong>Autoriser</strong> peut nécessiter une "
+"configuration spécifique mais est plus efficace.<br>Si vous rencontrez des "
+"soucis que vous ne pouvez pas résoudre avec le champ des <strong>URLs et "
+"dossiers personnalisés</strong> ci-dessous, revenez sur le réglage "
+"<strong>Interdire</strong>."
 
-#: free/modules/sensitive-data/settings/content-protect.php:460
+#: free/modules/sensitive-data/settings/content-protect.php:459
+msgid "Custom allowed URLs and Folders"
+msgstr "URLs et dossiers personnalisés"
+
+#: free/modules/sensitive-data/settings/content-protect.php:466
 msgid ""
 "They will be filtered to retain only those pointing to existing files and "
 "folders."
@@ -9296,16 +9336,16 @@ msgstr ""
 "d‘ici vous pouvez modifier la base de ces pages. Les comptes ayant accès à "
 "leur page de profil peuvent choisir leur propre identifiant."
 
-#: free/modules/sensitive-data/tools.php:237
+#: free/modules/sensitive-data/tools.php:270
 msgid "Profile URL Slug"
 msgstr "Identifiant de profil"
 
-#: free/modules/sensitive-data/tools.php:241
+#: free/modules/sensitive-data/tools.php:274
 #, php-format
 msgid "Leave empty for default value: %s"
 msgstr "Laisser vide pour obtenir la valeur par défaut : %s"
 
-#: free/modules/sensitive-data/tools.php:289
+#: free/modules/sensitive-data/tools.php:322
 msgid ""
 "<strong>Error</strong>: There was an error updating the author slug. Please "
 "try again."
@@ -9313,7 +9353,7 @@ msgstr ""
 "<strong>Erreur</strong> : Une erreur est survenue lors de la mise à jour de "
 "l'identifiant de profil. Merci de recommencer."
 
-#: free/modules/sensitive-data/tools.php:293
+#: free/modules/sensitive-data/tools.php:326
 msgid ""
 "<strong>Error</strong>: This profile URL slug is already registered. Please "
 "choose another one."
@@ -10106,7 +10146,7 @@ msgstr "Authentification"
 
 #: free/modules/users-login/settings/double-auth.php:14
 #: free/modules/users-login/settings/double-auth.php:28
-#: free/modules/users-login/settings/double-auth.php:109
+#: free/modules/users-login/settings/double-auth.php:111
 msgid "Use a Two-Factor Authentication"
 msgstr "Utiliser une Double Authentification"
 
@@ -10131,11 +10171,11 @@ msgstr "Oui, utiliser la méthode <strong>PasswordLess</strong> (ancienne)"
 msgid "Yes, use the <strong>OTP Auth App</strong> method"
 msgstr "Oui, utiliser la méthode <strong>Auth OTP App</strong>"
 
-#: free/modules/users-login/settings/double-auth.php:113
+#: free/modules/users-login/settings/double-auth.php:115
 msgid "Yes, use the <strong>PasswordLess</strong> method"
 msgstr "Oui, utiliser la méthode <strong>PasswordLess</strong>"
 
-#: free/modules/users-login/settings/double-auth.php:118
+#: free/modules/users-login/settings/double-auth.php:120
 msgid ""
 "Users will just have to enter their email address when log in, then click on "
 "a link in the email they receive."
@@ -10143,7 +10183,7 @@ msgstr ""
 "Les comptes affectés devront fournir leur adresse e-mail pour se connecter, "
 "puis cliquer sur un lien dans le courriel reçu."
 
-#: free/modules/users-login/settings/double-auth.php:122
+#: free/modules/users-login/settings/double-auth.php:124
 msgid ""
 "This module will not work until validated by a link sent to your email "
 "address when you activated it."
@@ -10151,7 +10191,7 @@ msgstr ""
 "Ce module ne fonctionnera que quand il aura été validé par le lien qui vous "
 "a été envoyé par courriel durant son activation."
 
-#: free/modules/users-login/settings/double-auth.php:133
+#: free/modules/users-login/settings/double-auth.php:135
 msgid ""
 "This module will not function until you validate it by clicking a link sent "
 "to your email address during activation."
@@ -10159,12 +10199,12 @@ msgstr ""
 "Ce module ne fonctionnera que quand il aura été validé par le lien qui vous "
 "a été envoyé par courriel durant son activation."
 
-#: free/modules/users-login/settings/double-auth.php:133
+#: free/modules/users-login/settings/double-auth.php:135
 #, php-format
 msgid "Need to <a href=\"%s\">resend the validation email</a>?"
 msgstr "Besoin de <a href=\"%s\">renvoyer une validation par courriel</a> ?"
 
-#: free/modules/users-login/settings/double-auth.php:152
+#: free/modules/users-login/settings/double-auth.php:154
 msgid ""
 "Affected users will have to provide their email address, then enter a unique "
 "numeric code to log in. They also need to set up a mobile app to use it."
@@ -10173,7 +10213,7 @@ msgstr ""
 "code numérique unique pour se connecter. Ils auront aussi besoin d'une app "
 "mobile pour l‘utiliser."
 
-#: free/modules/users-login/settings/double-auth.php:161
+#: free/modules/users-login/settings/double-auth.php:163
 msgid ""
 "We recommend you to activate at least the <a href=\"#row-password-"
 "policy_strong_passwords\">Force Strong Password</a> module below."
@@ -10181,19 +10221,19 @@ msgstr ""
 "Nous recommandons d‘activer au moins le module <a href=\"#row-password-"
 "policy_strong_passwords\">Forcer les mots de passe forts</a> ci-dessous."
 
-#: free/modules/users-login/settings/double-auth.php:177
+#: free/modules/users-login/settings/double-auth.php:179
 msgid "Future roles will be automatically selected"
 msgstr "Les nouveaux rôles seront automatiquement sélectionnés"
 
-#: free/modules/users-login/settings/double-auth.php:182
+#: free/modules/users-login/settings/double-auth.php:184
 msgid "Select at least 1 role"
 msgstr "Sélectionnez 1 rôle minimum"
 
-#: free/modules/users-login/settings/double-auth.php:192
+#: free/modules/users-login/settings/double-auth.php:194
 msgid "Enable our CAPTCHA v2 on login page"
 msgstr "Utiliser notre CAPTCHA v2 sur la page de connexion"
 
-#: free/modules/users-login/settings/double-auth.php:193
+#: free/modules/users-login/settings/double-auth.php:195
 msgid ""
 "This CAPTCHA will prevent the login form from being submitted if its rule "
 "isn’t respected."
@@ -10201,23 +10241,23 @@ msgstr ""
 "Ce CAPTCHA interdit que le formulaire de connexion soit envoyé si sa règle "
 "n’est pas respectée."
 
-#: free/modules/users-login/settings/double-auth.php:199
+#: free/modules/users-login/settings/double-auth.php:201
 msgid "Yes, use a Captcha"
 msgstr "Oui, utiliser un Captcha"
 
-#: free/modules/users-login/settings/double-auth.php:211
+#: free/modules/users-login/settings/double-auth.php:213
 msgid "<strong>Simple</strong> as a checkbox"
 msgstr "<strong>Simple</strong> comme une case à cocher"
 
-#: free/modules/users-login/settings/double-auth.php:211
+#: free/modules/users-login/settings/double-auth.php:213
 msgid "<strong>Challenge</strong> with Emojis"
 msgstr "<strong>Défi</strong> avec des Émojis"
 
-#: free/modules/users-login/settings/double-auth.php:219
+#: free/modules/users-login/settings/double-auth.php:221
 msgid "The box will check itself after 3 sec."
 msgstr "La case se coche après 3 secondes."
 
-#: free/modules/users-login/settings/double-auth.php:228
+#: free/modules/users-login/settings/double-auth.php:230
 msgid "Random"
 msgstr "Aléatoire"
 
@@ -12172,7 +12212,7 @@ msgstr "l j F Y \\à G:i:s"
 msgid "You do not have permission to install plugin updates"
 msgstr "Vous n’avez pas la permission d’installer des extensions sur ce site"
 
-#: pro/common.php:39
+#: pro/common.php:40
 #, php-format
 msgid ""
 "The malware database files could not be updated due to a JSON issue: Error "
@@ -12181,7 +12221,7 @@ msgstr ""
 "La base de virus n‘a pas été mise à jour suite à une erreur de JSON: Erreur "
 "%1$s</code>. Merci de %2$snous contacter%3$s pour plus d‘information"
 
-#: pro/common.php:49
+#: pro/common.php:50
 #, php-format
 msgid ""
 "The malware database file could not be updated due to a %1$s version issue. "
@@ -12191,12 +12231,12 @@ msgstr ""
 "version de %1$s. Le minimum requis est : <code>%2$s</code>. Merci de mettre "
 "à jour l‘extension en premier."
 
-#: pro/common.php:110
+#: pro/common.php:112 pro/modules/firewall/tools.php:72
 #, php-format
 msgid "Empty content data from API with format %s."
 msgstr "Contenu des données de l‘API vide au format %s."
 
-#: pro/common.php:123
+#: pro/common.php:125
 #, php-format
 msgid ""
 "Undefined file format when downloading from API: %s<br>Expected ZIP or JSON."
@@ -12204,23 +12244,14 @@ msgstr ""
 "Format de fichier non défini après le téléchargement depuis l'API : "
 "%s<br>Attendu ZIP ou JSON."
 
-#: pro/common.php:131
+#: pro/common.php:133
 #, php-format
 msgid "The malware database file have been updated to version %s."
 msgstr "La base de virus a été mise à jour en version %s."
 
-#: pro/common.php:143
-#, php-format
-msgid ""
-"An error occurred while reading the malware database version. Please open a "
-"%ssupport ticket%s"
-msgstr ""
-"Une erreur est survenue lors de la lecture de la version de la base de "
-"virus. Merci de créer un %sticket de support%s"
-
-#: pro/common.php:162
-msgid "Once Weekly"
-msgstr "Une fois par semaine"
+#: pro/common.php:164
+msgid "Every week"
+msgstr "Toutes les semaines"
 
 #: pro/functions/common.php:236
 msgid "Insert/edit link"
@@ -12534,19 +12565,32 @@ msgstr ""
 "Vous ne pouvez pas bloquer votre propre pays, il a été ajouté à la liste des "
 "pays autorisés."
 
-#: pro/modules/firewall/plugins/geoip-system.php:47
+#: pro/modules/firewall/plugins/geoip-system.php:44
 msgid "Database Table cannot be created."
 msgstr "La table de base de données n‘a pas pu être créée."
 
-#: pro/modules/firewall/plugins/geoip-system.php:52
+#: pro/modules/firewall/plugins/geoip-system.php:50
 msgid "GeoIP data cannot be updated."
 msgstr "La base de GeoIP n‘a pas pu être mise à jour."
 
-#: pro/modules/firewall/plugins/geoip-system.php:59
+#: pro/modules/firewall/plugins/geoip-system.php:58
 #, php-format
 msgid "The GeoIP module has encountered an error and cannot be installed: %s"
 msgstr ""
 "Le module GeoIP a rencontré une erreur et ne peut pas être installé : %s"
+
+#: pro/modules/firewall/tools.php:85
+#, php-format
+msgid ""
+"Undefined file format when downloading from %1$s API: %2$s<br>Expected ZIP "
+"or JSON."
+msgstr ""
+"Format de fichier non défini après le téléchargement depuis l'API %1$s : "
+"%2$s<br>Attendu ZIP ou JSON."
+
+#: pro/modules/firewall/tools.php:91
+msgid "The GeoIP database have been updated."
+msgstr "La base de GeoIP a été mise à jour."
 
 #: pro/modules/plugins-themes/plugins/detect-bad-plugins.php:111
 #: pro/modules/plugins-themes/plugins/detect-bad-themes.php:91
@@ -12844,6 +12888,14 @@ msgstr "[%s] Opération ratée"
 msgid "The scheduled operation of your site has failed."
 msgstr "L’opération planifiée sur votre site est un échec."
 
+#: pro/modules/sensitive-data/plugins/bad-url-access.php:266
+msgid ""
+"Then add the following in a file like /etc/nginx/conf.d/secupress.conf "
+"because it should be loaded in a \"http\" context of NGINX."
+msgstr ""
+"Ajoutez ensuite ce qui suit dans un fichier comme /etc/nginx/conf.d/"
+"secupress.conf car il doit être chargé dans un contexte « http » de NGINX."
+
 #: pro/modules/sensitive-data/plugins/hotlink.php:28
 msgid ""
 "The anti hotlink can work only over SSL (the URL of your website must start "
@@ -12857,8 +12909,8 @@ msgid "Passwords have been reset."
 msgstr "Les mots de passe ont tous été réinitialisés."
 
 #: pro/modules/users-login/callbacks.php:30
-#: pro/modules/users-login/plugins/sessions-control.php:488
-#: pro/modules/users-login/plugins/sessions-control.php:589
+#: pro/modules/users-login/plugins/sessions-control.php:490
+#: pro/modules/users-login/plugins/sessions-control.php:591
 msgid ""
 "You are now logged out everywhere else and all other users have been logged "
 "out."
@@ -13465,12 +13517,12 @@ msgstr "Vous ne pouvez pas vous connecter via cette page."
 msgid "Send PasswordLess Magic Link"
 msgstr "Envoyer un lien magique PasswordLess"
 
-#: pro/modules/users-login/plugins/passwordless.php:276
-#: pro/modules/users-login/plugins/passwordless.php:297
+#: pro/modules/users-login/plugins/passwordless.php:275
+#: pro/modules/users-login/plugins/passwordless.php:295
 msgid "Magic Link not sent."
 msgstr "Lien magique non envoyé."
 
-#: pro/modules/users-login/plugins/passwordless.php:300
+#: pro/modules/users-login/plugins/passwordless.php:298
 msgid "Magic Link has been sent."
 msgstr "Lien magique envoyé."
 
@@ -13517,73 +13569,73 @@ msgstr "Le mot de passe a été changé et le courriel a été envoyé."
 msgid "Reset password"
 msgstr "Réinitialisation du mot de passe"
 
-#: pro/modules/users-login/plugins/sessions-control.php:205
+#: pro/modules/users-login/plugins/sessions-control.php:206
 msgctxt "sessions column width in \"em\""
 msgid "13"
 msgstr "16"
 
-#: pro/modules/users-login/plugins/sessions-control.php:230
-#: pro/modules/users-login/plugins/sessions-control.php:337
+#: pro/modules/users-login/plugins/sessions-control.php:231
+#: pro/modules/users-login/plugins/sessions-control.php:339
 msgid "You are only logged in here"
 msgstr "C’est votre seule connexion ici"
 
-#: pro/modules/users-login/plugins/sessions-control.php:231
-#: pro/modules/users-login/plugins/sessions-control.php:330
+#: pro/modules/users-login/plugins/sessions-control.php:232
+#: pro/modules/users-login/plugins/sessions-control.php:332
 msgid "Disconnected"
 msgstr "Sans connexion"
 
-#: pro/modules/users-login/plugins/sessions-control.php:232
+#: pro/modules/users-login/plugins/sessions-control.php:233
 msgid "Destroy sessions"
 msgstr "Détruire les sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:252
+#: pro/modules/users-login/plugins/sessions-control.php:253
 msgid "Destroy all sessions"
 msgstr "Détruire toutes les sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:267
+#: pro/modules/users-login/plugins/sessions-control.php:268
 msgid "Sessions"
 msgstr "Sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:288
+#: pro/modules/users-login/plugins/sessions-control.php:289
 msgid "Never"
 msgstr "Jamais"
 
-#: pro/modules/users-login/plugins/sessions-control.php:303
+#: pro/modules/users-login/plugins/sessions-control.php:304
 #, php-format
 msgid "Last Login: %s"
 msgstr "Dernière connexion : %s"
 
-#: pro/modules/users-login/plugins/sessions-control.php:341
+#: pro/modules/users-login/plugins/sessions-control.php:343
 #, php-format
 msgid "You have %s sessions"
 msgstr "Vous avez %s sessions ouvertes"
 
-#: pro/modules/users-login/plugins/sessions-control.php:342
+#: pro/modules/users-login/plugins/sessions-control.php:344
 msgid "Destroy other sessions"
 msgstr "Détruire les autres sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:344
+#: pro/modules/users-login/plugins/sessions-control.php:346
 #, php-format
 msgid "%s session"
 msgid_plural "%s sessions"
 msgstr[0] "%s session"
 msgstr[1] "%s sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:345
+#: pro/modules/users-login/plugins/sessions-control.php:347
 msgid "Destroy session"
 msgid_plural "Destroy all sessions"
 msgstr[0] "Détruire la session"
 msgstr[1] "Détruire toutes les sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:353
+#: pro/modules/users-login/plugins/sessions-control.php:355
 msgid "Sessions Details"
 msgstr "Détails des sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:363
+#: pro/modules/users-login/plugins/sessions-control.php:365
 msgid "Session #"
 msgstr "Session #"
 
-#: pro/modules/users-login/plugins/sessions-control.php:364
+#: pro/modules/users-login/plugins/sessions-control.php:366
 #, php-format
 msgid ""
 "Logged-in since <em><abbr title=\"%5$s\">%1$s</abbr></em><br>Expires in "
@@ -13594,37 +13646,37 @@ msgstr ""
 "dans <em><abbr title=\"%6$s\">%2$s</abbr></em><br>IP : <code>%3$s</"
 "code><br>User-Agent : <code>%4$s</code>."
 
-#: pro/modules/users-login/plugins/sessions-control.php:460
-#: pro/modules/users-login/plugins/sessions-control.php:529
+#: pro/modules/users-login/plugins/sessions-control.php:462
+#: pro/modules/users-login/plugins/sessions-control.php:531
 msgid "Error: wrong user."
 msgstr "Erreur : Mauvais compte."
 
-#: pro/modules/users-login/plugins/sessions-control.php:466
-#: pro/modules/users-login/plugins/sessions-control.php:549
+#: pro/modules/users-login/plugins/sessions-control.php:468
+#: pro/modules/users-login/plugins/sessions-control.php:551
 msgid "Selected users have been logged out."
 msgstr "Les comptes sélectionnés seront déconnectés."
 
-#: pro/modules/users-login/plugins/sessions-control.php:478
-#: pro/modules/users-login/plugins/sessions-control.php:551
+#: pro/modules/users-login/plugins/sessions-control.php:480
+#: pro/modules/users-login/plugins/sessions-control.php:553
 msgid "You are now logged out everywhere else."
 msgstr "Vos sessions ont été déconnectées partout."
 
-#: pro/modules/users-login/plugins/sessions-control.php:480
+#: pro/modules/users-login/plugins/sessions-control.php:482
 #, php-format
 msgid "<strong>%s</strong> has been logged out."
 msgstr "<strong>%s</strong> a été déconnecté."
 
-#: pro/modules/users-login/plugins/sessions-control.php:514
-#: pro/modules/users-login/plugins/sessions-control.php:568
+#: pro/modules/users-login/plugins/sessions-control.php:516
+#: pro/modules/users-login/plugins/sessions-control.php:570
 msgid "You do not have sufficient permissions to access this page."
 msgstr "Vous n’avez pas la permission d’accéder à cette page."
 
-#: pro/modules/users-login/plugins/sessions-control.php:553
+#: pro/modules/users-login/plugins/sessions-control.php:555
 #, php-format
 msgid "%s has been logged out."
 msgstr "Le compte %s a été déconnecté."
 
-#: pro/modules/users-login/plugins/sessions-control.php:615
+#: pro/modules/users-login/plugins/sessions-control.php:617
 msgctxt "users"
 msgid "Connected"
 msgstr "Connectés"
@@ -14046,6 +14098,23 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#~ msgid "Yes, restrict access to these URLs and files"
+#~ msgstr "Oui, interdire l’accès à ces URLs et fichiers"
+
+#~ msgid "Allowed URLs"
+#~ msgstr "URLs autorisées"
+
+#, php-format
+#~ msgid ""
+#~ "An error occurred while reading the malware database version. Please open "
+#~ "a %ssupport ticket%s"
+#~ msgstr ""
+#~ "Une erreur est survenue lors de la lecture de la version de la base de "
+#~ "virus. Merci de créer un %sticket de support%s"
+
+#~ msgid "Once Weekly"
+#~ msgstr "Une fois par semaine"
 
 #~ msgctxt "method"
 #~ msgid "(recommended)"

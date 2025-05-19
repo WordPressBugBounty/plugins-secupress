@@ -438,20 +438,26 @@ if ( $choices ) {
 
 $main_field_name  = $this->get_field_name( 'bad-url-access' );
 $is_plugin_active = (int) secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' );
-
+$forbid_mode      = secupress_get_module_option( 'content-protect_bad-url-access', 'disallowed', 'sensitive-data' );
 $this->add_field( array(
 	'title'             => __( 'Bad URL Access and File Extensions', 'secupress' ),
 	'description'       => __( 'Directly accessing certain URLs or files on your site could expose sensitive information that might help an attacker.', 'secupress' ),
 	'label_for'         => $main_field_name,
 	'plugin_activation' => true,
-	'type'              => 'checkbox',
-	'value'             => $is_plugin_active,
-	'label'             => __( 'Yes, restrict access to these URLs and files', 'secupress' ),
+	'type'              => 'radioboxes',
+	'value'             => $forbid_mode,
+	'options'           => [ 'disallowed' => __( 'Yes, block a list of <strong>disallowed</strong> URLs from WP core <em>(legacy)</em>', 'secupress' ), 'allowed' => __( 'Yes, only <strong>allow</strong> a list of URLs from WP core <em>(new)</em>', 'secupress' ) ],
+	'helpers'           => array(
+		array(
+			'type'        => 'description',
+			'description' => __( '• <strong>Disallowing</strong> does not require any configuration, but is less effective.<br>• <strong>Allowing</strong> may require a special configuration but is way more effective.<br>If you encounter any issue that you cannot resolve with the <strong>Custom allowed URLs</strong> field below, roll back to <strong>Disallowed</strong>.', 'secupress' ),
+		),
+	),
 ) );
 
 $this->add_field( array(
-	'title'             => __( 'Allowed URLs', 'secupress' ),
-	'depends'           => $main_field_name,
+	'title'             => __( 'Custom allowed URLs and Folders', 'secupress' ),
+	'depends'           => $main_field_name . '_allowed',
 	'name'              => $main_field_name . '_allowed-urls',
 	'type'              => 'textarea',
 	'helpers'           => array(

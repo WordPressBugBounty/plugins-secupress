@@ -509,7 +509,7 @@ function secupress_add_module_notice( $module, $submodule, $action ) {
 	if ( empty( $submodule_name['Name'] ) ) {
 		return;
 	}
-
+	secupress_remove_module_notice( $module, $submodule, 'activation' === $action ? 'deactivation' : 'activation' );
 	$submodule_name    = $submodule_name['Name'];
 	$transient_name    = 'secupress_module_' . $action . '_' . get_current_user_id();
 	$transient_value   = secupress_get_site_transient( $transient_name );
@@ -674,10 +674,12 @@ function secupress_remove_module_rules_or_notice( $marker, $module_name ) {
  * An error notice is displayed on nginx or not supported systems, or if the file is not writable.
  * This is usually used on the module activation.
  *
+ * @since 2.3.13 Add filters for $message
+ * @author Julio Potier
  * @since 1.0
  * @since 1.3 Moved to global scope.
  * @author Grégory Viguier
- *
+ * 
  * @param (array) $args An array of arguments.
  *
  * @return (bool) True if the file has been edited.
@@ -685,17 +687,17 @@ function secupress_remove_module_rules_or_notice( $marker, $module_name ) {
 function secupress_add_module_rules_or_notice( $args ) {
 	global $is_apache, $is_nginx, $is_iis7;
 
-	$args = array_merge( array(
-		'rules'    => '',
-		'marker'   => '',
-		'iis_args' => array(),
-		'title'    => '', // Submodule name.
-	), $args );
+	$args = array_merge( [
+		'rules'      => '',
+		'marker'     => '',
+		'iis_args'   => [],
+		'title'      => '', // Submodule name.
+	], $args );
 
-	$rules    = $args['rules'];
-	$marker   = $args['marker'];
-	$iis_args = $args['iis_args'];
-	$title    = $args['title'];
+	$rules      = $args['rules'];
+	$marker     = $args['marker'];
+	$iis_args   = $args['iis_args'];
+	$title      = $args['title'];
 
 	// Apache.
 	if ( $is_apache ) {
@@ -710,6 +712,7 @@ function secupress_add_module_rules_or_notice( $args ) {
 				'<code>.htaccess</code>',
 				"<pre># BEGIN SecuPress $marker\n$rules# END SecuPress</pre>"
 			);
+			$message = apply_filters( 'secupress.apache.notice.message', $message, $args );
 			secupress_add_settings_error( 'general', 'apache_manual_edit', $message, 'error' );
 			return false;
 		}
@@ -751,6 +754,7 @@ function secupress_add_module_rules_or_notice( $args ) {
 					"<pre>{$spaces}{$rules}</pre>"
 				);
 			}
+			$message = apply_filters( 'secupress.iis7.notice.message', $message, $args );
 			secupress_add_settings_error( 'general', 'iis7_manual_edit', $message, 'error' );
 			return false;
 		}
@@ -769,6 +773,7 @@ function secupress_add_module_rules_or_notice( $args ) {
 			"<pre>$rules</pre>"
 		);
 		if ( apply_filters( 'secupress.nginx.notice', true ) ) {
+			$message = apply_filters( 'secupress.nginx.notice.message', $message, $args );
 			secupress_add_settings_error( 'general', 'nginx_manual_edit', $message, 'error' );
 		}
 		return false;
@@ -777,7 +782,9 @@ function secupress_add_module_rules_or_notice( $args ) {
 	// Server not supported.
 	$message  = sprintf( __( '%s:', 'secupress' ), $title ) . ' ';
 	$message .= __( 'It seems your server does not use <strong>Apache</strong>, <strong>Nginx</strong>, nor <strong>IIS7</strong>. This module won’t work.', 'secupress' );
+	$message = apply_filters( 'secupress.unknown_os.notice.message', $message, $args );
 	secupress_add_settings_error( 'general', 'unknown_os', $message, 'error' );
+
 	return false;
 }
 

@@ -34,24 +34,8 @@ if ( defined( 'SECUPRESS_LOCKED_ADMIN_EMAIL' ) ) {
 	if ( ! $host ) {
 		return; // Impossible to continue here...
 	}
-	$content = '';
-	if ( @file_exists( $fname ) ) {
-		$content = @file_get_contents( $fname, false, null, 0, 10 );
-	}
-	if ( (int) $content < ( time() - ( 60*60*4 ) ) ) {
-		$headers = 'From: no-reply@' . $_SERVER['HTTP_HOST'];
-		$headers = 'From: no-reply@' . $host . "\r\n" .
-					'Reply-To: no-reply@' . $host . "\r\n" .
-					'X-Mailer: PHP/' . phpversion();		
-		$sent    = @mail( SECUPRESS_LOCKED_ADMIN_EMAIL, 
-						sprintf( 'Website %s down!', $host ), 
-						sprintf( 'Website %s is down due to a database error. Please check the server and contact the host.', $host ),
-						$headers
-					);
-		if ( $sent ) {
-			@unlink( $fname );
-			@file_put_contents( $fname, time() );
-		}
+	if ( ! @file_exists( $fname ) ) {
+		@file_put_contents( $fname, time() );
 	}
 }
 wp_die( $message );

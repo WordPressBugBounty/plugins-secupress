@@ -65,7 +65,8 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 			2   => __( 'Users updated: The users with a login same as their nickname or display_name have been renamed, their login is still the same.', 'secupress' ),
 			// "bad"
 			200 => _n_noop( '<strong>%1$s user</strong> has a disallowed username: %2$s', '<strong>%1$s users</strong> have a disallowed username: %2$s', 'secupress' ),
-			201 => _n_noop( '<strong>%1$s user</strong> has the same nickname as login: %2$s', '<strong>%1$s users</strong> have the same nickname as login: %2$s', 'secupress' ),
+			201 => _n_noop( '<strong>%1$s user</strong> has the same display name as login: %2$s', '<strong>%1$s users</strong> have the same display name as login: %2$s', 'secupress' ),
+			202 => _n_noop( '<strong>%1$s user</strong> has the same nickname as login: %2$s', '<strong>%1$s users</strong> have the same nickname as login: %2$s', 'secupress' ),
 			// "cantfix"
 			300 => __( 'The module is already activated. Let’s give your users some time to change their username.', 'secupress' ),
 		);
@@ -128,14 +129,28 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 			$this->add_message( 200, array( $ids, $ids, static::wrap_in_tag( $logins, 'strong' ) ) );
 		}
 
-		$logins = $wpdb->get_col( "SELECT u.user_login FROM $wpdb->users u, $wpdb->usermeta um WHERE u.user_login=u.display_name OR (um.user_id=u.ID AND um.meta_key='nickname' AND um.meta_value=u.user_login ) GROUP BY ID" ); // WPCS: unprepared SQL ok.
-		$ids    = count( $logins );
+		if ( secupress_get_module_option( 'blacklist-logins_lexicomatisation', 0, 'users-login' ) ) {
 
-		// "bad"
-		if ( $ids ) {
-			$this->slice_and_dice( $logins, 10 );
-			// 2nd param: 1st item is used for the noop if needed, the rest for sprintf.
-			$this->add_message( 201, array( $ids, $ids, static::wrap_in_tag( $logins, 'strong' ) ) );
+			$logins = $wpdb->get_col( "SELECT u.user_login FROM $wpdb->users u, $wpdb->usermeta um WHERE u.user_login=u.display_name GROUP BY ID" ); // WPCS: unprepared SQL ok.
+			$ids    = count( $logins );
+
+			// "bad"
+			if ( $ids ) {
+				$this->slice_and_dice( $logins, 10 );
+				// 2nd param: 1st item is used for the noop if needed, the rest for sprintf.
+				$this->add_message( 201, array( $ids, $ids, static::wrap_in_tag( $logins, 'strong' ) ) );
+			}
+
+			$logins = $wpdb->get_col( "SELECT u.user_login FROM $wpdb->users u, $wpdb->usermeta um WHERE um.user_id=u.ID AND um.meta_key='nickname' AND um.meta_value=u.user_login GROUP BY ID" ); // WPCS: unprepared SQL ok.
+			$ids    = count( $logins );
+
+			// "bad"
+			if ( $ids ) {
+				$this->slice_and_dice( $logins, 10 );
+				// 2nd param: 1st item is used for the noop if needed, the rest for sprintf.
+				$this->add_message( 202, array( $ids, $ids, static::wrap_in_tag( $logins, 'strong' ) ) );
+			}
+
 		}
 
 		// "good"

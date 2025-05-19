@@ -9,14 +9,11 @@ add_action( 'secupress.loaded', 'secupress_db_error_delete_file' );
 /**
  * Delete the file .secupress_db_down_flag if exists and send an email to inform the admin
  *
+ * @since 2.3.13 If the file is there since 10 min min, we add the notice, else, we consider it a micro or small shutdown, not a possible hack.
  * @since 2.2.6
  * @author Julio Potier
  **/
 function secupress_db_error_delete_file() {
-	if ( ! is_admin() ) {
-		return;
-	}
-
 	$fname = ABSPATH . '/.secupress_db_down_flag';
 
 	if ( ! file_exists( $fname ) ) {
@@ -25,9 +22,9 @@ function secupress_db_error_delete_file() {
 
 	$content   = file_get_contents( $fname );
 	$file_time = (int) $content;
-	if ( $file_time > 0 && $file_time > ( time() - ( HOUR_IN_SECONDS * 4 ) ) ) {
+	if ( $file_time > 0 && $file_time < ( time() - 5*MINUTE_IN_SECONDS ) ) {
 		secupress_add_notice(
-			__('Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress'),
+			__( 'Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress' ),
 			'updated',
 			''
 		);

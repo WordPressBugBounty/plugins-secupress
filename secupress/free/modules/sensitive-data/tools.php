@@ -32,17 +32,28 @@ function secupress_blackhole_is_robots_txt_enabled() {
  * @return (string)
  */
 function secupress_bad_url_access_get_regex_pattern() {
-	$patterns                = [];
-    $patterns['root']        = '(index|wp-activate|wp-comments-post|wp-cron|wp-links-opml|wp-load|wp-login|wp-mail|wp-pass|wp-signup|wp-trackback|xmlrpc)\.php';
-    $patterns['wp-admin']    = 'wp-admin/(about|admin-ajax|admin-footer|admin-post|admin|async-upload|authorize-application|comment|contribute|credits|customize|edit-comments|edit-form-advanced|edit-form-blocks|edit-form-comment|edit-link-form|edit-tag-form|edit-tags|edit|erase-personal-data|export-personal-data|export|freedoms|import|index|link-add|link-manager|link|load-scripts|load-styles|maint/repair|media-new|media-upload|media|moderation|ms-admin|ms-delete-site|ms-edit|ms-options|ms-sites|ms-themes|ms-upgrade-network|ms-users|my-sites|nav-menus|network/about|network/admin|network/contribute|network/credits|network/edit|network/freedoms|network/index|network/plugin-editor|network/plugin-install|network/plugins|network/privacy|network/profile|network/settings|network/setup|network/site-info|network/site-new|network/site-settings|network/site-themes|network/site-users|network/sites|network/theme-editor|network/theme-install|network/themes|network/update-core|network/update|network/upgrade|network/user-edit|network/user-new|network/users|network|options-discussion|options-general|options-media|options-permalink|options-privacy|options-reading|options-writing|options|plugin-editor|plugin-install|plugins|post-new|post|press-this|privacy-policy-guide|privacy|profile|revision|site-editor|site-health|term|theme-editor|theme-install|themes|tools|update-core|update|upgrade|upload|user/about|user/admin|user/credits|user/freedoms|user/index|user/privacy|user/profile|user/user-edit|user-edit|user-new|users|widgets-form-blocks|widgets-form|widgets)\.php';
-    $patterns['wp-includes'] = 'wp-includes/js/tinymce/wp-tinymce\.php';
-    /**
-     * Filter the URLs allowed to be reached
-     * 
-     * @since 2.2.6
-     * @param (array) $patterns
-     */
-    $patterns                = apply_filters( 'secupress.plugins.bad_url_access.regex_pattern', $patterns );
+	$rules_mode = isset( $GLOBALS['contentprotectbadurlaccess'] ) ? $GLOBALS['contentprotectbadurlaccess'] : secupress_get_module_option( 'content-protect_bad-url-access', 'disallowed', 'sensitive-data' );
+	switch( $rules_mode ) {
+		case 'allowed':
+			$patterns                = [];
+			$patterns['root']        = '(index|wp-activate|wp-comments-post|wp-cron|wp-links-opml|wp-load|wp-login|wp-mail|wp-pass|wp-signup|wp-trackback|xmlrpc)\.php';
+			$patterns['wp-admin']    = 'wp-admin/(about|admin-ajax|admin-footer|admin-post|admin|async-upload|authorize-application|comment|contribute|credits|customize|edit-comments|edit-form-advanced|edit-form-blocks|edit-form-comment|edit-link-form|edit-tag-form|edit-tags|edit|erase-personal-data|export-personal-data|export|freedoms|import|index|link-add|link-manager|link|load-scripts|load-styles|maint/repair|media-new|media-upload|media|moderation|ms-admin|ms-delete-site|ms-edit|ms-options|ms-sites|ms-themes|ms-upgrade-network|ms-users|my-sites|nav-menus|network/about|network/admin|network/contribute|network/credits|network/edit|network/freedoms|network/index|network/plugin-editor|network/plugin-install|network/plugins|network/privacy|network/profile|network/settings|network/setup|network/site-info|network/site-new|network/site-settings|network/site-themes|network/site-users|network/sites|network/theme-editor|network/theme-install|network/themes|network/update-core|network/update|network/upgrade|network/user-edit|network/user-new|network/users|network|options-discussion|options-general|options-media|options-permalink|options-privacy|options-reading|options-writing|options|plugin-editor|plugin-install|plugins|post-new|post|press-this|privacy-policy-guide|privacy|profile|revision|site-editor|site-health|term|theme-editor|theme-install|themes|tools|update-core|update|upgrade|upload|user/about|user/admin|user/credits|user/freedoms|user/index|user/privacy|user/profile|user/user-edit|user-edit|user-new|users|widgets-form-blocks|widgets-form|widgets)\.php';
+			$patterns['wp-includes'] = 'wp-includes/js/tinymce/wp-tinymce\.php';
+			/**
+			 * Filter the URLs allowed to be reached
+			 * 
+			 * @since 2.2.6
+			 * @param (array) $patterns
+			 */
+			$patterns                = apply_filters( 'secupress.plugins.bad_url_access.regex_pattern', $patterns );
+		break;
+
+		default: // legacy
+		case 'disallowed':
+			$bases                   = secupress_get_rewrite_bases();
+			$patterns                = '^(' . $bases['home_from'] . 'php\.ini|' . $bases['site_from'] . 'wp-config\.php|' . $bases['site_from'] . WPINC . '/.+\.php|' . $bases['site_from'] . 'wp-admin/(admin-functions|install|menu-header|setup-config|([^/]+/)?menu|upgrade-functions|includes/.+)\.php)$';
+		break;
+	}
 	return $patterns;
 }
 
@@ -118,14 +129,14 @@ function secupress_bad_url_access_sort_urls() {
 	if ( empty( $urls ) ) {
 		return [ 'files' => [], 'content' => [], 'folders' => [] ];
 	}
-	$_urls     = [];
+	$_urls     = [ 'files' => [], 'content' => [], 'folders' => [] ];
 	$_content  = secupress_server_is_ssl() ? str_replace( 'http://', 'https://', WP_CONTENT_URL ) : WP_CONTENT_URL;
 	foreach ( $urls as $url ) {
 		$joker = strpos( $url, '*' );
 		$url   = rtrim( $url, '*' );
 		$path  = realpath( ABSPATH . str_replace( home_url( '/' ), '', $url ) );
 		if ( is_file( $path ) ) {
-			$_urls['files'][] = $url;
+			$_urls['files'][] = '/' . $url;
 			if ( 0 === strpos( $url, $_content ) ) {
 				$_urls['content'][] = $url;
 			}
@@ -142,7 +153,29 @@ function secupress_bad_url_access_sort_urls() {
 			continue;
 		}
 	}
+	var_dump($_urls);
+	$_urls = apply_filters( 'secupress.bad-url-access.urls', $_urls );
 	return $_urls;
+}
+
+add_filter( 'secupress.bad-url-access.urls', 'secupress_bad_url_access_add_third_party_urls' );
+/**
+ * Add some possible URLs needed by plugins
+ *
+ * @since 2.3.13
+ * @author Julio Potier
+ * 
+ * @param (array) $urls
+ * 
+ * @return (array) $urls
+ **/
+function secupress_bad_url_access_add_third_party_urls( $urls ) {
+	// MEMBERPRESS
+	if ( is_plugin_active( 'memberpress/memberpress.php' ) ) {
+		$urls['files'][] = '/' . plugins_url( 'memberpress/lock.php' );
+	}
+	
+	return $urls;
 }
 
 if ( ! secupress_is_plugin_active( 'sf-author-url-control/sf-author-url-control.php' ) ) { // Grégory Viguier first ;)

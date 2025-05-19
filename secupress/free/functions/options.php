@@ -346,18 +346,6 @@ function secupress_set_site_transient( $transient, $value ) {
 		 * @param (string) $transient  The name of the transient.
 		 */
 		do_action( 'set_site_transient_' . $transient, $value, 0, $transient );
-
-		/**
-		 * Fires after the value for a site transient has been set.
-		 *
-		 * @since 1.0
-		 * @since WP 3.0.0
-		 *
-		 * @param (string) $transient  The name of the transient.
-		 * @param (mixed)  $value      Transient value.
-		 * @param (int)    $expiration Time until expiration in seconds, forced to 0.
-		 */
-		do_action( 'setted_site_transient', $transient, $value, 0 );
 	}
 	return $result;
 }

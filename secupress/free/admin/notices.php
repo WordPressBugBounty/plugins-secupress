@@ -233,11 +233,10 @@ function secupress_warning_module_activity() {
 		return;
 	}
 
-	$current_user_id = get_current_user_id();
-
 	if ( ! current_user_can( secupress_get_capability() ) ) {
 		return;
 	}
+	$current_user_id = get_current_user_id();
 
 	$activated_modules   = secupress_get_site_transient( 'secupress_module_activation_' . $current_user_id );
 	$deactivated_modules = secupress_get_site_transient( 'secupress_module_deactivation_' . $current_user_id );
@@ -258,8 +257,6 @@ function secupress_warning_module_activity() {
 		secupress_delete_site_transient( 'secupress_module_deactivation_' . $current_user_id );
 	}
 }
-
-
 
 add_action( 'all_admin_notices', 'secupress_warning_no_oneclick_scan_yet', 50 );
 /**
@@ -383,9 +380,56 @@ add_action( 'admin_init', 'secupress_active_plugins_error' );
  * @author Julio Potier
  **/
 function secupress_active_plugins_error() {
+	if ( wp_doing_ajax() ) {
+		return;
+	}
+
+	if ( ! current_user_can( secupress_get_capability() ) ) {
+		return;
+	}
+
 	if ( ! defined( 'SECUPRESS_ACTIVE_PLUGINS_ERROR' ) || ! SECUPRESS_ACTIVE_PLUGINS_ERROR ) {
 		return;
 	}
+
+	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to the %sModule page%s or %sread the documentation%s.', 'secupress' ), 
+				secupress_tag_me( __( 'Plugin Actions', 'secupress' ), 'strong' ), 
+				sprintf( '<a href="%s">', 
+					esc_url( secupress_admin_url( 'modules', 'plugins-themes#row-plugins_actions' ) )
+				), 
+				'</a>',
+				sprintf( '<a href="%s">', 
+					esc_url( __( 'https://docs.secupress.me/article/233-plugin-actions', 'secupress' ) )
+				), 
+				'</a>',
+				);
+	secupress_add_notice( $message, 'error', 'active-plugins-error' );
+}
+
+add_action( 'admin_init', 'secupress_active_plugins_network_error' );
+/**
+ * If the constant SECUPRESS_ACTIVE_PLUGINS_NETWORK_ERROR is set, we got a problem.
+ *
+ * @since 2.3.13
+ * @author Julio Potier
+ **/
+function secupress_active_plugins_network_error() {
+	if ( wp_doing_ajax() ) {
+		return;
+	}
+
+	if ( ! current_user_can( secupress_get_capability() ) ) {
+		return;
+	}
+
+	if ( ! is_multisite() ) {
+		return;
+	}
+
+	if ( ! defined( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK_ERROR' ) || ! SECUPRESS_ACTIVE_PLUGINS_NETWORK_ERROR ) {
+		return;
+	}
+
 	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to the %sModule page%s or %sread the documentation%s.', 'secupress' ), 
 				secupress_tag_me( __( 'Plugin Actions', 'secupress' ), 'strong' ), 
 				sprintf( '<a href="%s">', 

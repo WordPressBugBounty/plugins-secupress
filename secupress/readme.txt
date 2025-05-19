@@ -1,10 +1,10 @@
-=== SecuPress Free — WordPress Security ===
+=== SecuPress Free with Simple SSL – Simple and Performant Security ===
 Contributors: SecuPress, juliobox, GregLone, Superment
 Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
 Tested up to: 6.7.2
 Requires PHP: 7.0
-Stable tag: 2.3.12
+Stable tag: 2.3.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,19 +179,16 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 3. The first scan
 4. The 1st step: result of the scan
 5. The 2nd step: choose what to automatically fix (1)
-6. SecuPress is fixing issue for you
+6. SecuPress is fixing issues for you
 7. The 3rd step: manual fix, when you have to decide something
 8. The 4th step: final report, you can export it as PDF (1)
 
 == Changelog ==
 
-= 2.3.12 =
-* 09 May 2025
-* Fix Multisite: In "Bad Url Access" was missing some file extensions in htaccess.
-* Fix: Warning: Undefined array key "folders" in secupress-pro/pro/modules/sensitive-data/plugins/bad-url-access.php on line 248
-* Fix: Some settings in pro were not correctly saved
-* Improvement: "/me/" is now allowed in module "Prevent User Listing" in rest api
-* Improvement: Add "pre_current_active_plugins" filter for Display All Plugins module
+= 2.3.13 =
+* 19 May 2025
+* Fix Multisite: Actions on Plugins could lead to empty list.
+* Improvement: Having logins not the same as nicknamed and display names is only scanned when the feature is activated.
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.

@@ -1096,6 +1096,7 @@ function secupress_get_rewrite_bases() {
 /**
  * Return the files paths
  *
+ * @since 2.3.13 Remove locations-en
  * @since 2.2.6
  * @author Julio Potier
  * 
@@ -1106,7 +1107,7 @@ function secupress_get_data_file_paths() {
 		// Free
 		'SECUPRESS_INC_PATH'     => [ 'bad_user_agents', 'bad_url_contents', 'bad_host_contents', 'bad_request_keys', 'disallowed_logins_list' ],
 		// Pro
-		'SECUPRESS_PRO_INC_PATH' => [ 'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'locations-en', 'IPv4', 'IPv6' ]
+		'SECUPRESS_PRO_INC_PATH' => [ 'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'IPv4', 'IPv6' ]
 	];
 }
 /**
@@ -1137,20 +1138,21 @@ function secupress_get_data_file_path( $slug ) {
  * @since 2.2.6
  * @author Julio Potier
  * 
- * @param (string) $format zip (3MB) or json (40MB)
+ * @param (string) $format 'zip' or 'json'
+ * @param (string) $api_type 'data' for malwares and bad plugins/themes ; 'geoip' for GeoIP module
  * 
  * @see download_url()
  * 
  * @return (string|WP_Error) $tmpfname
  **/
-function secupress_download_from_api( $format ) {
+function secupress_download_from_api( $format, $api_type ) {
 	// WARNING: The file is not automatically deleted, the script must delete or move the file.
 	if ( ! function_exists( 'wp_tempnam' ) ) {
 		include_once( ABSPATH . '/wp-admin/includes/file.php' );
 	}
 
-	$url          = SECUPRESS_API_MAIN . 'data/v2/?format=' . $format;
-	$tmpfname     = wp_tempnam( 'secupress-pro-data.' . $format );
+	$url          = SECUPRESS_API_MAIN . $api_type . '/v2/?format=' . $format;
+	$tmpfname     = wp_tempnam( 'secupress-pro-' . $api_type . '.' . $format );
 	if ( ! $tmpfname ) {
 		return new WP_Error( 'http_no_file', __( 'Could not create temporary file.' ) );
 	}

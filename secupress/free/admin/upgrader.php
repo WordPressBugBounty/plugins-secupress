@@ -325,6 +325,14 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 		}
 	}
+	// < 2.3.13
+	if ( version_compare( $actual_version, '2.3.13', '<' ) ) {
+		if ( secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' ) ) {
+			secupress_deactivate_submodule( 'sensitive-data', 'bad-url-access' );
+			$GLOBALS['contentprotectbadurlaccess'] = 'disallowed';
+			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
+		}
+	}
 }
 
 
@@ -579,12 +587,12 @@ if ( ! secupress_is_white_label() ) {
 	 * @return (void)
 	 **/
 	function secupress_display_whats_new() {
-		$notice_id = 'new-' . sanitize_key( SECUPRESS_VERSION );
+		$notice_id = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
 		if ( ! current_user_can( secupress_get_capability() ) || secupress_notice_is_dismissed( $notice_id ) ) {
 			return;
 		}
 
-		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
+		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
 		$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
 		$blogpost  = __( 'https://secupress.me/blog/secupress-v2-3/', 'secupress' );
 		$newitems  = [ 	
