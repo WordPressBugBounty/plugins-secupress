@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-05-18 17:45+0200\n"
-"PO-Revision-Date: 2025-05-18 17:46+0200\n"
+"POT-Creation-Date: 2025-05-19 23:49+0200\n"
+"PO-Revision-Date: 2025-05-19 23:49+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -41,7 +41,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-discloses.php:102
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:91
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:96
-#: free/functions/modules.php:713
+#: free/functions/modules.php:711
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please add the following lines at the "
@@ -773,45 +773,45 @@ msgstr ""
 "pouvez les désactiver maintenant et activer ces fonctions plus tard dans "
 "%1$s :"
 
-#: free/admin/notices.php:246
+#: free/admin/notices.php:245
 msgid "This module has been activated:"
 msgid_plural "These modules have been activated:"
 msgstr[0] "Ce module a été activé :"
 msgstr[1] "Ces modules ont été activés :"
 
-#: free/admin/notices.php:254
+#: free/admin/notices.php:253
 msgid "This module has been deactivated:"
 msgid_plural "These modules have been deactivated:"
 msgstr[0] "Ce module a été désactivé :"
 msgstr[1] "Ces modules ont été désactivés :"
 
-#: free/admin/notices.php:298
+#: free/admin/notices.php:295
 #, php-format
 msgid "%s is activated, let’s improve the security of your website!"
 msgstr "%s est activé, améliorons la sécurité de votre site !"
 
-#: free/admin/notices.php:299
+#: free/admin/notices.php:296
 msgid "Scan website for security issues, right now."
 msgstr "Scanner les points de sécurité sur le site maintenant."
 
-#: free/admin/notices.php:307 free/admin/scanner-step-1.php:75
+#: free/admin/notices.php:304 free/admin/scanner-step-1.php:75
 msgid "Scan website"
 msgstr "Scanner le site"
 
-#: free/admin/notices.php:312 free/admin/settings.php:108
+#: free/admin/notices.php:309 free/admin/settings.php:108
 #: free/admin/settings.php:185
 msgctxt "verb"
 msgid "Close"
 msgstr "Fermer"
 
-#: free/admin/notices.php:368
+#: free/admin/notices.php:365
 #, php-format
 msgid "Please read these special notes for this update, version %1$s - %2$s"
 msgstr ""
 "Merci de lire ces notes spécifiques à la mise à jour de la version %1$s du "
 "%2$s"
 
-#: free/admin/notices.php:389
+#: free/admin/notices.php:395 free/admin/notices.php:433
 #, php-format
 msgid ""
 "There is an issue with the %s module. It will not be active until the "
@@ -821,14 +821,15 @@ msgstr ""
 "sera pas corrigé.<br>Allez dans la %spage du module%s ou %slisez la "
 "documentation%s."
 
-#: free/admin/notices.php:390 free/functions/modules.php:76
+#: free/admin/notices.php:396 free/admin/notices.php:434
+#: free/functions/modules.php:76
 #: free/modules/plugins-themes/plugins/plugin-installation.php:13
 #: free/modules/plugins-themes/settings/plugins.php:15
 #: free/modules/plugins-themes/settings/plugins.php:19
 msgid "Plugin Actions"
 msgstr "Action des extensions"
 
-#: free/admin/notices.php:396
+#: free/admin/notices.php:402 free/admin/notices.php:440
 msgid "https://docs.secupress.me/article/233-plugin-actions"
 msgstr "https://fr.docs.secupress.me/article/234-actions-sur-les-extensions"
 
@@ -852,7 +853,7 @@ msgstr "En savoir plus"
 
 #: free/admin/scanner-step-1-all.php:95 free/admin/scanner-step-1-new.php:93
 #: free/classes/common/class-secupress-logs-list.php:311
-#: pro/modules/users-login/plugins/otp-auth.php:1734
+#: pro/modules/users-login/plugins/otp-auth.php:1739
 msgid "Close"
 msgstr "Fermer"
 
@@ -1100,11 +1101,11 @@ msgstr "Non corrigé"
 #: free/admin/scanner-step-4.php:213 free/admin/settings.php:149
 #: free/admin/settings.php:228
 #: pro/classes/vendors/edd-software-licensing/SecuPress_EDD_SL_Plugin_Updater.php:397
-#: pro/modules/users-login/plugins/otp-auth.php:642
-#: pro/modules/users-login/plugins/otp-auth.php:837
-#: pro/modules/users-login/plugins/otp-auth.php:1013
-#: pro/modules/users-login/plugins/otp-auth.php:1051
+#: pro/modules/users-login/plugins/otp-auth.php:647
+#: pro/modules/users-login/plugins/otp-auth.php:842
+#: pro/modules/users-login/plugins/otp-auth.php:1018
 #: pro/modules/users-login/plugins/otp-auth.php:1056
+#: pro/modules/users-login/plugins/otp-auth.php:1061
 msgid "Error"
 msgstr "Erreur"
 
@@ -1187,7 +1188,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: free/admin/settings.php:152
-#: pro/modules/users-login/plugins/otp-auth.php:1738
+#: pro/modules/users-login/plugins/otp-auth.php:1743
 msgid "Done!"
 msgstr "Fait !"
 
@@ -1301,10 +1302,10 @@ msgstr ""
 
 #: free/admin/settings.php:194
 msgid ""
-"This will change the 8 security keys for your installation.<br>You may need "
+"This will change the 10 security keys for your installation.<br>You may need "
 "to sign back in."
 msgstr ""
-"Cela va changer les 8 clés de sécurité de votre installation.<br/>Vous "
+"Cela va changer les 10 clés de sécurité de votre installation.<br/>Vous "
 "devrez peut-être vous reconnecter."
 
 #: free/admin/settings.php:214 free/functions/common.php:1873
@@ -1826,9 +1827,9 @@ msgstr "Identifiant"
 #: free/classes/common/class-secupress-logs.php:1380
 #: free/classes/common/class-secupress-logs.php:1384
 #: free/functions/modules.php:627 free/functions/modules.php:641
-#: free/functions/modules.php:654 free/functions/modules.php:710
-#: free/functions/modules.php:739 free/functions/modules.php:770
-#: free/functions/modules.php:785
+#: free/functions/modules.php:654 free/functions/modules.php:708
+#: free/functions/modules.php:737 free/functions/modules.php:768
+#: free/functions/modules.php:783
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:65
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:66
 #: free/modules/users-login/callbacks.php:371
@@ -2591,7 +2592,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-discloses.php:104
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:93
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:98
-#: free/functions/modules.php:753
+#: free/functions/modules.php:751
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please add the following lines inside the "
@@ -3673,7 +3674,7 @@ msgstr ""
 "des fichiers dans les dossiers ne peut pas être faite automatiquement."
 
 #: free/classes/scanners/class-secupress-scan-directory-listing.php:95
-#: free/functions/modules.php:744
+#: free/functions/modules.php:742
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please remove any previous %2$s tag and add "
@@ -5639,11 +5640,11 @@ msgstr "Lien de déverrouillage expiré."
 #: free/modules/wordpress-core/plugins/wp-config-constant-repair.php:44
 #: pro/admin/ajax-post-callbacks.php:22
 #: pro/modules/users-login/plugins/password-expiration.php:148
-#: pro/modules/users-login/plugins/sessions-control.php:397
-#: pro/modules/users-login/plugins/sessions-control.php:436
-#: pro/modules/users-login/plugins/sessions-control.php:520
-#: pro/modules/users-login/plugins/sessions-control.php:574
-#: pro/modules/users-login/plugins/strong-passwords.php:342
+#: pro/modules/users-login/plugins/sessions-control.php:396
+#: pro/modules/users-login/plugins/sessions-control.php:435
+#: pro/modules/users-login/plugins/sessions-control.php:519
+#: pro/modules/users-login/plugins/sessions-control.php:573
+#: pro/modules/users-login/plugins/strong-passwords.php:358
 msgid "Something went wrong."
 msgstr "Quelque chose s’est mal passé."
 
@@ -6606,7 +6607,7 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture, vous devrez l’éditer manuellement. "
 "Merci de supprimer les règles avec %2$s du fichier %1$s."
 
-#: free/functions/modules.php:773
+#: free/functions/modules.php:771
 #, php-format
 msgid ""
 "Your server runs <strong>Nginx</strong>. You have to edit the configuration "
@@ -6616,7 +6617,7 @@ msgstr ""
 "votre fichier de configuration manuellement. Merci d’ajouter le code suivant "
 "dans le fichier %1$s : %2$s"
 
-#: free/functions/modules.php:786
+#: free/functions/modules.php:784
 msgid ""
 "It seems your server does not use <strong>Apache</strong>, <strong>Nginx</"
 "strong>, nor <strong>IIS7</strong>. This module won’t work."
@@ -7243,7 +7244,7 @@ msgid "<strong>Error</strong>: Invalid username or e-mail."
 msgstr "<strong>Erreur</strong> : Identifiant ou e-mail non valide."
 
 #: free/modules/discloses/tools.php:22
-#: pro/modules/users-login/plugins/passwordless.php:93
+#: pro/modules/users-login/plugins/passwordless.php:98
 #: pro/modules/users-login/plugins/sessions-control.php:42
 msgid "<strong>Error</strong>: Invalid username or email."
 msgstr "<strong>Erreur</strong> : Identifiant ou e-mail incorrecte."
@@ -7271,7 +7272,7 @@ msgid "<strong>Error</strong>: Invalid username."
 msgstr "<strong>Erreur</strong> : identifiant invalide."
 
 #: free/modules/discloses/tools.php:25 free/modules/discloses/tools.php:28
-#: pro/modules/users-login/plugins/otp-auth.php:1224
+#: pro/modules/users-login/plugins/otp-auth.php:1229
 msgid "Lost your password?"
 msgstr "Mot de passe perdu ?"
 
@@ -9021,12 +9022,12 @@ msgid "DO NOT CLICK THIS LINK"
 msgstr "NE CLIQUEZ PAS SUR CE LIEN"
 
 #: free/modules/sensitive-data/plugins/xmlrpc.php:30
-#: free/modules/sensitive-data/plugins/xmlrpc.php:130
+#: free/modules/sensitive-data/plugins/xmlrpc.php:135
 msgid "XML-RPC services are disabled on this site."
 msgstr "Les services XML-RPC sont désactivés sur ce site."
 
 #: free/modules/sensitive-data/plugins/xmlrpc.php:31
-#: free/modules/sensitive-data/plugins/xmlrpc.php:131
+#: free/modules/sensitive-data/plugins/xmlrpc.php:136
 msgid "XML-RPC is disabled"
 msgstr "XML-RPC est désactivé"
 
@@ -9336,16 +9337,16 @@ msgstr ""
 "d‘ici vous pouvez modifier la base de ces pages. Les comptes ayant accès à "
 "leur page de profil peuvent choisir leur propre identifiant."
 
-#: free/modules/sensitive-data/tools.php:270
+#: free/modules/sensitive-data/tools.php:269
 msgid "Profile URL Slug"
 msgstr "Identifiant de profil"
 
-#: free/modules/sensitive-data/tools.php:274
+#: free/modules/sensitive-data/tools.php:273
 #, php-format
 msgid "Leave empty for default value: %s"
 msgstr "Laisser vide pour obtenir la valeur par défaut : %s"
 
-#: free/modules/sensitive-data/tools.php:322
+#: free/modules/sensitive-data/tools.php:321
 msgid ""
 "<strong>Error</strong>: There was an error updating the author slug. Please "
 "try again."
@@ -9353,7 +9354,7 @@ msgstr ""
 "<strong>Erreur</strong> : Une erreur est survenue lors de la mise à jour de "
 "l'identifiant de profil. Merci de recommencer."
 
-#: free/modules/sensitive-data/tools.php:326
+#: free/modules/sensitive-data/tools.php:325
 msgid ""
 "<strong>Error</strong>: This profile URL slug is already registered. Please "
 "choose another one."
@@ -9825,10 +9826,10 @@ msgstr ""
 
 #: free/modules/users-login/plugins/move-login.php:611
 #: pro/modules/users-login/plugins/otp-auth.php:141
-#: pro/modules/users-login/plugins/otp-auth.php:642
-#: pro/modules/users-login/plugins/otp-auth.php:875
-#: pro/modules/users-login/plugins/otp-auth.php:1037
-#: pro/modules/users-login/plugins/passwordless.php:216
+#: pro/modules/users-login/plugins/otp-auth.php:647
+#: pro/modules/users-login/plugins/otp-auth.php:880
+#: pro/modules/users-login/plugins/otp-auth.php:1042
+#: pro/modules/users-login/plugins/passwordless.php:221
 #: pro/modules/users-login/tools.php:276
 msgid "Log In"
 msgstr "Connexion"
@@ -12909,8 +12910,8 @@ msgid "Passwords have been reset."
 msgstr "Les mots de passe ont tous été réinitialisés."
 
 #: pro/modules/users-login/callbacks.php:30
-#: pro/modules/users-login/plugins/sessions-control.php:490
-#: pro/modules/users-login/plugins/sessions-control.php:591
+#: pro/modules/users-login/plugins/sessions-control.php:489
+#: pro/modules/users-login/plugins/sessions-control.php:590
 msgid ""
 "You are now logged out everywhere else and all other users have been logged "
 "out."
@@ -12931,22 +12932,22 @@ msgid "Continue"
 msgstr "Continuer"
 
 #: pro/modules/users-login/plugins/otp-auth.php:142
-#: pro/modules/users-login/plugins/otp-auth.php:658
+#: pro/modules/users-login/plugins/otp-auth.php:663
 msgid "Not you? Switch account."
 msgstr "Pas vous ? Changer de compte."
 
 #: pro/modules/users-login/plugins/otp-auth.php:163
-#: pro/modules/users-login/plugins/otp-auth.php:539
-#: pro/modules/users-login/plugins/otp-auth.php:740
-#: pro/modules/users-login/plugins/otp-auth.php:751
-#: pro/modules/users-login/plugins/otp-auth.php:825
-#: pro/modules/users-login/plugins/otp-auth.php:861
-#: pro/modules/users-login/plugins/otp-auth.php:867
-#: pro/modules/users-login/plugins/otp-auth.php:1011
-#: pro/modules/users-login/plugins/otp-auth.php:1033
-#: pro/modules/users-login/plugins/otp-auth.php:1071
-#: pro/modules/users-login/plugins/otp-auth.php:1075
-#: pro/modules/users-login/plugins/otp-auth.php:1081
+#: pro/modules/users-login/plugins/otp-auth.php:544
+#: pro/modules/users-login/plugins/otp-auth.php:745
+#: pro/modules/users-login/plugins/otp-auth.php:756
+#: pro/modules/users-login/plugins/otp-auth.php:830
+#: pro/modules/users-login/plugins/otp-auth.php:866
+#: pro/modules/users-login/plugins/otp-auth.php:872
+#: pro/modules/users-login/plugins/otp-auth.php:1016
+#: pro/modules/users-login/plugins/otp-auth.php:1038
+#: pro/modules/users-login/plugins/otp-auth.php:1076
+#: pro/modules/users-login/plugins/otp-auth.php:1080
+#: pro/modules/users-login/plugins/otp-auth.php:1086
 #, php-format
 msgid "Invalid Link.<br>Please try to <a href=\"%s\">log in again</a>."
 msgstr "Lien invalide, merci de <a href=\"%s\">vous reconnecter</a>."
@@ -12958,14 +12959,14 @@ msgstr ""
 "application OTP à la place."
 
 #: pro/modules/users-login/plugins/otp-auth.php:277
-#: pro/modules/users-login/plugins/otp-auth.php:655
-#: pro/modules/users-login/plugins/otp-auth.php:874
+#: pro/modules/users-login/plugins/otp-auth.php:660
+#: pro/modules/users-login/plugins/otp-auth.php:879
 #, php-format
 msgid "Howdy, %s"
 msgstr "Bonjour, %s"
 
-#: pro/modules/users-login/plugins/otp-auth.php:444
-#: pro/modules/users-login/plugins/passwordless.php:64
+#: pro/modules/users-login/plugins/otp-auth.php:449
+#: pro/modules/users-login/plugins/passwordless.php:69
 msgid ""
 "You cannot login using your password, please just fill your login or email "
 "address."
@@ -12973,17 +12974,17 @@ msgstr ""
 "Vous ne pouvez pas vous connecter avec votre mot de passe, renseignez juste "
 "votre identifiant ou adresse e-mail."
 
-#: pro/modules/users-login/plugins/otp-auth.php:447
+#: pro/modules/users-login/plugins/otp-auth.php:452
 msgctxt "or Log In using a magic link"
 msgid "or"
 msgstr "ou"
 
-#: pro/modules/users-login/plugins/otp-auth.php:447
+#: pro/modules/users-login/plugins/otp-auth.php:452
 msgid "Log In using a Magic Link"
 msgstr "Se connecter avec un Lien Magique"
 
-#: pro/modules/users-login/plugins/otp-auth.php:535
-#: pro/modules/users-login/plugins/otp-auth.php:836
+#: pro/modules/users-login/plugins/otp-auth.php:540
+#: pro/modules/users-login/plugins/otp-auth.php:841
 #, php-format
 msgid ""
 "Too much time has elapsed between the first step and now.<br>Please try to "
@@ -12992,54 +12993,54 @@ msgstr ""
 "Trop de temps est passé depuis le début de la procédure.<br>Merci de <a "
 "href=\"%s\">vous reconnecter</a>."
 
-#: pro/modules/users-login/plugins/otp-auth.php:566
-#: pro/modules/users-login/plugins/otp-auth.php:593
+#: pro/modules/users-login/plugins/otp-auth.php:571
+#: pro/modules/users-login/plugins/otp-auth.php:598
 msgid "<strong>Error</strong>: Wrong Authentication Code."
 msgstr "<strong>Erreur</strong> : Code d‘Authentification incorrect."
 
-#: pro/modules/users-login/plugins/otp-auth.php:663
+#: pro/modules/users-login/plugins/otp-auth.php:668
 #, php-format
 msgid "2-Step Verification for %s"
 msgstr "Vérification en 2 étapes pour %s"
 
-#: pro/modules/users-login/plugins/otp-auth.php:666
+#: pro/modules/users-login/plugins/otp-auth.php:671
 msgid "Enter the verification code generated by your mobile application."
 msgstr "Entrez le code de vérification généré par votre application mobile."
 
-#: pro/modules/users-login/plugins/otp-auth.php:667
+#: pro/modules/users-login/plugins/otp-auth.php:672
 msgid "Enter one of your backup codes to log-in."
 msgstr "Entrez un de vos codes de secours pour vous connecter."
 
-#: pro/modules/users-login/plugins/otp-auth.php:680
+#: pro/modules/users-login/plugins/otp-auth.php:685
 msgid "Verify"
 msgstr "Vérifier"
 
-#: pro/modules/users-login/plugins/otp-auth.php:693
+#: pro/modules/users-login/plugins/otp-auth.php:698
 msgid "Having trouble with your code?"
 msgstr "Des soucis avec votre code ?"
 
-#: pro/modules/users-login/plugins/otp-auth.php:698
+#: pro/modules/users-login/plugins/otp-auth.php:703
 msgid "Try one of these alternate methods:"
 msgstr "Essayez une de ces méthodes alternatives :"
 
-#: pro/modules/users-login/plugins/otp-auth.php:702
+#: pro/modules/users-login/plugins/otp-auth.php:707
 msgid "Enter a backup code to proceed"
 msgstr "Entrer un code de secours pour continuer"
 
-#: pro/modules/users-login/plugins/otp-auth.php:707
+#: pro/modules/users-login/plugins/otp-auth.php:712
 msgid "Send a backup code to my email"
 msgstr "Envoyer un code de secours sur mon courriel"
 
-#: pro/modules/users-login/plugins/otp-auth.php:715
+#: pro/modules/users-login/plugins/otp-auth.php:720
 msgid "Log in using your mobile phone by scanning a QR code"
 msgstr "Se connecter en utilisant votre mobile en scannant un QR Code"
 
-#: pro/modules/users-login/plugins/otp-auth.php:779
+#: pro/modules/users-login/plugins/otp-auth.php:784
 #, php-format
 msgid "[%1$s] OTP Authenticator Backup Code request"
 msgstr "[%1$s] Demande de Code OTP de secours"
 
-#: pro/modules/users-login/plugins/otp-auth.php:790
+#: pro/modules/users-login/plugins/otp-auth.php:795
 #, php-format
 msgid ""
 "Hello %1$s, you asked for a backup code, here it comes: %2$s. You have %3$d "
@@ -13048,11 +13049,11 @@ msgstr ""
 "Bonjour %1$s, vous avez demandé un code de sauvegarde, le voici : %2$s. Il "
 "vous reste %3$d codes de sauvegarde."
 
-#: pro/modules/users-login/plugins/otp-auth.php:880
+#: pro/modules/users-login/plugins/otp-auth.php:885
 msgid "<strong>Error</strong>.<br>This module needs JavaScript activated."
 msgstr "<strong>Erreur</strong> : Ce module requiert JavaScript activé."
 
-#: pro/modules/users-login/plugins/otp-auth.php:881
+#: pro/modules/users-login/plugins/otp-auth.php:886
 msgid ""
 "Please scan the <abbr title=\"Quick Response Code\">QR Code</abbr> below "
 "with your mobile phone that is already logged in."
@@ -13060,13 +13061,13 @@ msgstr ""
 "Merci de scanner le <abbr title=\"Quick Response Code\">QR Code</abbr> ci-"
 "dessous avec votre application mobile qui est déjà connectée."
 
-#: pro/modules/users-login/plugins/otp-auth.php:882
+#: pro/modules/users-login/plugins/otp-auth.php:887
 msgid "<strong>Reviewing request</strong>.<br>Awaiting owner‘s decision."
 msgstr ""
 "<strong>Vérification de la demande</strong>.<br>Attente de la décision du "
 "propriétaire."
 
-#: pro/modules/users-login/plugins/otp-auth.php:883
+#: pro/modules/users-login/plugins/otp-auth.php:888
 msgid ""
 "<strong>Request accepted</strong>.<br>Redirection in 3&hellip; 2&hellip; "
 "1&hellip;"
@@ -13074,7 +13075,7 @@ msgstr ""
 "<strong>Demande acceptée</strong>.<br>Redirection dans 3&hellip; 2&hellip; "
 "1&hellip;"
 
-#: pro/modules/users-login/plugins/otp-auth.php:884
+#: pro/modules/users-login/plugins/otp-auth.php:889
 msgid ""
 "<strong>Request refused</strong>.<br>Sorry, the request has been refused by "
 "the session owner."
@@ -13082,7 +13083,7 @@ msgstr ""
 "<strong>Demande refusée</strong>.<br>Désolé, la demande a été refusée par le "
 "propriétaire de la session."
 
-#: pro/modules/users-login/plugins/otp-auth.php:885
+#: pro/modules/users-login/plugins/otp-auth.php:890
 msgid ""
 "<strong>Request expired</strong>.<br>Too much time has elapsed between the "
 "first step and now."
@@ -13090,7 +13091,7 @@ msgstr ""
 "<strong>Demande expirée</strong>.<br>Trop de temps est passé depuis le début "
 "de la procédure."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1013
+#: pro/modules/users-login/plugins/otp-auth.php:1018
 msgid ""
 "You have exhausted your backup codes despite our warnings, and you are "
 "currently unable to log in.<br>Please contact an administrator for "
@@ -13100,7 +13101,7 @@ msgstr ""
 "ne pouvez plus vous connecter.<br>Merci de contacter un responsable de "
 "l‘administration pour obtenir de l‘aide."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1036
+#: pro/modules/users-login/plugins/otp-auth.php:1041
 #, php-format
 msgid ""
 "Please check your email for the Backup Code needed to <a href=\"%s\">log in</"
@@ -13109,7 +13110,7 @@ msgstr ""
 "Merci de vérifier vos courriels pour trouver le code de secours pour <a "
 "href=\"%s\">vous connectez</a>."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1051
+#: pro/modules/users-login/plugins/otp-auth.php:1056
 msgid ""
 "This page is not accessible on a desktop. Please use your mobile device "
 "instead."
@@ -13117,77 +13118,77 @@ msgstr ""
 "Cette page n'est pas accessible depuis un ordinateur de bureau. Merci "
 "d‘utiliser votre mobile."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1056
+#: pro/modules/users-login/plugins/otp-auth.php:1061
 #, php-format
 msgid "You need to <a href=\"%s\">log in</a> first to access this page."
 msgstr ""
 "Vous devez <a href=\"%s\">vous connecter</a> en premier accéder à cette page."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1068
-#: pro/modules/users-login/plugins/otp-auth.php:1809
+#: pro/modules/users-login/plugins/otp-auth.php:1073
+#: pro/modules/users-login/plugins/otp-auth.php:1814
 msgid "Double Authentication Account Settings"
 msgstr "Réglages de la double authentification pour le compte"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1091
+#: pro/modules/users-login/plugins/otp-auth.php:1096
 msgid "Login request <strong>accepted</strong>. You may close this window."
 msgstr ""
 "Demande de connexion <strong>acceptée</strong>. Vous pouvez fermer cette "
 "fenêtre."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1094
+#: pro/modules/users-login/plugins/otp-auth.php:1099
 msgid "Login request <strong>rejected</strong>. You may close this window."
 msgstr ""
 "Demande de connexion <strong>refusée</strong>. Vous pouvez fermer cette "
 "fenêtre."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1105
+#: pro/modules/users-login/plugins/otp-auth.php:1110
 msgid "You requested to log in on desktop using your mobile session."
 msgstr ""
 "Vous avez demandé de vous connecter sur ordinateur de bureau en utilisant "
 "votre session mobile."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1106
+#: pro/modules/users-login/plugins/otp-auth.php:1111
 msgid "Do you accept the request?"
 msgstr "Acceptez-vous la demande ?"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1108
+#: pro/modules/users-login/plugins/otp-auth.php:1113
 msgid "Cancel the request"
 msgstr "Annuler la demande"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1109
+#: pro/modules/users-login/plugins/otp-auth.php:1114
 msgid "Accept the request"
 msgstr "Accepter la demande"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1223
-#: pro/modules/users-login/plugins/passwordless.php:216
+#: pro/modules/users-login/plugins/otp-auth.php:1228
+#: pro/modules/users-login/plugins/passwordless.php:221
 msgid "Get my Magic Link"
 msgstr "Obtenir mon lien magique"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1253
-#: pro/modules/users-login/plugins/otp-auth.php:1298
+#: pro/modules/users-login/plugins/otp-auth.php:1258
+#: pro/modules/users-login/plugins/otp-auth.php:1303
 msgid "OTP Authenticator Settings"
 msgstr "Réglage de l‘Auth OTP"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1256
-#: pro/modules/users-login/plugins/otp-auth.php:1304
+#: pro/modules/users-login/plugins/otp-auth.php:1261
+#: pro/modules/users-login/plugins/otp-auth.php:1309
 msgid "Secret OTP Key"
 msgstr "Clé secrète OTP"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1260
+#: pro/modules/users-login/plugins/otp-auth.php:1265
 msgid "Their account is <strong>protected</strong> by a double authentication."
 msgstr "Ce compte <strong>est protégé</strong> par la double authentification."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1262
+#: pro/modules/users-login/plugins/otp-auth.php:1267
 msgid ""
 "Their account is <strong>not protected</strong> by a double authentication."
 msgstr ""
 "Ce compte <strong>n‘est pas protégé</strong> par la double authentification."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1268
+#: pro/modules/users-login/plugins/otp-auth.php:1273
 msgid "Revoke their application key"
 msgstr "Révoquer la clé d‘application"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1296
+#: pro/modules/users-login/plugins/otp-auth.php:1301
 #, php-format
 msgid ""
 "Get a Free <abbr title=\"One-Time Password\">OTP</abbr> Mobile Application "
@@ -13196,64 +13197,64 @@ msgstr ""
 "Obtenez une application mobile gratuite d‘<abbr title=\"One-Time "
 "Password\">OTP</abbr> sur %1$s et %2$s pour paramétrer votre App OTP."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1310
-#: pro/modules/users-login/plugins/otp-auth.php:1782
+#: pro/modules/users-login/plugins/otp-auth.php:1315
+#: pro/modules/users-login/plugins/otp-auth.php:1787
 msgid "https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp"
 msgstr "https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1311
-#: pro/modules/users-login/plugins/otp-auth.php:1783
+#: pro/modules/users-login/plugins/otp-auth.php:1316
+#: pro/modules/users-login/plugins/otp-auth.php:1788
 msgid "https://itunes.apple.com/us/app/freeotp-authenticator/id872559395?mt=8"
 msgstr "https://itunes.apple.com/us/app/freeotp-authenticator/id872559395?mt=8"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1326
+#: pro/modules/users-login/plugins/otp-auth.php:1331
 msgid "Your account is <strong>using</strong> a double authentication."
 msgstr ""
 "Votre compte <strong>est protégé</strong> par la double authentification."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1328
+#: pro/modules/users-login/plugins/otp-auth.php:1333
 msgid "Your account is <strong>not using</strong> a double authentication."
 msgstr ""
 "Votre compte <strong>n‘est pas protégé</strong> par la double "
 "authentification."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1334
+#: pro/modules/users-login/plugins/otp-auth.php:1339
 msgid "Revoke and generate a new application key"
 msgstr "Révoquer et générer une nouvelle clé d‘application"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1336
+#: pro/modules/users-login/plugins/otp-auth.php:1341
 msgid "Generate an application key"
 msgstr "Générer une clé d‘application"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1349
+#: pro/modules/users-login/plugins/otp-auth.php:1354
 msgid "Get alerted when the OTP Auth App is used"
 msgstr "Me tenir alerté quand l‘App OTP est utilisée"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1352
+#: pro/modules/users-login/plugins/otp-auth.php:1357
 msgid "Yes, send me an email when someone logs into my account using OTP"
 msgstr ""
 "Oui, m‘envoyer un courriel quand une personne se connecte en utilisant OTP"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1364
+#: pro/modules/users-login/plugins/otp-auth.php:1369
 msgid "Allow mobile sessions to log in"
 msgstr "Permettre les connexions via sessions mobile"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1367
+#: pro/modules/users-login/plugins/otp-auth.php:1372
 msgid "Yes, I want to be able to use my already logged in mobile session"
 msgstr "Oui, je veux pouvoir me connecter en utilisant ma session mobile"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1376
+#: pro/modules/users-login/plugins/otp-auth.php:1381
 #, php-format
 msgid "You have %d unused code."
 msgid_plural "You have %d unused codes."
 msgstr[0] "Vous avez %d code non utilisé."
 msgstr[1] "Vous avez %d codes non utilisés."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1380
+#: pro/modules/users-login/plugins/otp-auth.php:1385
 msgid "Backup Codes"
 msgstr "Codes de secours"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1381
+#: pro/modules/users-login/plugins/otp-auth.php:1386
 msgid ""
 "When your smartphone is unavailable or just can't log in your account using "
 "the Mobile Authenticator."
@@ -13261,7 +13262,7 @@ msgstr ""
 "Quand votre smartphone n‘est pas disponible ou que vous ne pouvez simplement "
 "pas vous connecter en utilisant l‘Authentification Mobile."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1401
+#: pro/modules/users-login/plugins/otp-auth.php:1406
 msgid ""
 "Keep them someplace accessible, like your wallet. Each code can be used only "
 "once.<br/>Before running out of backup codes, generate new ones. Only the "
@@ -13272,15 +13273,15 @@ msgstr ""
 "secours, générez-en de nouveaux. Seul le dernier jeu de codes de secours "
 "fonctionnera."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1407
+#: pro/modules/users-login/plugins/otp-auth.php:1412
 msgid "Show backup codes"
 msgstr "Montrer les codes de secours"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1414
+#: pro/modules/users-login/plugins/otp-auth.php:1419
 msgid "Generate new backup codes"
 msgstr "Générer de nouveaux codes de secours"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1433
+#: pro/modules/users-login/plugins/otp-auth.php:1438
 msgid ""
 "Renewing your backup codes will revoke all old ones.\n"
 "Are you sure to continue?"
@@ -13288,23 +13289,23 @@ msgstr ""
 "Renouveler les codes de secours révoquera vos anciens code.\n"
 "Confirmez-vous le renouvellement ?"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1455
+#: pro/modules/users-login/plugins/otp-auth.php:1460
 msgid "Do you want to download your Backup Codes as a txt file?"
 msgstr "Voulez-vous télécharger les codes de secours en fichier txt ?"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1533
+#: pro/modules/users-login/plugins/otp-auth.php:1538
 msgid "OTP Auth"
 msgstr "Auth OTP"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1549
+#: pro/modules/users-login/plugins/otp-auth.php:1554
 msgid "OTP Auth Activated"
 msgstr "Auth OTP activée"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1551
+#: pro/modules/users-login/plugins/otp-auth.php:1556
 msgid "OTP Auth Not Activated"
 msgstr "Auth TOP non activée"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1591
+#: pro/modules/users-login/plugins/otp-auth.php:1596
 #, php-format
 msgid ""
 "You are about to run out of backup codes! Only <strong>ONE</strong> remains "
@@ -13313,7 +13314,7 @@ msgstr ""
 "Vous êtes sur le point de manquer de codes de secours ! <strong>UN</strong> "
 "seul restant. Merci de les <a href=\"%s\">renouveler</a> !"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1594
+#: pro/modules/users-login/plugins/otp-auth.php:1599
 #, php-format
 msgid ""
 "You have run out of backup codes! None are left. Please <a href=\"%s\">renew "
@@ -13322,7 +13323,7 @@ msgstr ""
 "Vous êtes à cours de codes de secours ! Aucun restant. Merci de les <a "
 "href=\"%s\">renouveler</a> maintenant !"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1614
+#: pro/modules/users-login/plugins/otp-auth.php:1619
 #, php-format
 msgid ""
 "Your account requires a two-factor authentication using an OTP Authenticator "
@@ -13331,26 +13332,26 @@ msgstr ""
 "Votre compte requiert une authentification à 2 facteurs avec une App OTP. "
 "Merci de <a href=\"%s\">générer une clé d‘application</a>."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1648
+#: pro/modules/users-login/plugins/otp-auth.php:1653
 msgid "Continue &#8594;"
 msgstr "Continuer &#8594;"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1650
+#: pro/modules/users-login/plugins/otp-auth.php:1655
 msgid "Next &#8594;"
 msgstr "Suivant  &#8594;"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1656
+#: pro/modules/users-login/plugins/otp-auth.php:1661
 msgid "Double Authentication Setting Required"
 msgstr "Réglage de double authentification requis"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1672
-#: pro/modules/users-login/plugins/otp-auth.php:1687
-#: pro/modules/users-login/plugins/otp-auth.php:1746
+#: pro/modules/users-login/plugins/otp-auth.php:1677
+#: pro/modules/users-login/plugins/otp-auth.php:1692
+#: pro/modules/users-login/plugins/otp-auth.php:1751
 #, php-format
 msgid "Step %d"
 msgstr "Étape %d"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1678
+#: pro/modules/users-login/plugins/otp-auth.php:1683
 msgid ""
 "You can <span class=\"hide-if-no-js\">scan the QRCode or&nbsp;</span>use the "
 "provided key directly in your Mobile Application."
@@ -13358,7 +13359,7 @@ msgstr ""
 "Vous pouvez <span class=\"hide-if-no-js\">scanner le QR Code ou&nbsp;</"
 "span>utiliser la clé directement dans votre App Mobile."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1690
+#: pro/modules/users-login/plugins/otp-auth.php:1695
 msgid ""
 "When your smartphone is unavailable or if you are unable to log in to your "
 "account using the OTP Authenticator, you will need to use one of these "
@@ -13368,11 +13369,11 @@ msgstr ""
 "connecter en utilisant l‘Auth OTP, vous aurez besoin d‘une de ces code de "
 "secours."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1701
+#: pro/modules/users-login/plugins/otp-auth.php:1706
 msgid "Download Backup Codes"
 msgstr "Télécharger les codes de secours"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1718
+#: pro/modules/users-login/plugins/otp-auth.php:1723
 msgid ""
 "Keep them someplace accessible, like your wallet.<br>Each code can be used "
 "only once."
@@ -13380,19 +13381,19 @@ msgstr ""
 "Gardez-les dans un endroit accessible, comme votre portefeuille.<br>Chaque "
 "code ne peut être utilisé qu'une seule fois."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1740
+#: pro/modules/users-login/plugins/otp-auth.php:1745
 msgid "You account is now using a Double Authentication, congratulations!"
 msgstr ""
 "Votre compte utilise désormais la double authentification, félicitations !"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1741
+#: pro/modules/users-login/plugins/otp-auth.php:1746
 msgid ""
 "If you need to set an application password, you can do it in your profile."
 msgstr ""
 "Si vous avez besoin de mettre un mot de passe d‘application, vous pouvez le "
 "faire dans votre profil."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1749
+#: pro/modules/users-login/plugins/otp-auth.php:1754
 msgid ""
 "Now you need to confirm your double authentication setting, please enter the "
 "code provided by your Mobile OTP Application"
@@ -13400,16 +13401,16 @@ msgstr ""
 "Maintenant vous devez confirmer le réglage de double authentification, merci "
 "d‘entrer le code donné par l'App Mobile OTP"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1756
+#: pro/modules/users-login/plugins/otp-auth.php:1761
 msgid "Invalid Confirmation Code"
 msgstr "Code de confirmation invalide"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1758
+#: pro/modules/users-login/plugins/otp-auth.php:1763
 msgctxt "verb"
 msgid "Retry &#8594;"
 msgstr "Réessayer &#8594;"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1776
+#: pro/modules/users-login/plugins/otp-auth.php:1781
 #, php-format
 msgid ""
 "Your account requires a double authentication using a Mobile Authenticator, "
@@ -13418,7 +13419,7 @@ msgstr ""
 "Votre compte requiert une double authentification avec une Authentification "
 "Mobile, vous devez <a href=\"%s\">générer une clé d‘application</a>."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1781
+#: pro/modules/users-login/plugins/otp-auth.php:1786
 #, php-format
 msgid ""
 "Get a Free <abbr title=\"One-Time Password\">OTP</abbr> Mobile Application "
@@ -13427,7 +13428,7 @@ msgstr ""
 "Obtenez une application mobile gratuite d‘<abbr title=\"One-Time "
 "Password\">OTP</abbr> sur %1$s et %2$s pour paramétrer votre App OTP."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1800
+#: pro/modules/users-login/plugins/otp-auth.php:1805
 msgid ""
 "Skip this, i‘ll set it up later in my profile,<br/>please remind me in 7 "
 "days."
@@ -13435,11 +13436,11 @@ msgstr ""
 "Sauter cette étape, je le ferai plus tard dans mon profil,<br>rappelez-le "
 "moi dans 7 jours."
 
-#: pro/modules/users-login/plugins/otp-auth.php:1986
+#: pro/modules/users-login/plugins/otp-auth.php:1991
 msgid "[###SITENAME###] Logged in with OTP Authenticator"
 msgstr "[###SITENAME###] Connexion avec Authentification OTP"
 
-#: pro/modules/users-login/plugins/otp-auth.php:1994
+#: pro/modules/users-login/plugins/otp-auth.php:1999
 #, php-format
 msgid ""
 "Hello %1$s,<br>You or someone else has just logged into your account using "
@@ -13464,7 +13465,7 @@ msgstr ""
 "a>."
 
 #: pro/modules/users-login/plugins/password-expiration.php:151
-#: pro/modules/users-login/plugins/strong-passwords.php:347
+#: pro/modules/users-login/plugins/strong-passwords.php:363
 msgid "Password required"
 msgstr "Mot de passe requis"
 
@@ -13500,29 +13501,29 @@ msgstr "Nouveau mot de passe:"
 msgid "Your new password has been set."
 msgstr "Votre nouveau mot de passe a été sauvegardé."
 
-#: pro/modules/users-login/plugins/passwordless.php:218
+#: pro/modules/users-login/plugins/passwordless.php:223
 msgctxt "or Log In using a password"
 msgid "or"
 msgstr "ou"
 
-#: pro/modules/users-login/plugins/passwordless.php:218
+#: pro/modules/users-login/plugins/passwordless.php:223
 msgid "Log In using a password"
 msgstr "Se connecter avec un mot de passe"
 
-#: pro/modules/users-login/plugins/passwordless.php:242
+#: pro/modules/users-login/plugins/passwordless.php:247
 msgid "You cannot login using this page."
 msgstr "Vous ne pouvez pas vous connecter via cette page."
 
-#: pro/modules/users-login/plugins/passwordless.php:261
+#: pro/modules/users-login/plugins/passwordless.php:266
 msgid "Send PasswordLess Magic Link"
 msgstr "Envoyer un lien magique PasswordLess"
 
-#: pro/modules/users-login/plugins/passwordless.php:275
-#: pro/modules/users-login/plugins/passwordless.php:295
+#: pro/modules/users-login/plugins/passwordless.php:280
+#: pro/modules/users-login/plugins/passwordless.php:300
 msgid "Magic Link not sent."
 msgstr "Lien magique non envoyé."
 
-#: pro/modules/users-login/plugins/passwordless.php:298
+#: pro/modules/users-login/plugins/passwordless.php:303
 msgid "Magic Link has been sent."
 msgstr "Lien magique envoyé."
 
@@ -13575,12 +13576,12 @@ msgid "13"
 msgstr "16"
 
 #: pro/modules/users-login/plugins/sessions-control.php:231
-#: pro/modules/users-login/plugins/sessions-control.php:339
+#: pro/modules/users-login/plugins/sessions-control.php:338
 msgid "You are only logged in here"
 msgstr "C’est votre seule connexion ici"
 
 #: pro/modules/users-login/plugins/sessions-control.php:232
-#: pro/modules/users-login/plugins/sessions-control.php:332
+#: pro/modules/users-login/plugins/sessions-control.php:331
 msgid "Disconnected"
 msgstr "Sans connexion"
 
@@ -13605,37 +13606,37 @@ msgstr "Jamais"
 msgid "Last Login: %s"
 msgstr "Dernière connexion : %s"
 
-#: pro/modules/users-login/plugins/sessions-control.php:343
+#: pro/modules/users-login/plugins/sessions-control.php:342
 #, php-format
 msgid "You have %s sessions"
 msgstr "Vous avez %s sessions ouvertes"
 
-#: pro/modules/users-login/plugins/sessions-control.php:344
+#: pro/modules/users-login/plugins/sessions-control.php:343
 msgid "Destroy other sessions"
 msgstr "Détruire les autres sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:346
+#: pro/modules/users-login/plugins/sessions-control.php:345
 #, php-format
 msgid "%s session"
 msgid_plural "%s sessions"
 msgstr[0] "%s session"
 msgstr[1] "%s sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:347
+#: pro/modules/users-login/plugins/sessions-control.php:346
 msgid "Destroy session"
 msgid_plural "Destroy all sessions"
 msgstr[0] "Détruire la session"
 msgstr[1] "Détruire toutes les sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:355
+#: pro/modules/users-login/plugins/sessions-control.php:354
 msgid "Sessions Details"
 msgstr "Détails des sessions"
 
-#: pro/modules/users-login/plugins/sessions-control.php:365
+#: pro/modules/users-login/plugins/sessions-control.php:364
 msgid "Session #"
 msgstr "Session #"
 
-#: pro/modules/users-login/plugins/sessions-control.php:366
+#: pro/modules/users-login/plugins/sessions-control.php:365
 #, php-format
 msgid ""
 "Logged-in since <em><abbr title=\"%5$s\">%1$s</abbr></em><br>Expires in "
@@ -13646,37 +13647,37 @@ msgstr ""
 "dans <em><abbr title=\"%6$s\">%2$s</abbr></em><br>IP : <code>%3$s</"
 "code><br>User-Agent : <code>%4$s</code>."
 
-#: pro/modules/users-login/plugins/sessions-control.php:462
-#: pro/modules/users-login/plugins/sessions-control.php:531
+#: pro/modules/users-login/plugins/sessions-control.php:461
+#: pro/modules/users-login/plugins/sessions-control.php:530
 msgid "Error: wrong user."
 msgstr "Erreur : Mauvais compte."
 
-#: pro/modules/users-login/plugins/sessions-control.php:468
-#: pro/modules/users-login/plugins/sessions-control.php:551
+#: pro/modules/users-login/plugins/sessions-control.php:467
+#: pro/modules/users-login/plugins/sessions-control.php:550
 msgid "Selected users have been logged out."
 msgstr "Les comptes sélectionnés seront déconnectés."
 
-#: pro/modules/users-login/plugins/sessions-control.php:480
-#: pro/modules/users-login/plugins/sessions-control.php:553
+#: pro/modules/users-login/plugins/sessions-control.php:479
+#: pro/modules/users-login/plugins/sessions-control.php:552
 msgid "You are now logged out everywhere else."
 msgstr "Vos sessions ont été déconnectées partout."
 
-#: pro/modules/users-login/plugins/sessions-control.php:482
+#: pro/modules/users-login/plugins/sessions-control.php:481
 #, php-format
 msgid "<strong>%s</strong> has been logged out."
 msgstr "<strong>%s</strong> a été déconnecté."
 
-#: pro/modules/users-login/plugins/sessions-control.php:516
-#: pro/modules/users-login/plugins/sessions-control.php:570
+#: pro/modules/users-login/plugins/sessions-control.php:515
+#: pro/modules/users-login/plugins/sessions-control.php:569
 msgid "You do not have sufficient permissions to access this page."
 msgstr "Vous n’avez pas la permission d’accéder à cette page."
 
-#: pro/modules/users-login/plugins/sessions-control.php:555
+#: pro/modules/users-login/plugins/sessions-control.php:554
 #, php-format
 msgid "%s has been logged out."
 msgstr "Le compte %s a été déconnecté."
 
-#: pro/modules/users-login/plugins/sessions-control.php:617
+#: pro/modules/users-login/plugins/sessions-control.php:616
 msgctxt "users"
 msgid "Connected"
 msgstr "Connectés"
@@ -13740,7 +13741,7 @@ msgstr "Montrer"
 
 #: pro/modules/users-login/plugins/strong-passwords.php:93
 #: pro/modules/users-login/plugins/strong-passwords.php:177
-#: pro/modules/users-login/plugins/strong-passwords.php:395
+#: pro/modules/users-login/plugins/strong-passwords.php:411
 msgctxt "verb"
 msgid "Hide"
 msgstr "Cacher"
@@ -13751,7 +13752,7 @@ msgstr "Montrer le mot de passe"
 
 #: pro/modules/users-login/plugins/strong-passwords.php:96
 #: pro/modules/users-login/plugins/strong-passwords.php:175
-#: pro/modules/users-login/plugins/strong-passwords.php:394
+#: pro/modules/users-login/plugins/strong-passwords.php:410
 msgid "Hide password"
 msgstr "Cacher le mot de passe"
 
@@ -13764,7 +13765,7 @@ msgid "New Password"
 msgstr "Nouveau mot de passe"
 
 #: pro/modules/users-login/plugins/strong-passwords.php:170
-#: pro/modules/users-login/plugins/strong-passwords.php:389
+#: pro/modules/users-login/plugins/strong-passwords.php:405
 msgid "Generate Password"
 msgstr "Générer un mot de passe"
 
@@ -13773,7 +13774,7 @@ msgid "Cancel password change"
 msgstr "Annuler le changement de mot de passe"
 
 #: pro/modules/users-login/plugins/strong-passwords.php:184
-#: pro/modules/users-login/plugins/strong-passwords.php:399
+#: pro/modules/users-login/plugins/strong-passwords.php:415
 msgid "You must choose a strong password."
 msgstr "Vous devez choisir un mot de passe fort."
 
@@ -13785,20 +13786,20 @@ msgstr "Répéter le mot de passe"
 msgid "Type your new password again."
 msgstr "Tapez de nouveau votre mot de passe."
 
-#: pro/modules/users-login/plugins/strong-passwords.php:274
-#: pro/modules/users-login/plugins/strong-passwords.php:359
+#: pro/modules/users-login/plugins/strong-passwords.php:278
+#: pro/modules/users-login/plugins/strong-passwords.php:375
 msgid "<strong>Error</strong>: Please enter a strong password."
 msgstr "<strong>Erreur</strong> : Merci d’entrer un mot de passe fort."
 
-#: pro/modules/users-login/plugins/strong-passwords.php:312
+#: pro/modules/users-login/plugins/strong-passwords.php:328
 msgid "Too much time has elapsed between the first step and now."
 msgstr "Trop de temps est passé depuis le début de la procédure."
 
-#: pro/modules/users-login/plugins/strong-passwords.php:383
+#: pro/modules/users-login/plugins/strong-passwords.php:399
 msgid "Password Strength Security Update"
 msgstr "Mise à jour de la force du mot de passe"
 
-#: pro/modules/users-login/plugins/strong-passwords.php:384
+#: pro/modules/users-login/plugins/strong-passwords.php:400
 msgid ""
 "Your current password strength is too weak.<br>You must update your password "
 "to successfully log in."
@@ -13806,16 +13807,16 @@ msgstr ""
 "Votre mot de passe actuel est trop faible.<br>Vous devez le mettre à jour "
 "pour vous connecter correctement."
 
-#: pro/modules/users-login/plugins/strong-passwords.php:416
+#: pro/modules/users-login/plugins/strong-passwords.php:432
 #, php-format
 msgid "&larr; Cancel and go back to %s"
 msgstr "&larr; Annuler et retourner à %s"
 
-#: pro/modules/users-login/plugins/strong-passwords.php:428
+#: pro/modules/users-login/plugins/strong-passwords.php:444
 msgid "Please change your password"
 msgstr "Merci de changer votre mot de passe"
 
-#: pro/modules/users-login/plugins/strong-passwords.php:448
+#: pro/modules/users-login/plugins/strong-passwords.php:464
 msgid ""
 "Hi ###USERNAME###,\n"
 "\n"
@@ -13846,7 +13847,7 @@ msgstr ""
 "L‘équipe de ###SITENAME###\n"
 "###SITEURL###"
 
-#: pro/modules/users-login/plugins/strong-passwords.php:464
+#: pro/modules/users-login/plugins/strong-passwords.php:480
 #, php-format
 msgid "[%s] Password Changed"
 msgstr "[%s] Mot de passe changé"

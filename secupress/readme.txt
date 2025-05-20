@@ -2,9 +2,9 @@
 Contributors: SecuPress, juliobox, GregLone, Superment
 Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
-Tested up to: 6.7.2
+Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.13
+Stable tag: 2.3.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,10 +185,13 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.13 =
-* 19 May 2025
-* Fix Multisite: Actions on Plugins could lead to empty list.
-* Improvement: Having logins not the same as nicknamed and display names is only scanned when the feature is activated.
+= 2.3.14 =
+* 20 May 2025
+* Fix: #[\SensitiveParameter] can't be inline...
+* Fix: Warning false instead of array
+* Fix: a wild var_dump() was still there
+* Fix: Add SECRET_KEY and SECRET_SALT
+* Improvement: Remove usage of GMP, introduce secupress_next_prime()
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.

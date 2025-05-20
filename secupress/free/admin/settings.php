@@ -191,7 +191,7 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 			'moveLoginNonce'       => $move_login_nonce,
 			// Misc.
 			'resetDefault'         => __( 'This will reset the setting values to default for this module.', 'secupress' ),
-			'regenKeys'            => __( 'This will change the 8 security keys for your installation.<br>You may need to sign back in.', 'secupress' ),
+			'regenKeys'            => __( 'This will change the 10 security keys for your installation.<br>You may need to sign back in.', 'secupress' ),
 		) );
 
 	}

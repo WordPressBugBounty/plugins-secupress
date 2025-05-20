@@ -297,7 +297,7 @@ function secupress_get_fake_users() {
 
 	// #9 Get admin users granted directly in DB (not in SECUPRESS_ADMIN_IDS option)
 	$_tmp_pends = secupress_get_pending_user_ids();
-	$temp_users = get_users( [ 'role' => 'administrator', 'exclude' => array_merge( $_tmp_pends, get_option( SECUPRESS_ADMIN_IDS ) ), 'number' => -1, 'fields' => 'ids' ] );
+	$temp_users = get_users( [ 'role' => 'administrator', 'exclude' => array_merge( $_tmp_pends, get_option( SECUPRESS_ADMIN_IDS, [] ) ), 'number' => -1, 'fields' => 'ids' ] );
 	$fake_users = array_merge( $temp_users, $fake_users );
 
 	$fake_users = array_unique( $fake_users );

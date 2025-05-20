@@ -333,6 +333,30 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 		}
 	}
+	// < 2.3.14
+	if ( version_compare( $actual_version, '2.3.14', '<' ) ) {
+		// Replace the current content with the update without disconnecting users
+		if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
+			$filesystem     = secupress_get_filesystem();
+			$sk_content     = file( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
+			$file           = secupress_find_muplugin( '_secupress_salt_keys_' );
+			if ( ! $file ) {
+				$file       = secupress_find_muplugin( 'secupress_salt_keys_' );
+			}
+			if ( $file ) {
+				$file           = reset( $file );
+				$file_content   = file( $file );
+				$args           = [
+					'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
+				];
+				$sk_content[19] = $file_content[19];
+				$sk_content[20] = $file_content[20];
+				$alicia_keys    = implode( '', $sk_content );
+				$alicia_keys    = str_replace( array_keys( $args ), $args, $alicia_keys );
+				$filesystem->put_contents( $file, $alicia_keys );
+			}
+		}	
+	}
 }
 
 

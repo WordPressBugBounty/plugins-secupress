@@ -153,7 +153,6 @@ function secupress_bad_url_access_sort_urls() {
 			continue;
 		}
 	}
-	var_dump($_urls);
 	$_urls = apply_filters( 'secupress.bad-url-access.urls', $_urls );
 	return $_urls;
 }
