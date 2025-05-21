@@ -723,6 +723,24 @@ function secupress_async_upgrades() {
 	$lp_upgrader->bulk_upgrade( $language_updates );
 }
 
+/**
+ * Return all possible matches for a muplugin filename
+ *
+ * @since 2.0
+ * @author Julio Potier
+ *
+ * @param (string) $filename A part of the filename you are looking for
+ * @return (array) Empty if no file found.
+ **/
+function secupress_find_muplugin( $filename ) {
+	$mus = wp_get_mu_plugins();
+	foreach ( $mus as $i => $mu ) {
+		if ( false === strpos( $mu, $filename ) ) {
+			unset( $mus[ $i ] );
+		}
+	}
+	return $mus;
+}
 
 /**
  * Creates a MU-PLUGIN.

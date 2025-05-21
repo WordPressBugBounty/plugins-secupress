@@ -4,7 +4,8 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * Get file extensions that are allowed in the uploads folder.
  *
- * @since 2.3.12 Remove all filters in MS, we need all the correct
+ * @since 2.3.15 WP Rocket compat
+ * @since 2.3.12 Remove all filters, we need all the correct ones, in MS, it's filtered
  * @since 2.3.8 xml, xls
  * @since 2.2.6
  * @author Julio Potier
@@ -15,6 +16,7 @@ function secupress_get_allowed_extensions() {
 	remove_all_filters( 'upload_mimes' );
 	$exts             = get_allowed_mime_types();
 	$exts['htm|html'] = 1;
+	$exts['html_gzip'] = 1; // WP Rocket
 	$exts['js']       = 1;
 	$exts['php']      = 1; // allow PHP, only the allowed files will be loaded.
 	$exts['ai']       = 1;

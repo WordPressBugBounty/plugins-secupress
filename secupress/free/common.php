@@ -610,7 +610,6 @@ function secupress_add_salt_muplugin() {
 			secupress_delete_mu_plugin( $file );
 		}
 		if ( ! $alicia_keys || ! $created ) {
-			var_dump($created);
 			return;
 		}
 	}
@@ -709,24 +708,6 @@ function secupress_give_him_a_user( $user, $username ) {
 	return get_user_by( 'login', $username );
 }
 
-/**
- * Return all possible matches for a muplugin filename
- *
- * @since 2.0
- * @author Julio Potier
- *
- * @param (string) $filename A part of the filename you are looking for
- * @return (array) Empty if no file found.
- **/
-function secupress_find_muplugin( $filename ) {
-	$mus = wp_get_mu_plugins();
-	foreach ( $mus as $i => $mu ) {
-		if ( false === strpos( $mu, $filename ) ) {
-			unset( $mus[ $i ] );
-		}
-	}
-	return $mus;
-}
 
 /**
  * Add HTML header

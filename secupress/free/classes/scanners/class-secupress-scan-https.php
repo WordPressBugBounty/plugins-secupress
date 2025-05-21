@@ -1,46 +1,50 @@
 <?php
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-
-add_filter( 'pre_wp_update_https_detection_errors', 'secupress_update_https_detection_errors' );
+             
+// add_filter( 'pre_wp_update_https_detection_errors', 'secupress_update_https_detection_errors' ); // Deprecated by WP 6.4
+add_filter( 'pre_wp_get_https_detection_errors', 'secupress_update_https_detection_errors' );
 /**
  * Just for our scanner, do not use wp_is_local_html_output() which is crazy bad.
  *
+ * @since 2.3.15 pre_wp_get_https_detection_errors hook
  * @since 2.0.1
  * @author Julio Potier
  *
  * @return (WP_Error)
  **/
 function secupress_update_https_detection_errors() {
-	$support_errors = new WP_Error();
+	$support_errors = null;
 
 	$response = wp_remote_request(
 		home_url( '/', 'https' ),
-		array(
+		[
 			'headers'   => array(
 				'Cache-Control' => 'no-cache',
 			),
 			'sslverify' => true,
-		)
+		]
 	);
 
 	if ( is_wp_error( $response ) ) {
 		$unverified_response = wp_remote_request(
 			home_url( '/', 'https' ),
-			array(
+			[
 				'headers'   => array(
 					'Cache-Control' => 'no-cache',
 				),
 				'sslverify' => false,
-			)
+			]
 		);
 
 		if ( is_wp_error( $unverified_response ) ) {
+			$support_errors = new WP_Error();
 			$support_errors->add(
 				'https_request_failed',
 				__( 'HTTPS request failed.', 'secupress' )
 			);
 		} else {
+			$support_errors = new WP_Error();
 			$support_errors->add(
 				'ssl_verification_failed',
 				__( 'SSL verification failed.', 'secupress' )
@@ -52,6 +56,9 @@ function secupress_update_https_detection_errors() {
 
 	if ( ! is_wp_error( $response ) ) {
 		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			if ( is_null( $support_errors ) ) {
+				$support_errors = new WP_Error();
+			}
 			$support_errors->add( 'bad_response_code', wp_remote_retrieve_response_message( $response ) );
 		}
 	}
@@ -66,6 +73,7 @@ function secupress_update_https_detection_errors() {
 	* @return (WP_Error) $support_errors
 	*/
 	$support_errors = apply_filters( 'secupress.https_detection_errors', $support_errors, $response );
+
 	return $support_errors;
 }
 

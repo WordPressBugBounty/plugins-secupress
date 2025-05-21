@@ -6,7 +6,7 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.3.14
+ * Version: 2.3.15
  * Code Name: Starboost (Mark XXXIX)
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
@@ -173,8 +173,8 @@ function secupress_init() {
 		require_once( SECUPRESS_ADMIN_PATH . 'settings.php' );
 		require_once( SECUPRESS_ADMIN_PATH . 'admin.php' );
 		require_once( SECUPRESS_ADMIN_PATH . 'ajax-post-callbacks.php' );
-		require_once( SECUPRESS_ADMIN_PATH . 'notices.php' );
 	}
+	require_once( SECUPRESS_ADMIN_PATH . 'notices.php' );
 
 	/**
 	 * Fires when SecuPress is correctly loaded.

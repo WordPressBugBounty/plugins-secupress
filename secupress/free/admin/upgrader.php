@@ -357,6 +357,31 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			}
 		}	
 	}
+	// < 2.3.15
+	if ( version_compare( $actual_version, '2.3.15', '<' ) ) {
+		/* Replace the whole file content, should have done that in .14... */
+		$filesystem  = secupress_get_filesystem();
+		$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
+		$args        = [
+			'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
+			'{{HASH1}}'        => wp_generate_password( 64, true, true ),
+			'{{HASH2}}'        => wp_generate_password( 64, true, true ),
+		];
+		$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
+		$file        = secupress_find_muplugin( '_secupress_salt_keys_' );
+		if ( $file ) {
+			$file    = reset( $file );
+			secupress_delete_mu_plugin( $file );
+			secupress_create_mu_plugin( str_replace( [ '_secupress_', '.php' ], '', basename( $file ) ), $alicia_keys );
+		} else {
+			$file        = secupress_find_muplugin( 'secupress_salt_keys_' );
+			if ( $file ) {
+				$file    = reset( $file );
+				secupress_delete_mu_plugin( $file );
+				secupress_create_mu_plugin( str_replace( [ '(secupress_', ').php' ], '', basename( $file ) ), $alicia_keys );
+			}
+		}
+	}
 }
 
 
