@@ -530,18 +530,7 @@ function secupress_add_cookiehash_muplugin() {
 	$cookiehash = str_replace( array_keys( $args ), $args, $cookiehash );
 	$uniqid     = uniqid();
 
-	// retro compat (<2.2.6)
-	$files = secupress_find_muplugin( '_secupress-cookiehash-' );
-	if ( ! empty( $files ) ) {
-		array_map( 'secupress_delete_mu_plugin', $files );
-	}
-
-	// 2.2.6+
-	if ( ! empty( $files ) ) {
-		array_map( 'secupress_delete_mu_plugin', $files );
-	}
-
-	if ( ! $cookiehash || ! secupress_create_mu_plugin( 'cookiehash_' . $uniqid, $cookiehash ) ) {
+	if ( ! $cookiehash || ! secupress_create_mu_plugin( 'cookiehash', $cookiehash, $uniqid ) ) {
 		// MU Plugin creation failed.
 		secupress_set_site_transient( 'secupress-cookiehash-muplugin-failed', 1 );
 		secupress_fixit( 'WP_Config' );
@@ -603,26 +592,17 @@ function secupress_add_salt_muplugin() {
 		);
 		$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
 		$uniqid      = uniqid();
-		$file        = secupress_find_muplugin( '_secupress_salt_keys_' );
-		$file        = reset( $file );
-		$created     = secupress_create_mu_plugin( 'salt_keys_' . $uniqid, $alicia_keys );
-		if ( file_exists( $file ) ) {
-			secupress_delete_mu_plugin( $file );
-		}
+		$created     = secupress_create_mu_plugin( 'salt_keys', $alicia_keys, $uniqid );
 		if ( ! $alicia_keys || ! $created ) {
 			return;
 		}
 	}
 
-	$keys = array( 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT' );
 	// Remove old secret keys from the database.
-	foreach ( $keys as $constant ) {
-		delete_site_option( $constant );
-	}
+	secupress_delete_db_salt_keys();
 
 	// Make sure we find the `wp-config.php` file.
 	$wpconfig_filepath = secupress_is_wpconfig_writable();
-
 
 	if ( $wpconfig_filepath ) {
 		/**

@@ -22,11 +22,7 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 	$error      = [];
 	$const_err  = [];
 	foreach ( $constants as $constant => $correct_value ) {
-		if ( 0 === strpos( $correct_value, '0' ) ) { // octal (fs_chmod)
-			$check = defined( $constant ) ? '0' . decoct( constant( $constant ) ) : null;
-		} else {
-			$check = defined( $constant ) ? constant( $constant ) : null;
-		}
+		$check = defined( $constant ) ? constant( $constant ) : null;
 		if ( $correct_value !== $check || $force_rewrite ) {
 			// This will be printed in the wp-config file.
 			if ( is_bool( $correct_value ) ) {
@@ -62,13 +58,13 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 				/** Translators: 1 is a constant name, 2 is a file name, 4 and 5 are a small parts of code. */
 				__( 'Cannot change the value of the constant %1$s in the %2$s file. Please edit it and replace the lines that states: %3$s by: %4$s', 'secupress' ),
 				secupress_code_me( $const_err[ $i ] ),
-				secupress_code_me( $wpconfig_filename ),
+				secupress_code_me( esc_html( $wpconfig_filename ) ),
 				secupress_code_me( $err ),
 				secupress_tag_me( $new_define[ $i ], 'pre' )
 			);
 		}
 		secupress_add_settings_error( 'general', 'constant_not_removed', $messages, 'error' );
-		// return false; // Do not return here, we can still ad the other constants.
+		// return false; // Do not return now, we can still add the other constants.
 	}
 	// Add our constant now.
 	if ( ! empty( $new_define ) ) {

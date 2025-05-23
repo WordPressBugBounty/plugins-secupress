@@ -2,7 +2,7 @@
 /**
  * Plugin Name: {{PLUGIN_NAME}} No Plugin Installations
  * Description: Filters the active plugin option to prevent loading other ones.
- * Version: 2.2.6
+ * Version: 2.3.16
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -11,9 +11,16 @@
 
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
+if ( defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) ) {
+	@unlink( __FILE__ ); // We are in a duplicated file, should not happen, delete us!
+	return;
+}
+
 define( 'SECUPRESS_INSTALLED_PLUGINS'       , '_secupress_installed_plugins' );
 define( 'SECUPRESS_INSTALLED_MUPLUGINS'     , '_secupress_installed_muplugins' );
 define( 'SECUPRESS_ACTIVE_PLUGINS'          , '_secupress_active_plugins' );
+
+define( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING', true );
 
 if ( is_multisite() ) {
 	define( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK'  , '_secupress_active_sitewide_plugins' );
@@ -34,8 +41,6 @@ if ( is_multisite() ) {
 		return $plugins;
 	}
 }
-define( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING', true );
-
 
 add_filter( 'pre_option_active_plugins', 'secupress_no_action_filter_active_plugins' );
 /**

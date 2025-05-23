@@ -290,31 +290,34 @@ function secupress_get_wp_tables() {
 /**
  * Get salt keys.
  *
+ * @since 2.3.16 SECRET_KEY & SECRET_SALT
  * @since 2.0
  * @author Julio Potier
  *
  * @return (array)
  */
 function secupress_get_db_salt_keys() {
-	return [ 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT' ];
+	return [ 'SECRET_KEY', 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'SECRET_SALT', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT' ];
 }
 
 
 /**
  * Delete DB salt keys.
  *
+ * @since 2.3.16 returns integer now + __get_option to prevent WP from loading the constant via fake DB call.
  * @since 2.0
  * @author Julio Potier
  *
- * @return (bool) true: nothing delete or everything deleted, false: missing deletion, keys still in DB
+ * @return (int) 0 means everything has been deleted ; > 0 means some could not have been deleted
  */
 function secupress_delete_db_salt_keys() {
 	$keys    = secupress_get_db_salt_keys();
 	$present = 0;
 	$deleted = 0;
+	require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
 	foreach ( $keys as $key ) {
 		$key = strtolower( $key );
-		$db  = get_site_option( $key, null );
+		$db  = __get_option( $key, null );
 		if ( ! is_null( $db ) ) {
 			$present++;
 			if ( delete_site_option( $key ) ) {
@@ -322,6 +325,5 @@ function secupress_delete_db_salt_keys() {
 			}
 		}
 	}
-
-	return 0 === ( $present - $deleted );
+	return $present - $deleted;
 }

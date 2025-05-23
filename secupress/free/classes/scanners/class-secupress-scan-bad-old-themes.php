@@ -400,9 +400,6 @@ class SecuPress_Scan_Bad_Old_Themes extends SecuPress_Scan implements SecuPress_
 			$form  = '<h4 id="secupress-fix-bad-old-themes">' . __( 'Checked themes will be deleted:', 'secupress' ) . '</h4>';
 			$form .= '<fieldset aria-labelledby="secupress-fix-bad-old-themes" class="secupress-boxed-group">';
 			$theme = wp_get_theme();
-			var_dump($themes);
-			var_dump($theme->template);
-			var_dump($theme->stylesheet);
 			foreach ( $themes as $theme_slug => $theme_name ) {
 				$theme_name = esc_html( strip_tags( $theme_name ) );
 				if ( $theme_slug !== $theme->template && $theme_slug !== $theme->stylesheet ) {

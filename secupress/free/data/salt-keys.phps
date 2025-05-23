@@ -2,7 +2,7 @@
 /**
  * Plugin Name: {{PLUGIN_NAME}} Salt Keys
  * Description: Great Security Keys for your site
- * Version: 2.3.14
+ * Version: 2.3.16
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -10,6 +10,11 @@
  */
 
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
+
+if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
+	@unlink( __FILE__ ); // We are in a duplicated file, should not happen, delete us!
+	return;
+}
 
 if ( ! get_site_option( 'secupress_active_submodule_wp-config-constant-saltkeys' ) ) {
 	return;

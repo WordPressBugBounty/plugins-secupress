@@ -299,17 +299,17 @@ function secupress_muplugin_exists( $filename_part ) {
  * @return (bool) 
  **/
 function secupress_marker_exists_in_wpconfig( $marker ) {
-	static $file_content   = '';
+	static $file_content = '';
 
-	$wpconfig_filepath = secupress_is_wpconfig_writable();
+	$wpconfig_filepath   = secupress_is_wpconfig_writable();
 
 	if ( ! $wpconfig_filepath ) {
 		return false;
 	}
 
-	$filesystem       = secupress_get_filesystem();
+	$filesystem          = secupress_get_filesystem();
 	if ( ! $file_content ) {
-		$file_content = $filesystem->get_contents( $wpconfig_filepath );
+		$file_content    = $filesystem->get_contents( $wpconfig_filepath );
 	}
 
 	return preg_match( "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", $file_content );
@@ -726,16 +726,18 @@ function secupress_async_upgrades() {
 /**
  * Return all possible matches for a muplugin filename
  *
+ * @since 2.3.16 $prefix param + basename usage
  * @since 2.0
  * @author Julio Potier
  *
  * @param (string) $filename A part of the filename you are looking for
+ * @param (string) $prefix 
  * @return (array) Empty if no file found.
  **/
-function secupress_find_muplugin( $filename ) {
+function secupress_find_mu_plugin( $filename, $prefix = 'secupress_' ) {
 	$mus = wp_get_mu_plugins();
 	foreach ( $mus as $i => $mu ) {
-		if ( false === strpos( $mu, $filename ) ) {
+		if ( false === strpos( basename( $mu ), $prefix . $filename ) ) {
 			unset( $mus[ $i ] );
 		}
 	}
@@ -745,6 +747,7 @@ function secupress_find_muplugin( $filename ) {
 /**
  * Creates a MU-PLUGIN.
  *
+ * @since 2.3.16 3rd param $uniqid
  * @since 2.2.6 New filename pattern
  * @author Julio Potier
  * @since 1.0
@@ -752,31 +755,40 @@ function secupress_find_muplugin( $filename ) {
  *
  * @param (string) $filename_part The file name part in `(secupress_{$filename_part}).php`.
  * @param (string) $contents      The file content.
+ * @param (int)    $uniqid        A filename suffix if needed, do not concat into the filename!
  *
  * @return (bool) True on success.
  */
-function secupress_create_mu_plugin( $filename_part, $contents ) {
+function secupress_create_mu_plugin( $filename_part, $contents, $uniqid = '' ) {
 
 	$filesystem = secupress_get_filesystem();
-	$oldfile    = WPMU_PLUGIN_DIR . "/_secupress_{$filename_part}.php";
-	$filename   = WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}).php";
+	$uniqid     = $uniqid ? '_' . $uniqid : '';
+	$filenames  = [ WPMU_PLUGIN_DIR . "/_secupress_{$filename_part}",
+					WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}", // The real one since 2.3
+				];
+	// Delete all previous files before
+	foreach( $filenames as $filename ) {
+		$files  = secupress_find_mu_plugin( $filename );
+		if ( $files ) {
+			array_map( 'secupress_delete_mu_plugin', $files ); 
+		}
+	}
 
-	if ( file_exists( $oldfile ) ) {
-		$filesystem->delete( $filename );
-	}
-	if ( file_exists( $filename ) ) {
-		$filesystem->delete( $filename );
-	}
 	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
 		$filesystem->mkdir( WPMU_PLUGIN_DIR );
 	}
+	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
+		return false;
+	}
+
+	$filename   = WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}{$uniqid}).php";
 	if ( file_exists( $filename ) || ! file_exists( WPMU_PLUGIN_DIR ) ) {
 		return false;
 	}
 
-	$done = $filesystem->put_contents( $filename, $contents );
+	$done       = $filesystem->put_contents( $filename, $contents );
 	if ( defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) ) {
-		$mus  = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );
+		$mus    = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );
 		if ( $done && $mus ) {
 			$mus[ basename( $filename ) ] = get_plugin_data( $filename );
 			update_option( SECUPRESS_INSTALLED_MUPLUGINS, $mus );

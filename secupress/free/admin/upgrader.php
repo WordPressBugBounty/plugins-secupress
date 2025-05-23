@@ -335,51 +335,21 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 	}
 	// < 2.3.14
 	if ( version_compare( $actual_version, '2.3.14', '<' ) ) {
-		// Replace the current content with the update without disconnecting users
-		if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
-			$filesystem     = secupress_get_filesystem();
-			$sk_content     = file( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
-			$file           = secupress_find_muplugin( '_secupress_salt_keys_' );
-			if ( ! $file ) {
-				$file       = secupress_find_muplugin( 'secupress_salt_keys_' );
-			}
-			if ( $file ) {
-				$file           = reset( $file );
-				$file_content   = file( $file );
-				$args           = [
-					'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
-				];
-				$sk_content[19] = $file_content[19];
-				$sk_content[20] = $file_content[20];
-				$alicia_keys    = implode( '', $sk_content );
-				$alicia_keys    = str_replace( array_keys( $args ), $args, $alicia_keys );
-				$filesystem->put_contents( $file, $alicia_keys );
-			}
-		}	
+		// removed, see .15
 	}
 	// < 2.3.15
 	if ( version_compare( $actual_version, '2.3.15', '<' ) ) {
-		/* Replace the whole file content, should have done that in .14... */
-		$filesystem  = secupress_get_filesystem();
-		$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
-		$args        = [
-			'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
-			'{{HASH1}}'        => wp_generate_password( 64, true, true ),
-			'{{HASH2}}'        => wp_generate_password( 64, true, true ),
-		];
-		$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
-		$file        = secupress_find_muplugin( '_secupress_salt_keys_' );
-		if ( $file ) {
-			$file    = reset( $file );
-			secupress_delete_mu_plugin( $file );
-			secupress_create_mu_plugin( str_replace( [ '_secupress_', '.php' ], '', basename( $file ) ), $alicia_keys );
-		} else {
-			$file        = secupress_find_muplugin( 'secupress_salt_keys_' );
-			if ( $file ) {
-				$file    = reset( $file );
-				secupress_delete_mu_plugin( $file );
-				secupress_create_mu_plugin( str_replace( [ '(secupress_', ').php' ], '', basename( $file ) ), $alicia_keys );
-			}
+		if ( secupress_find_mu_plugin( 'salt_keys' ) ) {
+			$filesystem  = secupress_get_filesystem();
+			$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
+			$args        = [
+				'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
+				'{{HASH1}}'        => wp_generate_password( 64, true, true ),
+				'{{HASH2}}'        => wp_generate_password( 64, true, true ),
+			];
+			/* Replace the whole file, should have done that in .14... */
+			$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
+			secupress_create_mu_plugin( 'salt_keys', $alicia_keys );
 		}
 	}
 }

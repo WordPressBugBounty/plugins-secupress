@@ -33,7 +33,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'CONCATENATE_SCRIPTS', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'CONCATENATE_SCRIPTS', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -56,7 +56,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'CORE_UPGRADE_SKIP_NEW_BUNDLED', 'TRUE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'CORE_UPGRADE_SKIP_NEW_BUNDLED', 'TRUE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -79,7 +79,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'WP_DEBUG', 'FALSE' ) . '<br>' . secupress_get_wpconfig_constant_text( 'WP_DEBUG_DISPLAY', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'WP_DEBUG', 'FALSE' ) . '<br>' . secupress_get_wpconfig_constant_text( 'WP_DEBUG_DISPLAY', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -103,7 +103,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'RELOCATE', 'FALSE' ) . '<br>' . secupress_get_wpconfig_constant_text( 'WP_SITEURL', get_site_url() ) . '<br>' . secupress_get_wpconfig_constant_text( 'WP_HOME', get_home_url() ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'RELOCATE', 'FALSE' ) . '<br>' . secupress_get_wpconfig_constant_text( 'WP_SITEURL', get_site_url() ) . '<br>' . secupress_get_wpconfig_constant_text( 'WP_HOME', get_home_url() ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -126,7 +126,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'DISALLOW_FILE_EDIT', 'TRUE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'DISALLOW_FILE_EDIT', 'TRUE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -150,7 +150,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'ALLOW_UNFILTERED_UPLOADS', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'ALLOW_UNFILTERED_UPLOADS', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -174,7 +174,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'DIEONDBERROR', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'DIEONDBERROR', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -198,7 +198,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'WP_ALLOW_REPAIR', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'WP_ALLOW_REPAIR', 'FALSE' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -221,7 +221,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? secupress_get_wpconfig_constant_text( 'COOKIEHASH', __( '[a random string]', 'secupress' ) ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? secupress_get_wpconfig_constant_text( 'COOKIEHASH', __( '[a random string]', 'secupress' ) ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -249,7 +249,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $active && ! $disabled ? sprintf( __( '<strong>8 constants</strong> will be created in a must-use plugin, replacing the ones in your %s file and database.', 'secupress' ), '<code>wp-config.php</code>' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? sprintf( __( '<strong>8 constants</strong> will be created in a must-use plugin, replacing the ones in your %s file and database.', 'secupress' ), '<code>wp-config.php</code>' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',

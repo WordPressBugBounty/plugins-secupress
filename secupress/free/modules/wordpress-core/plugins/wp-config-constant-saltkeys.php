@@ -46,6 +46,4 @@ add_action( 'secupress.plugins.deactivation', 'secupress_wpconfig_saltkeys_deact
 function secupress_wpconfig_saltkeys_deactivation() {
     $current_user = wp_get_current_user();
     secupress_set_site_transient( 'secupress-auto-login', array( 'ID' => $current_user->ID ) );
-	// $mu = reset( secupress_find_muplugin( '_secupress_salt_keys_' ) );
-	// secupress_remove_old_plugin_file( $mu );
 }

@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.15
+Stable tag: 2.3.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,13 +185,13 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.15 =
-* 21 May 2025
-* Fix: "Bad Url Access" new setting could lead to 404 when WordPress was installed in a folder
-* Fix: Possible Fatal Error related to notices
-* Fix: Old Salt Keys file receive no correct hashes, not big deal, but still, you do now.
-* Improvement: Deprecated WP hook "pre_wp_update_https_detection_errors" so we use "pre_wp_get_https_detection_errors" now
-* Improvement: "bad Url Access" compat with WP Rocket gzip format (file extension "html_gzip" unknown from WordPress so we block it right?)
+= 2.3.16 =
+* 23 May 2025
+* Fix: "Your site soes not use HTTPS. Error %s" %s was not replaced
+* Fix: "Already done, your way" too often in wpconfig module UI
+* Fix: Possibly you could have duplicate muplugins file from us.
+* Fix: Salt Keys scan could still display a message even when fixed
+* Removed: FS_CHMOD constants are not mandatory anymore, no hacks are related to these constants.
 
 
 == Upgrade Notice ==

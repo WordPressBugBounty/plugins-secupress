@@ -42,6 +42,6 @@ add_action( 'secupress.plugins.deactivation', 'secupress_wpconfig_cookiehash_dea
  * @author Julio Potier
  */
 function secupress_wpconfig_cookiehash_deactivation() {
-	// $mu = secupress_find_muplugin( '_secupress_cookiehash_' );
-	// secupress_remove_old_plugin_file( reset( $mu ) );
+    $current_user = wp_get_current_user();
+    secupress_set_site_transient( 'secupress-auto-login', array( 'ID' => $current_user->ID ) );
 }

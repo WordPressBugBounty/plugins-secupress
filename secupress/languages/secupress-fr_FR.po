@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2025-05-19 23:49+0200\n"
-"PO-Revision-Date: 2025-05-19 23:49+0200\n"
+"POT-Creation-Date: 2025-05-23 09:52+0200\n"
+"PO-Revision-Date: 2025-05-23 09:53+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -1587,74 +1587,74 @@ msgstr ""
 "Les modules `Activation des extensions`, `Suppression des extensions` ont "
 "été consolidés dans le module `Actions sur les extensions`."
 
-#: free/admin/upgrader.php:398
+#: free/admin/upgrader.php:447
 msgid "Plugin Installation"
 msgstr "Nombre d’installations"
 
-#: free/admin/upgrader.php:527
+#: free/admin/upgrader.php:576
 msgid "Full Changelog"
 msgstr "Changelog complet"
 
-#: free/admin/upgrader.php:535
+#: free/admin/upgrader.php:584
 msgid "Install Update Now"
 msgstr "Installer la mise à jour"
 
-#: free/admin/upgrader.php:539
+#: free/admin/upgrader.php:588
 msgid "Get SecuPress Pro Now!"
 msgstr "Obtenez SecuPress Pro !"
 
-#: free/admin/upgrader.php:546
+#: free/admin/upgrader.php:595
 msgid "Requires WordPress Version:"
 msgstr "Requiert WordPress version :"
 
-#: free/admin/upgrader.php:548 free/admin/upgrader.php:551
+#: free/admin/upgrader.php:597 free/admin/upgrader.php:600
 #, php-format
 msgid "%s or higher"
 msgstr "%s ou plus"
 
-#: free/admin/upgrader.php:554 free/modules/addons/tools.php:151
+#: free/admin/upgrader.php:603 free/modules/addons/tools.php:151
 msgid "Compatible up to:"
 msgstr "Compatible jusque :"
 
-#: free/admin/upgrader.php:557
+#: free/admin/upgrader.php:606
 msgid "Active Installations:"
 msgstr "Installation actives :"
 
-#: free/admin/upgrader.php:560 free/modules/addons/tools.php:40
+#: free/admin/upgrader.php:609 free/modules/addons/tools.php:40
 msgctxt "Active plugin installations"
 msgid "1+ Million"
 msgstr "1+ million d'"
 
-#: free/admin/upgrader.php:562
+#: free/admin/upgrader.php:611
 msgctxt "Active plugin installations"
 msgid "Less Than 10"
 msgstr "Moins de 10"
 
-#: free/admin/upgrader.php:567
+#: free/admin/upgrader.php:616
 msgid "Average Rating"
 msgstr "Note moyenne"
 
-#: free/admin/upgrader.php:569
+#: free/admin/upgrader.php:618
 #, php-format
 msgid "(based on %s rating)"
 msgid_plural "(based on %s ratings)"
 msgstr[0] "(basée sur %s vote)"
 msgstr[1] "(basée sur %s votes)"
 
-#: free/admin/upgrader.php:595
+#: free/admin/upgrader.php:644
 #, php-format
 msgid "What’s new in SecuPress %s%s"
 msgstr "Quoi de neuf dans SecuPress %s%s"
 
-#: free/admin/upgrader.php:596
+#: free/admin/upgrader.php:645
 msgid "Or read full changelog on secupress.me"
 msgstr "Ou lisez tout le journal des modifications sur secupress.me"
 
-#: free/admin/upgrader.php:597
+#: free/admin/upgrader.php:646
 msgid "https://secupress.me/blog/secupress-v2-3/"
 msgstr "https://secupress.me/fr/blog/secupress-v2-3/"
 
-#: free/admin/upgrader.php:599
+#: free/admin/upgrader.php:648
 #, php-format
 msgid ""
 "So many things have changed, read our dedicated blogpost %sSecuPress v2.3 "
@@ -2172,7 +2172,7 @@ msgstr "Le compte %s n’as plus de rôle."
 
 #: free/classes/scanners/class-secupress-scan-admin-user.php:69
 #: free/classes/scanners/class-secupress-scan-salt-keys.php:61
-#: free/classes/scanners/class-secupress-scan-wp-config.php:86
+#: free/classes/scanners/class-secupress-scan-wp-config.php:84
 msgid ""
 "This fix is <strong>pending</strong>, please reload the page to apply it now."
 msgstr ""
@@ -2260,7 +2260,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-directory-listing.php:99
 #: free/classes/scanners/class-secupress-scan-discloses.php:120
 #: free/classes/scanners/class-secupress-scan-easy-login.php:79
-#: free/classes/scanners/class-secupress-scan-https.php:160
+#: free/classes/scanners/class-secupress-scan-https.php:91
 #: free/classes/scanners/class-secupress-scan-inactive-plugins-themes.php:85
 #: free/classes/scanners/class-secupress-scan-login-errors-disclose.php:66
 #: free/classes/scanners/class-secupress-scan-passwords-strength.php:89
@@ -2269,13 +2269,13 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-phpversion.php:80
 #: free/classes/scanners/class-secupress-scan-plugins-update.php:77
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:102
-#: free/classes/scanners/class-secupress-scan-salt-keys.php:76
+#: free/classes/scanners/class-secupress-scan-salt-keys.php:77
 #: free/classes/scanners/class-secupress-scan-shellshock.php:92
 #: free/classes/scanners/class-secupress-scan-sqli.php:78
 #: free/classes/scanners/class-secupress-scan-subscription.php:112
 #: free/classes/scanners/class-secupress-scan-themes-update.php:77
 #: free/classes/scanners/class-secupress-scan-woocommerce-discloses.php:89
-#: free/classes/scanners/class-secupress-scan-wp-config.php:137
+#: free/classes/scanners/class-secupress-scan-wp-config.php:135
 #: free/classes/scanners/class-secupress-scan-wpml-discloses.php:89
 #: free/classes/scanners/class-secupress-scan-wporg.php:93
 msgid "Unknown message"
@@ -3078,7 +3078,7 @@ msgstr "les données"
 msgid "Checked themes will be deleted:"
 msgstr "Les thèmes cochés seront supprimés :"
 
-#: free/classes/scanners/class-secupress-scan-bad-old-themes.php:416
+#: free/classes/scanners/class-secupress-scan-bad-old-themes.php:413
 msgid "Active theme, switch your theme before!"
 msgstr "Thème actif, changez-le d‘abord !"
 
@@ -3958,19 +3958,11 @@ msgstr "Double Authentification"
 msgid "https://docs.secupress.me/article/128-two-factor-authentication-scan"
 msgstr "https://fr.docs.secupress.me/article/36-scan-double-authentification"
 
-#: free/classes/scanners/class-secupress-scan-https.php:41
-msgid "HTTPS request failed."
-msgstr "Requête HTTPS échouée."
-
-#: free/classes/scanners/class-secupress-scan-https.php:46
-msgid "SSL verification failed."
-msgstr "Vérification SSL échouée."
-
-#: free/classes/scanners/class-secupress-scan-https.php:116
+#: free/classes/scanners/class-secupress-scan-https.php:47
 msgid "Check if your website is using an active HTTPS connection."
 msgstr "Vérifie si votre site utilise une connexion HTTPS."
 
-#: free/classes/scanners/class-secupress-scan-https.php:117
+#: free/classes/scanners/class-secupress-scan-https.php:48
 msgid ""
 "An HTTPS connection is needed for many features on the web today, it also "
 "gains the trust of your visitors by helping to protecting their online "
@@ -3980,29 +3972,21 @@ msgstr ""
 "fonctionnalités sur le Web. Cela améliore aussi la confiance des visiteurs "
 "en améliorant la protection de leur confidentialité en ligne."
 
-#: free/classes/scanners/class-secupress-scan-https.php:147
+#: free/classes/scanners/class-secupress-scan-https.php:78
 msgid "Your website is using an active HTTPS/SSL connection."
 msgstr "Votre site utilise une connexion HTTPS/SSL."
 
-#: free/classes/scanners/class-secupress-scan-https.php:149
+#: free/classes/scanners/class-secupress-scan-https.php:80
 #, php-format
 msgid "Your site does not totally use HTTPS/SSL: %s"
 msgstr "Votre site n’utilise pas totalement HTTPS/SSL : %s"
 
-#: free/classes/scanners/class-secupress-scan-https.php:150
+#: free/classes/scanners/class-secupress-scan-https.php:81
 #, php-format
 msgid "Your site does not use HTTPS/SSL. Error: %s"
 msgstr "Votre site n’utilise pas HTTPS/SSL. Erreur : %s"
 
-#: free/classes/scanners/class-secupress-scan-https.php:151
-msgid ""
-"Your website seems to run under maintenance mode, relaunch the HTTPS scanner "
-"later when you set it off."
-msgstr ""
-"Votre site semble être en mode maintenance, relancer le scanner HTTPS quand "
-"il sera désactivé."
-
-#: free/classes/scanners/class-secupress-scan-https.php:153
+#: free/classes/scanners/class-secupress-scan-https.php:84
 msgid ""
 "Cannot be fixed automatically. You have to contact you host provider to ask "
 "him to <strong>upgrade your site with HTTPS/SSL</strong>."
@@ -4011,12 +3995,12 @@ msgstr ""
 "hébergeur et lui demander de <strong>mettre à jour votre site avec HTTPS/"
 "SSL</strong>."
 
-#: free/classes/scanners/class-secupress-scan-https.php:154
+#: free/classes/scanners/class-secupress-scan-https.php:85
 #, php-format
 msgid "Update your HOME url and SITE url with %s."
 msgstr "Mettez à jour vos adresses HOME et SITE avec %s."
 
-#: free/classes/scanners/class-secupress-scan-https.php:155
+#: free/classes/scanners/class-secupress-scan-https.php:86
 msgid ""
 "The module <strong>WordPress Core > Locations</strong> is activated, "
 "deactivate it to fix this."
@@ -4024,20 +4008,20 @@ msgstr ""
 "Le module <strong>Cœur de WordPress > Adresses</strong> est activé, "
 "désactivez le pour régler ça."
 
-#: free/classes/scanners/class-secupress-scan-https.php:156
+#: free/classes/scanners/class-secupress-scan-https.php:87
 msgid "Sorry, you are not allowed to update this site to HTTPS."
 msgstr "Désolé, vous ne pouvez mettre à jour le site en HTTPS."
 
-#: free/classes/scanners/class-secupress-scan-https.php:177
+#: free/classes/scanners/class-secupress-scan-https.php:108
 msgid "https://docs.secupress.me/article/171-connection-https-ssl-scan"
 msgstr ""
 "https://fr.docs.secupress.me/article/170-scan-de-la-connexion-https-ssl"
 
-#: free/classes/scanners/class-secupress-scan-https.php:210
+#: free/classes/scanners/class-secupress-scan-https.php:137
 msgid "your front-end site is not using HTTPS"
 msgstr "votre front-office n’utilise pas HTTPS"
 
-#: free/classes/scanners/class-secupress-scan-https.php:211
+#: free/classes/scanners/class-secupress-scan-https.php:138
 msgid "your back-end site is not using HTTPS"
 msgstr "votre back-office n’utilise pas HTTPS"
 
@@ -4710,7 +4694,15 @@ msgstr ""
 "Le correctif des clés de sécurité a été appliqué, mais il reste des clés qui "
 "n’ont pu être modifiées jusqu’ici."
 
-#: free/classes/scanners/class-secupress-scan-salt-keys.php:93
+#: free/classes/scanners/class-secupress-scan-salt-keys.php:73
+msgid ""
+"Some keys have been deleted from database, but some could not. Please do it "
+"manually, refer to the documentation if needed."
+msgstr ""
+"Quelques clés ont été supprimées de la base de données, mais d‘autres non. "
+"Merci de le faire manuellement, référez-vous à la documentation si besoin."
+
+#: free/classes/scanners/class-secupress-scan-salt-keys.php:94
 msgid "https://docs.secupress.me/article/92-security-keys-scan"
 msgstr "https://fr.docs.secupress.me/article/48-scan-des-cles-de-securite"
 
@@ -5034,18 +5026,18 @@ msgstr ""
 "https://fr.docs.secupress.me/article/54-scan-de-la-divulgation-de-la-version-"
 "de-woocommerce"
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:61
+#: free/classes/scanners/class-secupress-scan-wp-config.php:59
 #, php-format
 msgid "Check your %s file, especially the PHP constants."
 msgstr "Vérifie votre fichier %s, spécialement les constantes PHP."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:63
+#: free/classes/scanners/class-secupress-scan-wp-config.php:61
 #, php-format
 msgid "You can use the %s file to improve the security of your website."
 msgstr ""
 "Vous pouvez utiliser le fichier %s pour améliorer la sécurité de votre site."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:65
+#: free/classes/scanners/class-secupress-scan-wp-config.php:63
 #, php-format
 msgid ""
 "Set some PHP constants in your %s file to improve the security of your "
@@ -5054,12 +5046,12 @@ msgstr ""
 "Ajoutez quelques constantes PHP dans votre fichier %s pour améliorer la "
 "sécurité de votre site."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:82
+#: free/classes/scanners/class-secupress-scan-wp-config.php:80
 #, php-format
 msgid "Your %s file is correct."
 msgstr "Votre fichier %s est correct."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:84
+#: free/classes/scanners/class-secupress-scan-wp-config.php:82
 #, php-format
 msgid ""
 "A <a href=\"https://codex.wordpress.org/Must_Use_Plugins\" "
@@ -5070,7 +5062,7 @@ msgstr ""
 "hreflang=\"en\">extension automatique</a> a été ajoutée pour modifier la "
 "valeur par défaut de %s."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:89
+#: free/classes/scanners/class-secupress-scan-wp-config.php:87
 #, php-format
 msgid ""
 "The PHP constant %s is defined with the default value, it should be modified."
@@ -5078,13 +5070,13 @@ msgstr ""
 "La constante PHP %s est définie avec sa valeur par défaut, elle devrait être "
 "modifiée."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:91
+#: free/classes/scanners/class-secupress-scan-wp-config.php:89
 #, php-format
 msgid "In your %1$s file, the PHP constant %2$s should be set."
 msgstr ""
 "Dans votre fichier %1$s, la constante PHP %2$s devrait être configurée."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:94
+#: free/classes/scanners/class-secupress-scan-wp-config.php:92
 #, php-format
 msgid "In your %1$s file, the PHP constant %2$s should not be set."
 msgid_plural "In your %1$s file, the PHP constants %2$s should not be set."
@@ -5095,7 +5087,7 @@ msgstr[1] ""
 "Dans votre fichier %1$s, les constantes PHP %2$s ne devraient pas être "
 "configurées."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:100
+#: free/classes/scanners/class-secupress-scan-wp-config.php:98
 #, php-format
 msgid "In your %1$s file, the PHP constant %2$s should not be empty."
 msgid_plural "In your %1$s file, the PHP constants %2$s should not be empty."
@@ -5104,8 +5096,8 @@ msgstr[0] ""
 msgstr[1] ""
 "Dans votre fichier %1$s, les constantes PHP %2$s ne devraient pas être vides."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:106
-#: free/classes/scanners/class-secupress-scan-wp-config.php:112
+#: free/classes/scanners/class-secupress-scan-wp-config.php:104
+#: free/classes/scanners/class-secupress-scan-wp-config.php:110
 #, php-format
 msgid "In your %1$s file, the PHP constant %2$s should be set to %3$s."
 msgid_plural "In your %1$s file, the PHP constants %2$s should be set to %3$s."
@@ -5116,8 +5108,8 @@ msgstr[1] ""
 "Dans votre fichier %1$s, les constantes PHP %2$s devraient être configurées "
 "sur %3$s."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:118
-#: free/classes/scanners/class-secupress-scan-wp-config.php:124
+#: free/classes/scanners/class-secupress-scan-wp-config.php:116
+#: free/classes/scanners/class-secupress-scan-wp-config.php:122
 #, php-format
 msgid "In your %1$s file, the PHP constant %2$s should be set to %3$s or less."
 msgid_plural ""
@@ -5129,12 +5121,12 @@ msgstr[1] ""
 "Dans votre fichier %1$s, les constantes PHP %2$s devraient être configurées "
 "sur %3$s ou moins."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:130
+#: free/classes/scanners/class-secupress-scan-wp-config.php:128
 #, php-format
 msgid "Some PHP constants could not be set correctly: %s."
 msgstr "Quelques constantes PHP ne sont pas correctement paramétrées : %s."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:132
+#: free/classes/scanners/class-secupress-scan-wp-config.php:130
 #, php-format
 msgid ""
 "Impossible to create a <a href=\"https://codex.wordpress.org/"
@@ -5145,14 +5137,14 @@ msgstr ""
 "Must_Use_Plugins\" hreflang=\"en\">extension automatique</a> pourtant la "
 "valeur par défaut de %s a besoin d’être modifiée."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:133
+#: free/classes/scanners/class-secupress-scan-wp-config.php:131
 #, php-format
 msgid "The %s file is not writable, the constants could not be changed."
 msgstr ""
 "Le fichier %s ne semble pas être en écriture, les constantes ne peuvent être "
 "changées."
 
-#: free/classes/scanners/class-secupress-scan-wp-config.php:154
+#: free/classes/scanners/class-secupress-scan-wp-config.php:152
 msgid "https://docs.secupress.me/article/93-wp-config-php-file-constants-scan"
 msgstr ""
 "https://fr.docs.secupress.me/article/46-scan-des-constantes-de-wp-config-php"
@@ -6005,7 +5997,7 @@ msgstr "drop-in"
 msgid "The temporary file could not be created."
 msgstr "Le fichier temporaire n’a pu être créé."
 
-#: free/functions/files.php:1157
+#: free/functions/files.php:1182
 msgid "Could not create temporary file."
 msgstr "Impossible de créer le fichier temporaire."
 
@@ -11558,7 +11550,7 @@ msgstr ""
 "Le fichier %1$s> n’est pas en écriture. Merci d’appliquer les droits %2$s "
 "sur ce fichier."
 
-#: free/modules/wordpress-core/tools.php:63
+#: free/modules/wordpress-core/tools.php:59
 #, php-format
 msgid ""
 "Cannot change the value of the constant %1$s in the %2$s file. Please edit "
@@ -11567,7 +11559,7 @@ msgstr ""
 "Impossible de changer la valeur de la constante %1$s dans le fichier %2$s. "
 "Merci d’éditer le fichier et de remplacer ceci : %3$s par ça : %4$s"
 
-#: free/modules/wordpress-core/tools.php:81
+#: free/modules/wordpress-core/tools.php:77
 #, php-format
 msgid ""
 "Cannot add the constants to the %1$s file. Please edit it and add the "
@@ -11576,7 +11568,7 @@ msgstr ""
 "Impossible d‘ajouter les constantes dans le fichier %1$s. Merci d’éditer le "
 "fichier et d’ajouter ceci au début : %2$s"
 
-#: free/modules/wordpress-core/tools.php:127
+#: free/modules/wordpress-core/tools.php:123
 #, php-format
 msgid ""
 "Cannot remove the constant %1$s from the %2$s file. Please edit it and "
@@ -11585,13 +11577,13 @@ msgstr ""
 "Impossible de supprimer la constante %1$s dans le fichier %2$s. Merci "
 "d’éditer le fichier et de supprimer la ligne indiquant : %3$s"
 
-#: free/modules/wordpress-core/tools.php:220
+#: free/modules/wordpress-core/tools.php:216
 #, php-format
 msgid "The constant <code>%s</code> will be set on <code>%s</code>."
 msgstr ""
 "La constante <code>%s</code> devrait être configurée sur <code>%s</code>."
 
-#: free/modules/wordpress-core/tools.php:235
+#: free/modules/wordpress-core/tools.php:231
 #, php-format
 msgid ""
 "The constant <code>%1$s</code> should be set on <code>%2$s</code>.<br>Please "
@@ -11600,7 +11592,7 @@ msgstr ""
 "La constante <code>%1$s</code> devrait être sur <code>%2$s</code>.<br/>Merci "
 "de désactiver et réactiver ce module."
 
-#: free/modules/wordpress-core/tools.php:251
+#: free/modules/wordpress-core/tools.php:247
 msgid "Change prefix"
 msgstr "Changer le préfixe"
 
@@ -14099,6 +14091,19 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#~ msgid "HTTPS request failed."
+#~ msgstr "Requête HTTPS échouée."
+
+#~ msgid "SSL verification failed."
+#~ msgstr "Vérification SSL échouée."
+
+#~ msgid ""
+#~ "Your website seems to run under maintenance mode, relaunch the HTTPS "
+#~ "scanner later when you set it off."
+#~ msgstr ""
+#~ "Votre site semble être en mode maintenance, relancer le scanner HTTPS "
+#~ "quand il sera désactivé."
 
 #~ msgid "Yes, restrict access to these URLs and files"
 #~ msgstr "Oui, interdire l’accès à ces URLs et fichiers"
