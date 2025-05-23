@@ -872,8 +872,9 @@ function secupress_get_malwarescastatus_admin_post_cb() {
 
 add_action( 'admin_post_secupress-regen-keys', 'secupress_regen_hash_key_admin_post_cb' );
 /**
- * Set a new has_key, this will reset the salt keys too
+ * Set a new has_key, and reset the salt keys too
  *
+ * @since 2.3.17 Regen the file too
  * @since 2.0
  * @author Julio Potier
  **/
@@ -886,6 +887,16 @@ function secupress_regen_hash_key_admin_post_cb() {
 	$options             = get_site_option( SECUPRESS_SETTINGS_SLUG );
 	$options['hash_key'] = secupress_generate_key( 64 );
 	secupress_update_options( $options );
+
+	$filesystem  = secupress_get_filesystem();
+	$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
+	$args        = [
+		'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
+		'{{HASH1}}'        => wp_generate_password( 64, true, true ),
+		'{{HASH2}}'        => wp_generate_password( 64, true, true ),
+	];
+	$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
+	secupress_create_mu_plugin( 'salt_keys', $alicia_keys, uniqid() );
 
 	secupress_auto_login( 'Salt_Keys' );
 }

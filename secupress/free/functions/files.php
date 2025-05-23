@@ -741,13 +741,13 @@ function secupress_find_mu_plugin( $filename, $prefix = 'secupress_' ) {
 			unset( $mus[ $i ] );
 		}
 	}
-	return $mus;
+	return array_values( $mus );
 }
 
 /**
  * Creates a MU-PLUGIN.
  *
- * @since 2.3.16 3rd param $uniqid
+ * @since 2.3.16 3rd param $suffix
  * @since 2.2.6 New filename pattern
  * @author Julio Potier
  * @since 1.0
@@ -755,20 +755,20 @@ function secupress_find_mu_plugin( $filename, $prefix = 'secupress_' ) {
  *
  * @param (string) $filename_part The file name part in `(secupress_{$filename_part}).php`.
  * @param (string) $contents      The file content.
- * @param (int)    $uniqid        A filename suffix if needed, do not concat into the filename!
+ * @param (int)    $suffix        A filename suffix if needed, do not concat into the filename! Usually a uniqid()
  *
  * @return (bool) True on success.
  */
-function secupress_create_mu_plugin( $filename_part, $contents, $uniqid = '' ) {
+function secupress_create_mu_plugin( $filename_part, $contents, $suffix = '' ) {
 
 	$filesystem = secupress_get_filesystem();
-	$uniqid     = $uniqid ? '_' . $uniqid : '';
+	$suffix     = $suffix ? '_' . $suffix : '';
 	$filenames  = [ WPMU_PLUGIN_DIR . "/_secupress_{$filename_part}",
-					WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}", // The real one since 2.3
+					WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}", // The good one since 2.3
 				];
 	// Delete all previous files before
 	foreach( $filenames as $filename ) {
-		$files  = secupress_find_mu_plugin( $filename );
+		$files  = secupress_find_mu_plugin( $filename_part );
 		if ( $files ) {
 			array_map( 'secupress_delete_mu_plugin', $files ); 
 		}
@@ -780,12 +780,7 @@ function secupress_create_mu_plugin( $filename_part, $contents, $uniqid = '' ) {
 	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
 		return false;
 	}
-
-	$filename   = WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}{$uniqid}).php";
-	if ( file_exists( $filename ) || ! file_exists( WPMU_PLUGIN_DIR ) ) {
-		return false;
-	}
-
+	$filename   = WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}{$suffix}).php";
 	$done       = $filesystem->put_contents( $filename, $contents );
 	if ( defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) ) {
 		$mus    = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );

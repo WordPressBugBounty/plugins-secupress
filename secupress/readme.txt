@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.16
+Stable tag: 2.3.16.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,13 +185,9 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.16 =
+= 2.3.16.1 =
 * 23 May 2025
-* Fix: "Your site soes not use HTTPS. Error %s" %s was not replaced
-* Fix: "Already done, your way" too often in wpconfig module UI
-* Fix: Possibly you could have duplicate muplugins file from us.
-* Fix: Salt Keys scan could still display a message even when fixed
-* Removed: FS_CHMOD constants are not mandatory anymore, no hacks are related to these constants.
+* Fix: Our upgrader now correctly delete old "salt_keys" files from mu-plugins folder. This could trigger too much warnings and maybe disconnect users in a loop on some configurations
 
 
 == Upgrade Notice ==

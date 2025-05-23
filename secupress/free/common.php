@@ -528,9 +528,8 @@ function secupress_add_cookiehash_muplugin() {
 		'{{HASH}}'        => wp_generate_password( 64 ),
 	);
 	$cookiehash = str_replace( array_keys( $args ), $args, $cookiehash );
-	$uniqid     = uniqid();
 
-	if ( ! $cookiehash || ! secupress_create_mu_plugin( 'cookiehash', $cookiehash, $uniqid ) ) {
+	if ( ! $cookiehash || ! secupress_create_mu_plugin( 'cookiehash', $cookiehash, uniqid() ) ) {
 		// MU Plugin creation failed.
 		secupress_set_site_transient( 'secupress-cookiehash-muplugin-failed', 1 );
 		secupress_fixit( 'WP_Config' );
@@ -591,8 +590,7 @@ function secupress_add_salt_muplugin() {
 			'{{HASH2}}'        => wp_generate_password( 64, true, true ),
 		);
 		$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
-		$uniqid      = uniqid();
-		$created     = secupress_create_mu_plugin( 'salt_keys', $alicia_keys, $uniqid );
+		$created     = secupress_create_mu_plugin( 'salt_keys', $alicia_keys, uniqid() );
 		if ( ! $alicia_keys || ! $created ) {
 			return;
 		}
@@ -633,7 +631,6 @@ function secupress_add_salt_muplugin() {
 	}
 
 	secupress_auto_login( 'Salt_Keys' );
-	die();
 }
 
 
