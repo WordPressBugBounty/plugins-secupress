@@ -129,6 +129,7 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 			$this->add_message( 200, array( $ids, $ids, static::wrap_in_tag( $logins, 'strong' ) ) );
 		}
 
+/* //// WAIT
 		if ( secupress_get_module_option( 'blacklist-logins_lexicomatisation', 0, 'users-login' ) ) {
 
 			$logins = $wpdb->get_col( "SELECT u.user_login FROM $wpdb->users u, $wpdb->usermeta um WHERE u.user_login=u.display_name GROUP BY ID" ); // WPCS: unprepared SQL ok.
@@ -152,7 +153,7 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 			}
 
 		}
-
+*/
 		// "good"
 		$this->maybe_set_status( 0 );
 

@@ -333,35 +333,13 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 		}
 	}
-	// < 2.3.14
-	if ( version_compare( $actual_version, '2.3.14', '<' ) ) {
-		// removed, see .15
-	}
-	// < 2.3.15
-	if ( version_compare( $actual_version, '2.3.15', '<' ) ) {
-		// removed, see .17
-	}
-	// < 2.3.16.1
-	if ( version_compare( $actual_version, '2.3.16.1', '<' ) ) {
+	// < 2.3.16.2
+	if ( version_compare( $actual_version, '2.3.16.2', '<' ) ) {
 		$files = secupress_find_mu_plugin( 'salt_keys' );
 		if ( count( $files ) > 1 ) {
 			unset( $files[0] );
 			// Delete all others salt keys files
 			array_map( 'secupress_delete_mu_plugin', $files );
-		}
-		if ( secupress_find_mu_plugin( 'salt_keys' ) ) {
-			$filesystem  = secupress_get_filesystem();
-			$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
-			$args        = [
-				'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
-				'{{HASH1}}'        => wp_generate_password( 64, true, true ),
-				'{{HASH2}}'        => wp_generate_password( 64, true, true ),
-			];
-			/* Replace the whole file, should have done that before... */
-			$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
-			secupress_create_mu_plugin( 'salt_keys', $alicia_keys, uniqid() );
-			
-			secupress_auto_login( 'Salt_Keys' );
 		}
 	}
 }

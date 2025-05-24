@@ -761,12 +761,21 @@ function secupress_find_mu_plugin( $filename, $prefix = 'secupress_' ) {
  */
 function secupress_create_mu_plugin( $filename_part, $contents, $suffix = '' ) {
 
-	$filesystem = secupress_get_filesystem();
 	$suffix     = $suffix ? '_' . $suffix : '';
+	$filesystem = secupress_get_filesystem();
+
+	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
+		$filesystem->mkdir( WPMU_PLUGIN_DIR );
+	}
+
+	if ( secupress_find_mu_plugin( $filename_part ) || ! file_exists( WPMU_PLUGIN_DIR ) ) {
+		return false;
+	}
+	
+	// Delete all previous files
 	$filenames  = [ WPMU_PLUGIN_DIR . "/_secupress_{$filename_part}",
 					WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}", // The good one since 2.3
 				];
-	// Delete all previous files before
 	foreach( $filenames as $filename ) {
 		$files  = secupress_find_mu_plugin( $filename_part );
 		if ( $files ) {
@@ -774,14 +783,9 @@ function secupress_create_mu_plugin( $filename_part, $contents, $suffix = '' ) {
 		}
 	}
 
-	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
-		$filesystem->mkdir( WPMU_PLUGIN_DIR );
-	}
-	if ( ! file_exists( WPMU_PLUGIN_DIR ) ) {
-		return false;
-	}
 	$filename   = WPMU_PLUGIN_DIR . "/(secupress_{$filename_part}{$suffix}).php";
 	$done       = $filesystem->put_contents( $filename, $contents );
+
 	if ( defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) ) {
 		$mus    = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );
 		if ( $done && $mus ) {
@@ -789,6 +793,7 @@ function secupress_create_mu_plugin( $filename_part, $contents, $suffix = '' ) {
 			update_option( SECUPRESS_INSTALLED_MUPLUGINS, $mus );
 		}
 	}
+
 	return $done;
 }
 

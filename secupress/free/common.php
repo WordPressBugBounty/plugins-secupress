@@ -612,6 +612,7 @@ function secupress_add_salt_muplugin() {
 		$comment_added    = false;
 		$comment          = '/** If you want to add secret keys back in wp-config.php, get new ones at https://api.wordpress.org/secret-key/1.1/salt, then delete this file. */';
 		$placeholder      = '/** SecuPress salt placeholder. */';
+		$keys             = secupress_get_db_salt_keys();
 
 		foreach ( $keys as $i => $constant ) {
 			$pattern = '@define\s*\(\s*([\'"])' . $constant . '\1.*@';
