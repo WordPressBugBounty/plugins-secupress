@@ -554,31 +554,16 @@ add_action( 'plugins_loaded', 'secupress_add_salt_muplugin', 50 );
  * @author Julio Potier
  */
 function secupress_add_salt_muplugin() {
-	global $current_user, $wpdb;
-
-	if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
-		return;
-	}
-
 	if ( ! secupress_can_perform_extra_fix_action() ) {
 		return;
 	}
 
 	$data = secupress_get_site_transient( 'secupress-add-salt-muplugin' );
-
-	if ( ! $data ) {
-		return;
-	}
-
-	if ( ! is_array( $data ) || ! isset( $data['ID'] ) ) {
-		secupress_delete_site_transient( 'secupress-add-salt-muplugin' );
-		return;
-	}
-
-	if ( get_current_user_id() !== (int) $data['ID'] ) {
-		return;
-	}
 	secupress_delete_site_transient( 'secupress-add-salt-muplugin' );
+
+	if ( ! $data || ! is_array( $data ) || ! isset( $data['ID'] ) || get_current_user_id() !== (int) $data['ID'] ) {
+		return;
+	}
 
 	// Create the MU plugin.
 	if ( ! defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
@@ -599,39 +584,8 @@ function secupress_add_salt_muplugin() {
 	// Remove old secret keys from the database.
 	secupress_delete_db_salt_keys();
 
-	// Make sure we find the `wp-config.php` file.
-	$wpconfig_filepath = secupress_is_wpconfig_writable();
-
-	if ( $wpconfig_filepath ) {
-		/**
-		 * Remove old secret keys from the `wp-config.php` file and add a comment.
-		 * We have to make sure the comment is added, only once, only if one or more keys are found, even if some secret keys are missing, and do not create useless empty lines.
-		 */
-		$wp_filesystem    = secupress_get_filesystem();
-		$wpconfig_content = $wp_filesystem->get_contents( $wpconfig_filepath );
-		$comment_added    = false;
-		$comment          = '/** If you want to add secret keys back in wp-config.php, get new ones at https://api.wordpress.org/secret-key/1.1/salt, then delete this file. */';
-		$placeholder      = '/** SecuPress salt placeholder. */';
-		$keys             = secupress_get_db_salt_keys();
-
-		foreach ( $keys as $i => $constant ) {
-			$pattern = '@define\s*\(\s*([\'"])' . $constant . '\1.*@';
-
-			if ( preg_match( $pattern, $wpconfig_content, $matches ) ) {
-				$replace          = $comment_added ? $placeholder : $comment;
-				$wpconfig_content = str_replace( $matches[0], $replace, $wpconfig_content );
-				$comment_added    = true;
-			}
-		}
-
-		if ( $comment_added ) {
-			$wpconfig_content = str_replace( $placeholder . "\n", '', $wpconfig_content );
-
-			$wp_filesystem->put_contents( $wpconfig_filepath, $wpconfig_content, FS_CHMOD_FILE );
-		}
-	}
-
-	secupress_auto_login( 'Salt_Keys' );
+	// Remove old secret keys from /wp-config.php.
+	secupress_delete_wpconfig_salt_keys();
 }
 
 

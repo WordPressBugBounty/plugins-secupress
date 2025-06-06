@@ -743,6 +743,9 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 						} elseif ( static::is_pro_feature( $args['name'] . '|' . $_value ) ) {
 							$classes      .= ' secupress-show-pro';
 						}
+						if ( static::is_expert_feature( $args['name'] . '|' . $_value ) ) {
+							$classes      .= ' secupress-show-expert';
+						}
 						// $toggle_all = false;
 						// class="secupress-row-check
 						?>
@@ -766,13 +769,16 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 					$disabled          = static::is_pro_feature( $args['name'] . '|' . $val ) && ! secupress_is_pro() ? ' disabled="disabled"' : '';
 					$pro_class         = '';
 					if ( static::is_pro_feature( $args['name'] . '|' . $val ) && ! secupress_is_pro() ) {
-						$pro_class = ' secupress-pro-option';
+						$pro_class     = ' secupress-pro-option';
 					} elseif ( static::is_pro_feature( $args['name'] . '|' . $val ) ) {
-						$pro_class = ' secupress-show-pro';
+						$pro_class     = ' secupress-show-pro';
+					}
+					if ( static::is_expert_feature( $args['name'] . '|' . $val ) ) {
+						$pro_class    .= ' secupress-show-expert';
 					}
 
 					if ( ! $disabled && strpos( $title, 'secupress-coming-soon-feature' ) !== false ) {
-						$disabled = ' disabled="disabled"';
+						$disabled      = ' disabled="disabled"';
 					}
 					?>
 					<p class="secupress-radio-line<?php echo $pro_class; ?>">
@@ -797,9 +803,12 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 					$args['label_for'] = $args['name'] . '_' . $val;
 					$pro_class         = '';
 					if ( static::is_pro_feature( $args['name'] . '|' . $val ) && ! secupress_is_pro() ) {
-						$pro_class = ' secupress-pro-option';
+						$pro_class     = ' secupress-pro-option';
 					} elseif ( static::is_pro_feature( $args['name'] . '|' . $val ) ) {
-						$pro_class = ' secupress-show-pro';
+						$pro_class     = ' secupress-show-pro';
+					}
+					if ( static::is_expert_feature( $args['name'] . '|' . $val ) ) {
+						$pro_class    .= ' secupress-show-expert';
 					}
 					?>
 					<p class="secupress-radio-line<?php echo $pro_class; ?>">
@@ -1126,26 +1135,34 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 				$depends           = ' depends-' . implode( ' depends-', $helper['depends'] );
 			}
 
-			$class = ! empty( $helper['class'] ) ? ' ' . trim( $helper['class'] ) : '';
-			$name  = $args['name'];
-			$type  = $helper['type'];
-			$tag   = preg_match( '@</?p[ >]@', $helper['description'] ) ? 'div' : 'p';
+			$class  = ! empty( $helper['class'] ) ? ' ' . trim( $helper['class'] ) : '';
+			$name   = $args['name'];
+			$type   = $helper['type'];
+			$tag    = preg_match( '@</?p[ >]@', $helper['description'] ) ? 'div' : 'p';
+			$force  = '';
+			$desc   = '';
+			$forced = false !== strpos( $type, 'force-' );
+			$type   = str_replace( 'force-', '', $type );
 
 			switch ( $type ) {
 				case 'description' :
-					$description = '<' . $tag . ' class="description desc' . $depends . $class . '">' . $helper['description'] . '</' . $tag . '>';
+					$desc  = '<' . $tag . ' class="description desc' . $depends . $class . '">' . $helper['description'] . '</' . $tag . '>';
 				break;
 				case 'help' :
-					$description = '<' . $tag . ' class="description help' . $depends . $class . '"><span class="dashicons dashicons-editor-help"></span> ' . $helper['description'] . '</' . $tag . '>';
+					$desc  = '<' . $tag . ' class="description help' . $depends . $class . '"><span class="dashicons dashicons-editor-help"></span> ' . $helper['description'] . '</' . $tag . '>';
 				break;
 				case 'doc' :
-					$description = '<' . $tag . ' class="description help' . $depends . $class . '"><span class="dashicons dashicons-sos"></span> ' . $helper['description'] . '</' . $tag . '>';
+					$desc  = '<' . $tag . ' class="description help' . $depends . $class . '"><span class="dashicons dashicons-sos"></span> ' . $helper['description'] . '</' . $tag . '>';
 				break;
 				case 'warning' :
-					$description = '<' . $tag . ' class="description warning' . $depends . $class . '">' . ( 'p' === $tag ? '' : '<p>' ) . '<strong>' . __( 'Warning: ', 'secupress' ) . '</strong> ' . $helper['description'] . '</' . $tag . '>'; // Don't forget to close the <p> tag.
+					$desc  = '<' . $tag . ' class="description warning' . $depends . $class . '">' . ( 'p' === $tag ? '' : '<p>' ) . '<strong>' . __( 'Warning: ', 'secupress' ) . '</strong> ' . $helper['description'] . '</' . $tag . '>'; // Don't forget to close the <p> tag.
 				break;
 				default :
 					continue 2;
+			}
+			if ( $forced ) {
+				$force = $desc;
+				$desc = '';
 			}
 
 			/**
@@ -1153,11 +1170,21 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 			 *
 			 * @since 1.0
 			 *
-			 * @param (string) $description The description.
-			 * @param (string) $name        The field name argument.
-			 * @param (string) $type        The helper type.
+			 * @param (string) $desc The description.
+			 * @param (string) $name The field name argument.
+			 * @param (string) $type The helper type.
 			 */
-			echo apply_filters( 'secupress.settings.help', $description, $name, $type );
+			echo apply_filters( 'secupress.settings.help', $desc, $name, $type );
+			/**
+			 * Filter the forced helper description.
+			 *
+			 * @since 2.3.17
+			 *
+			 * @param (string) $desc The description.
+			 * @param (string) $name The field name argument.
+			 * @param (string) $type The helper type.
+			 */
+			echo apply_filters( 'secupress.settings.help.forced', $force, $name, $type );
 		}
 	}
 
@@ -1268,6 +1295,7 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 			$class    = 'secupress-setting-row_' . sanitize_html_class( $field_id ) . ' secupress-setting-row ';
 			$class   .= static::is_pro_feature( $field['args']['name'] ) && $is_free ? 'secupress-pro-row ' : '';
 			$class   .= static::is_pro_feature( $field['args']['name'] ) && ! $is_free ? 'secupress-show-pro ' : '';
+			$class   .= static::is_expert_feature( $field['args']['name'] ) ? 'secupress-show-expert ' : '';
 
 			// Row ID.
 			if ( ! empty( $field['args']['row_id'] ) ) {
@@ -1766,6 +1794,19 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 	 */
 	public static function is_pro_feature( $value ) {
 		return secupress_feature_is_pro( $value );
+	}
+
+
+	/**
+	 * Tell if the option value is an expert module.
+	 *
+	 * @since 2.3.17
+	 *
+	 * @param (string) $value 
+	 * @return (bool) 
+	 */
+	public static function is_expert_feature( $value ) {
+		return secupress_feature_is_pro( $value ) && ! secupress_is_pro() ? false : secupress_feature_is_expert( $value );
 	}
 
 

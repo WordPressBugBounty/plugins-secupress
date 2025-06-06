@@ -213,7 +213,7 @@ function secupress_get_constants_from_marker( $marker ) {
  * @return (string) Translated text
  **/
 function secupress_get_wpconfig_constant_text( $constant, $value ) {
-	return sprintf( __( 'The constant <code>%s</code> will be set on <code>%s</code>.', 'secupress' ), esc_html( $constant ), esc_html( $value ) );
+	return sprintf( __( 'The constant %s will be set on %s.', 'secupress' ), secupress_code_me( esc_html( $constant ) ), secupress_code_me( esc_html( $value ) ) );
 }
 
 
@@ -228,7 +228,7 @@ function secupress_get_wpconfig_constant_text( $constant, $value ) {
  * @return (string) Translated text
  **/
 function secupress_get_wpconfig_constant_error( $constant, $value ) {
-	return sprintf( __( 'The constant <code>%1$s</code> should be set on <code>%2$s</code>.<br>Please deactivate and activate this module again.', 'secupress' ), $constant, $value );
+	return sprintf( __( 'The constant %1$s should be set on %2$s.<br>Please deactivate and activate this module again.', 'secupress' ), secupress_code_me( esc_html( $constant ) ), secupress_code_me( esc_html( $value ) ) );
 }
 
 add_filter( 'secupress.settings.section.submit_button_args', 'secupress_change_submit_button_label_for_db_prefix', 10, 2 );

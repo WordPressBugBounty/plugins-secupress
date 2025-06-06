@@ -410,6 +410,7 @@ function secupress_bad_username_view( $views ) {
 function secupress_get_bad_username_ids() {
     global $wpdb;
     static $user_ids;
+
 	if ( ! empty( $user_ids ) ) {
 		return $user_ids;
 	} 
@@ -489,23 +490,240 @@ function secupress_usernames_security_body_class( $classes ) {
 	return $classes;
 }
 
-add_filter( 'pre_user_login', 'secupress_usernames_security_login_detector' );
+
+add_action( 'authenticate', 'secupress_pro_same_usernames_on_login', 22, 3 );
 /**
-  * When a new user is created, creates a global var $secupress_new_login
-  * 
-  * @since 2.2.6
-  * @author Roch Daniel, Julio Potier
-  * 
-  * @param (string) $login
-  * 
-  * @return (string) $login
-  */
-function secupress_usernames_security_login_detector( $login ) {
-	global $secupress_new_login;
+ * Check the login same as nickname/display_name on login
+ *
+ * @since 2.3.17
+ * @author Julio Potier
+ * 
+ * @param (mixed) $raw_user
+ * @param (string) $username
+ * 
+ * @return (mixed) $raw_user Can also display a form to ask a new strong password
+ **/
+function secupress_pro_same_usernames_on_login( $raw_user, $username, $password ) {
+	if ( ! secupress_get_module_option( 'blacklist-logins_lexicomatisation', 0, 'users-login' ) ) {
+		return $raw_user;
+	}
+	if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
+		return $raw_user;
+	}
+	$which = secupress_pro_same_usernames_get_which( $raw_user );
+	if ( is_a( $raw_user, 'WP_User' ) && ! empty( $which ) ) {
+		if ( ! empty( trim( $raw_user->first_name ) ) || ! empty( trim( $raw_user->last_name ) ) ) {
+			$user_name = trim( trim( $raw_user->first_name ) . ' ' . trim( $raw_user->last_name ) );
+			if ( $user_name ) {
+				if ( isset( $which['nickname'] ) ) {
+					$raw_user->nickname     = $user_name;
+				}
+				if ( isset( $which['display_name'] ) ) {
+					$raw_user->display_name = $user_name;
+				}
+				if ( isset( $which['nicename'] ) ) {
+					$raw_user->nicename     = $user_name;
+				}
+				secupress_add_transient_notice( sprintf( _nx( '%1$s updated as %2$s.', '%1$s updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%s', $which ), secupress_tag_me( esc_html( $user_name ), 'strong' ) ), 'updated', 'nickname-updated' );
+				wp_update_user( $raw_user );
+			}
+		}
+		$which = secupress_pro_same_usernames_get_which( $raw_user );
+		if ( empty( $which ) ) {
+			return $raw_user;
+		}
+	}
+	if ( is_a( $raw_user, 'WP_User' ) && empty( $which ) ) {
+		return $raw_user;
+	}
 
-	$secupress_new_login = ! get_user_by( 'login', $login );
+	$update_user = false;
 
-	return $login;
+	if ( ! is_a( $raw_user, 'WP_User' ) ) {
+		$tmp_user   = secupress_get_user_by( $username );
+		if ( ! is_a( $tmp_user, 'WP_User' ) ) {
+			return $raw_user;
+		}
+		$user_token = secupress_pro_same_usernames_get_user_option( 'token', $tmp_user->ID );
+		$user_token = ! $user_token ? '' : $user_token;
+		$user_db    = secupress_pro_same_usernames_get_user_from_meta_value( 'token', $password );
+		$time       = secupress_pro_same_usernames_get_user_option( 'timeout', $tmp_user->ID );
+
+		if ( ! is_a( $tmp_user, 'WP_User' ) || ! $user_db || $user_db !== $tmp_user->ID || ! hash_equals( $user_token, $password ) ) {
+			return $raw_user;
+		}
+
+		if ( $time < time() ) {
+			$error = __( 'Too much time has elapsed between the first step and now.', 'secupress' );
+		} else {
+			$update_user = true;
+			$raw_user    = $tmp_user;
+		}
+
+	}
+
+	$new_token  = wp_hash( wp_generate_password( 32, false ) );
+	secupress_pro_same_usernames_update_user_option( 'token', $new_token, $raw_user->ID );
+	secupress_pro_same_usernames_update_user_option( 'timeout', time() + ( 10 * MINUTE_IN_SECONDS ), $raw_user->ID );
+
+	$nonce      = 'secupress-new-name-' . $raw_user->ID;
+	$error      = '';
+
+	// A new name is submitted.
+	$which = secupress_pro_same_usernames_get_which( $raw_user );
+	if ( isset( $_POST['name'] ) && $update_user ) {
+
+		if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], $nonce ) ) {
+			secupress_die( __( 'Something went wrong.', 'secupress' ), '', [ 'force_die' => true, 'context' => 'same_usernames_on_login', 'attack_type' => 'login' ] );
+		}
+		$user_name = trim( $_POST['name'] );
+		if ( empty( $user_name ) ) {
+			$error = __( 'Nickname required.', 'secupress' );
+		}
+		if ( $raw_user->user_login === $user_name ) {
+			$error = __( 'A nickname different from your login is required.', 'secupress' );
+		}
+		if ( get_user_by( 'login', $user_name ) ) {
+			$error = __( 'A nickname different from another user‘s login is required.', 'secupress' );
+		}
+		if ( isset( $which['nicename'] ) && sanitize_user( $user_name, true ) !== $user_name ) {
+			$error  = sprintf( __( 'The username %1$s is invalid because it uses illegal characters. Spot the differences: %2$s.', 'secupress' ), secupress_tag_me( esc_html( $user_name ), 'strong' ), secupress_tag_me( esc_html( sanitize_user( $user_name, true ) ), 'strong' ) );
+			$error .= '<p>' . sprintf( __( 'Allowed characters: %s.', 'secupress' ), '<code>A-Z, a-z, 0-9, _, ., -, @</code>' ) . '</p>';
+		}
+		if ( ! $error ) {
+			if ( isset( $which['nickname'] ) ) {
+				$raw_user->nickname     = $user_name;
+			}
+			if ( isset( $which['display_name'] ) ) {
+				$raw_user->display_name = $user_name;
+			}
+			if ( isset( $which['nicename'] ) ) {
+				$raw_user->user_nicename = $user_name;
+			}
+			secupress_add_transient_notice( sprintf( _nx( '%1$s updated as %2$s.', '%1$s updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%s', $which ), secupress_tag_me( esc_html( $user_name ), 'strong' ) ), 'updated', 'nickname-updated' );
+			wp_update_user( $raw_user );
+			return $raw_user;
+		}
+	}
+	ob_start();
+	?>
+	<form class="wrap" method="post">
+		<h1><?php echo wp_sprintf_l( '%l', $which ) . ' ' . __( 'Security Update', 'secupress' ); ?></h1>
+		<h3><?php printf( _n( 'Your current %s is the same as your login.<br>You must update it to successfully log in.', 'Your current %s are the same as your login.<br>You must update them to successfully log in.', count( $which ), 'secupress' ), wp_sprintf_l( '%l', $which ) ); ?></h3>
+		<?php echo $error ? '<p class="error">' . $error . '</p>' : ''; ?>
+		<table class="form-table <?php echo is_rtl() ? 'rtl' : 'ltr'; ?>" style="width: 100%">
+			<tr id="nickname" class="secupress-user-name-wrap">
+				<td>
+					<div class="wp-pwd">
+						<span class="nickname-input-wrapper">
+							<input type="text" name="name" id="secupress-name" class="regular-text" value="" autocomplete="off" />
+						</span>
+					</div>
+					<input type="submit" id="thesubmit" class="secupress-button secupress-button-primary disabled"/>
+				</td>
+			</tr>
+		</table>
+		<?php
+		wp_nonce_field( $nonce );
+		// "pwd" field act as the token wrapper
+		?>
+		<input type="hidden" name="log" value="<?php echo esc_attr( $username ); ?>" />
+		<input type="hidden" name="pwd" value="<?php echo esc_attr( $new_token ); ?>" />
+
+		<p class="wrap"><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php printf( __( '&larr; Cancel and go back to %s', 'secupress' ), get_bloginfo( 'name' ) ); ?></a></p>
+	</form>
+	<?php
+	$raw_user = null;
+	$content  = ob_get_contents();
+	ob_clean();
+	secupress_action_page( __( 'Please change your profile names', 'secupress' ), $content, [] );
+}
+
+
+add_action( 'admin_init', 'secupress_lexicomatisation_set_expert' );
+/**
+ * Add our module to the global
+ *
+ * @since 2.3.17
+ * @author Julio Potier
+ **/
+function secupress_lexicomatisation_set_expert() {
+	if ( ! secupress_get_module_option( 'blacklist-logins_lexicomatisation', 0, 'users-login' ) ) {
+		return;
+	}
+	$GLOBALS['SECUPRESS_EXPERT_MODULES_ON']['lexicomatisation'] = true;
+}
+
+/**
+ * Get a same usernames option name
+ * 
+ * @since 2.3.17
+ * @author Julio Potier
+ * 
+ * @param (string) $option
+ * 
+ * @return (string)
+ **/
+function secupress_pro_same_usernames_get_option_name( $option ) {
+	global $wpdb;
+	return sprintf( '%ssecupress_same_usernames_%s', $wpdb->prefix, $option );
+}
+
+/**
+ * Get a user_id from a meta value
+ *
+ * @since 2.3.17
+ * @author Julio Potier
+ *
+ * @param (string) $key
+ * @param (string) $value
+ *
+ * @return (array)
+ */
+function secupress_pro_same_usernames_get_user_from_meta_value( $key, $value ) {
+	global $wpdb;
+	$res = secupress_cache_data( "$key|$value" );
+	if ( $res ) {
+		return $res;
+	}
+	$res = (int) $wpdb->get_var( $wpdb->prepare( "SELECT user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value = %s", secupress_pro_same_usernames_get_option_name( $key ), $value ) );
+	secupress_cache_data( "$key|$value", $res );
+	return $res;
+}
+
+/**
+ * Get a same usernames user option easily
+ * 
+ * @since 2.3.17
+ * @author Julio Potier
+ * 
+ * @param (string) $option
+ * @param (int) $uid 0 = current_user
+ * 
+ * @return (string)
+ **/
+function secupress_pro_same_usernames_get_user_option( $option, $uid = 0 ) {
+	$current_user = wp_get_current_user();
+	$uid          = $uid ?? $current_user->ID;
+	return get_user_option( 'secupress_same_usernames_' . $option, $uid );
+}
+
+/**
+ * Update a same usernames user option easily
+ * 
+ * @since 2.3.17
+ * @author Julio Potier
+ * 
+ * @param (string) $option
+ * @param (string) $value
+ * @param (int) $uid 0 = current_user
+ * 
+ * @return (string)
+ **/
+function secupress_pro_same_usernames_update_user_option( $option, $value, $uid = 0 ) {
+	$current_user = wp_get_current_user();
+	$user_id      = $uid ? $uid : $current_user->ID;
+	return update_user_option( $user_id, 'secupress_same_usernames_' . $option, $value );
 }
 
 add_filter( 'pre_user_display_name', 'secupress_usernames_security_name_filter' );
@@ -514,28 +732,63 @@ add_filter( 'pre_user_nickname', 'secupress_usernames_security_name_filter' );
   * When a new user is created or modified, change User Nicename, Nickname and Display Name
   * 
   * @since 2.2.6
-  * @author Roch Daniel, Julio Potier
+  * @author Julio Potier
   *
   * @param (string) $name
   * 
   * @return (string) $name
   */
 function secupress_usernames_security_name_filter( $name ) {
-	global $secupress_new_login;
-	static $_name;
+	global $current_user;
 
 	if ( ! secupress_get_module_option( 'blacklist-logins_lexicomatisation', 0, 'users-login' ) ) {
 		return $name;
 	}
-	$user_test = get_user_by( 'login', $name );
-	if ( $secupress_new_login || is_a( $user_test, 'WP_User' ) ) {
-		if ( ! $_name ) {
-			$_name = secupress_usernames_lexicomatisation();
-		}
-		$name = $_name;
-		if ( 'pre_user_nicename' === current_filter() && $secupress_new_login ) {
-			$name = sanitize_key( $name );
-		}
+	if ( ! is_a( $current_user, 'WP_User' ) ) {
+		return $name;
 	}
+	if ( $name === $current_user->user_login && 'pre_user_nickname' === current_filter() ) {
+		secupress_die( __( 'A nickname different from your login is required.', 'secupress' ), __( 'Invalid User Data', 'secupress' ), [ 'force_die' => true, 'back_link' => true ] );
+	}
+	if ( $name === $current_user->user_login && 'pre_user_display_name' === current_filter() ) {
+		secupress_die( __( 'A display name different from your login is required.', 'secupress' ), __( 'Invalid User Data', 'secupress' ), [ 'force_die' => true, 'back_link' => true  ] );
+	}
+
+	if ( get_user_by( 'login', $name ) && 'pre_user_nickname' === current_filter() ) {
+		secupress_die( __( 'A nickname different from another user‘s login is required.', 'secupress' ), __( 'Invalid User Data', 'secupress' ), [ 'force_die' => true, 'back_link' => true  ] );
+	}
+
+	if ( get_user_by( 'login', $name ) && 'pre_user_display_name' === current_filter() ) {
+		secupress_die( __( 'A display name different from another user‘s login is required.', 'secupress' ), __( 'Invalid User Data', 'secupress' ), [ 'force_die' => true, 'back_link' => true  ] );
+	}
+
 	return $name;
+}
+
+/**
+  * Return the needed public names identical to the user's login
+  * 
+  * @since 2.3.17
+  * @author Julio Potier
+  * 
+  * @param (WP_User) $user
+  * 
+  * @return (array)
+  */
+function secupress_pro_same_usernames_get_which( $user ) {
+	if ( ! is_a( $user, 'WP_User' ) ) {
+		return [];
+	}
+	$result = [];
+
+	if ( $user->user_login === $user->nickname ) {
+		$result['nickname']     = __( 'Nickname', 'secupress' );
+	}
+	if ( $user->user_login === $user->display_name ) {
+		$result['display_name'] = __( 'Display Name', 'secupress' );
+	}
+	if ( $user->user_login === $user->user_nicename ) {
+		$result['nicename']     = __( 'Nicename', 'secupress' );
+	}
+	return $result;
 }

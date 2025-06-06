@@ -112,6 +112,7 @@ function secupress_get_scanners() {
 			1 => 'Readme_Discloses',
 			2 => 'PHP_Disclosure',
 			3 => 'HTTPS',
+			4 => 'Bad_Url_Access',
 		),
 		'file-system' => array(
 			0 => 'Chmods',
@@ -126,7 +127,7 @@ function secupress_get_scanners() {
 			// 3 => 'Anti_Scanner',
 			// 4 => 'Anti_Front_Brute_Force',
 			// 5 => 'Bad_Request_Methods',
-			6 => 'Bad_Url_Access',
+			// 6 => 'Bad_Url_Access', see "sentitive-data"
 			7 => 'PhpVersion',
 			8 => 'Php_404',
 		),
@@ -589,7 +590,7 @@ function secupress_is_scan_request() {
  */
 function secupress_admin_url( $page, $module = '' ) {
 	if ( 'get-pro' === $page ) {
-		return trailingslashit( set_url_scheme( SECUPRESS_WEB_MAIN, 'https' ) ) . _x( 'pricing', 'link to website (Only FR or EN!)', 'secupress' );
+		return trailingslashit( set_url_scheme( SECUPRESS_WEB_MAIN, 'https' ) ) . _x( 'pricing', 'link to website (Only FR or EN!)', 'secupress' ) . $module;
 	}
 
 	$module = $module ? '&module=' . $module : '';
@@ -619,10 +620,10 @@ function secupress_get_capability( $force_mono = false, $context = '' ) {
 	/**
 	 * Filter the user capability/role that gives access to SecuPress features.
 	 *
+	 * @since 2.2 $context param
 	 * @since 1.0
-	 * @param (string) $role
 	 *
-	 * @since 2.2
+	 * @param (string) $role
 	 * @param (string) $context
 	 */
 	return apply_filters( 'secupress.user_capability', $role, $context );
@@ -721,8 +722,9 @@ function secupress_is_white_label() {
  * @return (string) The HTML tag.
  */
 function secupress_get_logo( $atts = [], $return = 'html' ) {
-	$base_url  = SECUPRESS_ADMIN_IMAGES_URL . 'logo';
-	$base_path = SECUPRESS_ADMIN_PATH . 'images/logo';
+	$is_pro    = secupress_is_pro() ? '-pro' : '';
+	$base_url  = SECUPRESS_ADMIN_IMAGES_URL . 'logo' . $is_pro;
+	$base_path = SECUPRESS_ADMIN_PATH . 'images/logo' . $is_pro;
 	if ( secupress_is_white_label() ) {
 		/**
 		 * If white label is activated, no SecuPress logo is retrieved.
@@ -1214,6 +1216,24 @@ function secupress_is_pro() {
 
 
 /**
+ * Tell if a feature exists as expert mode
+ *
+ * @since 2.3.17
+ * @author Julio Potier
+ *
+ * @return (bool) True if the feature is in list.
+ */
+function secupress_feature_is_expert( $feature ) {
+	$features = [
+		// Field names.
+		'content-protect_bad-url-access|allowed'    => 1,
+		'advanced-settings_expert-mode-main'        => 1,
+		'plugins_installation'                      => 1,
+		'blacklist-logins_lexicomatisation'         => 1,
+	];
+	return isset( $features[ $feature ] );
+}
+/**
  * Tell if a feature is for pro version.
  *
  * @since 1.0
@@ -1223,7 +1243,7 @@ function secupress_is_pro() {
  *                          - A field "name" when the whole field is pro: the result of `$this->get_field_name( $field_name )`.
  *                          - A field "name + value" when only one (or some) of the values is pro: the result of `$this->get_field_name( $field_name ) . "|" . $value`.
  *
- * @return (bool) True if the feature is in the white-list.
+ * @return (bool) True if the feature is in the list.
  */
 function secupress_feature_is_pro( $feature ) {
 	$features = [
@@ -1236,6 +1256,7 @@ function secupress_feature_is_pro( $feature ) {
 		'password-policy_password_expiration'       => 1,
 		'password-policy_strong_passwords'          => 1,
 		'plugins_detect_bad_plugins'                => 1,
+		'plugins_installation'                      => 1,
 		'themes_activation'                         => 1,
 		'themes_deletion'                           => 1,
 		'themes_detect_bad_themes'                  => 1,
@@ -1243,7 +1264,7 @@ function secupress_feature_is_pro( $feature ) {
 		'content-protect_hotlink'                   => 1,
 		'content-protect_404guess'                  => 1,
 		'file-scanner_file-scanner'                 => 1,
-		'content-protect_bad-url-access'            => 1,
+		'content-protect_bad-url-access|allowed'    => 1,
 		'backup-files_backup-file'                  => 1,
 		'backup-db_backup-db'                       => 1,
 		'backup-history_backup-history'             => 1,
@@ -1264,6 +1285,7 @@ function secupress_feature_is_pro( $feature ) {
 		'schedules-file-monitoring_scheduled'       => 1,
 		'notification-types_types'                  => 1,
 		'alerts_activated'                          => 1,
+		'event-alerts_module-alerts'                => 1,
 		'backups-storage_location'                  => 1,
 		'event-alerts_activated'                    => 1,
 		'notification-types_emails'                 => 1,
@@ -1280,7 +1302,6 @@ function secupress_feature_is_pro( $feature ) {
 		'bbq-headers_block-ai'                      => 1,
 		'blacklist-logins_user-creation-protection' => 1,
 		'blacklist-logins_bad-email-domains'        => 1,
-		'bbq-url-content_block-functions'           => 1,
 	];
 
 	return isset( $features[ $feature ] );
@@ -1503,7 +1524,6 @@ function secupress_maybe_increase_memory_limit() {
  */
 function secupress_add_settings_error( $setting, $code, $message, $type = 'error' ) {
 	global $wp_settings_errors;
-
 	$wp_settings_errors[] = array(
 		'setting' => $setting,
 		'code'    => $code,
@@ -1585,15 +1605,49 @@ function secupress_is_function_disabled( $function ) {
 }
 
 /**
- * Returns true if SECUPRESS_MODE is defined on "expert"
+ * Return an aray of translated expert modules with links, set by SECUPRESS_EXPERT_MODULES_ON GLOBAL var
  *
+ * @since 2.3.17
+ * @author Julio Potier
+ * 
+ * @return (array)
+ **/
+function secupress_get_expert_modules_on() {
+	global $SECUPRESS_EXPERT_MODULES_ON;
+	if ( empty( $SECUPRESS_EXPERT_MODULES_ON ) ) {
+		return;
+	}
+	$values['bad_url_access']   = '"<a href="' . secupress_admin_url( 'modules', 'sensitive-data#row-content-protect_bad-url-access' ) . '">' . __( 'Bad Url Access', 'secupress' )    . '</a>"';
+	$values['plugin_actions']   = '"<a href="' . secupress_admin_url( 'modules', 'plugins-themes#row-plugins_actions' ) . '">'                . __( 'Plugin Actions', 'secupress' )    . '</a>"';
+	$values['lexicomatisation'] = '"<a href="' . secupress_admin_url( 'modules', 'users-login#row-blacklist-logins_activated' ) . '">'        . __( 'Rename user names', 'secupress' ) . '</a>"';
+
+	return array_intersect_key( $values, $SECUPRESS_EXPERT_MODULES_ON );
+}
+
+/**
+ * Returns true if SECUPRESS_MODE contains "expert" or setting is on
+ *
+ * @since 2.3.17 main
  * @since 2.0.1 Read the new setting too
  * @since 1.4.6
  * @return (bool)
  * @author Julio Potier
  **/
 function secupress_is_expert_mode() {
-	return secupress_get_module_option( 'advanced-settings_expert-mode', false , 'welcome') || defined( 'SECUPRESS_MODE' ) && ( 'expert' === strtolower( SECUPRESS_MODE ) );
+	return secupress_get_expert_modules_on() || secupress_get_module_option( 'advanced-settings_expert-mode-main', false, 'welcome' ) 
+		|| ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'expert' ) ) );
+}
+
+/**
+ * Returns true if SECUPRESS_MODE contains "help"
+ *
+ * @since 2.3.17 
+ * @return (bool)
+ * @author Julio Potier
+ **/
+function secupress_no_contextual_help() {
+	return secupress_get_module_option( 'advanced-settings_expert-mode', false , 'welcome' )
+		|| ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'help' ) ) );
 }
 
 

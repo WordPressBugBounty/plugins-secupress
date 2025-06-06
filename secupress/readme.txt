@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 4.9
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.16.2
+Stable tag: 2.3.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,7 +54,7 @@ SecuPress is the only plugin with a full scanner able to fix the issues for you.
 Once done, you get a security grade that gives you a clear idea of what your security level is. You can export this analysis in PDF format to share with others (clients or colleagues) (1).
 
 **Users & Login**
-This feature is the easiest way to make sure your users’ data is protected and to keep their accounts from being compromised. With this feature you can limit the number of bad login attempts, ban non-existing usernames login attempts and set a non-login time slot. SecuPress also makes sure you can avoid double logins and control your sessions.
+This feature is the easiest way to make sure your users’ data is protected and to keep their accounts from being compromised. With this feature you can limit the number of bad login attempts, ban non-existing usernames login attempts and set a non-login time slot. SecuPress also makes sure you control the sessions of your users.
 
 SecuPress also adds a [2FA](https://secupress.me/blog/two-factor-authentication/) (Two Factor Authentication) because it’s almost a mandatory feature when it comes to WordPress security!
 
@@ -185,10 +185,24 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.16.2 =
-* 24 May 2025
-* Fix: A possible loop when login
-* Fix: A too big SQL query on site with too many users
+= 2.3.17 =
+* 05 June 2025
+* Fix: "No actions on plugins" has been fixed, you should not find your plugins deactivated now.
+* Fix: Some could still get DB ERROR emails, it's now gone, and you'll only get an admin notice if the down last 10 min or more.
+* Fix: Possible PHP Warning with "SECRET_KEY" not set
+* Fix: Roles choice was gone for PasswordLess 2FA.
+* Fix: Do not export '_transient_secupress_updates_message'
+* Fix: Possible PHP Warning on plugins page
+* Fix: Possible PHP Warning on Captcha, if you still encounter issues and cannot log in, check the docs: https://docs.secupress.me/article/205-temporarily-remove-the-use-of-captcha
+* Fix: User names won't be renamed by a random name (my bad, could sounds like a hack when you don't know), now, we'll try to rename users based on their first&last names, else they will be asked to rename it themselves.
+* Fix: "Bad File Extensions" now use one random extensions from our blocked list, more efficient.
+* Removed: The BETA features "Block function names in requests". Not effective, too much false positives.
+* Improve: "Bad Url Access" scanner is now in the correct scan section
+* Improve: The expert mode became "No contextual help" as it was working, and now the real "expert mode" will show you advanced modules for expert users. Find the blue logo.
+* Improve: The eagle logo? Well, what about "the eagle logo"? You mean "the yellow Logo"? ;)
+* Improve: Yes, we moved the Malware Scanner 2 places up.
+* New: Not really new, but the "No actions on plugins" has been split. Back-end side (like v2.2) and now FTP side (since 2.3) pro only, expert mode only, beta dev.
+* New: You can now manually update the data if needed for GeoIP module, Malware Scanner and Bad plugins & themes manually under Expert mode.
 
 
 == Upgrade Notice ==
@@ -197,5 +211,11 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 == TODO ==
 Create a trust score for each non WP file and displays it
 Create a "suspicious" status for alerts
-Revamp alerts
+Revamp alerts?
 PHP 8.O min
+TODO .18
+.htaccess scanner
+move EDD updater+white label into a mu to allow upgrade+rollback even with plugin deactivated
+email alerts when a module is deactivated more than 2h (user request)
+chartjs graph on dashboard widget
+if stable enough: rename .18 > .100

@@ -9,14 +9,13 @@ $this->add_section( __( 'Event Alerts', 'secupress' ) );
 $main_field_name = $this->get_field_name( 'activated' );
 
 $this->add_field( array(
-	'title'             => __( 'Notify me for important events', 'secupress' ),
+	'title'             => __( 'Enable notifications for important events', 'secupress' ),
 	'label_for'         => $main_field_name,
 	'plugin_activation' => true,
 	'type'              => 'checkbox',
 	'value'             => (int) secupress_is_submodule_active( 'alerts', 'event-alerts' ),
-	'label'             => __( 'Yes, alert me', 'secupress' ),
+	'label'             => __( 'Yes, enable important event notifications', 'secupress' ),
 ) );
-
 
 $label   = __( 'Every %d minutes.', 'secupress' );
 $label   = explode( '%d', $label );
@@ -47,3 +46,35 @@ $this->add_field( array(
 		),
 	),
 ) );
+
+/** 2.3.18
+$timing = apply_filters( 'secupress.plugins.module-alerts.timing', 2 );
+$timing = (int) $timing ?: 2;
+$this->add_field( array(
+	'title'             => __( 'Module Notifications', 'secupress' ),
+	'label_for'         => $this->get_field_name( 'module-alerts' ),
+	'plugin_activation' => true,
+	'type'              => 'checkbox',
+	'value'             => (int) secupress_is_submodule_active( 'alerts', 'module-alerts' ),
+	'label'             => __( 'Yes, enable module notifications', 'secupress' ),
+	'helpers'      => array(
+		array(
+			'type'        => 'description',
+			'description' => sprintf( __( 'When a module is deactivated and not reactivated within <strong>%d hours</strong>, an alert email will be sent to the Email Notifications List above to warn them about it.', 'secupress' ), $timing ),
+		),
+	),
+) );
+
+$this->add_field( array(
+	'label_for'         => $this->get_field_name( 'module-alerts' ) . '-notice',
+	'depends'           => $this->get_field_name( 'module-alerts' ),
+	'type'              => 'checkbox',
+	'label'             => __( 'Yes, add admin notices too', 'secupress' ),
+	'helpers'      => array(
+		array(
+			'type'        => 'description',
+			'description' => __( 'Once read by 1 other administrator, the notice is gone.', 'secupress' ),
+		),
+	),
+) );
+*/

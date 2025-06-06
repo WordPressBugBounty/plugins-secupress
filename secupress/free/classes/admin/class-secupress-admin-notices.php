@@ -338,8 +338,8 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 						continue;
 					}
 					$plugin_name = SECUPRESS_PLUGIN_NAME . ( secupress_has_pro() && ! secupress_is_white_label() ? ' Pro' : '' );
-					$label       = secupress_is_expert_mode() ? '' : '<label class="plugin-title">' . esc_html( $plugin_name ) . '</label>';
-					$lab_class   = secupress_is_expert_mode() ? '' : ' has-plugin-title';
+					$label       = secupress_no_contextual_help() ? '' : '<label class="plugin-title">' . esc_html( $plugin_name ) . '</label>';
+					$lab_class   = secupress_no_contextual_help() ? '' : ' has-plugin-title';
 					if ( 'sp-dismissible' === $type ) {
 						foreach ( $messages as $notice_id => $message ) {
 							$button = admin_url( 'admin-post.php?action=secupress_dismiss-notice&notice_id=' . $notice_id . '&_wp_http_referer=' . $referer );

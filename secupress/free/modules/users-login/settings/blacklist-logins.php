@@ -124,19 +124,17 @@ $this->add_field( array(
 						]
 ) );
 
-$this->add_field( array(
-	'title'             => sprintf( __( 'Rename the users nickname', 'secupress' ), 'admin' ),
-	'description'       => __( 'Any new user or updated user who has their nickname as the same as their login will be renamed', 'secupress' ),
-	'label_for'         => $this->get_field_name( 'lexicomatisation' ),
-	'type'              => 'checkbox',
-	'depends'           => $this->get_field_name( 'activated' ),
-	'default'           => false,
-	'label'             => sprintf( __( 'Yes, prevent user‘s login to be the same as their display name', 'secupress' ), secupress_tag_me( 'admin', 'strong' ) ),
-	'helpers'           => [
-							[ 'type' => 'description',  'description' => sprintf( __( 'New nickname will look like this: "%s"', 'secupress' ), secupress_tag_me( secupress_usernames_lexicomatisation(), 'em' ) ), ],
-						]
-) );
-
+if ( secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'             => sprintf( __( 'Rename public user names', 'secupress' ), 'admin' ),
+		'description'       => __( 'All users whose nickname, display name, or nicename is identical to their login may be asked to rename it following our automatic fix attempt.', 'secupress' ),
+		'label_for'         => $this->get_field_name( 'lexicomatisation' ),
+		'type'              => 'checkbox',
+		'depends'           => $this->get_field_name( 'activated' ),
+		'default'           => false,
+		'label'             => sprintf( __( 'Yes, prevent user‘s login to be the same as their public names', 'secupress' ), secupress_tag_me( 'admin', 'strong' ) ),
+	) );
+}
 $woomobileurl = __( 'https://woocommerce.com/mobile/', 'secupress' );
 $this->add_field( array(
 	'title'             => __( 'Forbid User Enumeration', 'secupress' ),

@@ -167,7 +167,8 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 	$this->add_field( array(
 		'title'        => '<span class="dashicons dashicons-groups"></span> ' . __( 'Affected Roles', 'secupress' ),
 		'description'  => __( 'Which roles does this module affect?', 'secupress' ),
-		'depends'      => $field_name . '_passwordless ' . $field_name . '_otp-auth',
+		'depends'      => $field_name,
+		// 'depends'      => $field_name . '_passwordless ' . $field_name . '_otp-auth',
 		'row_class'    => 'affected-role-row',
 		'name'         => $this->get_field_name( 'affected_role' ),
 		'type'         => 'roles',

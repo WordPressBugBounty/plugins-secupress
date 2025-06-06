@@ -234,7 +234,6 @@ $this->add_field( array(
 	),
 ) );
 
-
 $active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-saltkeys' );
 $disabled = ! $is_writable || ( ! $is_after_save && ! $active && ( ( defined( 'SECUPRESS_SALT_KEYS_ACTIVE' ) && SECUPRESS_SALT_KEYS_ACTIVE ) || ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) && SECUPRESS_SALT_KEYS_MODULE_ACTIVE ) ) );
 $this->add_field( array(
@@ -249,7 +248,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $disabled ? sprintf( __( '<strong>8 constants</strong> will be created in a must-use plugin, replacing the ones in your %s file and database.', 'secupress' ), '<code>wp-config.php</code>' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? sprintf( __( '<strong>%d constants</strong> will be created in a must-use plugin, replacing the ones in your %s file and database.', 'secupress' ), 10, '<code>wp-config.php</code>' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
