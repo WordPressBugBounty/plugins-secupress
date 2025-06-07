@@ -62,7 +62,7 @@ function secupress_been_first() {
 /** DETECT BAD PLUGINS AND THEMES =============================================================== */
 /** --------------------------------------------------------------------------------------------- */
 
-if ( secupress_no_contextual_help() ) {
+if ( secupress_is_expert_mode() ) {
 	add_filter( 'secupress.settings.help', '__return_empty_string' );
 	add_filter( 'secupress.settings.description', '__return_empty_string' );
 }

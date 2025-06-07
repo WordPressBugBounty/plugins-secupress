@@ -22,9 +22,13 @@ add_action( 'secupress.plugins.activation', 'secupress_wpconfig_saltkeys_activat
  * @author Julio Potier
  */
 function secupress_wpconfig_saltkeys_activation() {
-	// Don't do it in the submodule file to prevent 10 db delete query at each load for nothing mainly.
+	// Don't do it in the submodule file to prevent 8 db delete query at each load for nothing mainly.
 	// So we just do it on activation, mu file present or not.
 	secupress_delete_db_salt_keys();
+
+	if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
+		return;
+	}
 
 	$current_user = wp_get_current_user();
 	secupress_set_site_transient( 'secupress-add-salt-muplugin', array( 'ID' => $current_user->ID ) );
@@ -40,6 +44,6 @@ add_action( 'secupress.plugins.deactivation', 'secupress_wpconfig_saltkeys_deact
  * @author Julio Potier
  */
 function secupress_wpconfig_saltkeys_deactivation() {
-    // $current_user = wp_get_current_user();
-    // secupress_set_site_transient( 'secupress-auto-login', array( 'ID' => $current_user->ID ) );
+    $current_user = wp_get_current_user();
+    secupress_set_site_transient( 'secupress-auto-login', array( 'ID' => $current_user->ID ) );
 }

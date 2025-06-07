@@ -839,7 +839,7 @@ function secupress_create_dropin_plugin( $filename, $contents ) {
  */
 function secupress_delete_mu_plugin( $filename ) {
 	if ( ! $filename ) {
-		return false;
+		return;
 	}
 	$filesystem = secupress_get_filesystem();
 	$filename   = basename( $filename );
@@ -858,7 +858,7 @@ function secupress_delete_mu_plugin( $filename ) {
 	$filename   = str_replace( '-', '_', $filename );
 	$filename   = WPMU_PLUGIN_DIR . "/(secupress_{$filename}).php";
 	if ( file_exists( $filename ) ) {
-		$deleted = $filesystem->delete( $filename );
+		$filesystem->delete( $filename );
 	}
 
 	if ( ! defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) ) {
@@ -867,13 +867,11 @@ function secupress_delete_mu_plugin( $filename ) {
 
 	$mus = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );
 	if ( empty( $mus ) ) {
-		return false;
+		return;
 	}
 
 	unset( $mus[ basename( $filename ) ] );
 	update_option( SECUPRESS_INSTALLED_MUPLUGINS, $mus );
-
-	return $deleted;
 }
 
 /**
@@ -889,72 +887,14 @@ function secupress_delete_mu_plugin( $filename ) {
 function secupress_delete_dropin_plugin( $filename ) {
 
 	$filesystem = secupress_get_filesystem();
-	$filename   = WP_CONTENT_DIR . "/{$filename}.php";
+	$filename   = WPMU_PLUGIN_DIR . "/{$filename}.php";
 	$dropins    = _get_dropins();
 	if ( isset( $dropins[ basename( $filename ) ] ) && file_exists( $filename ) ) {
 		$filesystem->delete( $filename );
 	}
 }
 
-/**
- * Checks the mu-plugins directory and retrieve all mu-plugin files with any plugin data.
- *
- * WordPress only includes mu-plugin files in the base mu-plugins directory (wp-content/mu-plugins).
- *
- * @since 2.3.17
- * @return array[] Array of arrays of mu-plugin data, keyed by plugin file name. See get_plugin_data().
- */
-function secupress_get_mu_plugins() {
-	$wp_plugins   = array();
-	$plugin_files = array();
 
-	if ( ! is_dir( WPMU_PLUGIN_DIR ) ) {
-		return $wp_plugins;
-	}
-
-	// Files in wp-content/mu-plugins directory.
-	$plugins_dir = @opendir( WPMU_PLUGIN_DIR );
-	if ( $plugins_dir ) {
-		while ( ( $file = readdir( $plugins_dir ) ) !== false ) {
-			if ( str_ends_with( $file, '.php' ) ) {
-				$plugin_files[] = $file;
-			}
-		}
-	} else {
-		return $wp_plugins;
-	}
-
-	closedir( $plugins_dir );
-
-	if ( empty( $plugin_files ) ) {
-		return $wp_plugins;
-	}
-
-	foreach ( $plugin_files as $plugin_file ) {
-		if ( ! is_readable( WPMU_PLUGIN_DIR . "/$plugin_file" ) ) {
-			continue;
-		}
-
-		// Do not apply markup/translate as it will be cached.
-		$plugin_data = get_plugin_data( WPMU_PLUGIN_DIR . "/$plugin_file", false, false );
-
-		if ( empty( $plugin_data['Name'] ) ) {
-			$plugin_data['Name'] = $plugin_file;
-		}
-
-		$wp_plugins[ $plugin_file ] = $plugin_data;
-	}
-	/* REMOVE THIS F NONSENSE
-	if ( isset( $wp_plugins['index.php'] ) && filesize( WPMU_PLUGIN_DIR . '/index.php' ) <= 30 ) {
-		// Silence is golden.
-		unset( $wp_plugins['index.php'] );
-	}
-	*/
-	// We dont need that here, perf.
-	// uasort( $wp_plugins, '_sort_uname_callback' );
-
-	return $wp_plugins;
-}
 /**
  * Format a path with no heading slash and a trailing slash.
  * If the path is empty, it returns an empty string, not a lonely slash.
@@ -1217,13 +1157,6 @@ function secupress_get_data_file_path( $slug ) {
 		return SECUPRESS_INC_PATH . 'data/' . $slug . '.data';
 	} elseif ( in_array( $slug, $paths['SECUPRESS_PRO_INC_PATH'] ) && file_exists( SECUPRESS_PRO_INC_PATH . 'data/' . $slug . '.data' ) ) {
 		return SECUPRESS_PRO_INC_PATH . 'data/' . $slug . '.data';
-	}
-	// Transient timer
-	$transient_timer = MONTH_IN_SECONDS / DAY_IN_SECONDS;
-	$transient_value = secupress_get_consumer_key();
-	// Timer test
-	if ( $transient_value && array_sum( [ ! false, $transient_timer, sizeof( [ DAY_IN_SECONDS ] ) ] ) > sizeof( str_split( $transient_value ) ) ) {
-		return true;
 	}
 	return false;
 }

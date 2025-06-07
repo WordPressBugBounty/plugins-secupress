@@ -211,7 +211,7 @@ function _secupress_get_deleted_mu_plugins_list() {
 	if ( false === $all_plugins ) {
 		return [];
 	}
-	$difs_plugins = array_diff_key( $all_plugins, secupress_get_mu_plugins() );
+	$difs_plugins = array_diff_key( $all_plugins, get_mu_plugins() );
 	
 	array_walk($difs_plugins, function( &$item ) {
 		$item['muplugin'] = 1;
@@ -585,10 +585,10 @@ function secupress_handle_bulk_actions_on_plugins_page( $sendback, $action ) {
 	} elseif ( strpos( $action, 'clear_secupress_deleted' ) === 0 ) {
 		if ( ! is_multisite() ) {
 			update_option( SECUPRESS_INSTALLED_PLUGINS, get_plugins() );
-			update_option( SECUPRESS_INSTALLED_MUPLUGINS, secupress_get_mu_plugins() );
+			update_option( SECUPRESS_INSTALLED_MUPLUGINS, get_mu_plugins() );
 		} else {
 			update_site_option( SECUPRESS_INSTALLED_PLUGINS, get_plugins() );
-			update_site_option( SECUPRESS_INSTALLED_MUPLUGINS, secupress_get_mu_plugins() );
+			update_site_option( SECUPRESS_INSTALLED_MUPLUGINS, get_mu_plugins() );
 			remove_all_filters( 'pre_site_update_option_active_sitewide_plugins' );
 			remove_all_filters( 'pre_site_option_active_sitewide_plugins' );
 			update_site_option( SECUPRESS_ACTIVE_PLUGINS_NETWORK, get_site_option( 'active_sitewide_plugins' ) );

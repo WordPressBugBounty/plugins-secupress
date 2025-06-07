@@ -2,7 +2,7 @@
 /**
  * Plugin Name: {{PLUGIN_NAME}} Salt Keys
  * Description: Great Security Keys for your site
- * Version: 2.3.17
+ * Version: 2.3.16
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -41,8 +41,7 @@ unset( $file_str, $main_key, $main_keys, $hash_1, $hash_2, $hash_key, $sp_setup 
 
 if ( ! function_exists( 'wp_salt' ) ) {
 	function wp_salt( $scheme = 'auth' ) {
-		$scheme = strtoupper( $scheme );
-		if ( ! defined( "{$scheme}_KEY" ) || ! defined( "{$scheme}_SALT" ) ) {
+		if ( ! defined( "{$scheme}_KEY" ) || ! defined( "{$scheme}_AUTH" ) ) {
 			$scheme = 'secret';
 		}
 		/** This filter is documented in wp-includes/pluggable.php */

@@ -47,8 +47,8 @@ class SecuPress_Scan_Bad_URL_Access extends SecuPress_Scan implements SecuPress_
 	protected function init() {
 		global $is_apache, $is_nginx, $is_iis7;
 
-		$this->title    = __( 'Check if some of your WordPress URLs disclose your site’s internal path.', 'secupress' );
-		$this->more     = __( 'When an attacker wants to hack into a WordPress site, they will search for all available informations. The goal is to find something useful that will help him penetrate your site. Don’t let them easily find any informations using useful URLs.', 'secupress' );
+		$this->title    = __( 'Check if any of your WordPress files disclose your site’s internal path.', 'secupress' );
+		$this->more     = __( 'When an attacker wants to hack into a WordPress site, they will search for all available informations. The goal is to find something useful that will help him penetrate your site. Don’t let them easily find any informations.', 'secupress' );
 		$this->more_fix = sprintf(
 			__( 'Activate the %1$s protection from the module %2$s.', 'secupress' ),
 			'<strong>' . __( 'Bad URL Access', 'secupress' ) . '</strong>',
@@ -97,7 +97,7 @@ class SecuPress_Scan_Bad_URL_Access extends SecuPress_Scan implements SecuPress_
 			),
 			// "bad"
 			/** Translators: %s is a URL, or a list of URLs. */
-			200 => _n_noop( 'This URL should not be accessible by anyone: %s', 'These URLs should not be accessible by anyone: %s', 'secupress' ),
+			200 => _n_noop( '%s should not be accessible by anyone.', '%s should not be accessible by anyone.', 'secupress' ),
 			// "cantfix"
 			/** Translators: 1 is a file name, 2 is some code. */
 			300 => sprintf( __( 'Your server runs <strong>Nginx</strong>, the files that disclose your site’s internal path cannot be protected automatically but you can do it yourself by adding the following code to your %1$s file: %2$s', 'secupress' ), '<code>nginx.conf</code>', '%s' ),

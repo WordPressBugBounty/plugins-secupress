@@ -342,49 +342,12 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			array_map( 'secupress_delete_mu_plugin', $files );
 		}
 	}
-	// < 2.3.17
-	if ( version_compare( $actual_version, '2.3.17', '<' ) ) {
-		if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
-			$plugin_file = secupress_find_mu_plugin( 'salt_keys' );
-			if ( $plugin_file ) {
-				$plugin_file = reset( $plugin_file );
-				$plugin_data = get_plugin_data( $plugin_file );
-				if ( isset( $plugin_data['Version'] ) && version_compare( $plugin_data['Version'], '2.3.17' ) < 0 ) {
-					$filesystem  = secupress_get_filesystem();
-					$content     = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
-					$args        = array(
-						'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
-						'{{HASH1}}'        => wp_generate_password( 64, true, true ),
-						'{{HASH2}}'        => wp_generate_password( 64, true, true ),
-					);
-					$content = str_replace( array_keys( $args ), $args, $content );
-					$filesystem->put_contents( $plugin_file, $content );
-				}
-			}
-		}
-		if ( defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) ) {
-			secupress_delete_mu_plugin( 'no_plugins_installation' );
-			secupress_deactivate_submodule_silently( 'plugins-themes', 'plugin-installation' );
-			secupress_activate_submodule_silently( 'plugins-themes', 'plugin-installation' );
-			secupress_no_plugin_actions__deactivation();
-		}
-		// Removed
-		if ( secupress_is_pro() ) {
-			secupress_deactivate_submodule_silently( 'firewall', 'block-functions' );
-			secupress_remove_old_plugin_file( SECUPRESS_PRO_MODULES_PATH . 'firewall/plugins/block-functions.php' );
-		}
-		// Recreate the file
-		if ( secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-dieondberror' ) ) {
-			secupress_deactivate_submodule( 'wordpress-core', 'wp-config-constant-dieondberror' );
-			secupress_activate_submodule( 'wordpress-core', 'wp-config-constant-dieondberror' );
-		}
-	}
 }
 
 
 add_action( 'admin_init', 'secupress_better_changelog' );
 /**
- * If the plugin is secupress free or pro, let's add our changelog content
+ * If the plugin is secupress free or pro, let's add our changlog content
  *
  * @since 1.4.3
  * @author Julio Potier
@@ -625,7 +588,6 @@ if ( ! secupress_is_white_label() ) {
 	/**
 	 * Display a "what's new" notice when not in WhiteLabel and user has the correct capa
 	 *
-	 * @since 2.3 SECUPRESS_MAJOR_VERSION
 	 * @since 2.0 secupress_add_transient_notice + SECUPRESS_VERSION
 	 * @since 1.4.10
 	 * @author Julio Potier
@@ -635,39 +597,19 @@ if ( ! secupress_is_white_label() ) {
 	 **/
 	function secupress_display_whats_new() {
 		$notice_id = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
-		if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id ) ) {
-			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
-			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-			$blogpost  = __( 'https://secupress.me/blog/secupress-v2-3/', 'secupress' );
-			$newitems  = [ 	
-							sprintf( __( 'So many things have changed, read our dedicated blogpost %sSecuPress v2.3 aka Starboost%s!', 'secupress' ), sprintf( '<a href="%s" target="_blank">', $blogpost ), '</a>' ),
-						];
-			if ( ! empty( $newitems ) ) {
-				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-				secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id );
-			}
+		if ( ! current_user_can( secupress_get_capability() ) || secupress_notice_is_dismissed( $notice_id ) ) {
 			return;
 		}
-		$notice_id = 'new-' . sanitize_key( SECUPRESS_VERSION );
-		if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id ) ) {
-			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
-			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-			// $blogpost  = __( 'https://secupress.me/blog/secupress-v2-3/', 'secupress' );
-			$newitems  = [ 	
-							__( 'Here are some key improvement for this version:', 'secupress' ),
-							__( '<strong>Expert Mode</strong> has changed, it now shows powerful but more complex features dedicated to expert users only.', 'secupress' ),
-							__( '<strong>No Actions on Plugins</strong> has been fixed, you should not find your plugins deactivated now.', 'secupress' ),
-							__( 'Also for this module the new method "by FTP" is now running under Expert Mode in Pro version.', 'secupress' ),
-							__( 'Being spam by DB Error email messages is gone.', 'secupress' ),
-							__( 'Roles choice was gone for <strong>PasswordLess 2FA</strong>.', 'secupress' ),
-							__( 'Some scanners have been improved to prevent false positives.', 'secupress' ),
-							__( 'User names won‘t be renamed by a random name.', 'secupress' ),
-							__( 'The BETA feature <strong>Block function names in requests</strong> has been removed.', 'secupress' ),
-						];
-			if ( ! empty( $newitems ) ) {
-				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-				secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id );
-			}
+
+		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
+		$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+		$blogpost  = __( 'https://secupress.me/blog/secupress-v2-3/', 'secupress' );
+		$newitems  = [ 	
+						sprintf( __( 'So many things have changed, read our dedicated blogpost %sSecuPress v2.3 aka Starboost%s!', 'secupress' ), sprintf( '<a href="%s" target="_blank">', $blogpost ), '</a>' ),
+					];
+		if ( ! empty( $newitems ) ) {
+			$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
+			secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id );
 		}
 	}
 }

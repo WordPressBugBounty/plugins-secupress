@@ -23,17 +23,16 @@ function secupress_blackhole_is_robots_txt_enabled() {
 /**
  * Get a regex pattern matching the files.
  *
- * @since 2.3.17 $rules_mode param
  * @since 2.2.6 Invert the behaviour
  * @author Julio Potier
  * 
  * @since 1.0.3
  * @author Grégory Viguier
  *
- * @param (string) $rules_mode
  * @return (string)
  */
-function secupress_bad_url_access_get_regex_pattern( $rules_mode = 'disallowed' ) {
+function secupress_bad_url_access_get_regex_pattern() {
+	$rules_mode = isset( $GLOBALS['contentprotectbadurlaccess'] ) ? $GLOBALS['contentprotectbadurlaccess'] : secupress_get_module_option( 'content-protect_bad-url-access', 'disallowed', 'sensitive-data' );
 	switch( $rules_mode ) {
 		case 'allowed':
 			$patterns                = [];
@@ -261,7 +260,7 @@ if ( ! secupress_is_plugin_active( 'sf-author-url-control/sf-author-url-control.
 			return;
 		}
 
-		$def_user_nicename = sanitize_title( $userdata->nickname );
+		$def_user_nicename = sanitize_title( $userdata->user_login );
 		$blog_prefix       = is_multisite() && ! is_subdomain_install() && is_main_site() ? '/blog/' : '/';
 		$author_base       = $wp_rewrite->author_base;
 

@@ -215,15 +215,7 @@ function secupress_preventusercreation_settings_callback( $modulenow, &$settings
 	$user_prot_activate = isset( $activate['blacklist-logins_user-creation-protection'] ) && $activate['blacklist-logins_user-creation-protection'];
 
 	// (De)Activation.
-	$settings['blacklist-logins_admin'] = isset( $settings['blacklist-logins_admin'] ) ? '1' : '0';
-	if ( $settings['blacklist-logins_admin'] !== secupress_get_module_option( 'blacklist-logins_admin', false, 'users-login' ) ) {
-		secupress_add_module_notice( '', sprintf( __( 'Forbid «%s» Usernames', 'secupress' ), 'admin' ), $settings['blacklist-logins_admin'] ? 'activation' : 'deactivation' );
-	}
-	$settings['blacklist-logins_lexicomatisation'] = isset( $settings['blacklist-logins_lexicomatisation'] ) ? '1' : '0';
-	if ( $settings['blacklist-logins_lexicomatisation'] !== secupress_get_module_option( 'blacklist-logins_lexicomatisation', false, 'users-login' ) ) {
-		secupress_add_module_notice( '', __( 'Rename public user names', 'secupress' ), $settings['blacklist-logins_lexicomatisation'] ? 'activation' : 'deactivation' );
-	}
-	////secupress_manage_submodule( $modulenow, 'prevent-reset-password', isset( $activate['blacklist-logins_prevent-reset-password'] ) );
+	//secupress_manage_submodule( $modulenow, 'prevent-reset-password', isset( $activate['blacklist-logins_prevent-reset-password'] ) );
 	secupress_manage_submodule( $modulenow, 'same-email-domain', isset( $activate['blacklist-logins_same-email-domain'] ) );
 	if ( secupress_is_pro() ) {
 		secupress_manage_submodule( $modulenow, 'user-creation-protection', $confirmed && $user_prot_activate );

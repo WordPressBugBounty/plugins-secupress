@@ -445,3 +445,26 @@ function secupress_get_emojiset( $set = 'random' ) {
 
 	return $sets[ $set ];
 }
+
+/**
+  * This function will generate a random name, humanly readable
+  *
+  * @param (int) $count
+  * 
+  * @since 2.2.6
+  * @author Julio Potier
+  * 
+  * @return (string) $name
+  */
+function secupress_usernames_lexicomatisation( $count = 8 ) {
+	$v    = array_flip( str_split( 'aaeeiou' ) );
+	$c    = array_flip( str_split( 'bcdfgjlmnprstv' ) );
+	$name = '';
+	for ( $i = 1; $i <= $count; $i++ ) { 
+		if ( ceil( $count / 2 ) == $i ) { // float vs int, use == here.
+			$name .= ' ' . array_rand( $c ) . '. ' . array_rand( $v );
+		}
+		$name .= array_rand( $c ) . array_rand( $v );
+	}
+	return ucwords( $name );
+}

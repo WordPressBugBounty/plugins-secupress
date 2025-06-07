@@ -331,18 +331,15 @@ class SecuPress_Scan_Bad_File_Extensions extends SecuPress_Scan implements SecuP
 	/**
 	 * Create a test file in the uploads folder. Also set the test file path and URL.
 	 *
-	 * @since 2.3.17 Use a forbidden ext directly from the list
 	 * @since 1.0
 	 */
 	protected function create_file() {
 		$wp_filesystem = secupress_get_filesystem();
 		$uploads       = wp_upload_dir( null, false );
 		$basedir       = wp_normalize_path( $uploads['basedir'] );
-		$extensions    = secupress_bad_file_extensions_get_forbidden_extensions();
 
 		// Get the file name.
-		$file_ext  = mt_rand( 0, count( $extensions ) - 1 );
-		$file_ext  = $extensions[ $file_ext ];
+		$file_ext  = 'sp' . strtolower( secupress_generate_key( 3 ) );
 		$file_name = 'secupress-temporary-file-' . secupress_generate_hash( 'file_name', 2, 6 ) . '.' . $file_ext;
 		$file_path = $basedir . '/' . $file_name;
 
@@ -364,7 +361,6 @@ class SecuPress_Scan_Bad_File_Extensions extends SecuPress_Scan implements SecuP
 			$this->file_url  = trailingslashit( $uploads['baseurl'] ) . $file_name;
 		}
 	}
-
 
 
 	/**

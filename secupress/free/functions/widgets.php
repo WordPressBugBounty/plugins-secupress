@@ -1,7 +1,6 @@
 <?php
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-add_action( 'wp_dashboard_setup', 'secupress_attacks_dashboard_widget' );
 /**
  * Adds a custom dashboard widget that displays blocked attack by SecuPress
  *
@@ -9,14 +8,13 @@ add_action( 'wp_dashboard_setup', 'secupress_attacks_dashboard_widget' );
  * @since 2.2.6
  * 
  **/
+add_action( 'wp_dashboard_setup', 'secupress_attacks_dashboard_widget' );
 function secupress_attacks_dashboard_widget() {
-	$attacks = secupress_get_attacks( 'all' );
+	$attacks = get_option( SECUPRESS_ATTACKS, [] );
     wp_add_dashboard_widget( 
         "secupress-attacks-widget",
         sprintf( __( '%1$s Blocked Attacks (%2$s)', 'secupress' ), SECUPRESS_PLUGIN_NAME, number_format_i18n( array_sum( $attacks ) ) ),
-        "secupress_attacks_render_dashboard_widget",
-        null, // $control_callback
-        $attacks
+        "secupress_attacks_render_dashboard_widget"
     );
 
     // Force this widget to the top.
@@ -37,15 +35,13 @@ function secupress_attacks_dashboard_widget() {
 /**
  * Callback function to render the contents of our custom dashboard widget.
  *
- * @since 2.3.17 $attacks param
- * @since 2.2.6
  * @author Julio Potier
+ * @since 2.2.6
  * 
- * @param (array) $attacks
  * @return string HTML markup to be displayed in the widget.
  **/
-function secupress_attacks_render_dashboard_widget( $attacks = null ) {
-    $attacks = $attacks ?: secupress_get_attacks();
+function secupress_attacks_render_dashboard_widget() {
+    $attacks = secupress_get_attacks();
 
     if ( is_array( $attacks ) && ! empty( $attacks ) ) {
     	echo '<ul>';

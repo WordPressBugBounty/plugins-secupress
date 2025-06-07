@@ -9,39 +9,27 @@ add_action( 'secupress.loaded', 'secupress_db_error_delete_file' );
 /**
  * Delete the file .secupress_db_down_flag if exists and send an email to inform the admin
  *
- * @since 2.3.17 Add action hook
- * @since 2.3.13 If the file is there since 10 minutes minimum, we add the notice, else, we consider it a micro or small shutdown, not a possible hack.
+ * @since 2.3.13 If the file is there since 10 min min, we add the notice, else, we consider it a micro or small shutdown, not a possible hack.
  * @since 2.2.6
  * @author Julio Potier
  **/
 function secupress_db_error_delete_file() {
 	$fname = ABSPATH . '/.secupress_db_down_flag';
-	/**
-	 * Let the possibility to not show the notice when DB is down more than 10 min.
-	 * @param (bool) True will display the notice
-	 * @since 2.3.17
-	 * @author Julio Potier
-	 */ 
-	if ( ! do_action( 'secupress.db_error.add_notice', true ) ) {
-		$filesystem = secupress_get_filesystem();
-		$filesystem->delete( $fname );
-		return;
-	}
 
 	if ( ! file_exists( $fname ) ) {
 		return;
 	}
-	$filesystem = secupress_get_filesystem();
-	$content    = $filesystem->get_contents( $fname );
-	$file_time  = (int) $content;
-	$filesystem->delete( $fname );
-	if ( $file_time > 0 && $file_time < ( time() - ( 10 * MINUTE_IN_SECONDS ) ) ) {
-		secupress_add_transient_notice(
+
+	$content   = file_get_contents( $fname );
+	$file_time = (int) $content;
+	if ( $file_time > 0 && $file_time < ( time() - 5*MINUTE_IN_SECONDS ) ) {
+		secupress_add_notice(
 			__( 'Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress' ),
 			'updated',
 			''
 		);
 
+		unlink($fname);
 	}
 }
 

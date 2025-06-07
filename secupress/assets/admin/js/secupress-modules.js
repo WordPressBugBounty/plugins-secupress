@@ -265,7 +265,7 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 }
 
 
-// Roles : at least one role must be chosen. ========================================================
+// Roles: at least one role must be chosen. ========================================================
 (function($, d, w, undefined) {
 
 	if ( "function" === typeof document.createElement( "input" ).checkValidity ) {
@@ -277,8 +277,16 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 				$( "#secupress-module-form-settings [type='submit']" ).first().trigger( "click.secupress" );
 			}
 		} );
+		$( ".secupress-setting-row_bbq-url-content_block-functions-sources :checkbox" ).on( "click.secupress", function() {
+			this.setCustomValidity( '' );
+
+			if ( 0 === $( '[name="' + this.name + '"]:checked' ).length ) {
+				this.setCustomValidity( SecuPressi18nModules.selectOneOptMinimum );
+				$( "#secupress-module-form-settings [type='submit']" ).first().trigger( "click.secupress" );
+			}
+		} );
 	} else {
-		$( ".affected-role-row p.warning" ).removeClass( "hide-if-js" );
+		$( ".affected-role-row p.warning, .secupress-setting-row_bbq-url-content_block-functions-sources p.warning" ).removeClass( "hide-if-js" );
 	}
 
 } )(jQuery, document, window);

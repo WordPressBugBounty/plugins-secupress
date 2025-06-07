@@ -540,10 +540,6 @@ input:hover + .secupress_disabled{
 	top: 0;
 }
 
-.secupress-setting-row_file-scanner_file-scanner p.description.help{
-	display: block;
-}
-
 /* Indeterminate styles */
 .secupress-checkbox.secupress-checkbox:indeterminate + label:after,
 .secupress-checkbox.secupress-checkbox:indeterminate + .label-text:after {

@@ -92,7 +92,7 @@ $this->add_field( array(
 	'helpers' => array(
 		array(
 			'type'        => 'description',
-			'description' => sprintf( __( 'Add more than %s words in different languages.', 'secupress' ), number_format_i18n( 20000 ) ),
+			'description' => __( 'Add more than 20,000 words in different languages.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
