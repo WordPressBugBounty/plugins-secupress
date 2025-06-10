@@ -143,3 +143,12 @@ function secupress_find_muplugin( $filename ) {
 	_deprecated_function( __FUNCTION__, '2.3.16', 'secupress_find_mu_plugin' );
 	 return secupress_find_mu_plugin( $filename );
 }
+
+
+/**
+  * @since 2.3.17 Deprecated
+  */
+function secupress_usernames_lexicomatisation( $count = 8 ) {
+	_deprecated_function( __FUNCTION__, '2.3.17', '' );
+	return '';
+}

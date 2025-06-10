@@ -71,7 +71,7 @@ function secupress_action_page( $title, $content, $args = array() ) {
 	</head>
 	<body <?php echo $body; ?>>
 		<div class="secupress-action-page-content">
-			<?php echo $logo ? $logo : '<div class="wrap"><img src="' . get_site_icon_url( 160, secupress_get_logo( [], 'url' ) ) . '" alt="' . __( 'Site Icon', 'secupress' ) . '"/></div>'; ?>
+			<?php echo $logo ? $logo : '<div class="wrap"><img src="' . get_site_icon_url( 90, secupress_get_logo( [], 'url' ) ) . '" alt="' . __( 'Site Icon', 'secupress' ) . '"/></div>'; ?>
 			<?php echo $content; ?>
 		</div>
 	</body>
@@ -390,7 +390,7 @@ function secupress_readable_duration( $entry ) {
  * @return (string)
  **/
 function secupress_tag_me( $str, $tag, $attrs = '' ) {
-	return sprintf( '<%1$s %3$s>%2$s</%1$s>', $tag, $str, $attrs );
+	return sprintf( '<%1$s%3$s>%2$s</%1$s>', $tag, $str, $attrs );
 }
 
 /**

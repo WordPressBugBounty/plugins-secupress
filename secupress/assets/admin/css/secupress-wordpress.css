@@ -370,8 +370,6 @@
 	font-family: "Open Sans",Helvetica,Arial,sans-serif;
 	font-size: 0.85em;
 	font-weight: 500;
-	font-style: italic;
-	border-radius: 50%;
 }
 .secupress-icon-cross:before {
 	transform: translateY(-1px);
@@ -721,6 +719,10 @@ button.secupress-virgin {
 .secupress-button-big.secupress-button-big .icon:after {
 	height: 30px;
 	margin-top: -15px;
+}
+
+.secupress-button.secupress-button-doc {
+	text-transform: none;
 }
 
 .secupress-logo-block p {

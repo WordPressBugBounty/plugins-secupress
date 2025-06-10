@@ -36,14 +36,23 @@ function secupress_welcome_settings_callback( $settings ) {
 		return $settings;
 	}
 
-	if ( ! isset( $settings['advanced-settings_admin-bar'] ) ) {
-		$settings['advanced-settings_admin-bar'] = '0';
+	$settings['advanced-settings_admin-bar'] = isset( $settings['advanced-settings_admin-bar'] ) ? '1' : '0';
+	if ( $settings['advanced-settings_admin-bar'] !== secupress_get_module_option( 'advanced-settings_admin-bar', '0', 'welcome' ) ) {
+		secupress_add_module_notice( '', __( 'Admin Bar Menu', 'secupress' ), $settings['advanced-settings_admin-bar'] ? 'activation' : 'deactivation' );
 	}
-	if ( ! isset( $settings['advanced-settings_grade-system'] ) ) {
-		$settings['advanced-settings_grade-system'] = '0';
+	$settings['advanced-settings_grade-system'] = isset( $settings['advanced-settings_grade-system'] ) ? '1' : '0';
+	if ( $settings['advanced-settings_grade-system'] !== secupress_get_module_option( 'advanced-settings_grade-system', '0', 'welcome' ) ) {
+		secupress_add_module_notice( '', __( 'Grade System', 'secupress' ), $settings['advanced-settings_grade-system'] ? 'activation' : 'deactivation' );
 	}
-	if ( ! isset( $settings['advanced-settings_expert-mode'] ) ) {
-		$settings['advanced-settings_expert-mode'] = '0';
+	// expert-mode-main = real expert mode since 2.3.17
+	$settings['advanced-settings_expert-mode-main'] = isset( $settings['advanced-settings_expert-mode-main'] ) || secupress_get_expert_modules_on() ? '1' : '0';
+	if ( $settings['advanced-settings_expert-mode-main'] !== secupress_get_module_option( 'advanced-settings_expert-mode-main', '0', 'welcome' ) ) {
+		secupress_add_module_notice( '', __( 'Expert Mode', 'secupress' ), $settings['advanced-settings_expert-mode-main'] ? 'activation' : 'deactivation' );
+	}
+	// expert-mode = no contextual help, don't change the name for retro-compat
+	$settings['advanced-settings_expert-mode'] = isset( $settings['advanced-settings_expert-mode'] ) ? '1' : '0';
+	if ( $settings['advanced-settings_expert-mode'] !== secupress_get_module_option( 'advanced-settings_expert-mode', '0', 'welcome' ) ) {
+		secupress_add_module_notice( '', __( 'Hide Contextual Help & Tips', 'secupress' ), $settings['advanced-settings_expert-mode'] ? 'activation' : 'deactivation' );
 	}
 	/**
 	 * Filter the settings before saving.

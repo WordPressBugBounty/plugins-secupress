@@ -2,24 +2,6 @@
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
 /**
- * Depending on the value of `$activate`, will activate or deactivate a sub-module.
- *
- * @since 1.0
- *
- * @param (string) $module    The module.
- * @param (string) $submodule The sub-module.
- * @param (bool)   $activate  True to activate, false to deactivate.
- */
-function secupress_manage_submodule( $module, $submodule, $activate ) {
-	if ( $activate ) {
-		secupress_activate_submodule( $module, $submodule );
-	} else {
-		secupress_deactivate_submodule( $module, $submodule );
-	}
-}
-
-
-/**
  * This is used when submitting a module form.
  * If we submitted the given module form, it will return an array containing the values of sub-modules to activate.
  *

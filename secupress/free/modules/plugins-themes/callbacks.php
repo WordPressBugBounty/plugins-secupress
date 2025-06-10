@@ -69,8 +69,14 @@ function secupress_plugins_settings_callback( $modulenow, &$settings, $activate 
 	$db_opt          = secupress_get_module_option( 'plugins_confirm', false, $modulenow );
 	$confirmed       = $db_opt || isset( $settings['plugins_confirm'] );
 	$plugins_actions = isset( $activate['plugins_actions'] ) && $activate['plugins_actions'];
+	if ( ! $plugins_actions ) {
+		unset( $settings['plugins_installation'] );
+	}
 
 	// (De)Activation.
+	if ( $plugins_actions && ! $confirmed ) {
+		secupress_add_transient_notice( sprintf( __( 'The <strong>%s</strong> module requires confirmation. Please try to activate it again.', 'secupress' ), __( 'Plugin Actions', 'secupress' ) ), 'updated', 'missing-confirmation' );
+	}
 	secupress_manage_submodule( $modulenow, 'plugin-installation', $confirmed && $plugins_actions ); // keep the name "plugin-installation", it's the file
 
 	if ( isset( $settings['plugins_show-all-color'] ) ) {
@@ -79,13 +85,19 @@ function secupress_plugins_settings_callback( $modulenow, &$settings, $activate 
 		unset( $settings['plugins_show-all-color'] );
 	}
 	secupress_manage_submodule( $modulenow, 'plugin-show-all',     isset( $activate['plugins_show-all'] ) );
-
 	if ( secupress_is_pro() ) {
 		secupress_manage_submodule( $modulenow, 'detect-bad-plugins',  ! empty( $activate['plugins_detect_bad_plugins'] ) );
+		$settings['plugins-installation-pro'] = $confirmed && isset( $settings['plugins_installation'], $activate['plugins_actions'] );
+		if ( ! $settings['plugins-installation-pro'] && function_exists( 'secupress_no_plugin_actions__deactivation' ) ) {
+			secupress_no_plugin_actions__deactivation();
+		}
+		if ( $settings['plugins-installation-pro'] && function_exists( 'secupress_no_plugin_actions__activation' ) ) {
+			secupress_no_plugin_actions__activation();
+		}
 	}
-
 	if ( ! secupress_is_submodule_active( $modulenow, 'plugin-installation' ) ) {
 		unset( $settings['plugins_confirm'] );
+		unset( $settings['plugins-installation-pro'] );
 	} else {
 		$settings['plugins_confirm'] = 1;
 	}

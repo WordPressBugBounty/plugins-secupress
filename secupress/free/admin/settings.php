@@ -191,7 +191,7 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 			'moveLoginNonce'       => $move_login_nonce,
 			// Misc.
 			'resetDefault'         => __( 'This will reset the setting values to default for this module.', 'secupress' ),
-			'regenKeys'            => __( 'This will change the 10 security keys for your installation.<br>You may need to sign back in.', 'secupress' ),
+			'regenKeys'            => sprintf( __( 'This will change the %d security keys for your installation.<br>You may need to sign back in.', 'secupress' ), 10 ),
 		) );
 
 	}
@@ -510,25 +510,25 @@ function secupress_scanners() {
 										<ul class="secupress-chart-legend hide-if-no-js">
 											<li class="status-good" data-status="good">
 												<span class="secupress-carret"></span>
-												<?php _e( 'Good', 'secupress' ); ?>
+												<?php _ex( 'Good', 'scan result', 'secupress' ); ?>
 												<span class="secupress-count-good"></span>
 											</li>
 											<?php if ( $counts['warning'] > 0 ) : ?>
 											<li class="status-warning" data-status="warning">
 												<span class="secupress-carret"></span>
-												<?php _e( 'Pending', 'secupress' ); ?>
+												<?php _ex( 'Pending', 'scan result', 'secupress' ); ?>
 												<span class="secupress-count-warning"></span>
 											</li>
 											<?php endif; ?>
 											<li class="status-bad" data-status="bad">
 												<span class="secupress-carret"></span>
-												<?php _e( 'Bad', 'secupress' ); ?>
+												<?php _ex( 'Bad', 'scan result', 'secupress' ); ?>
 												<span class="secupress-count-bad"></span>
 											</li>
 											<?php if ( $counts['notscannedyet'] > 0 ) : ?>
 											<li class="status-notscannedyet" data-status="notscannedyet">
 												<span class="secupress-carret"></span>
-												<?php _e( 'New Scan', 'secupress' ); ?>
+												<?php _ex( 'New Scan', 'scan result', 'secupress' ); ?>
 												<span class="secupress-count-notscannedyet"></span>
 											</li>
 											<?php endif; ?>

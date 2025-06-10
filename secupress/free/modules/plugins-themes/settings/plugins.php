@@ -10,21 +10,45 @@ $req_wp_ver  = '6.3'; // 6.3 because of the needed filter "plugins_list"
 $is_wp_ok    = secupress_wp_version_is( $req_wp_ver );
 $helper_type = '';
 $helper_desc = '';
+$active      = (int) secupress_is_submodule_active( 'plugins-themes', 'plugin-installation' );
 if ( ! $is_wp_ok ) {
 	$helper_type = 'warning';
 	$helper_desc = sprintf( __( 'WordPress <b>v%1$s</b> is required to use the module <em>%2$s</em>.', 'secupress' ), $req_wp_ver, __( 'Plugin Actions', 'secupress' ) );
 }
 
 $this->add_field( array(
-	'title'             => __( 'Plugin Actions', 'secupress' ),
+	'title'             => __( 'Plugin Actions on Back-end', 'secupress' ),
 	'label_for'         => $this->get_field_name( 'actions' ),
-	'description'       => __( 'This will disallow <strong>installation, activation, deactivation, deletion</strong> on this site.', 'secupress' ),
+	'description'       => __( 'This will disallow <strong>installation, activation, deactivation, deletion</strong> actions on back-end side.', 'secupress' ),
 	'plugin_activation' => true,
 	'type'              => 'checkbox',
-	'value'             => (int) secupress_is_submodule_active( 'plugins-themes', 'plugin-installation' ),
+	'value'             => $active,
 	'label'             => __( 'Yes, disable <strong>all actions</strong> for every plugins', 'secupress' ),
+	'helpers'     => array(
+		array(
+			'type'        => 'force-warning',
+			'description' => $active && ! secupress_find_mu_plugin( 'no_plugins_installation' ) ? __( 'Our file is missing, please deactivate/reactivate the module.', 'secupress' ) : '',
+		),
+	),
 ) );
 
+if ( secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'             => __( 'Plugin Actions on FTP', 'secupress' ),
+		'depends'           => $this->get_field_name( 'actions' ),
+		'label_for'         => $this->get_field_name( 'installation' ),
+		'description'       => __( 'This will disallow <strong>installation, activation, deactivation, deletion</strong> on FTP side.', 'secupress' ),
+		'type'              => 'checkbox',
+		// 'value'             => secupress_get_module_option( 'advanced-settings_expert-mode-main', false, 'welcome' ),
+		'label'             => __( 'Yes, also disable <strong>all these actions</strong> on FTP', 'secupress' ),
+		'helpers'           => array(
+			array(
+				'type'        => secupress_is_pro() ? 'warning' : '',
+				'description' => sprintf( __( 'This module is still in %1$s. If you encounter too many issues, please contact us at %2$s.', 'secupress' ), '<strong>BETA DEV</strong>', secupress_a_me( 'support@secupress.me' ) ),
+			),
+		),
+	) );
+}
 $plugins         = get_plugins();
 $c_plugins       = count( $plugins );
 if ( ! is_multisite() ) {
@@ -42,7 +66,7 @@ if ( ! is_multisite() ) {
 		$message = sprintf( _n( 'I confirm that this site is using <strong>%1$d</strong> plugins, <strong>%2$d</strong> are network activated, <strong>%3$d</strong> is not activated.', 'I confirm that this site is using <strong>%1$d</strong> plugins, <strong>%2$d</strong> are network activated, <strong>%3$d</strong> are not activated.', ( $c_plugins - $c_active_p ), 'secupress' ), $c_plugins, $c_active_p, ( $c_plugins - $c_active_p ) );
 	}
 }
-$muplugins       = get_mu_plugins();
+$muplugins       = secupress_get_mu_plugins();
 $c_mup_acti      = count( $muplugins );
 if ( $c_mup_acti ) {
 	$message    .= ' ' . sprintf( _n( 'Additionally there is <strong>%d</strong> must-use plugin.', 'Additionally there are <strong>%d</strong> must-use plugins.', $c_mup_acti, 'secupress' ), $c_mup_acti );
@@ -124,12 +148,16 @@ if ( ! secupress_is_expert_mode() ) {
 		),
 	) );
 } else {
+	$update_button = sprintf( '<p class="secupress-show-expert"><a href="%s" class="button button-secondary">%s</a></p>',
+								wp_nonce_url( admin_url( 'admin-post.php?action=secupress_bad_plugins_update_data' ), 'secupress_bad_plugins_update_data' ),
+								__( 'Update the data', 'secupress' )
+							);
 	$this->add_field( array(
 		'title'        => __( 'Manual Update', 'secupress' ),
 		'label_for'    => 'plugins_manual_update',
 		'depends'      => secupress_is_submodule_active( 'plugins-themes', 'detect-bad-plugins' ) ? $main_field_name : 'not_installed_yet',
 		'type'         => 'html',
-		'value'        => secupress_is_submodule_active( 'plugins-themes', 'detect-bad-plugins' ) ? '<a href="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress_bad_plugins_update_data' ), 'secupress_bad_plugins_update_data' ) . '" class="button button-secondary">' . __( 'Update the data', 'secupress' ) . '</a>' : '<a disabled class="button button-secondary">' . __( 'Save changes first', 'secupress' ) . '</a>',
+		'value'        => secupress_is_submodule_active( 'plugins-themes', 'detect-bad-plugins' ) ? $update_button : '<a disabled class="button button-secondary">' . __( 'Save changes first', 'secupress' ) . '</a>',
 		'helpers'      => array(
 			array(
 				'type'        => 'description',

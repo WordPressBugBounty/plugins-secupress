@@ -698,7 +698,7 @@ function secupress_unlock_admin_ajax_post_cb() {
 	}
 	$url_remember = wp_login_url();
 
-	$subject      = __( '###SITENAME### – Unlock a lost user', 'secupress' );
+	$subject      = sprintf( __( '[%s] Unlock a lost user', 'secupress' ), '###SITENAME###' );
 	$message      = sprintf( __( 'Hello %1$s,
 It seems you are locked out from the website ###SITENAME###.
 

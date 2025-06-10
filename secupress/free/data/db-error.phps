@@ -1,7 +1,7 @@
 <?php
 /**
  * {{PLUGIN_NAME}} DB Error Bail Message
- * @since 2.2.6
+ * @since 2.3.13
  * @author Julio Potier
  * @license GPLv2
  * @see $wpdb->db_connect()

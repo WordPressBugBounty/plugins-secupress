@@ -39,7 +39,7 @@ class SecuPress_Scan_Salt_Keys extends SecuPress_Scan implements SecuPress_Scan_
 	 */
 	protected function init() {
 		$this->title    = __( 'Check if the security keys are correctly set.', 'secupress' );
-		$this->more     = __( 'WordPress provides 8 security keys, each key has its own purpose. These keys must be set with long random strings: don’t keep the default value, don’t store them in the database, don’t hardcode them.', 'secupress' );
+		$this->more     = sprintf( __( 'WordPress provides %d security keys, each key has its own purpose. These keys must be set with long random strings: don’t keep the default value, don’t store them in the database, don’t hardcode them.', 'secupress' ), 10 );
 		$this->more_fix = sprintf( __( 'Create a <a href="https://codex.wordpress.org/Must_Use_Plugins">must-use plugin</a> to replace your actual keys stored in <code>%s</code> or in your database to keep them safer.', 'secupress' ), secupress_get_wpconfig_filename() );
 	}
 

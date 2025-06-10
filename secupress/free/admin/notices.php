@@ -93,8 +93,9 @@ function secupress_plugins_to_deactivate() {
 		'security-ninja-pro/security-ninja.php', // not sure
 		'security-ninja-pro/security-ninja-pro.php', // not sure
 		'sucuri-scanner/sucuri.php', // repo
+		'patchstack/patchstack.php', // repo
 		'wordfence/wordfence.php', // repo
-		'wp-cerber/wp-cerber.php', // repo
+		'wp-cerber/wp-cerber.php', // premium only, deleted from repo 2022
 		'wp-defender/wp-defender.php', // repo
 		'wp-simple-firewall/icwp-wpsf.php', // repo
 		'user-name-security/user-name-security.php', // repo
@@ -112,7 +113,7 @@ function secupress_plugins_to_deactivate() {
 			return;
 		}
 
-		$message  = _n( 'The following plugin is not compatible with us and may cause conflicts:', 'The following plugins are not compatible with us and may cause conflicts:', count( $plugins_to_warn ), 'secupress' );
+		$message  = sprintf( _n( 'The following plugin may cause conflicts with %s:', 'The following plugins may cause conflicts with %s:', count( $plugins_to_warn ), 'secupress' ), SECUPRESS_PLUGIN_NAME );
 		$message .= '</p><ul>';
 		foreach ( $plugins_to_warn as $plugin ) {
 			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugin );
@@ -392,7 +393,7 @@ function secupress_active_plugins_error() {
 		return;
 	}
 
-	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to the %sModule page%s or %sread the documentation%s.', 'secupress' ), 
+	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to %sModule page%s or %sread the documentation%s.', 'secupress' ), 
 				secupress_tag_me( __( 'Plugin Actions', 'secupress' ), 'strong' ), 
 				sprintf( '<a href="%s">', 
 					esc_url( secupress_admin_url( 'modules', 'plugins-themes#row-plugins_actions' ) )
@@ -430,7 +431,7 @@ function secupress_active_plugins_network_error() {
 		return;
 	}
 
-	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to the %sModule page%s or %sread the documentation%s.', 'secupress' ), 
+	$message = sprintf( __( 'There is an issue with the %s module. It will not be active until the problem is fixed.<br>Go to %sModule page%s or %sread the documentation%s.', 'secupress' ), 
 				secupress_tag_me( __( 'Plugin Actions', 'secupress' ), 'strong' ), 
 				sprintf( '<a href="%s">', 
 					esc_url( secupress_admin_url( 'modules', 'plugins-themes#row-plugins_actions' ) )

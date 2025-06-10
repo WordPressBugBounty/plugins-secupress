@@ -3,6 +3,78 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
 
 /**
+ * Get file extensions that are forbidden in the uploads folder.
+ *
+ * @since 1.0
+ * @see http://www.file-extensions.org/filetype/extension/name/dangerous-malicious-files
+ *
+ * @return (array)
+ */
+function secupress_bad_file_extensions_get_forbidden_extensions() {
+	// Build a regex pattern with the allowed extensions.
+	$allowed = wp_get_mime_types();
+	$allowed = array_keys( $allowed );
+	$allowed = implode( '|', $allowed );
+	$allowed = "#,($allowed),#i";
+
+	$exts = array(
+		'.9',
+		'73i87a', '386',
+		'aaa', 'abc', 'aepl', 'aru', 'atm', 'aut',
+		'bat', 'bhx', 'bin', 'bkd', 'blf', 'bll', 'bmw', 'boo', 'bps', 'bqf', 'breaking_bad', 'btc', 'buk', 'bup', 'bxz',
+		'cc', 'ccc', 'ce0', 'ceo', 'cfxxe', 'chm', 'cih', 'cla', 'class', 'cmd', 'com', 'coverton', 'cpl', 'crinf', 'crjoker', 'crypt', 'crypted', 'cryptolocker', 'cryptowall', 'ctbl', 'cxq', 'cyw', 'czvxce',
+		'darkness', 'dbd', 'delf', 'dev', 'dlb', 'dli', 'dll', 'dllx', 'dom', 'drv', 'dx', 'dxz', 'dyv', 'dyz',
+		'ecc', 'enciphered', 'encrypt', 'encrypted', 'enigma', 'exe', 'exe1', 'exe_renamed', 'exx', 'ezt', 'ezz',
+		'fag', 'fjl', 'fnr', 'fuj', 'fun',
+		'good', 'gzquar',
+		'ha3', 'hlp', 'hlw', 'hsq', 'hts',
+		'iva', 'iws',
+		'jar', 'js',
+		'kcd', 'kernel_complete', 'kernel_pid', 'kernel_time', 'keybtc@inbox_com', 'kimcilware', 'kkk', 'kraken',
+		'lechiffre', 'let', 'lik', 'lkh', 'lnk', 'locked', 'locky', 'lok', 'lol!', 'lpaq5',
+		'magic', 'mfu', 'micro', 'mjg', 'mjz',
+		'nls',
+		'oar', 'ocx', 'osa', 'ozd',
+		'p5tkjw', 'pcx', 'pdcr', 'pgm', 'php', 'php2', 'php3', 'pid', 'pif', 'plc', 'poar2w', 'pr', 'pzdc',
+		'qit', 'qrn',
+		'r5a', 'rdm', 'rhk', 'rna', 'rokku', 'rrk', 'rsc_tmp',
+		's7p', 'scr', 'scr', 'shs', 'ska', 'smm', 'smtmp', 'sop', 'spam', 'ssy', 'surprise', 'swf', 'sys',
+		'tko', 'tps', 'tsa', 'tti', 'ttt', 'txs',
+		'upa', 'uzy',
+		'vb', 'vba', 'vbe', 'vbs', 'vbx', 'vexe', 'vxd', 'vzr',
+		'wlpginstall', 'wmf', 'ws', 'wsc', 'wsf', 'wsh', 'wss',
+		'xdu', 'xir', 'xlm', 'xlv', 'xnt', 'xnxx', 'xtbl', 'xxx', 'xyz',
+		'zix', 'zvz', 'zzz',
+	);
+
+	// Remove the allowed extensions from the forbidden ones.
+	$exts = implode( ',', $exts );
+	$exts = ",$exts,";
+	$exts = preg_replace( $allowed, ',', $exts );
+	$exts = trim( $exts, ',' );
+	$exts = explode( ',', $exts );
+
+	/**
+	 * Filter the forbidden file extensions.
+	 *
+	 * @since 1.0
+	 *
+	 * @param (array) $all_exts The file extensions.
+	 */
+	$out = apply_filters( 'secupress.plugin.bad_file_extensions.forbidden_extenstions', $exts );
+	/**
+	 * Filter the forbidden file extensions.
+	 *
+	 * @since 2.3.13
+	 *
+	 * @param (array) $all_exts The file extensions.
+	 */
+	$out = apply_filters( 'secupress.plugin.bad_file_extensions.forbidden_extensions', $out ); // typo...
+	$out = array_filter( $out );
+	return $out ? $out : $exts;
+}
+
+/**
  * Tell if a `robots.txt` file is in use.
  * WordPress does not create a rewrite rule for the `robots.txt` file if it is installed in a folder.
  * If a constant `SECUPRESS_FORCE_ROBOTS_TXT` is defined to `true`, the field will be available.
@@ -23,16 +95,17 @@ function secupress_blackhole_is_robots_txt_enabled() {
 /**
  * Get a regex pattern matching the files.
  *
+ * @since 2.3.17 $rules_mode param
  * @since 2.2.6 Invert the behaviour
  * @author Julio Potier
  * 
  * @since 1.0.3
  * @author Grégory Viguier
  *
+ * @param (string) $rules_mode
  * @return (string)
  */
-function secupress_bad_url_access_get_regex_pattern() {
-	$rules_mode = isset( $GLOBALS['contentprotectbadurlaccess'] ) ? $GLOBALS['contentprotectbadurlaccess'] : secupress_get_module_option( 'content-protect_bad-url-access', 'disallowed', 'sensitive-data' );
+function secupress_bad_url_access_get_regex_pattern( $rules_mode = 'disallowed' ) {
 	switch( $rules_mode ) {
 		case 'allowed':
 			$patterns                = [];
@@ -260,7 +333,7 @@ if ( ! secupress_is_plugin_active( 'sf-author-url-control/sf-author-url-control.
 			return;
 		}
 
-		$def_user_nicename = sanitize_title( $userdata->user_login );
+		$def_user_nicename = sanitize_title( $userdata->display_name );
 		$blog_prefix       = is_multisite() && ! is_subdomain_install() && is_main_site() ? '/blog/' : '/';
 		$author_base       = $wp_rewrite->author_base;
 

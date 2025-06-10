@@ -231,9 +231,12 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $mu_description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $active && ! secupress_find_mu_plugin( 'cookiehash' ) ? __( 'Our file is missing, please deactivate/reactivate the module.', 'secupress' ) : '',
+		),
 	),
 ) );
-
 
 $active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-saltkeys' );
 $disabled = ! $is_writable || ( ! $is_after_save && ! $active && ( ( defined( 'SECUPRESS_SALT_KEYS_ACTIVE' ) && SECUPRESS_SALT_KEYS_ACTIVE ) || ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) && SECUPRESS_SALT_KEYS_MODULE_ACTIVE ) ) );
@@ -249,7 +252,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => ! $disabled ? sprintf( __( '<strong>8 constants</strong> will be created in a must-use plugin, replacing the ones in your %s file and database.', 'secupress' ), '<code>wp-config.php</code>' ) : __( 'Already done your way.', 'secupress' ),
+			'description' => ! $disabled ? sprintf( __( '<strong>%d constants</strong> will be created in a must-use plugin, replacing the ones in your %s file and database.', 'secupress' ), 10, '<code>wp-config.php</code>' ) : __( 'Already done your way.', 'secupress' ),
 		),
 		array(
 			'type'        => 'warning',
@@ -267,7 +270,13 @@ if ( $active ) {
 		'title'       => __( 'Regenerate Secure Keys', 'secupress' ),
 		'type'        => 'html',
 		'depends'     => $this->get_field_name( 'saltkeys' ),
-		'value'       => '<a href="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress-regen-keys' ), 'secupress-regen-keys' ) . '"' . ' id="secupress-regen-keys" class="button secupress-button button-small">' . __( 'Regenerate the secure keys', 'secupress' ) . '</a>'
+		'value'       => '<a href="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress-regen-keys' ), 'secupress-regen-keys' ) . '"' . ' id="secupress-regen-keys" class="button secupress-button button-small">' . __( 'Regenerate the secure keys', 'secupress' ) . '</a>',
+		'helpers'     => array(
+			array(
+				'type'        => 'force-warning',
+				'description' => $active && ! secupress_find_mu_plugin( 'salt_keys' ) ? __( 'Our file is missing, please regenerate the keys manually.', 'secupress' ) : '',
+			),
+		),
 	) );
 }
 

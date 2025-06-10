@@ -16,7 +16,7 @@ if ( secupress_is_submodule_active( 'logs', 'action-logs' ) ) {
 
 // E-mails.
 $this->add_field( array(
-	'title'        => __( 'Email Notifications', 'secupress' ),
+	'title'        => __( 'Email Notifications List', 'secupress' ),
 	'name'         => $this->get_field_name( 'emails' ),
 	'type'         => 'textarea',
 	'attributes'   => array( 'rows' => 3 ),

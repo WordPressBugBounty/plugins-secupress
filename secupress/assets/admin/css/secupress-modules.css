@@ -139,7 +139,11 @@ p.secupress-sh-subtitle {
 
 .secupress-modules-list-links i {
 	position: absolute;
-	right: 20px; top: 24px;
+	right: 20px;
+	top: 24px;
+}
+.no-contextual-help-secupress .secupress-modules-list-links i {
+	top: 4px;
 }
 .secupress-modules-list-links i,
 .secupress-modules-list-links i:before {
@@ -156,6 +160,7 @@ p.secupress-sh-subtitle {
 }
 
 .secupress-modules-list-links .secupress-icon-sensitive-data,
+.secupress-modules-list-links .secupress-icon-sheet,
 .secupress-modules-list-links .secupress-icon-logs,
 .secupress-modules-list-links .secupress-icon-schedule {
 	right: 25px;
@@ -579,9 +584,20 @@ input[type="text"]:required:invalid {
 
 .secupress-show-pro {
 	background: url("../images/logo-pro-mini.png") top right no-repeat transparent;
+	background-position-y: 20px;
 }
 p.secupress-show-pro {
-/*	background-size: contain;*/
+	background-position-y: bottom;
+	min-height: 2.4em;
+}
+
+.secupress-show-expert {
+	background: url("../images/logo-expert-mini.png") top right no-repeat transparent;
+	background-position-y: 20px;
+}
+p.secupress-show-expert {
+	background-position-y: bottom;
+	min-height: 2.4em;
 }
 
 /**

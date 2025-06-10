@@ -31,8 +31,8 @@ if ( is_admin() ) {
 function secupress_captcha_session() {
 	if ( session_status() === PHP_SESSION_NONE && ! headers_sent() ) {
 		session_start();
-		secupress_update_captcha_seed();
 	}
+	secupress_update_captcha_seed();
 }
 
 add_action( 'login_form_login', 'secupress_captcha_init' );

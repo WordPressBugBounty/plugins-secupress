@@ -361,7 +361,7 @@ class SecuPress_Scan_WP_Config extends SecuPress_Scan implements SecuPress_Scan_
 
 		$has_plugin = array(
 			'ALLOW_UNFILTERED_UPLOADS' => 'unfiltered-uploads',
-			// 'COOKIEHASH'               => 'cookiehash',
+			'COOKIEHASH'               => 'cookiehash',
 			'DIEONDBERROR'             => 'dieondberror',
 			'DISALLOW_FILE_EDIT'       => 'file-edit',
 			'RELOCATE'                 => 'locations',

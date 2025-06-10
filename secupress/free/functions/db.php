@@ -327,3 +327,46 @@ function secupress_delete_db_salt_keys() {
 	}
 	return $present - $deleted;
 }
+
+/**
+ * Removes the salt keys from wp-config file
+ *
+ * @sinuce 2.3.17
+ * @author Julio Potier
+ * @return (bool)
+ **/
+function secupress_delete_wpconfig_salt_keys() {
+	// Make sure we find the `wp-config.php` file.
+	$wpconfig_filepath = secupress_is_wpconfig_writable();
+
+	if ( ! $wpconfig_filepath ) {
+		return false;
+	}
+	/**
+	 * Remove old secret keys from the `wp-config.php` file and add a comment.
+	 * We have to make sure the comment is added, only once, only if one or more keys are found, even if some secret keys are missing, and do not create useless empty lines.
+	 */
+	$wp_filesystem    = secupress_get_filesystem();
+	$wpconfig_content = $wp_filesystem->get_contents( $wpconfig_filepath );
+	$comment_added    = false;
+	$comment          = '// If you want to add secret keys back in wp-config.php, get new ones at https://api.wordpress.org/secret-key/1.1/salt, then delete this file.';
+	$placeholder      = '// SecuPress salt placeholder.';
+	$keys             = secupress_get_db_salt_keys();
+
+	foreach ( $keys as $i => $constant ) {
+		$pattern = '@define\s*\(\s*([\'"])' . $constant . '\1.*@';
+
+		if ( preg_match( $pattern, $wpconfig_content, $matches ) ) {
+			$replace          = $comment_added ? $placeholder : $comment;
+			$wpconfig_content = str_replace( $matches[0], $replace, $wpconfig_content );
+			$comment_added    = true;
+		}
+	}
+
+	if ( $comment_added ) {
+		$wpconfig_content = str_replace( $placeholder . "\n", '', $wpconfig_content );
+		$wp_filesystem->put_contents( $wpconfig_filepath, $wpconfig_content, FS_CHMOD_FILE );
+		return true;
+	}
+	return false;
+}
