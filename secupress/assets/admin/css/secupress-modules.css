@@ -234,13 +234,12 @@ p.secupress-sh-subtitle {
 	z-index: 2;
 }
 .secupress-tab-content-header i {
-	margin-right: 10px;
 	font-size: 30px;
 	background-color: #393E46;
 	color: #DFE3E8;
 	padding: 8px 8px 14px 10px;
 	border-radius: 5px;
-	display: inline;
+	display: inline-block;
 }
 .secupress-tc-title {
 	margin-top: .5em;

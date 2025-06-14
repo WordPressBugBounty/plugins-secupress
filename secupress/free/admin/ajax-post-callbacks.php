@@ -880,6 +880,11 @@ add_action( 'admin_post_secupress-regen-keys', 'secupress_regen_hash_key_admin_p
  **/
 function secupress_regen_hash_key_admin_post_cb() {
 	global $current_user;
+	
+	if ( ! secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-saltkeys' ) ) {
+		wp_die( 'Something went wrong.' );
+	}
+
 	if ( ! isset( $_GET['_wpnonce'] ) || ! check_ajax_referer( 'secupress-regen-keys', '_wpnonce', false ) ) {
 		wp_die( 'Something went wrong.' );
 	}
@@ -887,18 +892,20 @@ function secupress_regen_hash_key_admin_post_cb() {
 	$options             = get_site_option( SECUPRESS_SETTINGS_SLUG );
 	$options['hash_key'] = secupress_generate_key( 64 );
 	secupress_update_options( $options );
+	// We do not need to refresh the hashes in the file, do it only if file is missing
+	if ( ! defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
+		$filesystem  = secupress_get_filesystem();
+		$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
+		$args        = [
+			'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
+			'{{HASH1}}'        => wp_generate_password( 64, true, true ),
+			'{{HASH2}}'        => wp_generate_password( 64, true, true ),
+		];
+		$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
+		secupress_create_mu_plugin( 'salt_keys', $alicia_keys, uniqid() );
+	}
 
-	$filesystem  = secupress_get_filesystem();
-	$alicia_keys = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
-	$args        = [
-		'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
-		'{{HASH1}}'        => wp_generate_password( 64, true, true ),
-		'{{HASH2}}'        => wp_generate_password( 64, true, true ),
-	];
-	$alicia_keys = str_replace( array_keys( $args ), $args, $alicia_keys );
-	secupress_create_mu_plugin( 'salt_keys', $alicia_keys, uniqid() );
-
-	secupress_auto_login( 'Salt_Keys' );
+	secupress_auto_login( 'Salt_Keys', null, __( 'Security keys have been successfully regenerated.', 'secupress' ) );
 }
 
 add_action( 'admin_post_secupress_accept_notification', 'secupress_accept_notification_admin_post_cb' );

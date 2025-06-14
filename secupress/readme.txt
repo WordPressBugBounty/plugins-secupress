@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.18
+Stable tag: 2.3.18.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,14 +185,18 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.18 =
-* 10 June 2025
-* Fix: Fatal error if the previous "Block Function Names in Requests" was activated, this feature has been removed in last version
-* Fix: Fatal error on forbidden extensions scanner
-* Fix: 1 of our CSS rules was everywhere, sorry
-* Improve: Display a message if our mu-plugins files are missing, without recreating them automatically to prevent a possible infinite loop
-* Improve: "Rename user names" module, your nicename will be automatically renamed if possible. You can still change it in your profile, but not the same as your login.
-* New: "Module Notifications" can mail you when a module have been deactivated and not reactivated within the hour
+= 2.3.18.1 =
+* 13 June 2025
+* Fix: Cookie hash file was not created when running the autofix
+* Fix: "Bad Url Access" and "Bad File Extensions" were tagged as "fixable in pro only"
+* Fix: "Already done your way" message on "Security Keys" module was wrong.
+* Fix: Upgrader should always check the mu version file
+* Fix: Remove "mail*" from the bad usernames list, too wide (Hello Maïlis & Mailisa...)
+* Improve: Regenerating salt keys will now display a notice message as a feedback #UX
+* Improve: Some strings were not translated.
+* Improve: Better handling for "Rename User Names"
+* Improve: "Show Admin Bar Menu" & "Hide Contextual Help & Tips"
+* New: "Show Contextual Help & Tips" and "Admin Bar Menu" are now a user setting
 
 
 == Upgrade Notice ==
@@ -202,15 +206,19 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 == TODO ==
 Create a trust score for each non WP file and displays it
 Create a "suspicious" status for alerts
-Revamp alerts?
+Revamp alerts
+Revamp logs
+Add http logs
 PHP 8.O min
 replace %s by ###USERNAME### in emails
-TODO .19
 .htaccess scanner
 move EDD updater+white label into a mu to allow upgrade+rollback even with plugin deactivated
 chartjs graph on dashboard widget
 give possibility to rename logins
-if stable enough: rename .18 > .100
+if stable enough: rename version to .100
 move secupress_action_screen to wp-login actions to match css of the site without efforts
 target="_blank" on doc links
-autolofin after fix step3
+remove <code> and <strong> in trads
+autologin after fix step3?
+file_upgrader where mu plugin files could be updated easily
+secupress_add_action > wp-login.php

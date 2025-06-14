@@ -13,7 +13,15 @@ $this->add_field( array(
 	'label_for'         => $this->get_field_name( 'admin-bar' ),
 	'type'              => 'checkbox',
 	'value'             => secupress_get_module_option( 'advanced-settings_admin-bar', true ),
-	'label'             => sprintf( __( 'Yes, show the %s admin bar menu', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
+	'label'             => sprintf( __( 'Yes, show the %s admin bar menu for me', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
+) );
+
+$this->add_field( array(
+	'title'             => __( 'Show Contextual Help & Tips', 'secupress' ),
+	'label_for'         => $this->get_field_name( 'expert-mode' ),
+	'type'              => 'checkbox',
+	'value'             => secupress_get_module_option( 'advanced-settings_expert-mode', true ),
+	'label'             => sprintf( __( 'Yes, show contextual help in %s for me', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
 ) );
 
 $this->add_field( array(
@@ -21,15 +29,7 @@ $this->add_field( array(
 	'label_for'         => $this->get_field_name( 'grade-system' ),
 	'type'              => 'checkbox',
 	'value'             => secupress_get_module_option( 'advanced-settings_grade-system', true ),
-	'label'             => sprintf( __( 'Yes, enable and show the Grade system in %s', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
-) );
-
-$this->add_field( array(
-	'title'             => __( 'Hide Contextual Help & Tips', 'secupress' ),
-	'label_for'         => $this->get_field_name( 'expert-mode' ),
-	'type'              => 'checkbox',
-	'value'             => secupress_get_module_option( 'advanced-settings_expert-mode', false ),
-	'label'             => sprintf( __( 'Yes, hide all contextual help in %s', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
+	'label'             => __( 'Yes, show the Grade system for everyone', 'secupress' ),
 ) );
 
 $expert_modules = secupress_get_expert_modules_on();
@@ -39,7 +39,7 @@ $this->add_field( array(
 	'disabled'          => ! empty( $expert_modules ),
 	'type'              => 'checkbox',
 	'value'             => secupress_get_module_option( 'advanced-settings_expert-mode-main', false ) || secupress_get_expert_modules_on(),
-	'label'             => __( 'Yes, show me <strong>extra features</strong> for experts', 'secupress' ),
+	'label'             => __( 'Yes, show <strong>experts features</strong> for everyone', 'secupress' ),
 	'helpers'           => array(
 		array(
 			'type'        => 'help',

@@ -406,6 +406,9 @@ i.bold {
 	font-family: 'secupress';
 	content: "\e907";
 }
+#wp-admin-bar-secupress .ab-sub-wrapper {
+	min-width: 200px;
+}
 .secupress-pro-notice a,
 #adminmenu .wp-submenu a[href*="secupress.me"] {
 	color: #F7AB13 !important;

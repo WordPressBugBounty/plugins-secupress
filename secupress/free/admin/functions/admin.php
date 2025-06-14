@@ -225,8 +225,8 @@ function secupress_print_pro_advantages() {
 				<i class="secupress-icon-information" aria-hidden="true"></i>
 			</div>
 			<div class="secupress-col">
-				<p class="secupress-blob-title"><?php esc_html_e( 'Alerts', 'secupress' ); ?></p>
-				<p class="secupress-blob-desc"><?php esc_html_e( 'Get alerts via SMS, mobile notifications, or even by social networks in addition to email.', 'secupress' ); ?></p>
+				<p class="secupress-blob-title"><?php _e( 'Alerts', 'secupress' ); ?></p>
+				<p class="secupress-blob-desc"><?php _e( 'Get alerts via SMS, mobile notifications, or even by social networks in addition to email.', 'secupress' ); ?></p>
 			</div>
 		</div>
 		<div class="secupress-col-1-2 secupress-flex secupress-landscape-blob">
@@ -243,8 +243,8 @@ function secupress_print_pro_advantages() {
 				<i class="secupress-icon-logs" aria-hidden="true"></i>
 			</div>
 			<div class="secupress-col">
-				<p class="secupress-blob-title"><?php esc_html_e( 'Logs', 'secupress' ); ?></p>
-				<p class="secupress-blob-desc"><?php esc_html_e( 'All actions considered dangerous are kept in this log available at any time to check what is happening on your site.', 'secupress' ); ?></p>
+				<p class="secupress-blob-title"><?php _ex( 'Logs', 'post type general name', 'secupress' ); ?></p>
+				<p class="secupress-blob-desc"><?php _e( 'All actions considered dangerous are kept in this log available at any time to check what is happening on your site.', 'secupress' ); ?></p>
 			</div>
 		</div>
 	</div>
