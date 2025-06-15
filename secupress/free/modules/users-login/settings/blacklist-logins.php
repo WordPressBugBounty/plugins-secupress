@@ -187,9 +187,7 @@ $this->add_field( array(
 	'not'               => secupress_get_forbidden_default_roles(),
 	'disabled'          => $is_plugin_active,
 	'helpers'           => [
-							[ 'type' => 'warning',     
-							  'description' => $is_plugin_active ? __( 'To switch the default role, deactivate the module first.', 'secupress' ) : '',
-							],
+							[ 'type' => 'warning',     'description' => $is_plugin_active ? __( 'To change the default role, you must first deactivate the module.', 'secupress' ) : '', ],
 						]
 ) );
 $this->add_field( array(

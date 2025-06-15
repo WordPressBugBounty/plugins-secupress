@@ -1,7 +1,7 @@
 <?php
 /**
  * Module Name: Correct Security Keys
- * Description: Creates a mu-plugin with 10 constants.
+ * Description: Creates a mu-plugin with 8 constants.
  * Main Module: wordpress_core
  * Author: SecuPress
  * Version: 2.0

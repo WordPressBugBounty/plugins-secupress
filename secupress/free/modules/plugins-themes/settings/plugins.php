@@ -24,6 +24,12 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, disable <strong>all actions</strong> for every plugins', 'secupress' ),
+	'helpers'     => array(
+		array(
+			'type'        => 'force-warning',
+			'description' => $active && ! secupress_find_mu_plugin( 'no_plugins_installation' ) ? __( 'Our file is missing, please deactivate/reactivate the module.', 'secupress' ) : '',
+		),
+	),
 ) );
 
 if ( secupress_is_expert_mode() ) {
@@ -39,10 +45,6 @@ if ( secupress_is_expert_mode() ) {
 			array(
 				'type'        => secupress_is_pro() ? 'warning' : '',
 				'description' => sprintf( __( 'This module is still in %1$s. If you encounter too many issues, please contact us at %2$s.', 'secupress' ), '<strong>BETA DEV</strong>', secupress_a_me( 'support@secupress.me' ) ),
-			),
-			array(
-				'type'        => 'force-warning',
-				'description' => $active && ! secupress_find_mu_plugin( 'no_plugins_installation' ) ? __( 'Our file is missing, please deactivate/reactivate the module.', 'secupress' ) : '',
 			),
 		),
 	) );
@@ -70,7 +72,7 @@ if ( $c_mup_acti ) {
 	$message    .= ' ' . sprintf( _n( 'Additionally there is <strong>%d</strong> must-use plugin.', 'Additionally there are <strong>%d</strong> must-use plugins.', $c_mup_acti, 'secupress' ), $c_mup_acti );
 }
 
-if ( ! $active && ! secupress_get_module_option( 'plugins_confirm', false, 'plugins-themes' ) ) {
+if ( ! secupress_get_module_option( 'plugins_confirm', false, 'plugins-themes' ) ) {
 	$this->add_field( array(
 		'title'             => __( 'Confirmation', 'secupress' ),
 		'label'             => $message,

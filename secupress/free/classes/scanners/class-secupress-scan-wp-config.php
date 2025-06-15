@@ -28,7 +28,7 @@ class SecuPress_Scan_WP_Config extends SecuPress_Scan implements SecuPress_Scan_
 	 * @var (object)
 	 */
 	protected static $_instance;
-	protected $delayed_fix = 2;
+
 	/**
 	 * Constants to test, with values to test against.
 	 *

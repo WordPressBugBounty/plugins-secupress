@@ -67,7 +67,7 @@ function secupress_plugins_settings_callback( $modulenow, &$settings, $activate 
 		return;
 	}
 	$db_opt          = secupress_get_module_option( 'plugins_confirm', false, $modulenow );
-	$confirmed       = $db_opt || isset( $settings['plugins_confirm'] ) || secupress_is_submodule_active( $modulenow, 'plugin-installation' );
+	$confirmed       = $db_opt || isset( $settings['plugins_confirm'] );
 	$plugins_actions = isset( $activate['plugins_actions'] ) && $activate['plugins_actions'];
 	if ( ! $plugins_actions ) {
 		unset( $settings['plugins_installation'] );

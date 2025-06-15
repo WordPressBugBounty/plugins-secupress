@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-if ( ! secupress_get_module_option( 'advanced-settings_admin-bar', true, 'welcome' ) ) { // this is now a user_option, filtered by us
+if ( ! secupress_get_module_option( 'advanced-settings_admin-bar', true , 'welcome' ) ) {
 	return;
 }
 
