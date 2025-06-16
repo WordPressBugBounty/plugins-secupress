@@ -1228,7 +1228,7 @@ function secupress_feature_is_expert( $feature ) {
 		// Field names.
 		'content-protect_bad-url-access|allowed'    => 1,
 		'advanced-settings_expert-mode-main'        => 1,
-		'plugins_installation'                      => 1,
+		'plugins_installation-pro'                  => 1,
 		'blacklist-logins_lexicomatisation'         => 1,
 	];
 	return isset( $features[ $feature ] );
@@ -1256,7 +1256,7 @@ function secupress_feature_is_pro( $feature ) {
 		'password-policy_password_expiration'       => 1,
 		'password-policy_strong_passwords'          => 1,
 		'plugins_detect_bad_plugins'                => 1,
-		'plugins_installation'                      => 1,
+		'plugins_installation-pro'                  => 1,
 		'themes_activation'                         => 1,
 		'themes_deletion'                           => 1,
 		'themes_detect_bad_themes'                  => 1,
@@ -1380,33 +1380,6 @@ function secupress_get_user_metas( $meta_key ) {
 		secupress_cache_data( __FUNCTION__ . $meta_key, $res );
 	}
 	return $res;
-}
-
-/**
- * Get a user by id, login or email
- *
- * @since 2.2.6
- * @author Julio Potier
- *
- * @see get_user_by()
- * 
- * @param (int|string) $value ID, email, or login
- * @return (bool|WP_User) False or WP_User
- */
-function secupress_get_user_by( $value ) {
-	if ( secupress_is_user( $value ) ) {
-		return $value;
-	}
-	if ( is_int( $value ) ) {
-		return get_user_by( 'ID', $value );
-	}
-	$by   = is_email( $value ) ? 'email' : 'login';
-	$user = get_user_by( $by, $value );
-
-	if ( ! secupress_is_user( $user ) && is_email( $value ) ) {
-		$user = get_user_by( 'login', $value );
-	}
-	return $user;
 }
 
 /**
@@ -1639,14 +1612,15 @@ function secupress_is_expert_mode() {
 }
 
 /**
- * Returns true if SECUPRESS_MODE contains "help"
+ * Returns true if user option is '1' or old site option is '1' or SECUPRESS_MODE contains "help"
  *
+ * @since 2.3.18.1 
  * @since 2.3.17 
  * @return (bool)
  * @author Julio Potier
  **/
 function secupress_no_contextual_help() {
-	return secupress_get_module_option( 'advanced-settings_expert-mode', false , 'welcome' )
+	return (bool) ! get_user_option( 'advanced-settings_expert-mode' ) || ! secupress_get_module_option( 'advanced-settings_expert-mode', false , 'welcome' )
 		|| ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'help' ) ) );
 }
 
@@ -2292,4 +2266,218 @@ function secupress_get_function_name_by_server_type( $prefix, $default = '__retu
  **/
 function secupress_is_soft_request() {
 	return ! ( wp_doing_ajax() || wp_doing_cron() || wp_is_json_request() ||  wp_is_jsonp_request() || wp_is_xml_request() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) );
+}
+
+/*
+/**
+ * Returns only the main user fields.
+ *
+ * @since ?
+ *
+ * @see WP_User->get_data_by()
+ *
+ * @param (string)     $field The field to query against: Accepts 'id/ID', 'slug/nicename', 'email', 'login', 'display_name'.
+ * @param (string|int) $value The field value.
+ * @param (bool)       $like Usage of "LIKE" in the DB Query
+ * @param (string)     $sanitize_cb A callable callback function on $value
+ * 
+ * @return (WP_User|false) Raw user object.
+ *
+function secupress_get_user_data_by( $field, $value, $like = false, $sanitize_cb = '' ) {
+	global $wpdb;
+
+	$like = (bool) $like;
+
+	if ( ! is_int( $value ) && ! is_string( $value ) ) {
+		return false;
+	}
+
+	if ( false !== strpos( $sanitize_cb, 'trim' ) ) {
+		$sanitize_cb = '';
+	}
+
+	// 'id' is an alias of 'ID'.
+	if ( 'ID' === strtoupper( $field ) ) {
+		$field       = 'ID';
+		$sanitize_cb = 'absint';
+	}
+
+	// 'slug' is an alias of 'nicename'.
+	if ( 'slug' === $field || 'nicename' === $field ) {
+		$field       = 'user_nicename';
+		$sanitize_cb = 'sanitize_title';
+	}
+
+	if ( 'ID' === $field && ! is_numeric( $value ) ) {
+		return false;
+	}
+
+	if ( $sanitize_cb && is_callable( $sanitize_cb ) ) {
+		try {
+			set_error_handler( '__return_false', E_ALL );
+			$result = call_user_func( $sanitize_cb, $value );
+			restore_error_handler();
+
+			$value = $result ?: $value;
+		} catch ( Throwable $e ) {
+			error_log( 'Sanitize callback failed on ' . __FILE__ . ' in ' . __FUNCTION__ . ' on line ' . __LINE__ . ': ' . $e->getMessage() );
+			return false;
+		}
+	}
+
+	$value = trim( $value );
+	if ( ! $value ) {
+		return false;
+	}
+
+	if ( $like ) {
+		$value = secupress_esc_like( $value );
+	}
+
+	$db_field = $field;
+	$user_id  = false;
+	switch ( $field ) {
+		case 'ID':
+			$user_id  = $value;
+		break;
+		case 'nicename':
+			$user_id  = wp_cache_get( $value, 'userslugs' );
+			$db_field = 'user_nicename';
+		break;
+		case 'email':
+			$user_id  = wp_cache_get( $value, 'useremail' );
+			$db_field = 'user_email';
+		break;
+		case 'login':
+			$value    = sanitize_user( $value );
+			$user_id  = wp_cache_get( $value, 'userlogins' );
+			$db_field = 'user_login';
+		break;
+		default:
+			$user_id  = wp_cache_get( $value, "user{$field}" );
+		break;
+	}
+
+	$user = false;
+	if ( false !== $user_id ) {
+		$user = wp_cache_get( $user_id, 'users' );
+	}
+	if ( ! $user ) {
+		switch( $like ) {
+			case true:
+				$like = 'LIKE';
+			break;
+			case false:
+				$like = '=';
+			break;
+		}
+		$sql  = "SELECT * FROM $wpdb->users WHERE $db_field %s %s ORDER BY $db_field ASC LIMIT 1";
+		$sql  = sprintf( $sql, $like, '%s' );
+		$sql  = $wpdb->prepare( $sql, $value );
+		$user = $wpdb->get_row( $sql );
+	}
+	if ( ! isset( $user->ID ) ) {
+		return false;
+	}
+
+	$user = new WP_User( $user->ID );
+	if ( ! is_a( $user, 'WP_User' ) ) {
+		return false;
+	}
+	update_user_caches( $user );
+
+	return $user;
+}
+
+/**
+ * Get a user by id, login or email
+ *
+ * @since 2.3.18.1 Revamp to use secupress_get_user_data_by()
+ * @since 2.2.6
+ * @author Julio Potier
+ *
+ * @see get_user_by()
+ * @see secupress_get_user_data_by()
+ * 
+ * @param (string|int) $value The field value.
+ * 
+ * @return (bool|WP_User) False or WP_User
+ *
+function secupress_get_user_by( $value, $return_field = '' ) {
+	// Already a user.
+	if ( secupress_is_user( $value ) ) {
+		return $value;
+	}
+	$user = false;
+	// Asking for an ID?
+	if ( is_int( $value ) ) {
+		$user = secupress_get_user_data_by( 'ID', $value );
+	}
+	// Asking for an email or login?
+	if ( ! secupress_is_user( $user ) ) {
+		$by   = is_email( $value ) ? 'email' : 'login';
+		$user = secupress_get_user_data_by( $by, $value );
+	}
+
+	// Asking for an email as login?
+	if ( ! secupress_is_user( $user ) && is_email( $value ) ) {
+		$user = secupress_get_user_data_by( 'login', $value );
+	}
+
+	// Asking for a nicename?
+	if ( ! secupress_is_user( $user ) ) {
+		$user = secupress_get_user_data_by( 'nicename', $value );
+	}
+
+	// Asking for a display name?
+	if ( ! secupress_is_user( $user ) ) {
+		$user = secupress_get_user_data_by( 'display_name', $value );
+	}
+	// WHAT ARE YOU ASKING FOR??
+	if ( ! secupress_is_user( $user ) ) {
+		var_dump(__LINE__);
+		return false;
+	}
+	// We got it.
+	if ( $return_field ) {
+		var_dump(__LINE__);
+		if ( isset( $user->{$return_field} ) ) {
+		var_dump(__LINE__);
+		var_dump($user->{$return_field});
+			return $user->{$return_field};
+		} else {
+		var_dump(__LINE__);
+			return false;
+		}
+	}
+		var_dump(__LINE__);
+	return $user;
+}
+/*/
+
+/**
+ * Get a user by id, login or email
+ *
+ * @since 2.2.6
+ * @author Julio Potier
+ *
+ * @see get_user_by()
+ * 
+ * @param (int|string) $value ID, email, or login
+ * @return (bool|WP_User) False or WP_User
+ */
+function secupress_get_user_by( $value ) {
+	if ( secupress_is_user( $value ) ) {
+		return $value;
+	}
+	if ( is_int( $value ) ) {
+		return get_user_by( 'ID', $value );
+	}
+	$by   = is_email( $value ) ? 'email' : 'login';
+	$user = get_user_by( $by, $value );
+
+	if ( ! secupress_is_user( $user ) && is_email( $value ) ) {
+		$user = get_user_by( 'login', $value );
+	}
+	return $user;
 }

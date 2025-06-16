@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.18
+Stable tag: 2.3.18.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,15 +185,11 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.18 =
-* 10 June 2025
-* Fix: Fatal error if the previous "Block Function Names in Requests" was activated, this feature has been removed in last version
-* Fix: Fatal error on forbidden extensions scanner
-* Fix: 1 of our CSS rules was everywhere, sorry
-* Improve: Display a message if our mu-plugins files are missing, without recreating them automatically to prevent a possible infinite loop
-* Improve: "Rename user names" module, your nicename will be automatically renamed if possible. You can still change it in your profile, but not the same as your login.
-* New: "Module Notifications" can mail you when a module have been deactivated and not reactivated within the hour
-
+= 2.3.18.2 =
+* 16 June 2025
+* Fix: "Show Contextual Help & Tips" was always unchecked. You may have to recheck it to recover the helps
+* Fix: Again, no actions on plugins on FTP was displaying a wrong message
+* Fix: Missing CSS class with no contextual help. The module icons were not correct.
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.
@@ -202,15 +198,19 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 == TODO ==
 Create a trust score for each non WP file and displays it
 Create a "suspicious" status for alerts
-Revamp alerts?
+Revamp alerts
+Revamp logs
+Add http logs
 PHP 8.O min
 replace %s by ###USERNAME### in emails
-TODO .19
 .htaccess scanner
 move EDD updater+white label into a mu to allow upgrade+rollback even with plugin deactivated
 chartjs graph on dashboard widget
 give possibility to rename logins
-if stable enough: rename .18 > .100
 move secupress_action_screen to wp-login actions to match css of the site without efforts
 target="_blank" on doc links
-autolofin after fix step3
+remove <code> and <strong> in trads
+autologin after fix step3?
+file_upgrader where mu plugin files could be updated easily
+secupress_add_action > wp-login.php
+if stable enough: rename version to .100

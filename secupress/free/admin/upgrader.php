@@ -344,24 +344,6 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 	}
 	// < 2.3.17
 	if ( version_compare( $actual_version, '2.3.17', '<' ) ) {
-		if ( defined( 'SECUPRESS_SALT_KEYS_MODULE_ACTIVE' ) ) {
-			$plugin_file = secupress_find_mu_plugin( 'salt_keys' );
-			if ( $plugin_file ) {
-				$plugin_file = reset( $plugin_file );
-				$plugin_data = get_plugin_data( $plugin_file );
-				if ( isset( $plugin_data['Version'] ) && version_compare( $plugin_data['Version'], '2.3.17' ) < 0 ) {
-					$filesystem  = secupress_get_filesystem();
-					$content     = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
-					$args        = array(
-						'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
-						'{{HASH1}}'        => wp_generate_password( 64, true, true ),
-						'{{HASH2}}'        => wp_generate_password( 64, true, true ),
-					);
-					$content = str_replace( array_keys( $args ), $args, $content );
-					$filesystem->put_contents( $plugin_file, $content );
-				}
-			}
-		}
 		if ( defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) ) {
 			secupress_delete_mu_plugin( 'no_plugins_installation' );
 			secupress_deactivate_submodule_silently( 'plugins-themes', 'plugin-installation' );
@@ -377,6 +359,25 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 		if ( secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-dieondberror' ) ) {
 			secupress_deactivate_submodule( 'wordpress-core', 'wp-config-constant-dieondberror' );
 			secupress_activate_submodule( 'wordpress-core', 'wp-config-constant-dieondberror' );
+		}
+	}
+	// < 2.3.18.1
+	if ( version_compare( $actual_version, '2.3.18.1', '<' ) ) {
+		$plugin_file = secupress_find_mu_plugin( 'salt_keys' );
+		if ( $plugin_file ) {
+			$plugin_file = reset( $plugin_file );
+			$plugin_data = get_plugin_data( $plugin_file );
+			if ( isset( $plugin_data['Version'] ) && version_compare( $plugin_data['Version'], '2.3.17' ) < 0 ) {
+				$filesystem  = secupress_get_filesystem();
+				$content     = $filesystem->get_contents( SECUPRESS_INC_PATH . 'data/salt-keys.phps' );
+				$args        = array(
+					'{{PLUGIN_NAME}}'  => SECUPRESS_PLUGIN_NAME,
+					'{{HASH1}}'        => wp_generate_password( 64, true, true ),
+					'{{HASH2}}'        => wp_generate_password( 64, true, true ),
+				);
+				$content = str_replace( array_keys( $args ), $args, $content );
+				$filesystem->put_contents( $plugin_file, $content );
+			}
 		}
 	}
 }
@@ -635,7 +636,7 @@ if ( ! secupress_is_white_label() ) {
 	 **/
 	function secupress_display_whats_new() {
 		$notice_id1 = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
-		$notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
+		// $notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
 		if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id1 ) ) {
 			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
 			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
@@ -646,30 +647,31 @@ if ( ! secupress_is_white_label() ) {
 			if ( ! empty( $newitems ) ) {
 				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
 				secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id1 );
-				secupress_dismiss_notice( $notice_id2 ); // Do not show the second one.
+				// secupress_dismiss_notice( $notice_id2 ); // Do not show the second one.
 			}
 			return;
-		} else {
-			if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
-				$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
-				$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-				$newitems  = [ 	
-								__( 'Here are some key improvement for this version:', 'secupress' ),
-								__( 'New Alert <strong>Module Deactivation</strong>. Be alerted when a module have been deactivated and not reactivated within the hour.', 'secupress' ),
-								__( '<strong>Expert Mode</strong> has changed, it now shows powerful but more complex features dedicated to expert users only.', 'secupress' ),
-								__( '<strong>No Actions on Plugins</strong> has been fixed, you should not find your plugins deactivated now.', 'secupress' ),
-								__( 'Also for this module the new method "by FTP" is now running under Expert Mode in Pro version.', 'secupress' ),
-								__( 'Being spam by DB Error email messages is gone.', 'secupress' ),
-								__( 'Roles choice was gone for <strong>PasswordLess 2FA</strong>.', 'secupress' ),
-								__( 'Some scanners have been improved to prevent false positives.', 'secupress' ),
-								__( 'User names won‘t be renamed by a random name.', 'secupress' ),
-								__( 'The BETA feature <strong>Block function names in requests</strong> has been removed.', 'secupress' ),
-							];
-				if ( ! empty( $newitems ) ) {
-					$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-					secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
-				}
-			}
-		}
+		} 
+		// else {
+		// 	if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
+		// 		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
+		// 		$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+		// 		$newitems  = [ 	
+		// 						__( 'Here are some key improvement for this version:', 'secupress' ),
+		// 						__( 'New Alert <strong>Module Deactivation</strong>. Be alerted when a module have been deactivated and not reactivated within the hour.', 'secupress' ),
+		// 						__( '<strong>Expert Mode</strong> has changed, it now shows powerful but more complex features dedicated to expert users only.', 'secupress' ),
+		// 						__( '<strong>No Actions on Plugins</strong> has been fixed, you should not find your plugins deactivated now.', 'secupress' ),
+		// 						__( 'Also for this module the new method "by FTP" is now running under Expert Mode in Pro version.', 'secupress' ),
+		// 						__( 'Being spam by DB Error email messages is gone.', 'secupress' ),
+		// 						__( 'Roles choice was gone for <strong>PasswordLess 2FA</strong>.', 'secupress' ),
+		// 						__( 'Some scanners have been improved to prevent false positives.', 'secupress' ),
+		// 						__( 'User names won‘t be renamed by a random name.', 'secupress' ),
+		// 						__( 'The BETA feature <strong>Block function names in requests</strong> has been removed.', 'secupress' ),
+		// 					];
+		// 		if ( ! empty( $newitems ) ) {
+		// 			$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
+		// 			secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
+		// 		}
+		// 	}
+		// }
 	}
 }

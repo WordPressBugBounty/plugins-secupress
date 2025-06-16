@@ -76,7 +76,7 @@ function secupress_get_modules() {
 			'submodules'  => [
 							'row-uploads_activate'           => sprintf( __( 'Disallow %s uploads', 'secupress' ), 'zip' ),
 							'row-plugins_actions'            => __( 'Plugin Actions Back-end', 'secupress' ),
-							'row-plugins_installation'       => secupress_is_submodule_active( 'plugins-themes', 'plugin-installation' ) ? '>*' . __( 'Plugin Actions FTP', 'secupress' ) : '',
+							'row-plugins_installation-pro'   => secupress_is_submodule_active( 'plugins-themes', 'plugin-installation' ) ? '>*' . __( 'Plugin Actions FTP', 'secupress' ) : '',
 							'row-plugins_show-all'           => __( 'Show All Plugins', 'secupress' ),
 							'row-plugins_detect_bad_plugins' => '*' . __( 'Detect Bad Plugins', 'secupress' ),
 							'row-themes_actions'             => __( 'Theme Actions', 'secupress' ),
@@ -521,12 +521,19 @@ function secupress_deactivate_submodule_silently( $module, $submodules ) {
  * @param (string) $action    "activation" or "deactivation".
  */
 function secupress_add_module_notice( $module, $submodule, $action ) {
-	$submodule_name     = secupress_get_module_data( $module, $submodule )['Name'];
+	$is_for_user_only    = false !== strpos( $module, '###USER###' );
+	if ( $is_for_user_only ) {
+		$module = '';
+	}
+	$submodule_name      = secupress_get_module_data( $module, $submodule )['Name'];
 	secupress_remove_module_notice( $module, $submodule, 'activation' === $action ? 'deactivation' : 'activation' );
-	$transient_name     = 'secupress_module_' . $action . '_' . get_current_user_id();
-	$transient_value    = secupress_get_site_transient( $transient_name );
-	$transient_value    = is_array( $transient_value ) ? $transient_value : array();
-	$transient_value[]  = $submodule_name;
+	$transient_name      = 'secupress_module_' . $action . '_' . get_current_user_id();
+	$transient_value     = secupress_get_site_transient( $transient_name );
+	$transient_value     = is_array( $transient_value ) ? $transient_value : array();
+	if ( $is_for_user_only ) {
+		$submodule_name .= ' ' . secupress_tag_me( __( '(just for you)', 'secupress' ), 'em' );
+	}
+	$transient_value[]   = $submodule_name;
 	if ( secupress_is_pro() ) {
 		switch( $action ) {
 			case 'activation' :

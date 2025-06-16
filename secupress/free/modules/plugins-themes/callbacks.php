@@ -67,7 +67,7 @@ function secupress_plugins_settings_callback( $modulenow, &$settings, $activate 
 		return;
 	}
 	$db_opt          = secupress_get_module_option( 'plugins_confirm', false, $modulenow );
-	$confirmed       = $db_opt || isset( $settings['plugins_confirm'] );
+	$confirmed       = $db_opt || isset( $settings['plugins_confirm'] ) || secupress_is_submodule_active( $modulenow, 'plugin-installation' );
 	$plugins_actions = isset( $activate['plugins_actions'] ) && $activate['plugins_actions'];
 	if ( ! $plugins_actions ) {
 		unset( $settings['plugins_installation'] );
@@ -87,13 +87,8 @@ function secupress_plugins_settings_callback( $modulenow, &$settings, $activate 
 	secupress_manage_submodule( $modulenow, 'plugin-show-all',     isset( $activate['plugins_show-all'] ) );
 	if ( secupress_is_pro() ) {
 		secupress_manage_submodule( $modulenow, 'detect-bad-plugins',  ! empty( $activate['plugins_detect_bad_plugins'] ) );
-		$settings['plugins-installation-pro'] = $confirmed && isset( $settings['plugins_installation'], $activate['plugins_actions'] );
-		if ( ! $settings['plugins-installation-pro'] && function_exists( 'secupress_no_plugin_actions__deactivation' ) ) {
-			secupress_no_plugin_actions__deactivation();
-		}
-		if ( $settings['plugins-installation-pro'] && function_exists( 'secupress_no_plugin_actions__activation' ) ) {
-			secupress_no_plugin_actions__activation();
-		}
+		$plugins_installation_pro = $confirmed && isset( $settings['plugins_installation-pro'] );
+		secupress_manage_submodule( $modulenow, 'plugin-installation-pro', $plugins_installation_pro && $plugins_actions );
 	}
 	if ( ! secupress_is_submodule_active( $modulenow, 'plugin-installation' ) ) {
 		unset( $settings['plugins_confirm'] );

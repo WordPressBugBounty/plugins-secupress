@@ -406,6 +406,9 @@ i.bold {
 	font-family: 'secupress';
 	content: "\e907";
 }
+#wp-admin-bar-secupress .ab-sub-wrapper {
+	min-width: 200px;
+}
 .secupress-pro-notice a,
 #adminmenu .wp-submenu a[href*="secupress.me"] {
 	color: #F7AB13 !important;
@@ -762,8 +765,7 @@ span.secupress-get-pro-version {
 	font-weight: bold;
 }
 .secupress-get-pro-version a,
-.secupress-cta-pro a,
-.secupress-setting-content-col a {
+.secupress-cta-pro a{
 	color: #F7AB13;
 }
 .secupress-get-pro-col p.secupress-get-pro,

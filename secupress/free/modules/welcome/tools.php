@@ -13,7 +13,7 @@ add_filter( 'admin_body_class', 'secupress_no_contextual_help_add_css_body_class
  **/
 function secupress_no_contextual_help_add_css_body_class( $classes ) {
 	if ( secupress_no_contextual_help() && isset( $_GET['page'] ) && strpos( $_GET['page'], SECUPRESS_PLUGIN_SLUG ) !== false ) {
-		$classes .= 'no-contextual-help-secupress'; // do not start with "secupress-"
+		$classes .= ' no-contextual-help-secupress'; // do not start with "secupress-"
 	}
 	return $classes;
 }

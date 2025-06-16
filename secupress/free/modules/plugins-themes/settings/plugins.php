@@ -11,6 +11,7 @@ $is_wp_ok    = secupress_wp_version_is( $req_wp_ver );
 $helper_type = '';
 $helper_desc = '';
 $active      = (int) secupress_is_submodule_active( 'plugins-themes', 'plugin-installation' );
+$active_pro  = (int) secupress_is_submodule_active( 'plugins-themes', 'plugin-installation-pro' );
 if ( ! $is_wp_ok ) {
 	$helper_type = 'warning';
 	$helper_desc = sprintf( __( 'WordPress <b>v%1$s</b> is required to use the module <em>%2$s</em>.', 'secupress' ), $req_wp_ver, __( 'Plugin Actions', 'secupress' ) );
@@ -24,27 +25,20 @@ $this->add_field( array(
 	'type'              => 'checkbox',
 	'value'             => $active,
 	'label'             => __( 'Yes, disable <strong>all actions</strong> for every plugins', 'secupress' ),
-	'helpers'     => array(
-		array(
-			'type'        => 'force-warning',
-			'description' => $active && ! secupress_find_mu_plugin( 'no_plugins_installation' ) ? __( 'Our file is missing, please deactivate/reactivate the module.', 'secupress' ) : '',
-		),
-	),
 ) );
 
 if ( secupress_is_expert_mode() ) {
 	$this->add_field( array(
 		'title'             => __( 'Plugin Actions on FTP', 'secupress' ),
 		'depends'           => $this->get_field_name( 'actions' ),
-		'label_for'         => $this->get_field_name( 'installation' ),
+		'label_for'         => $this->get_field_name( 'installation-pro' ),
 		'description'       => __( 'This will disallow <strong>installation, activation, deactivation, deletion</strong> on FTP side.', 'secupress' ),
 		'type'              => 'checkbox',
-		// 'value'             => secupress_get_module_option( 'advanced-settings_expert-mode-main', false, 'welcome' ),
 		'label'             => __( 'Yes, also disable <strong>all these actions</strong> on FTP', 'secupress' ),
 		'helpers'           => array(
 			array(
-				'type'        => secupress_is_pro() ? 'warning' : '',
-				'description' => sprintf( __( 'This module is still in %1$s. If you encounter too many issues, please contact us at %2$s.', 'secupress' ), '<strong>BETA DEV</strong>', secupress_a_me( 'support@secupress.me' ) ),
+				'type'        => 'force-warning',
+				'description' => $active_pro && ! secupress_find_mu_plugin( 'no_plugins_installation' ) ? __( 'Our file is missing, please deactivate/reactivate the module.', 'secupress' ) : '',
 			),
 		),
 	) );
@@ -72,7 +66,7 @@ if ( $c_mup_acti ) {
 	$message    .= ' ' . sprintf( _n( 'Additionally there is <strong>%d</strong> must-use plugin.', 'Additionally there are <strong>%d</strong> must-use plugins.', $c_mup_acti, 'secupress' ), $c_mup_acti );
 }
 
-if ( ! secupress_get_module_option( 'plugins_confirm', false, 'plugins-themes' ) ) {
+if ( ! $active && ! secupress_get_module_option( 'plugins_confirm', false, 'plugins-themes' ) ) {
 	$this->add_field( array(
 		'title'             => __( 'Confirmation', 'secupress' ),
 		'label'             => $message,

@@ -1,6 +1,6 @@
 <?php
 /**
- * Module Name: No Plugin Actions
+ * Module Name: No Plugin Actions on Back-end
  * Description: Disable the plugin actions: Installation, Activation, Deactivation, Deletion on back-end. Update and rollback are still possible.
  * Main Module: plugins_themes
  * Author: SecuPress
@@ -26,74 +26,6 @@ defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) || define( 'SECUPRESS_INSTALLED_MUPLU
 defined( 'SECUPRESS_ACTIVE_PLUGINS' ) || define( 'SECUPRESS_ACTIVE_PLUGINS', '_secupress_active_plugins' );
 if ( is_multisite() ) {
 	defined( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK' ) || define( 'SECUPRESS_ACTIVE_PLUGINS_NETWORK', '_secupress_active_sitewide_plugins' );
-}
-
-// add_action( 'secupress.pro.plugins.activation',                                     'secupress_no_plugin_actions__activation' );
-// add_action( 'secupress.modules.activate_submodule_' . basename( __FILE__, '.php' ), 'secupress_no_plugin_actions__activation' );
-/**
- * Add the options and MU on module activation
- *
- * @author Julio Potier
- * @since 2.2.6
- **/
-function secupress_no_plugin_actions__activation() {
-	$filepart   = 'no_plugins_installation';
-	$args       = [
-		'{{PLUGIN_NAME}}' => SECUPRESS_PLUGIN_NAME,
-	];
-	$filesystem = secupress_get_filesystem();
-	$contents   = $filesystem->get_contents( SECUPRESS_INC_PATH . "data/{$filepart}.phps" );
-	$contents   = str_replace( array_keys( $args ), $args, $contents );
-
-	! defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) ? define( 'SECUPRESS_INSTALLED_MUPLUGINS' ) : false;
-	secupress_create_mu_plugin( $filepart, $contents );
-	sleep( 1 ); // let 1s to create the file on disk.
-
-	// (De)Activation
-	if ( ! is_multisite() ) {
-		update_option( SECUPRESS_ACTIVE_PLUGINS, get_option( 'active_plugins', null ) );
-	} else {
-		update_site_option( SECUPRESS_ACTIVE_PLUGINS_NETWORK, get_site_option( 'active_sitewide_plugins', null ) );
-		$sites = get_sites();
-		foreach ( $sites as $site ) {
-			$site_id = $site->blog_id;
-			switch_to_blog( $site_id );
-			update_option( SECUPRESS_ACTIVE_PLUGINS, get_option( 'active_plugins', null ) );
-			restore_current_blog();
-		}
-	}
-	// Installation
-	update_site_option( SECUPRESS_INSTALLED_PLUGINS,   get_plugins() );
-	update_site_option( SECUPRESS_INSTALLED_MUPLUGINS, get_mu_plugins() );
-}
-
-// add_action( 'secupress.pro.plugins.deactivation',                                     'secupress_no_plugin_actions__deactivation' );
-// add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.php' ), 'secupress_no_plugin_actions__deactivation' );
-/**
- * Delete the options on deactivation
- *
- * @author Julio Potier
- * @since 2.2.6
- **/
-function secupress_no_plugin_actions__deactivation() {
-	$filepart = 'no_plugins_installation';
-	secupress_delete_mu_plugin( $filepart );
-	// Installation
-	delete_site_option( SECUPRESS_INSTALLED_PLUGINS );
-	delete_site_option( SECUPRESS_INSTALLED_MUPLUGINS );
-	// (De)Activation
-	if ( ! is_multisite() ) {
-		delete_option( SECUPRESS_ACTIVE_PLUGINS );
-	} else {
-		delete_site_option( SECUPRESS_ACTIVE_PLUGINS_NETWORK );
-		$sites = get_sites();
-		foreach ( $sites as $site ) {
-			$site_id = $site->blog_id;
-			switch_to_blog( $site_id );
-			delete_option( SECUPRESS_ACTIVE_PLUGINS );
-			restore_current_blog();
-		}
-	}
 }
 
 add_filter( 'map_meta_cap', 'secupress_no_plugin_action_caps', 10, 2 );
@@ -326,7 +258,8 @@ function secupress_no_plugin_install_remove_new_plugins_link() {
 	global $submenu;
 	unset( $submenu['plugins.php'][10] );
 }
-add_action( 'secupress.plugins.loaded', 'secupress_no_plugin_install_warning_no_muplugin' );
+
+// add_action( 'secupress.plugins.loaded', 'secupress_no_plugin_install_warning_no_muplugin' );
 /**
  * Run secupress_no_plugin_actions__activation() if needed and require pro version of the module
  *
@@ -335,9 +268,11 @@ add_action( 'secupress.plugins.loaded', 'secupress_no_plugin_install_warning_no_
  * @author Julio Potier
  **/
 function secupress_no_plugin_install_warning_no_muplugin() {
-	if ( ! defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) && secupress_get_module_option( 'plugins-installation-pro', false, 'plugins-themes') ) {
-		secupress_no_plugin_actions__activation();
-	} elseif ( defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) && secupress_get_module_option( 'plugins-installation-pro', false, 'plugins-themes') ) {
+	if ( secupress_get_module_option( 'plugins-installation-pro', false, 'plugins-themes') ) {
 		require_once( SECUPRESS_PRO_MODULES_PATH . 'plugins-themes/plugins/plugin-installation-pro.php' );
 	}
+	// if ( ! defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) &&  ) {
+		// secupress_no_plugin_actions__activation();
+	// } elseif ( defined( 'SECUPRESS_NO_PLUGIN_ACTION_RUNNING' ) && secupress_get_module_option( 'plugins-installation-pro', false, 'plugins-themes') ) {
+	// }
 }

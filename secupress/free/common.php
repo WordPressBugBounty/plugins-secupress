@@ -586,7 +586,6 @@ function secupress_add_salt_muplugin() {
 	}
 
 	secupress_auto_login( 'Salt_Keys' );
-
 }
 
 
@@ -601,7 +600,7 @@ function secupress_auto_username_login() {
 		return;
 	}
 
-	list( $username, $action ) = secupress_get_site_transient( 'secupress_auto_login_' . $_GET['secupress_auto_login_token'] );
+	list( $username, $action, $message_str ) = secupress_get_site_transient( 'secupress_auto_login_' . $_GET['secupress_auto_login_token'] );
 
 	secupress_delete_site_transient( 'secupress_auto_login_' . $_GET['secupress_auto_login_token'] );
 	if ( ! $username ) {
@@ -623,6 +622,9 @@ function secupress_auto_username_login() {
 	$redirect = esc_url_raw( wp_get_referer() );
 	if ( strpos( $redirect, wp_login_url() ) !== false ) {
 		$redirect = esc_url( secupress_admin_url( 'modules' ) );
+	}
+	if ( $message_str ) {
+		secupress_add_transient_notice( $message_str, 'updated' );
 	}
 	wp_safe_redirect( $redirect );
 	die();
@@ -707,7 +709,7 @@ if ( is_admin() ) {
  * @param (string)      $module The SecuPress module to be redirected
  * @param (WP_User|int) $user The user to be logged in
  **/
-function secupress_auto_login( $module, $user = null ) {
+function secupress_auto_login( $module, $user = null, $message_str = '' ) {
 	if( is_int( $user ) ) {
 		$user = new WP_User( $user );
 	}
@@ -720,7 +722,7 @@ function secupress_auto_login( $module, $user = null ) {
 		return;
 	}
 	$token = md5( time() . $module );
-	secupress_set_site_transient( 'secupress_auto_login_' . $token, array( $current_user->user_login, $module ), MINUTE_IN_SECONDS );
+	secupress_set_site_transient( 'secupress_auto_login_' . $token, array( $current_user->user_login, $module, $message_str ), MINUTE_IN_SECONDS );
 
 	wp_safe_redirect( esc_url_raw( add_query_arg( 'secupress_auto_login_token', $token ) ) );
 	die();
