@@ -380,6 +380,20 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			}
 		}
 	}
+	// < 2.3.19
+	if ( version_compare( $actual_version, '2.3.19', '<' ) ) {
+		// Forgot to add our prefix... it won't be uninstalled!
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->usermeta SET meta_key = CONCAT( 'secupress-', meta_key ) WHERE meta_key LIKE %s", 'advanced-settings%m%' ) );
+		if ( secupress_is_pro() ) {
+			secupress_deactivate_submodule_silently( 'users-login', array( 'password-expiration' ) );
+			if ( secupress_get_module_option( 'password-policy_password_expiration', 0, 'users-login' ) > 0 
+				&& ! secupress_is_submodule_active( 'users-login', 'strong-passwords' )
+			) {
+				secupress_add_notice( sprintf( __( 'For information, the module "Password Lifespan" has been deactivated. We cannot reactivated it unless you activate the <a href="%s">module "Force Strong Passwords"</a>.', 'secupress' ), secupress_admin_url( 'modules', 'users-login#row-password-policy_strong_passwords' ) ), 'info', '' );
+			}
+		}
+	}
+	// DEV: DO NOT REDIRECT / DO NOT AUTOLOGIN / DO NOT USE $modulenow //
 }
 
 

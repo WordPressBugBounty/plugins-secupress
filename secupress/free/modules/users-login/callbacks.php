@@ -145,11 +145,14 @@ function secupress_login_protection_settings_callback( $modulenow, &$settings, $
 function secupress_password_policy_settings_callback( $modulenow, &$settings, $activate ) {
 	// Settings + (De)Activation.
 	if ( secupress_is_pro() ) {
-		$settings['password-policy_password_expiration'] = ! empty( $settings['password-policy_password_expiration'] ) ? absint( $settings['password-policy_password_expiration'] ) : 0;
-		secupress_manage_submodule( $modulenow, 'password-expiration', $settings['password-policy_password_expiration'] > 0 ); // `$settings`, not `$activate`.
-	} else {
-		unset( $settings['password-policy_password_expiration'] );
-		secupress_deactivate_submodule( $modulenow, array( 'password-expiration' ) );
+		$settings['password-policy_password_expiration'] = ! empty( $settings['password-policy_password_expiration'] ) ? absint( $settings['password-policy_password_expiration'] ) : '0';
+		if ( $settings['password-policy_password_expiration'] !== secupress_get_module_option( 'password-policy_password_expiration', '0', 'users-login' ) ) {
+			// 2.3.19 we do not activate this module here, "strong password" will include it if needed
+			// secupress_manage_submodule( $modulenow, 'password-expiration', $settings['password-policy_password_expiration'] > 0 ); // `$settings`, not `$activate`.
+			secupress_add_module_notice( '', __( 'Password Lifespan', 'secupress' ), $settings['password-policy_password_expiration'] > 0 ? 'activation' : 'deactivation' );
+		} else {
+			unset( $settings['password-policy_password_expiration'] );
+		}
 	}
 
 	// Affected roles.

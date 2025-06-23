@@ -4,7 +4,7 @@
  * Description: Creates a mu-plugin with 10 constants.
  * Main Module: wordpress_core
  * Author: SecuPress
- * Version: 2.0
+ * Version: 2.3.18
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );

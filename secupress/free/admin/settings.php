@@ -416,7 +416,7 @@ function secupress_scanners() {
 	$reports     = array();
 	$last_report = '—';
 	$time_offset = get_option( 'gmt_offset' ) * HOUR_IN_SECONDS;
-	$use_grade   = secupress_get_module_option( 'advanced-settings_grade-system', true );
+	$use_grade   = secupress_show_grade_system();
 
 	if ( $items ) {
 		$last_percent = -1;

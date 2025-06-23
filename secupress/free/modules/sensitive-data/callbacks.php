@@ -117,7 +117,7 @@ function secupress_wp_endpoints_settings_callback( $modulenow, &$settings, $acti
 	// (De)Activation.
 	secupress_manage_submodule( $modulenow, 'xmlrpc', ! empty( $settings['wp-endpoints_xmlrpc'] ) ); // `$settings`, not `$activate`.
 
-	if ( ! empty( $settings['wp-endpoints_author_base'] ) ){
+	if ( ! empty( $settings['wp-endpoints_author_base'] ) ) {
 		$old_author_base = trim( secupress_get_module_option( 'wp-endpoints_author_base', 'author', 'sensitive-data' ), '/' );
 		$new_author_base = sanitize_title( $settings['wp-endpoints_author_base'] );
 		$message         = '';
@@ -127,6 +127,7 @@ function secupress_wp_endpoints_settings_callback( $modulenow, &$settings, $acti
 			if ( 'author' === $new_author_base || ! $new_author_base ) { // back to WP default, no need to check
 				$settings['wp-endpoints_author_base'] = 'author';
 				secupress_set_author_base( 'author' );
+				secupress_add_module_notice( '', __( 'Author Page Base', 'secupress' ), 'deactivation' );
 				return $settings;
 			}
 
@@ -171,29 +172,32 @@ function secupress_wp_endpoints_settings_callback( $modulenow, &$settings, $acti
 			}
 
 			if ( ! empty( $bases[ $new_author_base ] ) ) {
-				$message = '';
+				$error = '';
 				if ( taxonomy_exists( $bases[ $new_author_base ] ) ) {
-					$message = __( 'a taxonomy', 'secupress' );
+					$error = __( 'a taxonomy', 'secupress' );
 				} elseif ( post_type_exists( $bases[ $new_author_base ] ) ) {
-					$message = __( 'a custom post type', 'secupress' );
+					$error = __( 'a custom post type', 'secupress' );
 				}
 			} elseif ( get_page_by_path( $new_author_base ) ) {
-				$message = __( 'a page', 'secupress' );
+				$error = __( 'a page', 'secupress' );
 
 			} elseif ( trim( get_option( 'permalink_structure' ), '/' ) === trim( $wp_rewrite->front . '%postname%', '/' ) && get_page_by_path( $new_author_base, 'OBJECT', 'post' ) ) {
-				$message = __( 'a post', 'secupress' );
+				$error = __( 'a post', 'secupress' );
 			}
 
-			if ( $message ) {
+			if ( $error ) {
 				$settings['wp-endpoints_author_base'] = $old_author_base;
-				$message = sprintf( __( '<strong>Error</strong>: This author page base is already used for %s. Please choose another one.', 'secupress' ), $message );
-				secupress_add_transient_notice( $message, 'error', '' );
+				$error = sprintf( __( 'This author page base is already used for %s. Please choose another one.', 'secupress' ), $message );
+				secupress_add_transient_notice( $error, 'error', '', 'exist' );
 				return $settings;
 			}
 
 			$settings['wp-endpoints_author_base'] = $new_author_base;
 			secupress_set_author_base( $new_author_base );
+			secupress_add_module_notice( '', __( 'Author Page Base', 'secupress' ), 'activation' );
 		}
+	} else {
+		secupress_add_module_notice( '', __( 'Author Page Base', 'secupress' ), 'deactivation' );
 	}
 
 }

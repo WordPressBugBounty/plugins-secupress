@@ -1320,10 +1320,19 @@ function secupress_feature_is_pro( $feature ) {
  * @return (-1|bool) -1 = every role is affected, true = the user's role is affected, false = the user's role isn't affected.
  */
 function secupress_is_affected_role( $module, $submodule, $user ) {
-	$roles = secupress_get_module_option( $submodule . '_affected_role', array(), $module );
+	$roles = secupress_get_module_option( $submodule . '_affected_role', [], $module );
 
 	if ( ! $roles ) {
 		return -1;
+	}
+
+	if ( ! secupress_is_user( $user ) ) {
+		$user = secupress_get_user_by( $user );
+	}
+
+	if ( ! secupress_is_user( $user ) ) {
+		trigger_error( '$user is not a valid WP_User object.' );
+		return false;
 	}
 
 	return secupress_is_user( $user ) && ! array_intersect( $roles, $user->roles );
@@ -1597,34 +1606,98 @@ function secupress_get_expert_modules_on() {
 	return array_intersect_key( $values, $SECUPRESS_EXPERT_MODULES_ON );
 }
 
+function secupress_no_contextual_help() {
+	_deprecated_function( __FUNCTION__, '2.3.19', 'secupress_show_contextual_help' );
+	return ! secupress_show_contextual_help();
+}
+
 /**
  * Returns true if SECUPRESS_MODE contains "expert" or setting is on
  *
+ * @since 2.3.19 Revamp
  * @since 2.3.17 main
  * @since 2.0.1 Read the new setting too
  * @since 1.4.6
- * @return (bool)
  * @author Julio Potier
+ * 
+ * @return (bool|null)
  **/
-function secupress_is_expert_mode() {
-	return secupress_get_expert_modules_on() || secupress_get_module_option( 'advanced-settings_expert-mode-main', false, 'welcome' ) 
-		|| ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'expert' ) ) );
+function secupress_is_expert_mode( $from_constant = false ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'expert' ) ) ) {
+		$constant = true;
+	}
+	if ( $from_constant ) {
+		return isset( $constant ) ? $constant : null;
+	}
+	if ( isset( $constant ) && is_bool( $constant ) ) {
+		return $constant;
+	}
+	return secupress_get_expert_modules_on() || secupress_get_module_option( 'advanced-settings_expert-mode-main', false, 'welcome' );
 }
 
 /**
- * Returns true if user option is '1' or old site option is '1' or SECUPRESS_MODE contains "help"
+ * Returns true if user option is '1' or SECUPRESS_MODE does not contains "help"
  *
  * @since 2.3.18.1 
  * @since 2.3.17 
- * @return (bool)
  * @author Julio Potier
+ * 
+ * @return (bool|null)
  **/
-function secupress_no_contextual_help() {
-	return (bool) ! get_user_option( 'advanced-settings_expert-mode' ) || ! secupress_get_module_option( 'advanced-settings_expert-mode', false , 'welcome' )
-		|| ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'help' ) ) );
+function secupress_show_contextual_help( $from_constant = false ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'help' ) ) ) {
+		$constant = false;
+	}
+	if ( $from_constant ) {
+		return isset( $constant ) ? $constant : null;
+	}
+	if ( isset( $constant ) && is_bool( $constant ) ) {
+		return $constant;
+	}
+	return secupress_get_module_option( 'advanced-settings_expert-mode', true, 'welcome' );
 }
 
+/**
+ * Returns true if user option is '1' or SECUPRESS_MODE contains "adminbar"
+ *
+ * @since 2.3.19
+ * @author Julio Potier
+ * 
+ * @return (bool|null)
+ **/
+function secupress_show_adminbar( $from_constant = false ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'adminbar' ) ) ) {
+		$constant = false;
+	}
+	if ( $from_constant ) {
+		return isset( $constant ) ? $constant : null;
+	}
+	if ( isset( $constant ) && is_bool( $constant ) ) {
+		return $constant;
+	}
+	return secupress_get_module_option( 'advanced-settings_admin-bar', true, 'welcome' );
+}
 
+/**
+ * Returns true if user option is '1' or SECUPRESS_MODE contains "grade"
+ *
+ * @since 2.3.19
+ * @author Julio Potier
+ * 
+ * @return (bool|null)
+ **/
+function secupress_show_grade_system( $from_constant = false ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'grade' ) ) ) {
+		$constant = false;
+	}
+	if ( $from_constant ) {
+		return isset( $constant ) ? $constant : null;
+	}
+	if ( isset( $constant ) && is_bool( $constant ) ) {
+		return $constant;
+	}
+	return secupress_get_module_option( 'advanced-settings_grade-system', true, 'welcome' );
+}
 /**
  * Set recursive chmod rights on a path
  *
@@ -2257,22 +2330,29 @@ function secupress_get_function_name_by_server_type( $prefix, $default = '__retu
 }
 
 /**
- * If the http request is ajax, cron, json, jsonp, xml, REST, it's not "soft".
+ * If the http request is ajax, cron, json, xml, REST, wp.com it's not "soft".
  *
+ * @since 2.3.19 APP_REQUEST IS_WPCOM REST_API_REQUEST
  * @since 2.3.18
  * @author Julio Potier
  * 
  * @return (bool) False if any of advanced request detected
  **/
 function secupress_is_soft_request() {
-	return ! ( wp_doing_ajax() || wp_doing_cron() || wp_is_json_request() ||  wp_is_jsonp_request() || wp_is_xml_request() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) );
+	return ! ( wp_doing_ajax() ||
+			wp_is_json_request() || wp_is_jsonp_request() || 
+			wp_doing_cron() || 
+			wp_is_xml_request() || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ||
+			( defined( 'APP_REQUEST' ) && APP_REQUEST ) ||
+			( defined( 'IS_WPCOM' ) && IS_WPCOM ) ||
+			( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'REST_API_REQUEST' ) && REST_API_REQUEST )
+		);
 }
 
-/*
 /**
  * Returns only the main user fields.
  *
- * @since ?
+ * @since 2.3.19
  *
  * @see WP_User->get_data_by()
  *
@@ -2281,8 +2361,9 @@ function secupress_is_soft_request() {
  * @param (bool)       $like Usage of "LIKE" in the DB Query
  * @param (string)     $sanitize_cb A callable callback function on $value
  * 
+ * @author Julio Potier
  * @return (WP_User|false) Raw user object.
- *
+ */
 function secupress_get_user_data_by( $field, $value, $like = false, $sanitize_cb = '' ) {
 	global $wpdb;
 
@@ -2402,16 +2483,18 @@ function secupress_get_user_data_by( $field, $value, $like = false, $sanitize_cb
  * @param (string|int) $value The field value.
  * 
  * @return (bool|WP_User) False or WP_User
- *
+ */
 function secupress_get_user_by( $value, $return_field = '' ) {
 	// Already a user.
 	if ( secupress_is_user( $value ) ) {
 		return $value;
 	}
 	$user = false;
+	$by   = '';
 	// Asking for an ID?
 	if ( is_int( $value ) ) {
-		$user = secupress_get_user_data_by( 'ID', $value );
+		$by = 'ID';
+		$user = secupress_get_user_data_by( $by, $value );
 	}
 	// Asking for an email or login?
 	if ( ! secupress_is_user( $user ) ) {
@@ -2421,63 +2504,90 @@ function secupress_get_user_by( $value, $return_field = '' ) {
 
 	// Asking for an email as login?
 	if ( ! secupress_is_user( $user ) && is_email( $value ) ) {
-		$user = secupress_get_user_data_by( 'login', $value );
+		$by   = 'login';
+		$user = secupress_get_user_data_by( $by, $value );
 	}
 
 	// Asking for a nicename?
 	if ( ! secupress_is_user( $user ) ) {
-		$user = secupress_get_user_data_by( 'nicename', $value );
+		$by   = 'nicename';
+		$user = secupress_get_user_data_by( $by, $value );
 	}
 
 	// Asking for a display name?
 	if ( ! secupress_is_user( $user ) ) {
-		$user = secupress_get_user_data_by( 'display_name', $value );
+		$by   = 'display_name';
+		$user = secupress_get_user_data_by( $by, $value );
 	}
 	// WHAT ARE YOU ASKING FOR??
 	if ( ! secupress_is_user( $user ) ) {
-		var_dump(__LINE__);
 		return false;
 	}
 	// We got it.
 	if ( $return_field ) {
-		var_dump(__LINE__);
 		if ( isset( $user->{$return_field} ) ) {
-		var_dump(__LINE__);
-		var_dump($user->{$return_field});
+			$user->secupress_get_user_by_field = $return_field;
 			return $user->{$return_field};
 		} else {
-		var_dump(__LINE__);
 			return false;
 		}
 	}
-		var_dump(__LINE__);
+
+	$user->secupress_get_user_by_field = $by;
+
 	return $user;
 }
-/*/
 
+add_filter( 'wp_login_errors', 'secupress_display_relogin_message' );
 /**
- * Get a user by id, login or email
+ * Display a message on the login form.
  *
- * @since 2.2.6
+ * @since 2.3.19 Revamp
+ * @since 1.0
  * @author Julio Potier
  *
- * @see get_user_by()
- * 
- * @param (int|string) $value ID, email, or login
- * @return (bool|WP_User) False or WP_User
+ * @param (object) $errors
+ *
+ * @return (object) $errors
  */
-function secupress_get_user_by( $value ) {
-	if ( secupress_is_user( $value ) ) {
-		return $value;
+function secupress_display_relogin_message( $errors ) {
+	if ( ! isset( $_GET['secupress-relog'] ) || empty( wp_get_referer() ) || ! secupress_is_soft_request() ) {
+		return $errors;
 	}
-	if ( is_int( $value ) ) {
-		return get_user_by( 'ID', $value );
-	}
-	$by   = is_email( $value ) ? 'email' : 'login';
-	$user = get_user_by( $by, $value );
 
-	if ( ! secupress_is_user( $user ) && is_email( $value ) ) {
-		$user = get_user_by( 'login', $value );
+	if ( empty( $errors ) ) {
+		$errors = new WP_Error();
 	}
-	return $user;
+
+	switch ( $_GET['secupress-relog'] ) {
+		case 'none':
+		case '':
+		case '0':
+		case 0:
+			// do nothing
+		break;
+		
+		case 'new-login':
+			$errors->add( 'secupress_relog', __( 'You will receive your new login confirmation in your mailbox.', 'secupress' ), 'message' );
+		break;
+		
+		case 'new-password':
+			$errors->add( 'secupress_relog', __( 'You will receive your new password confirmation in your mailbox.', 'secupress' ), 'message' );
+		break;
+						
+		default: // Should be an integer, user_id.
+			$user_id = (int) $_GET['secupress-relog'];
+			if ( $user_id ) { // user_id 0 exists for cron jobs, we don't want them.
+				$notices = secupress_get_transient( 'secupress-notices-' . $user_id, [] );
+				if ( is_array( $notices ) && ! empty( $notices ) ) {
+					delete_transient( 'secupress-notices-' . $user_id );
+					foreach ( $notices as $notice ) {
+						$errors->add( $notice['error_code'], $notice['message'], 'message' );
+					}
+				}
+			}
+		break;
+	}
+
+	return $errors;
 }

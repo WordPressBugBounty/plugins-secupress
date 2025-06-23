@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-add_filter( 'admin_body_class', 'secupress_no_contextual_help_add_css_body_class' );
+add_filter( 'admin_body_class', 'secupress_contextual_help_add_css_body_class' );
 /**
  * Add the no contexttual help as css class
  *
@@ -11,8 +11,8 @@ add_filter( 'admin_body_class', 'secupress_no_contextual_help_add_css_body_class
  * @param (string) $classes
  * @return (string) $classes
  **/
-function secupress_no_contextual_help_add_css_body_class( $classes ) {
-	if ( secupress_no_contextual_help() && isset( $_GET['page'] ) && strpos( $_GET['page'], SECUPRESS_PLUGIN_SLUG ) !== false ) {
+function secupress_contextual_help_add_css_body_class( $classes ) {
+	if ( ! secupress_show_contextual_help() && isset( $_GET['page'] ) && strpos( $_GET['page'], SECUPRESS_PLUGIN_SLUG ) !== false ) {
 		$classes .= ' no-contextual-help-secupress'; // do not start with "secupress-"
 	}
 	return $classes;

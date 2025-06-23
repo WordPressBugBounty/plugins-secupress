@@ -14,11 +14,7 @@ if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS )
 	return;
 }
 
-if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-	return;
-}
-
-if ( is_admin() ) {
+if ( ! secupress_is_soft_request() || is_admin() ) {
 	return;
 }
 
@@ -36,11 +32,13 @@ function secupress_captcha_session() {
 }
 
 add_action( 'login_form_login', 'secupress_captcha_init' );
+add_action( 'login_form_register', 'secupress_captcha_init' );
 /**
  * Init only on login form
  *
- * @author Julio Potier
+ * @since 2.3.19 + login_form_register hook
  * @since 2.3.6
+ * @author Julio Potier
  **/
 function secupress_captcha_init() {
 	secupress_captcha_session();
@@ -291,7 +289,7 @@ function secupress_manage_captcha( $object ) {
 	}
 	$running = true;
 
-	if ( defined( 'XMLRPC_REQUEST' ) || defined( 'APP_REQUEST' ) ) {
+	if ( ! secupress_is_soft_request() ) {
 		$running = false;
 		return $object;
 	}

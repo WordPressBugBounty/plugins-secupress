@@ -6,7 +6,7 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.3.18.2
+ * Version: 2.3.19
  * Code Name: Starboost (Mark XXXIX)
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
@@ -117,7 +117,6 @@ function secupress_init_i18n() {
 	// Load translations.
 	secupress_load_plugin_textdomain_translations();
 }
-
 add_action( 'plugins_loaded', 'secupress_init', 0 );
 /**
  * Tell WP what to do when the plugin is loaded.
@@ -137,19 +136,18 @@ function secupress_init() {
 	// Functions.
 	secupress_load_functions();
 
-	// Hooks.
-	require_once( SECUPRESS_INC_PATH . 'network-options-autoload.php' );
-	require_once( SECUPRESS_INC_PATH . 'common.php' );
-	require_once( SECUPRESS_INC_PATH . 'admin-bar.php' );
-
 	// Last constants.
 	if ( secupress_is_pro() ) {
 		define( 'SECUPRESS_PLUGIN_NAME', esc_html( secupress_get_option( 'wl_plugin_name', 'SecuPress' ) ) );
 	} else {
 		define( 'SECUPRESS_PLUGIN_NAME', 'SecuPress' );
 	}
-
 	define( 'SECUPRESS_PLUGIN_SLUG', sanitize_title( SECUPRESS_PLUGIN_NAME ) );
+
+	// Hooks.
+	require_once( SECUPRESS_INC_PATH . 'network-options-autoload.php' );
+	require_once( SECUPRESS_INC_PATH . 'common.php' );
+	require_once( SECUPRESS_INC_PATH . 'admin-bar.php' );
 
 	// Cleanup leftovers periodically.
 	SecuPress_Cleanup_Leftovers::get_instance();

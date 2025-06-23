@@ -250,167 +250,168 @@ function secupress_bad_url_access_add_third_party_urls( $urls ) {
 	return $urls;
 }
 
-if ( ! secupress_is_plugin_active( 'sf-author-url-control/sf-author-url-control.php' ) ) { // Grégory Viguier first ;)
-	/**
-	 * Set the author page base and flush the rules
-	 *
-	 * @since 2.2.6
-	 * @author Grégory Viguier, Julio Potier
-	 * 
-	 * @param (string) $author_base
-	 */
-	function secupress_set_author_base( $author_base = '' ) {
-		global $wp_rewrite;
+/**
+ * Set the author page base and flush the rules
+ *
+ * @since 2.2.6
+ * @author Grégory Viguier, Julio Potier
+ * 
+ * @param (string) $author_base
+ */
+function secupress_set_author_base( $author_base = '' ) {
+	global $wp_rewrite;
 
-		if ( trim( secupress_get_module_option( 'author_base', 'author', 'sensitive-data' ), '/' ) === $author_base ) {
-			return;
-		}
-
-		if ( $author_base ) {
-			$wp_rewrite->author_base = $author_base;
-		} else {
-			$wp_rewrite->author_base = 'author';
-		}
-
-		$wp_rewrite->init();
-		flush_rewrite_rules();
+	if ( trim( secupress_get_module_option( 'author_base', 'author', 'sensitive-data' ), '/' ) === $author_base ) {
+		return;
 	}
 
-	/**
-	 * Return the actual author base.
-	 *
-	 * @since 2.2.6
-	 * @author Grégory Viguier
-	 * 
-	 * @return (string) $author_base
-	 */
-	function secupress_get_author_base() {
-		global $wp_rewrite;
-
-		$front       = ! empty( $wp_rewrite ) ? trim( $wp_rewrite->front, '/' ) . '/' : 'blog/';
-		$author_base = trim( secupress_get_module_option( 'wp-endpoints_author_base', 'author', 'sensitive-data' ), '/' );
-		$author_base = sanitize_title( $author_base );
-		$author_base = $author_base && trim( $front, '/' ) !== $author_base ? $author_base : 'author';
-
-		return $author_base;
+	if ( $author_base ) {
+		$wp_rewrite->author_base = $author_base;
+	} else {
+		$wp_rewrite->author_base = 'author';
 	}
 
-	add_action( 'init', 'secupress_author_base_init' );
-	/**
-	 * Set the actual author base on init.
-	 *
-	 * @since 2.2.6
-	 * @author Grégory Viguier
-	 */
-	function secupress_author_base_init() {
-		global $wp_rewrite;
+	$wp_rewrite->init();
+	flush_rewrite_rules();
+}
 
-		if ( ! $wp_rewrite || ! is_object( $wp_rewrite ) ) {
-			return;
-		}
+/**
+ * Return the actual author base.
+ *
+ * @since 2.2.6
+ * @author Grégory Viguier
+ * 
+ * @return (string) $author_base
+ */
+function secupress_get_author_base() {
+	global $wp_rewrite;
 
-		$wp_rewrite->author_base = secupress_get_author_base();
+	$front       = ! empty( $wp_rewrite ) ? trim( $wp_rewrite->front, '/' ) . '/' : 'blog/';
+	$author_base = trim( secupress_get_module_option( 'wp-endpoints_author_base', 'author', 'sensitive-data' ), '/' );
+	$author_base = sanitize_title( $author_base );
+	$author_base = $author_base && trim( $front, '/' ) !== $author_base ? $author_base : 'author';
+
+	return $author_base;
+}
+
+add_action( 'init', 'secupress_author_base_init' );
+/**
+ * Set the actual author base on init.
+ *
+ * @since 2.2.6
+ * @author Grégory Viguier
+ */
+function secupress_author_base_init() {
+	global $wp_rewrite;
+
+	if ( ! $wp_rewrite || ! is_object( $wp_rewrite ) ) {
+		return;
 	}
 
-	add_action( 'show_user_profile', 'secupress_author_base_edit_user_options' );
-	add_action( 'edit_user_profile', 'secupress_author_base_edit_user_options' );
-	/**
-	 * Add the field.
-	 *
-	 * @since 2.2.6
-	 * @author Grégory Viguier
-	 */
-	function secupress_author_base_edit_user_options() {
-		global $user_id, $wp_rewrite;
+	$wp_rewrite->author_base = secupress_get_author_base();
+}
 
-		$user_id = isset( $user_id ) ? (int) $user_id : 0;
+add_action( 'show_user_profile', 'secupress_author_base_edit_user_options' );
+add_action( 'edit_user_profile', 'secupress_author_base_edit_user_options' );
+/**
+ * Add the field.
+ *
+ * @since 2.2.6
+ * @author Grégory Viguier, Julio Potier
+ */
+function secupress_author_base_edit_user_options() {
+	global $user_id, $wp_rewrite;
 
-		if ( ! ( $userdata = get_userdata( $user_id ) ) ) {
-			return;
-		}
+	$user_id = isset( $user_id ) ? (int) $user_id : 0;
 
-		if ( ! secupress_author_base_user_can_edit_user_slug() ) {
-			return;
-		}
-
-		$def_user_nicename = sanitize_title( $userdata->display_name );
-		$blog_prefix       = is_multisite() && ! is_subdomain_install() && is_main_site() ? '/blog/' : '/';
-		$author_base       = $wp_rewrite->author_base;
-
-		echo '<table class="form-table">' . "\n";
-			echo '<tr>' . "\n";
-				echo '<th><label for="user_nicename">' . __( 'Profile URL Slug', 'secupress' ) . "</label></th>\n";
-				echo '<td>';
-					echo $blog_prefix . $author_base . '/';
-					echo '<input id="user_nicename" name="user_nicename" class="regular-text code" type="text" value="' . esc_attr( sanitize_title( $userdata->user_nicename, $def_user_nicename ) ) . '"/> ';
-					echo '<span class="description">' . sprintf( __( 'Leave empty for default value: %s', 'secupress' ), secupress_tag_me( $def_user_nicename, 'strong' ) ) . '</span> ';
-				echo '</td>' . "\n";
-			echo '</tr>' . "\n";
-		echo '</table>' . "\n";
+	if ( ! ( $userdata = get_userdata( $user_id ) ) ) {
+		return;
 	}
 
-	add_action( 'personal_options_update',  'secupress_author_base_save_user_options' );
-	add_action( 'edit_user_profile_update', 'secupress_author_base_save_user_options' );
-	/**
-	 * Save the user nicename and display error notices.
-	 *
-	 * @since 2.2.6
-	 * @author Grégory Viguier
-	 */
-	function secupress_author_base_save_user_options() {
-		if ( empty( $_POST['user_id'] ) || ! isset( $_POST['user_nicename'] ) || ! secupress_author_base_user_can_edit_user_slug() ) {
-			return;
+	$def_user_nicename = sanitize_title( $userdata->display_name );
+	$blog_prefix       = is_multisite() && ! is_subdomain_install() && is_main_site() ? '/blog/' : '/';
+	$author_base       = $wp_rewrite->author_base;
+	?>
+	<table class="form-table">
+		<tr>
+		<th><label for="user_nicename"><?php _e( 'Profile URL Slug', 'secupress' ); ?></label></th>
+			<td>
+				<?php echo $blog_prefix . $author_base . '/'; ?>
+				<input id="user_nicename" name="user_nicename" class="regular-text code" type="text" value="<?php echo esc_attr( sanitize_title( $userdata->user_nicename, $def_user_nicename ) ); ?>"/>
+				<span class="description"><?php printf( __( 'Leave empty for default value: %s', 'secupress' ), secupress_tag_me( $def_user_nicename, 'strong' ) ); ?></span>
+			</td>
+		</tr>
+	</table>
+	<?php
+}
+
+add_action( 'personal_options_update',  'secupress_author_base_save_user_options' );
+add_action( 'edit_user_profile_update', 'secupress_author_base_save_user_options' );
+/**
+ * Save the user nicename and display error notices.
+ *
+ * @since 2.2.6
+ * @author Grégory Viguier, Julio Potier
+ */
+function secupress_author_base_save_user_options() {
+	if ( empty( $_POST['user_id'] ) || ! isset( $_POST['user_nicename'] ) ) {
+		return;
+	}
+	$user_id = (int) $_POST['user_id'];
+
+	check_admin_referer( 'update-user_' . $user_id );
+
+	if ( ! ( $userdata = get_userdata( $user_id ) ) ) {
+		return;
+	}
+
+	$def_user_nicename = sanitize_title( $userdata->user_login );
+	$new_nicename      = sanitize_title( $_POST['user_nicename'], $def_user_nicename );
+
+	if ( 0 === strcmp( $new_nicename, $userdata->user_nicename ) ) {
+		return;
+	}
+
+	// "wp_admin_notice_markup" hook is 6.4
+	if ( secupress_get_user_by( $new_nicename ) ) {
+		if ( secupress_wp_version_is( '6.4' ) ) {
+			add_action( 'user_profile_update_errors', 'secupress_author_base_user_add_fake_error' );
 		}
+		secupress_add_transient_notice( sprintf( __( 'Sorry, the slug %s is already in use!', 'secupress' ), secupress_tag_me( esc_html( $new_nicename ), 'strong' ) ), 'error', '', 'exist' );
+	} else {
+		$updated = wp_update_user( array(
+			'ID'            => $user_id,
+			'user_nicename' => $new_nicename,
+		) );
 
-		$user_id = (int) $_POST['user_id'];
-
-		check_admin_referer( 'update-user_' . $user_id );
-
-		if ( ! ( $userdata = get_userdata( $user_id ) ) ) {
-			return;
-		}
-
-		$def_user_nicename = sanitize_title( $userdata->user_login );
-		$new_nicename      = sanitize_title( $_POST['user_nicename'], $def_user_nicename );
-
-		if ( $new_nicename === $userdata->user_nicename ) {
-			return;
-		}
-
-		if ( ! get_user_by( 'slug', $new_nicename ) ) {
-			$updated = wp_update_user( array(
-				'ID'            => $user_id,
-				'user_nicename' => $new_nicename,
-			) );
-
-			if ( ! $updated ) {
-				add_action( 'user_profile_update_errors', 'secupress_author_base_user_profile_slug_generic_error' );
+		if ( ! $updated ) {
+			if ( secupress_wp_version_is( '6.4' ) ) {
+				add_action( 'user_profile_update_errors', 'secupress_author_base_user_add_fake_error' );
 			}
-		} else {
-			add_action( 'user_profile_update_errors', 'secupress_author_base_user_profile_slug_error' );
-		}
-
-		function secupress_author_base_user_profile_slug_generic_error( $errors ) {
-			$errors->add( 'user_nicename', __( '<strong>Error</strong>: There was an error updating the author slug. Please try again.', 'secupress' ) );
-		}
-
-		function secupress_author_base_user_profile_slug_error( $errors ) {
-			$errors->add( 'user_nicename', __( '<strong>Error</strong>: This profile URL slug is already registered. Please choose another one.', 'secupress' ) );
+			secupress_add_transient_notice( __( 'Unexpected issue updating the author profile URL slug. Please try again.', 'secupress' ), 'error', '', 'exist' );
 		}
 	}
 
+	function secupress_author_base_user_add_fake_error( $errors ) {
+		$errors->add( '###SECUPRESS-DO-NOT-SHOW-ME###', '###SECUPRESS-DO-NOT-SHOW-ME###' );
+	}
 
+	add_filter( 'wp_admin_notice_markup', 'secupress_author_base_remove_fake_error', 10, 2 ); // WP 6.4
 	/**
-	 * Return true if the current user can edit the user slug.
+	 * Maybe remove the markup, the error is set just to not show the "Profile updated" msg
 	 *
-	 * @since 2.2.6
-	 * @author Grégory Viguier
+	 * @since 2.3.19
+	 * @author Julio Potier
 	 * 
-	 * @param (int) $user_id
+	 * @param (string) $markup
+	 * @param (string) $message
 	 * 
-	 * @return (bool)
-	 */
-	function secupress_author_base_user_can_edit_user_slug( $user_id = 0 ) {
-		return current_user_can( 'edit_users' ) || ( ( ( defined( 'IS_PROFILE_PAGE' ) && IS_PROFILE_PAGE ) || ( $user_id && get_current_user_id() === $user_id ) ) && apply_filters( 'secupress.plugins.user_can_edit_user_slug', false ) );
+	 * @return (string) $markup
+	 **/
+	function secupress_author_base_remove_fake_error( $markup, $message ) {
+		if ( strpos( $message, '###SECUPRESS-DO-NOT-SHOW-ME###' ) !== false ) {
+			return '';
+		}
+		return $markup;
 	}
 }

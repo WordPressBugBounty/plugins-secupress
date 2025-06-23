@@ -38,7 +38,7 @@ function secupress_db_error_delete_file() {
 	if ( $file_time > 0 && $file_time < ( time() - ( 10 * MINUTE_IN_SECONDS ) ) ) {
 		secupress_add_transient_notice(
 			__( 'Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress' ),
-			'updated',
+			'info',
 			''
 		);
 

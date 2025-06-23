@@ -153,7 +153,7 @@ function secupress_plugin_show_all_force_all_plugins_view() {
 }
 
 
-add_action( 'admin_print_footer_scripts-plugins.php', 'secupress_plugin_show_all_hack_css', SECUPRESS_INT_MAX );
+add_action( 'admin_footer-plugins.php', 'secupress_plugin_show_all_hack_css', SECUPRESS_INT_MAX );
 /**
  * Handle the CSS case when a plugin use CSS to display:none
  *
@@ -170,6 +170,7 @@ function secupress_plugin_show_all_hack_css() {
 		const hiddenElements = Array.from(document.querySelectorAll('[data-plugin]:not(.plugin-update-tr)'))
 			.filter(element => {
 				const style  = window.getComputedStyle(element);
+				// console.log(element.getAttribute('data-slug')+' '+style.display);
 				return style.display === 'none';
 			});
 		hiddenElements.forEach(element => {
@@ -185,6 +186,7 @@ function secupress_plugin_show_all_hack_css() {
 			}
 			var existingNotice = document.querySelector('[data-id="plugins_all_js_css"]');
 			if (existingNotice) {
+				existingNotice.classList.remove('hidden');
 				existingNotice.innerHTML += '<p>' + "<?php echo esc_js( __( 'The plugin %s has been hidden! (using CSS)', 'secupress' ) ); ?>".replace('%s', '<code>'+slug+'</code>') + ' <span style="font-size:large;color:<?php echo esc_js( $backgroundColor ); ?>">&#x25A0;</span></p>';
 			}
 		});
@@ -195,7 +197,7 @@ function secupress_plugin_show_all_hack_css() {
 <?php
 }
 
-add_action( 'admin_footer', 'secupress_plugin_show_all_maybe_add_notice', 1 );
+add_action( 'admin_head-plugins.php', 'secupress_plugin_show_all_maybe_add_notice', 1 );
 /**
  * Add an empty notice if need by CSS and JS hidden plugins since they cannot add it.
  *
@@ -208,21 +210,24 @@ function secupress_plugin_show_all_maybe_add_notice() {
 	if ( 'plugins.php' !== $pagenow ) {
 		return;
 	}
-	$type = secupress_cache_data( 'plugins_show-all-notice' );
-	if ( ! $type ) {
-		secupress_add_notice( ' ', 'error', 'plugins_all_js_css' );
-	}
+	// $type = secupress_cache_data( 'plugins_show-all-notice' );
+	// if ( ! $type ) {
+		secupress_add_notice( ' ', 'error hidden', 'plugins_all_js_css' );
+	// }
 }
 
-add_action( 'admin_print_footer_scripts-plugins.php', 'secupress_plugin_show_all_hack_js', 1 );
+add_action( 'admin_enqueue_scripts', 'secupress_plugin_show_all_hack_js', 1 );
 /**
  * Handle the JS case when a plugin use JS to .remove()
  *
- * @author Julio Potier
  * @since 2.2.6
+ * @author Julio Potier
  * 
  **/
-function secupress_plugin_show_all_hack_js() {
+function secupress_plugin_show_all_hack_js( $hook_suffix ) {
+	if ( 'plugins.php' !== $hook_suffix ) {
+		return;
+	}
 	$backgroundColor                           = secupress_get_module_option( 'plugins_show-all-color', '#FAC898', 'plugins-themes' );
 	?>
 <script>
@@ -243,7 +248,20 @@ function secupress_plugin_show_all_hack_js() {
 		});
 		var existingNotice                     = document.querySelector('[data-id="plugins_all_js_css"]');
 		if (existingNotice) {
-			existingNotice.innerHTML          += '<br class="separator">' + "<?php echo esc_js( __( 'The plugin %s has been hidden! (using JS)', 'secupress' ) ); ?>".replace('%s', '<code>'+slug+'</code>') + ' <span style="font-size:large;color:<?php echo esc_js( $backgroundColor ); ?>">&#x25A0;</span>';
+			existingNotice.classList.remove('hidden');
+			// Créer un élément temporaire pour vérifier la présence de <code>
+			const tempDiv = document.createElement('div');
+			tempDiv.innerHTML = existingNotice.innerHTML;
+
+			// Vérifier si l'élément contient une balise <code>
+			if (tempDiv.querySelector('code')) {
+				existingNotice.innerHTML += '<br class="separator">';
+			}
+
+			// Ajouter le nouveau contenu
+			existingNotice.innerHTML += "<p><?php echo esc_js( __( 'The plugin %s has been hidden! (using JS)', 'secupress' ) ); ?>"
+			.replace('%s', '<code>' + slug + '</code>') +
+			' <span style="font-size:large;color:<?php echo esc_js( $backgroundColor ); ?>">&#x25A0;</span></p>';
 		}
 
 		parentElement = document.getElementById('the-list');

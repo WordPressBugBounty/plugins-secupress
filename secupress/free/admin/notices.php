@@ -125,7 +125,7 @@ function secupress_plugins_to_deactivate() {
 		}
 		$message .= '</ul>';
 
-		secupress_add_transient_notice( $message, 'error', SECUPRESS_MAJOR_VERSION . '-warn-plugin-' . $hash );
+		secupress_add_transient_notice( $message, 'warning', SECUPRESS_MAJOR_VERSION . '-warn-plugin-' . $hash );
 	}
 
 }

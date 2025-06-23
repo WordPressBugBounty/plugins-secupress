@@ -79,6 +79,363 @@ function secupress_action_page( $title, $content, $args = array() ) {
 	die();
 }
 
+/**
+ * Outputs a fake login page design.
+ *
+ * @since 2.3.19
+ * @author Julio Potier
+ *
+ * @param (string)   $title    Fake login page title to display in the `<title>` element.
+ * @param (string)   $content  Content to display in body.
+ * @param (WP_Error) $wp_error Optional. The errors to pass.
+ * @param (int)      $user_id  Optional. Needed when you there is no user logged in
+ */
+function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 ) {
+	global $sp_action;
+
+	if ( ! isset( $sp_action ) || ! $sp_action ) {
+		secupress_die( __( 'Something went wrong.', 'secupress' ), '', [ 'force_die' => true, 'context' => 'missing-sp_action', 'attack_type' => 'login' ] );
+	}
+
+	$user_id = $user_id ? $user_id : get_current_user_id();
+	if ( $user_id ) {
+		switch_to_locale( get_user_locale( $user_id ) );
+		// Add user color scheme to login page
+		global $_wp_admin_css_colors;
+		register_admin_color_schemes();
+		$color = get_user_option( 'admin_color', $user_id );
+		if ( empty( $color ) || ! isset( $_wp_admin_css_colors[ $color ] ) ) {
+			$color = 'fresh';
+		}
+		$color = $_wp_admin_css_colors[ $color ];
+		$url   = $color->url;
+		if ( $url ) {
+			$ver  = get_bloginfo( 'version' );
+			$hash = secupress_generate_hash( $ver );
+			$url  = add_query_arg( 'ver', $hash, $url );
+			add_action( 'login_head', function() use( $url ) {
+				echo "<link rel='stylesheet' id='colors-css' href='{$url}' media='all' />";
+			});
+		}
+	}
+
+	if ( ! is_wp_error( $wp_error ) ) {
+		$wp_error = new WP_Error();
+	}
+	?><!DOCTYPE html>
+	<html <?php language_attributes(); ?>>
+	<head>
+	<meta http-equiv="Content-Type" content="<?php bloginfo( 'html_type' ); ?>; charset=<?php bloginfo( 'charset' ); ?>" />
+	<title><?php echo $title; ?></title>
+	<style>
+		.secupress-notice.has-plugin-title {margin-bottom: 33px !important; position: relative; }
+		.secupress-notice label.plugin-title {background: rgba(0, 0, 0, 0.3); color: #fff; padding: 2px 10px; position: absolute; top: 100%; border-top: 2px solid rgba(0, 0, 0, 0.1); border-radius: 0px 0px 2px 2px; }
+	</style>
+	<?php
+	wp_enqueue_style( 'login' );
+
+	/**
+	 * Run actions after title tag
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.after_title_tag' );
+
+	/**
+	 * Enqueues scripts and styles for the login page.
+	 *
+	 * @since WP 3.1.0
+	 */
+	do_action( 'login_enqueue_scripts' );
+	/**
+	 * Enqueues scripts and styles for the login page.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.login_enqueue_scripts' );
+
+	/**
+	 * Fires in the login page header after scripts are enqueued.
+	 *
+	 * @since WP 2.1.0
+	 */
+	do_action( 'login_head' );
+	/**
+	 * Fires in the login page header after scripts are enqueued.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.login_head' );
+	?><meta name="viewport" content="width=device-width, initial-scale=1.0" /><?php
+	?><meta name='referrer' content='strict-origin-when-cross-origin' /><?php
+
+	$login_header_url = home_url();
+
+	$login_header_text = get_bloginfo( 'blogdescription' );
+
+	$classes = array( 'login-action-' . $sp_action, 'wp-core-ui' );
+
+	if ( is_rtl() ) {
+		$classes[] = 'rtl';
+	}
+
+	$classes[] = ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_user_locale() ) ) );
+
+	/**
+	 * Filters the login page body classes.
+	 *
+	 * @since WP 3.5.0
+	 *
+	 * @param string[] $classes An array of body classes.
+	 * @param string   $action  The action that brought the visitor to the login page.
+	 */
+	$classes = apply_filters( 'login_body_class', $classes, $sp_action );
+	/**
+	 * Filters the login page body classes.
+	 *
+	 * @since 2.3.19
+	 *
+	 * @param string[] $classes An array of body classes.
+	 * @param string   $action  The action that brought the visitor to the login page.
+	 */
+	$classes = apply_filters( 'secupress_login_page.login_body_class', $classes, $sp_action );
+	?>
+	</head>
+	<body class="login no-js <?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+	<?php
+	wp_print_inline_script_tag( "document.body.className = document.body.className.replace('no-js','js');" );
+	?>
+
+	<?php
+	/**
+	 * Fires in the login page header after the body tag is opened.
+	 *
+	 * @since WP 4.6.0
+	 */
+	do_action( 'login_header' );
+	/**
+	 * Fires in the login page header after the body tag is opened.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.login_header' );
+	?>
+	<div id="login">
+		<h1 role="presentation" class="wp-login-logo"><a href="<?php echo esc_url( $login_header_url ); ?>"><?php echo $login_header_text; ?></a></h1>
+	<?php
+	if ( $wp_error->has_errors() ) {
+		$error_list = array();
+		$messages   = '';
+
+		foreach ( $wp_error->get_error_codes() as $code ) {
+			$severity = $wp_error->get_error_data( $code );
+			foreach ( $wp_error->get_error_messages( $code ) as $error_message ) {
+				if ( 'message' === $severity ) {
+					$messages .= '<p>' . $error_message . '</p>';
+				} else {
+					$error_list[] = $error_message;
+				}
+			}
+		}
+
+		if ( ! empty( $messages ) ) {
+			/**
+			 * Filters instructional messages displayed above the login form.
+			 *
+			 * @since WP 2.5.0
+			 *
+			 * @param string $messages Login messages.
+			 */
+			$messages = apply_filters( 'login_messages', $messages );
+			/**
+			 * Filters instructional messages displayed above the login form.
+			 *
+			 * @since 2.3.19
+			 *
+			 * @param string $messages Login messages.
+			 */
+			$messages    = apply_filters( 'secupress_login_page.login_messages', $messages );
+			$plugin_name = SECUPRESS_PLUGIN_NAME . ( secupress_has_pro() && ! secupress_is_white_label() ? ' Pro' : '' );
+			$label       = ! secupress_show_contextual_help() ? '' : '<label class="plugin-title">' . esc_html( $plugin_name ) . '</label>';
+			$lab_class   = ! secupress_show_contextual_help() ? '' : 'secupress-notice has-plugin-title';
+
+			wp_admin_notice(
+				$messages . $label,
+				array(
+					'type'               => 'info',
+					'id'                 => 'login-message',
+					'additional_classes' => array( 'message', $lab_class ),
+					'paragraph_wrap'     => false,
+				)
+			);
+		}
+
+		if ( ! empty( $error_list ) ) {
+			$errors = '';
+
+			if ( count( $error_list ) > 1 ) {
+				$errors .= '<ul class="login-error-list">';
+
+				foreach ( $error_list as $item ) {
+					$errors .= '<li>' . $item . '</li>';
+				}
+
+				$errors .= '</ul>';
+			} else {
+				$errors .= '<p>' . $error_list[0] . '</p>';
+			}
+
+			/**
+			 * Filters the error messages displayed above the login form.
+			 *
+			 * @since 2.1.0
+			 *
+			 * @param string $errors Login error messages.
+			 */
+			$errors = apply_filters( 'login_errors', $errors );
+			$errors = apply_filters( 'secupress_login_page.login_errors', $errors );
+
+			wp_admin_notice(
+				$errors,
+				array(
+					'type'           => 'error',
+					'id'             => 'login_error',
+					'paragraph_wrap' => false,
+				)
+			);
+		}
+
+	}
+
+	nocache_headers();
+
+	header( 'Content-Type: ' . get_bloginfo( 'html_type' ) . '; charset=' . get_bloginfo( 'charset' ) );
+
+	// Set a cookie now to see if they are supported by the browser.
+	$secure = ( 'https' === parse_url( wp_login_url(), PHP_URL_SCHEME ) );
+	setcookie( TEST_COOKIE, 'WP Cookie check', 0, COOKIEPATH, COOKIE_DOMAIN, $secure, true );
+
+	if ( SITECOOKIEPATH !== COOKIEPATH ) {
+		setcookie( TEST_COOKIE, 'WP Cookie check', 0, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true );
+	}
+
+	if ( isset( $_REQUEST['wp_lang'] ) ) {
+		setcookie( 'wp_lang', sanitize_text_field( $_REQUEST['wp_lang'] ), 0, COOKIEPATH, COOKIE_DOMAIN, $secure, true );
+	}
+
+	/**
+	 * Fires when the login form is initialized.
+	 *
+	 * @since WP 3.2.0
+	 */
+	do_action( 'login_init' );
+	/**
+	 * Fires when the login form is initialized.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.login_init' );
+
+	/**
+	 * Fires before a specified login form action.
+	 *
+	 * The dynamic portion of the hook name, `$action`, refers to the action
+	 * that brought the visitor to the login form.
+	 *
+	 * @since WP 2.8.0
+	 */
+	do_action( "login_form_{$sp_action}" );
+	/**
+	 * Fires before a specified login form action.
+	 *
+	 * The dynamic portion of the hook name, `$action`, refers to the action
+	 * that brought the visitor to the login form.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( "secupress_login_page.login_form_{$sp_action}" );
+
+	/**
+	 * Filters the content of the form
+	 *
+	 * @since 2.3.19
+	 *
+	 * @param string $content
+	 */
+	$content = apply_filters( 'secupress_login_page.content', $content, $sp_action );
+
+	echo $content . "\n";
+
+	wp_enqueue_script( 'user-profile' );
+	
+	?>
+	<p id="backtoblog">
+	<?php
+	$redirect_to = isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : '';
+	$html_link = sprintf(
+		'<a href="%s">%s</a>',
+		esc_url( wp_login_url( $redirect_to, true ) ),
+		sprintf(
+			__( '&larr; Back to %s', 'secupress' ),
+			strtolower( __( 'Login Page', 'secupress' ) )
+		)
+	);
+	/**
+	 * Filters the "Go to site" link displayed in the login page footer.
+	 *
+	 * @since WP 5.7.0
+	 *
+	 * @param string $link HTML link to the home URL of the current site.
+	 */
+	$html_link = apply_filters( 'login_site_html_link', $html_link );
+	/**
+	 * Filters the "Go to site" link displayed in the login page footer.
+	 *
+	 * @since 2.3.19
+	 *
+	 * @param string $link HTML link to the home URL of the current site.
+	 */
+	$html_link = apply_filters( 'secupress_login_page.login_link', $html_link );
+	echo $html_link;
+	?>
+	</p>
+	</div>
+	<script>
+	try {
+		const firstInput = document.querySelector('#loginform input:not([type="hidden"])');
+		if (typeof firstInput !== 'undefined') {
+			firstInput.focus();
+		}
+	} catch(e) {}
+	if (typeof wpOnload === 'function') wpOnload();
+	</script>
+	<?php
+	/**
+	 * Fires in the login page footer.
+	 *
+	 * @since WP 3.1.0
+	 */
+	do_action( 'login_footer' );
+	/**
+	 * Fires in the login page footer.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.login_footer' );
+	/**
+	 * Shake the form when true
+	 *
+	 * @since 2.3.19
+	 */
+	if ( apply_filters( 'secupress_login_page.shake_js', false ) ) {
+		wp_print_inline_script_tag( "document.querySelector('form').classList.add('shake');" );
+	}
+	?>
+	</body>
+	</html>
+	<?php
+	die();
+}
 
 /**
  * First half of escaping for LIKE special characters % and _ before preparing for MySQL.

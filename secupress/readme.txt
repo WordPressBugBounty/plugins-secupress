@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.18.2
+Stable tag: 2.3.19
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -167,7 +167,7 @@ Yes, SecuPress is compatible with all multilingual WordPress plugins. If you hav
 
 Yes, SecuPress is compatible with all server engines. If you encounter an issue, do not hesitate to contact our support team.
 
-= Is SecuPress compatible with other security plugins like WordFence, iThemes Security, Bullet Proof Security? =
+= Is SecuPress compatible with other security plugins like WordFence, Solid Security (iThemes Security), Really Simple SSL Security, Bullet Proof Security, Sucuri Security? =
 
 The answer is no. SecuPress is not compatible with another security plugin. Just like two caching plugins do not make your website faster, two security plugins do not make your WordPress more secure. Security rules tend to be overwritten or conflict with other rules if two security plugins are installed. This can cause errors on your website and is not recommended.
 
@@ -179,17 +179,23 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 3. The first scan
 4. The 1st step: result of the scan
 5. The 2nd step: choose what to automatically fix (1)
-6. SecuPress is fixing issues for you
+6. SecuPress is now fixing issues for you (1)
 7. The 3rd step: manual fix, when you have to decide something
 8. The 4th step: final report, you can export it as PDF (1)
 
 == Changelog ==
 
-= 2.3.18.2 =
-* 16 June 2025
-* Fix: "Show Contextual Help & Tips" was always unchecked. You may have to recheck it to recover the helps
-* Fix: Again, no actions on plugins on FTP was displaying a wrong message
-* Fix: Missing CSS class with no contextual help. The module icons were not correct.
+= 2.3.19 =
+* 23 June 2025
+* Fix: Remove "1" from "Bad Usernames" because Man/age WP use it as a fake login and it break the connection. You don't say.
+* Fix: Possible multiple notices when malware database is updating.
+* Fix: Possible PHP Warning when renaming a username.
+* Fix: Fatal error when saving Firewall settings
+* Fix: Missing captcha session on registration page
+* Improve: Better UI and UX. We use the WP login page and not our own page design (byebye secupress_action_page() on some modules)
+* Improve: Module "Password Lifespan" now depends of "Force Strong Passwords", because if you care about the lifetime of a password, I bet you care tyour their strengh too and before.
+* Improve: Constant SECUPRESS_MODE improved, read the doc: https://docs.secupress.me/article/237-secupressmode
+* Update: ZXCVBN libs
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.
@@ -204,13 +210,13 @@ Add http logs
 PHP 8.O min
 replace %s by ###USERNAME### in emails
 .htaccess scanner
+login rest disclose scanner
 move EDD updater+white label into a mu to allow upgrade+rollback even with plugin deactivated
 chartjs graph on dashboard widget
 give possibility to rename logins
-move secupress_action_screen to wp-login actions to match css of the site without efforts
 target="_blank" on doc links
 remove <code> and <strong> in trads
 autologin after fix step3?
 file_upgrader where mu plugin files could be updated easily
-secupress_add_action > wp-login.php
-if stable enough: rename version to .100
+SECUPRESS_ALLOW_LOGIN_ACCESS as a function + do not deactivate modules when TRUE
+move login; allow fake wplogin message

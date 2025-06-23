@@ -40,7 +40,7 @@ $this->add_field( array(
 	'label_for'    => $this->get_field_name( 'number_attempts' ),
 	'type'         => 'number',
 	'default'      => '10',
-	'move_item'    => '.secupress-field-login-protection_type_limitloginattempts',
+	// 'move_item'    => '.secupress-field-login-protection_type_limitloginattempts',
 	'attributes'   => array(
 		'min' => 3,
 		'max' => 99,

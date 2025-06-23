@@ -48,10 +48,10 @@ function secupress_get_modules() {
 							'row-login-protection_login_errors'               => __( 'Login Errors', 'secupress' ),
 							'row-double-auth_type'                            => '*' . __( '2 Factors Authentication', 'secupress' ),
 							'row-captcha_activate'                            => __( 'Captcha', 'secupress' ),
+							'row-password-policy_strong_passwords'            => '*' . __( 'Strong Password', 'secupress' ),
+							'row-password-policy_password_expiration'         => secupress_is_submodule_active( 'users-login', 'strong-passwords' ) ? '*' . __( 'Password Lifespan', 'secupress' ) : '',
 							'row-password-policy_send-emails'                 => '*' . __( 'Force Reset Passwords', 'secupress' ),
 							'row-password-policy_force-logout'                => '*' . __( 'Force Logout Everyone', 'secupress' ),
-							'row-password-policy_password_expiration'         => '*' . __( 'Password Lifespan', 'secupress' ),
-							'row-password-policy_strong_passwords'            => '*' . __( 'Strong Password', 'secupress' ),
 							'row-blacklist-logins_user-creation-protection'   => '*' . __( 'Protect User Creation', 'secupress' ),
 							'row-blacklist-logins_prevent-user-creation'      => secupress_is_submodule_active( 'users-login', 'user-creation-protection' ) ? '>*' . __( 'Forbid User Creation', 'secupress' ) : '',
 							'row-blacklist-logins_bad-email-domains'          => '*' . __( 'Forbid Bad Email Domains', 'secupress' ),
@@ -526,6 +526,8 @@ function secupress_add_module_notice( $module, $submodule, $action ) {
 		$module = '';
 	}
 	$submodule_name      = secupress_get_module_data( $module, $submodule )['Name'];
+	$is_silent           = false !== strpos( $action, 'silent-' );
+	$action              = str_replace( 'silent-', '', $action );
 	secupress_remove_module_notice( $module, $submodule, 'activation' === $action ? 'deactivation' : 'activation' );
 	$transient_name      = 'secupress_module_' . $action . '_' . get_current_user_id();
 	$transient_value     = secupress_get_site_transient( $transient_name );
@@ -534,7 +536,7 @@ function secupress_add_module_notice( $module, $submodule, $action ) {
 		$submodule_name .= ' ' . secupress_tag_me( __( '(just for you)', 'secupress' ), 'em' );
 	}
 	$transient_value[]   = $submodule_name;
-	if ( secupress_is_pro() ) {
+	if ( secupress_is_pro() && ! $is_silent ) {
 		switch( $action ) {
 			case 'activation' :
 				secupress_remove_submodule_alert( $module, $submodule );

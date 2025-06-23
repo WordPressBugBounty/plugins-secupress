@@ -624,7 +624,7 @@ function secupress_auto_username_login() {
 		$redirect = esc_url( secupress_admin_url( 'modules' ) );
 	}
 	if ( $message_str ) {
-		secupress_add_transient_notice( $message_str, 'updated' );
+		secupress_add_transient_notice( $message_str, 'updated', '', 'exist' );
 	}
 	wp_safe_redirect( $redirect );
 	die();
@@ -728,40 +728,6 @@ function secupress_auto_login( $module, $user = null, $message_str = '' ) {
 	die();
 }
 
-//// add_filter( 'authenticate', 'secupress_authenticate_cookie', 0 );
-/**
- * Auto login the user
- *
- * @since 2.0
- * @author Julio Potier
- * 
- * @param  (WP_User) $user
- * 
- * @return (WP_User) $user
- */
-function secupress_authenticate_cookie( $user ) { ////
-	return $user;
-}
-function _secupress_authenticate_cookie( $user ) {
-	if ( ! secupress_is_soft_request() ) {
-		return $user;
-	}
-	$data = secupress_get_site_transient( 'secupress-auto-login' );
-
-	if ( ! $data ) {
-		return $user;
-	}
-
-	secupress_delete_site_transient( 'secupress-auto-login' );
-
-	if ( ! is_array( $data ) || ! isset( $data['ID'] ) ) {
-		return $user;
-	}
-	
-	if ( isset( $user->ID ) && $user->ID === $data['ID'] ) {
-		secupress_auto_login( 'none', $user );
-	}
-}
 
 /**
  * Shuffle an associative array

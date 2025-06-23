@@ -711,15 +711,15 @@ Regards,
 All at ###SITENAME###
 ###SITEURL###', 'secupress' ),
 							$user->display_name,
-							'<a href="' . $url_remember . '">' . $url_remember . '</a>'
+							$url_remember
 					);
 
 	$capa             = secupress_get_capability(); // Do it again to get the usual capa for managing options.
 	if ( $capa && apply_filters( 'secupress.plugins.move_login.email.deactivation_link', true ) ) {
+		$token        = md5( secupress_generate_key() );
 		$url_remove   = add_query_arg( [ '_wpnonce' => $token, 'user_email' => $user->user_email ], admin_url( 'admin-post.php?action=secupress_deactivate_module&module=move-login' ) );
-		$token        = strtolower( wp_generate_password( 10, false ) );
-		set_transient( 'secupress_unlock_admin_key-' . $user->user_email, $token, DAY_IN_SECONDS );
-		$message     .= "\n" . sprintf( __( "ps: you can also deactivate the Move Login module:\n%s", 'secupress' ), '<a href="' . $url_remove . '">' . $url_remove . '</a> ' . __( '(Valid 1 day)', 'secupress' ) );
+		set_transient( 'secupress_unlock_admin_key-' . $user->user_email, $token, HOUR_IN_SECONDS );
+		$message     .= "\n" . sprintf( __( "ps: you can also deactivate the Move Login module:\n%s", 'secupress' ), $url_remove . ' ' . __( '(Valid 1 hour)', 'secupress' ) );
 	}
 
 	/**
@@ -748,18 +748,20 @@ add_action( 'admin_post_nopriv_secupress_deactivate_module', 'secupress_deactiva
 /**
  * Can deactivate a module from a link sent by secupress_unlock_admin_ajax_post_cb()
  *
- * @author Julio Potier
  * @since 1.3.2
+ * @author Julio Potier
  **/
 function secupress_deactivate_module_admin_post_cb() {
+	$tr_key_name = 'secupress_unlock_admin_key-' . ( isset( $_GET['user_email'] ) ? $_GET['user_email'] : '' );
 	if ( ! isset( $_GET['_wpnonce'], $_GET['module'], $_GET['user_email'] ) || 
 		empty( $_GET['_wpnonce'] ) || 
-		! get_transient( 'secupress_unlock_admin_key' . $_GET['user_email'] ) || 
-		! hash_equals( get_transient( 'secupress_unlock_admin_key' . $_GET['user_email'] ), $_GET['_wpnonce'] )
+		! get_transient( $tr_key_name ) || 
+		! hash_equals( get_transient( $tr_key_name ), $_GET['_wpnonce'] )
 	) {
+		delete_transient( $tr_key_name );
 		wp_die( 'Something went wrong.' );
 	}
-	delete_transient( 'secupress_unlock_admin_key-' . $_GET['user_email'] );
+	delete_transient( $tr_key_name );
 	secupress_deactivate_submodule( 'users-login', array( 'move-login' ) );
 	wp_redirect( wp_login_url( secupress_admin_url( 'modules', 'users-login' ) ) );
 	die();
@@ -827,7 +829,7 @@ function secupress_set_scan_speed_admin_post_cb() {
 }
 
 
-add_action( 'wp_ajax_secupress_send_deactivation_info', 'secupress_send_deactivation_info_admin_post_cb' );
+// add_action( 'wp_ajax_secupress_send_deactivation_info', 'secupress_send_deactivation_info_admin_post_cb' );
 /**
  * Send the deactivation reason on secupress.me
  *

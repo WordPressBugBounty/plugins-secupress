@@ -4,7 +4,7 @@
  * Description: Forbid some usernames to be used.
  * Main Module: users_login
  * Author: SecuPress
- * Version: 2.3.18
+ * Version: 2.3.19
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
@@ -34,12 +34,15 @@ add_action( 'auth_redirect', 'secupress_auth_redirect_blacklist_logins', 11 );
  * As soon as we are sure a user is connected, and before any redirection, check if the user login is not blacklisted.
  * If he is, he can't access the administration area and is asked to change it.
  *
+ * @since 2.3.19 Use secupress_login_page() instead of secupress_action_page()
  * @since 1.0
  * @author Julio Potier
  *
- * @param (int) $user_id The user ID.
+ * @param (int) $user_id
  */
 function secupress_auth_redirect_blacklist_logins( $user_id ) {
+	global $sp_action, $wp_errors;
+
 	if ( ! is_user_logged_in() ) {
 		return;
 	}
@@ -51,31 +54,34 @@ function secupress_auth_redirect_blacklist_logins( $user_id ) {
 		return;
 	}
 
-	$nonce_action = 'secupress-blacklist-logins-new-login-' . $user_id;
-	$error        = '';
+	$sp_action      = 'new-login';
+	$post_param     = "secupress-blacklist-logins-{$sp_action}";
+	$nonce_action   = "{$post_param}-{$user_id}";
+	$error          = '';
 
 	// A new login is submitted.
-	if ( isset( $_POST['secupress-blacklist-logins-new-login'] ) ) {
+	if ( isset( $_POST[ $post_param ], $_POST['sp_action'] ) && $sp_action === $_POST['sp_action'] ) {
+		$user_login = sanitize_user( $_POST[ $post_param ], true );
 
 		if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], $nonce_action ) ) {
 			secupress_die( __( 'Something went wrong.', 'secupress' ), '', [ 'force_die' => true, 'context' => 'bad_usernames_on_login', 'attack_type' => 'login' ] );
 		}
 
-		if ( empty( $_POST['secupress-blacklist-logins-new-login'] ) ) {
+		if ( empty( $user_login ) ) {
 			// Empty username.
 			$error = __( 'Username required', 'secupress' );
 		} 
 		// Sanitize the submitted username.
-		$user_login       = sanitize_user( $_POST['secupress-blacklist-logins-new-login'], true );
 		if ( secupress_is_username_blacklisted( $user_login ) ) {
 			// The new login is blacklisted.
-			$error = __( 'Sorry, this username is not allowed.', 'secupress' );
-		} 
-		// Good, change the user login.
-		$inserted = secupress_blacklist_logins_change_user_login( $user_id, $user_login );
-		if ( is_wp_error( $inserted ) ) {
-			// Too bad, try again.
-			$error = $inserted->get_error_message();
+			$error = __( 'Sorry, that username is not allowed.', 'secupress' );
+		} else {
+			// Good, change the user login.
+			$inserted = secupress_blacklist_logins_change_user_login( $user_id, $user_login );
+			if ( is_wp_error( $inserted ) ) {
+				// Too bad, try again.
+				$error = $inserted->get_error_message();
+			} 
 		} 
 
 		if ( ! $error ) {
@@ -83,54 +89,59 @@ function secupress_auth_redirect_blacklist_logins( $user_id ) {
 			$raw_user->user_login = $user_login;
 			// Send the new login by email.
 			secupress_blocklist_logins_new_user_notification( $raw_user );
-			secupress_add_transient_notice( ucfirst( sprintf( _nx( '%1$s updated as %2$s.', '%1$s updated as %2$s.', 1, 'a nickname', 'secupress' ), __( 'Your username has been', 'secupress' ), secupress_tag_me( esc_html( $user_login ), 'strong' ) ) ), 'updated', 'username-updated' );
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), __( 'username', 'secupress' ), secupress_tag_me( esc_html( $user_login ), 'strong' ) ), 'updated', 'username-updated', 'exist' );
 			// Kill session.
 			wp_clear_auth_cookie();
 			wp_destroy_current_session();
 
 			// Redirect the user to the login page.
-			$login_url = wp_login_url( secupress_get_current_url( 'raw' ), true );
-			$login_url = add_query_arg( 'secupress-relog', 1, $login_url );
+			$redirect  = strpos( secupress_get_current_url( 'raw' ), wp_login_url() ) === false ? secupress_get_current_url( 'raw' ) : admin_url();
+			$login_url = wp_login_url( $redirect, true );
+			$login_url = add_query_arg( 'secupress-relog', $sp_action, $login_url );
+			$login_url = add_query_arg( 'wp_lang', get_user_locale(), $login_url );
 			wp_redirect( esc_url_raw( $login_url ) );
-			exit();
+			die();
 		}
 	}
 
-	// Allowed characters for the login.
-	$allowed = esc_attr( secupress_blacklist_logins_allowed_characters() );
+	$message   = sprintf(
+		/* Translators: 1st is 'nickname/display name/public name/username' ; 2nd is the actual value in <strong> */
+		_n( 'Your current %s %s is not allowed.', 'Your current %s %s are not allowed.', 1, 'secupress' ),
+		__( 'username', 'secupress' ),
+		secupress_tag_me( esc_html( $raw_user->user_login ), 'strong' )
+	);
+	$message  .= '<br>' . _n( 'You must update it to successfully log in.', 'You must update them to successfully log in.', 1, 'secupress' ); // 1 : one username
 
+	$wp_errors = new WP_Error();
+	$wp_errors->add( "{$sp_action}-message", $message, 'message' );
+	if ( $error ) {
+		$wp_errors->add( "{$sp_action}-error", $error, 'error' );
+		add_action( 'secupress_login_page.shake_js', '__return_true' );
+	}
 	// The form.
 	ob_start();
 	?>
-	<form class="wrap" method="post">
-		<h1><?php printf( __( 'Security Update for %s', 'secupress' ), __( 'your username', 'secupress' ) ); ?></h1>
+	<form name="loginform" id="loginform" action="" method="post">
 		<p>
-			<?php
-			$message  = sprintf(
-				/* Translators: 1st is 'nickname/display name/public name/username' ; 2nd is the actual value in <strong> */
-				_n( 'Your current %s %s is not allowed.', 'Your current %s %s are not allowed.', 1, 'secupress' ),
-				__( 'username', 'secupress' ),
-				secupress_tag_me( esc_html( $user->user_login ), 'strong' )
-			);
-			$message .= '<br>' . _n( 'You must update it to successfully log in.', 'You must update them to successfully log in.', 1, 'secupress' ); // 1 : one username
-			echo $message;
-			?>
+			<label for="<?php echo $sp_action; ?>"><?php _e( 'New username:', 'secupress' ); ?></label><br/>
+			<input type="text" id="<?php echo $sp_action; ?>" name="<?php echo $post_param; ?>" value="" maxlength="60" required="required" aria-required="true" pattern="[A-Za-z0-9 _.\-@]{2,60}" autocorrect="off" autocapitalize="off" title="<?php echo esc_attr( secupress_blacklist_logins_allowed_characters() ); ?>"/>
 		</p>
-		<?php echo $error ? '<p class="error">' . $error . '</p>' : ''; ?>
-		<label for="new-login"><?php _e( 'New username:', 'secupress' ); ?></label><br/>
-		<input type="text" id="new-login" name="secupress-blacklist-logins-new-login" value="" maxlength="60" required="required" aria-required="true" pattern="[A-Za-z0-9 _.\-@]{2,60}" autocorrect="off" autocapitalize="off" title="<?php echo $allowed; ?>"/><br/>
-		<input type="submit" />
-		<?php wp_nonce_field( $nonce_action ) ?>
-		<p class="wrap"><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php printf( __( '&larr; Cancel and go back to %s', 'secupress' ), get_bloginfo( 'name' ) ); ?></a></p>
+		<?php
+		submit_button( _x( 'Rename', 'verb', 'secupress' ) );
+		wp_nonce_field( $nonce_action );
+		?>
+		<input type="hidden" name="sp_action" value="<?php echo esc_attr( $sp_action ); ?>">
 	</form>
 	<?php
 	$content = ob_get_contents();
-	ob_clean();
+	ob_end_clean();
+	
 	unset( $raw_user );
-	if ( wp_is_json_request() ) {
+
+	if ( ! secupress_is_soft_request() ) {
 		wp_send_json_error( [ 'error' => $error, 'message' => $message ] );
 	} else {
-		secupress_action_page( __( 'Please change your username', 'secupress' ), $content );
+		secupress_login_page( __( 'Please change your username', 'secupress' ), $content, $wp_errors );
 	}
 }
 
@@ -148,6 +159,8 @@ add_action( 'auth_redirect', 'secupress_pro_same_usernames_on_login', 12 );
  * @return (mixed) $raw_user Can also display a form to ask a new strong password
  **/
 function secupress_pro_same_usernames_on_login( $user_id ) {
+	global $sp_action, $wp_errors;
+
 	if ( ! secupress_get_module_option( 'blacklist-logins_lexicomatisation', 0, 'users-login' ) ) {
 		return;
 	}
@@ -155,10 +168,8 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 	if ( ! is_user_logged_in() ) {
 		return;
 	}
-
 	$raw_user = get_userdata( $user_id );
 	$which    = secupress_pro_same_usernames_get_which( $raw_user );
-
 	if ( is_a( $raw_user, 'WP_User' ) && ! empty( $which ) ) {
 		if ( ! empty( trim( $raw_user->first_name ) ) || ! empty( trim( $raw_user->last_name ) ) ) {
 			$new_name = trim( trim( $raw_user->first_name ) . ' ' . trim( $raw_user->last_name ) );
@@ -172,12 +183,12 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 				if ( isset( $which['nicename'] ) ) {
 					$raw_user->user_nicename = sanitize_title( $new_name );
 				}
-				secupress_add_transient_notice( ucfirst( sprintf( _nx( '%1$s updated as %2$s.', '%1$s updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ) ), 'updated', 'nickname-updated' );
+				secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ), 'updated', 'nickname-updated', 'exist' );
 				wp_update_user( $raw_user );
 			}
 		} elseif ( isset( $which['nicename'] ) && $raw_user->user_nicename !== sanitize_title( $raw_user->display_name ) ) {
 			$raw_user->user_nicename = sanitize_title( $raw_user->display_name );
-			secupress_add_transient_notice( ucfirst( sprintf( _nx( '%1$s updated as %2$s.', '%1$s updated as %2$s.', 1, 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( sanitize_title( $raw_user->display_name ), 'strong' ) ) ), 'updated', 'nickname-updated' );
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( sanitize_title( $raw_user->display_name ), 'strong' ) ), 'updated', 'nickname-updated', 'exist' );
 			wp_update_user( $raw_user );
 		}
 		$which = secupress_pro_same_usernames_get_which( $raw_user );
@@ -188,12 +199,13 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 		return;
 	}
 
-	$nonce_action = 'secupress-blacklist-logins-new-names-' . $user_id;
-	$error        = '';
+	$sp_action      = 'new-names';
+	$post_param     = "secupress-blacklist-logins-{$sp_action}";
+	$nonce_action   = "{$post_param}-{$user_id}";
+	$error          = '';
+	$which          = secupress_pro_same_usernames_get_which( $raw_user );
 
 	// A new name is submitted.
-	$which = secupress_pro_same_usernames_get_which( $raw_user );
-
 	if ( isset( $_POST['secupress-blacklist-logins-new-names'] ) ) {
 
 		if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], $nonce_action ) ) {
@@ -203,10 +215,10 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 		if ( empty( $new_name ) ) {
 			$error = __( 'Name required.', 'secupress' );
 		}
-		if ( $raw_user->user_login === $new_name ) {
-			$error = __( 'Sorry, a nickname different from your login is required.', 'secupress' );
+		if ( 0 === strcmp( $new_name, $raw_user->user_login ) ) {
+			$error = __( 'Sorry, this should be different from your login.', 'secupress' );
 		}
-		if ( get_user_by( 'login', $new_name ) ) {
+		if ( secupress_get_user_by( $new_name ) ) {
 			$error = __( 'Sorry, that username already exists!', 'secupress' );
 		}
 		if ( ! $error ) {
@@ -216,74 +228,72 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 			if ( isset( $which['display_name'] ) ) {
 				$raw_user->display_name = $new_name;
 			}
+			// Check if the sanitized nicename is already in use, if true, make it unique.
 			if ( isset( $which['nicename'] ) ) {
-				$raw_user->user_nicename = sanitize_user( $new_name );
+				$def_user_nicename       = sanitize_title( $raw_user->user_login );
+				$raw_user->user_nicename = sanitize_title( $new_name, $def_user_nicename );
 			}
-			secupress_add_transient_notice( ucfirst( sprintf( _nx( '%1$s updated as %2$s.', '%1$s updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ) ), 'updated', 'nickname-updated' );
+			$i = 0;
+			while ( secupress_get_user_by( $raw_user->user_nicename . ( $i ? "-{$i}" : '' ) ) ) {
+				++$i;
+			}
+			if ( $i ) {
+				$raw_user->user_nicename = $raw_user->user_nicename . "-{$i}";
+			}
+			$last = '';
+			if ( $i ) {
+				unset( $which['nicename'] );
+				$last = ' ' . sprintf( __( 'Your author profil URL slug has to be updated as %s.', 'secupress' ), secupress_tag_me( esc_html( $raw_user->user_nicename ), 'strong' ) );
+			}
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ) . $last, 'updated', 'nickname-updated', 'exist' );
+
 			wp_update_user( $raw_user );
 			return;
 		}
 	}
+	$whiches  = wp_sprintf_l( '%l', $which );
+
+	$message  = sprintf(
+		/* Translators: 1st is 'nickname/display name/public name/username' ; 2nd is the actual value in <strong> */
+		_n( 'Your current %s %s is not allowed.', 'Your current %s %s are not allowed.', count( $which ), 'secupress' ),
+		$whiches,
+		'(' . secupress_tag_me( esc_html( $raw_user->user_login ), 'strong' ) . ')',
+	);
+	$message .= '<br>' . _n( 'You must update it to successfully log in.', 'You must update them to successfully log in.', count( $which ), 'secupress' ); // 1 : one password
+
+	$wp_errors = new WP_Error();
+	$wp_errors->add( "{$sp_action}-message", $message, 'message' );
+	if ( $error ) {
+		// $error .= '<br>' . __( 'Find one that is not the same as your username', 'secupress' );
+		$wp_errors->add( "{$sp_action}-error", $error, 'error' );
+		add_action( 'secupress_login_page.shake_js', '__return_true' );
+	}
 	ob_start();
-	$whiches = wp_sprintf_l( '%l', $which );
 	?>
-	<form class="wrap" method="post">
-		<h1><?php printf( __( 'Security Update for %s', 'secupress' ), $whiches ); ?></h1>
-		<p><?php
-		$message  = sprintf(
-			/* Translators: 1st is 'nickname/display name/public name/username' ; 2nd is the actual value in <strong> */
-			_n( 'Your current %s %s is not allowed.', 'Your current %s %s are not allowed.', count( $which ), 'secupress' ),
-			wp_sprintf_l( '%l', $which ),
-			'',
-		);
-		$message .= '<br>' . _n( 'You must update it to successfully log in.', 'You must update them to successfully log in.', count( $which ), 'secupress' );
-		echo $message;
-	?></p>
-		<?php echo $error ? '<p class="error">' . $error . '</p>' : ''; ?>
-		<label for="secupress-blacklist-logins-new-names"><?php printf( _nx( 'New %s:', 'New %s:', count( $which ), 'public name/s', 'secupress' ), $whiches ); ?></label><br/>
-		<input type="text" name="secupress-blacklist-logins-new-names" id="secupress-blacklist-logins-new-names" class="regular-text" value="" autocomplete="off" />
-		<input type="submit" />
+	<form name="loginform" id="loginform" action="" method="post">
+		<p>
+			<label for="secupress-blacklist-logins-new-names">
+			<?php
+			printf( '%s %s.', sprintf( __( '%s:', 'secupress' ), _x( 'Rename', 'verb', 'secupress' ) ), $whiches );
+			?>
+			</label><br/>
+			<input type="text" name="secupress-blacklist-logins-new-names" id="secupress-blacklist-logins-new-names" class="regular-text" value="" autocomplete="off" />
+		</p>
 		<?php
 		wp_nonce_field( $nonce_action );
+		submit_button( _x( 'Rename', 'verb', 'secupress' ) );
 		?>
-		<p class="wrap"><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php printf( __( '&larr; Cancel and go back to %s', 'secupress' ), get_bloginfo( 'name' ) ); ?></a></p>
 	</form>
 	<?php
 	unset( $raw_user );
-	$content  = ob_get_contents();
-	ob_clean();
-
-	if ( wp_is_json_request() ) {
+	$content = ob_get_contents();
+	ob_end_clean();
+	unset( $raw_user );
+	if ( ! secupress_is_soft_request() ) {
 		wp_send_json_error( [ 'error' => $error, 'message' => $message ] );
 	} else {
-		secupress_action_page( __( 'Please change your profile names', 'secupress' ), $content, [] );
+		secupress_login_page( __( 'Please update your profil names', 'secupress' ), $content, $wp_errors );
 	}
-}
-
-add_filter( 'wp_login_errors', 'secupress_blacklist_logins_display_login_message', 10, 2 );
-/**
- * Display a message on the login form after the new login creation.
- *
- * @since 1.0
- * @author Julio Potier
- *
- * @param (object) $errors      WP Error object.
- * @param (string) $redirect_to Redirect destination URL.
- *
- * @return (object) WP Error object.
- */
-function secupress_blacklist_logins_display_login_message( $errors, $redirect_to ) {
-	if ( empty( $_GET['secupress-relog'] ) ) {
-		return $errors;
-	}
-
-	if ( empty( $errors ) ) {
-		$errors = new WP_Error();
-	}
-
-	$errors->add( 'secupress_relog', __( 'You will receive your new login in your mailbox.', 'secupress' ), 'message' );
-
-	return $errors;
 }
 
 
@@ -705,16 +715,18 @@ function secupress_pro_same_usernames_get_which( $user ) {
 	if ( ! is_a( $user, 'WP_User' ) ) {
 		return [];
 	}
+
 	$result = [];
 
-	if ( $user->user_login === $user->nickname ) {
+	if ( 0 === strcmp( $user->user_login, $user->nickname ) ) {
 		$result['nickname']     = _x( 'Nickname', 'bad logins', 'secupress' );
 	}
-	if ( $user->user_login === $user->display_name ) {
+	if ( 0 === strcmp( $user->user_login, $user->display_name ) ) {
 		$result['display_name'] = _x( 'Display Name', 'bad logins', 'secupress' );
 	}
-	if ( $user->user_login === $user->user_nicename ) {
-		$result['nicename']     = _x( 'Nicename', 'bad logins', 'secupress' );
+	if ( 0 === strcmp( $user->user_login, $user->user_nicename ) ) {
+		$result['nicename']     = _x( 'Author Profile URL', 'bad logins', 'secupress' );
 	}
+	
 	return $result;
 }
