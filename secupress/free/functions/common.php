@@ -2332,14 +2332,17 @@ function secupress_get_function_name_by_server_type( $prefix, $default = '__retu
 /**
  * If the http request is ajax, cron, json, xml, REST, wp.com it's not "soft".
  *
- * @since 2.3.19 APP_REQUEST IS_WPCOM REST_API_REQUEST
+ * @since 2.3.19.1 admin-post
+ * @since 2.3.19   APP_REQUEST IS_WPCOM REST_API_REQUEST
  * @since 2.3.18
  * @author Julio Potier
  * 
  * @return (bool) False if any of advanced request detected
  **/
 function secupress_is_soft_request() {
+	global $pagenow;
 	return ! ( wp_doing_ajax() ||
+			( ! empty( $pagenow ) && 'admin-post.php' === $pagenow ) || 
 			wp_is_json_request() || wp_is_jsonp_request() || 
 			wp_doing_cron() || 
 			wp_is_xml_request() || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ||

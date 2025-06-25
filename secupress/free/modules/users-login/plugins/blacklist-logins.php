@@ -13,17 +13,18 @@ add_action( 'admin_init', 'secupress_do_auth_redirect_early' );
 /**
  * Force the auth_redirect on admin-post, admin-ajax, REST
  *
- * @author Julio Potier
+ * @since 2.3.19.1 Add secupress_ip_is_whitelisted()
  * @since 2.3.18
+ * @author Julio Potier
  **/
 function secupress_do_auth_redirect_early() {
-	global $pagenow;
-	if ( is_user_logged_in() &&
-		( ( ! empty( $pagenow ) && 'admin-post.php' === $pagenow ) || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) // wp_is_serving_rest_request() is WP6.5
-	) {
+	if ( secupress_ip_is_whitelisted() ) {
+		return;
+	} elseif ( is_user_logged_in() && ! secupress_is_soft_request() ) {
 		auth_redirect();
 	}
 }
+
 
 /** --------------------------------------------------------------------------------------------- */
 /** EXISTING USERS WITH A BLACKLISTED USERNAME MUST CHANGE IT. ================================== */

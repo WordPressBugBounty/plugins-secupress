@@ -338,7 +338,7 @@ function secupress_add_own_ua( $r, $url ) {
 	return $r;
 }
 
-add_filter( 'pre_http_request', 'secupress_request_me', 10, 3 );
+add_filter( 'pre_http_request', 'secupress_request_me', 11, 3 );
 /**
  * Force our site to be requested.
  *

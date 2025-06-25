@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 2.3.19
+Stable tag: 2.3.19.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,17 +185,10 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.19 =
-* 23 June 2025
-* Fix: Remove "1" from "Bad Usernames" because Man/age WP use it as a fake login and it break the connection. You don't say.
-* Fix: Possible multiple notices when malware database is updating.
-* Fix: Possible PHP Warning when renaming a username.
-* Fix: Fatal error when saving Firewall settings
-* Fix: Missing captcha session on registration page
-* Improve: Better UI and UX. We use the WP login page and not our own page design (byebye secupress_action_page() on some modules)
-* Improve: Module "Password Lifespan" now depends of "Force Strong Passwords", because if you care about the lifetime of a password, I bet you care tyour their strengh too and before.
-* Improve: Constant SECUPRESS_MODE improved, read the doc: https://docs.secupress.me/article/237-secupressmode
-* Update: ZXCVBN libs
+= 2.3.19.1 =
+* 24 June 2025
+* Fix: Check allowed IP before auth_redirect in "bad usernames" module
+* Update: Allowed IP List
 
 == Upgrade Notice ==
 * SecuPress 2.3+ now requires PHP 7.0 minimum.
@@ -220,3 +213,4 @@ autologin after fix step3?
 file_upgrader where mu plugin files could be updated easily
 SECUPRESS_ALLOW_LOGIN_ACCESS as a function + do not deactivate modules when TRUE
 move login; allow fake wplogin message
+secupress_blacklist_logins_allowed_characters
