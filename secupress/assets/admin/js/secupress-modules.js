@@ -1525,6 +1525,35 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 } )(jQuery, document, window);
 
 
+// Malware button "Update data" =======================================================================
+(function( w, d, $, undefined ) {
+	$( '#button-update-malware-data' ).on( 'click', function(e) {
+		e.preventDefault();
+		var _this = $(this);
+		var href  = secupressPreAjaxCall( $(this).attr('href'), e, 'button-update-malware-data' );
+		secupressDisableAjaxButton( $(this), null, 'button-update-malware-data' );
+		$.getJSON( href )
+		.done( function( r ) {
+			if ( r.success ) {
+				if ( wp.a11y && wp.a11y.speak ) {
+					wp.a11y.speak( SecuPressi18nModules.malwareUpdateOK );
+				}
+				$('p.description.warning.secupress-show-expert').text( SecuPressi18nModules.malwareUpdateOK ).removeClass('warning').addClass('help');
+				try {
+					location.reload();
+				} catch (e) {
+					window.location.href = window.location.href;
+				}				
+			} else {
+				secupressDisplayAjaxError( _this, SecuPressi18nModules.malwareUpdateKO, "data" );
+			}
+		} )
+		.fail( function() {
+			secupressDisplayAjaxError( _this, null, "data" );
+		} );
+	} );
+} )(window, document, jQuery);
+
 // Malware Scan "Search for malwares" =======================================================================
 (function( w, d, $, undefined ) {
 	$( '#toggle_file_scanner' ).on( 'click', function(e) {

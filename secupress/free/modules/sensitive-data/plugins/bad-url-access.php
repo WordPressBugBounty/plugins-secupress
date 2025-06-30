@@ -4,7 +4,7 @@
  * Description: Deny access to some sensitive files.
  * Main Module: sensitive_data
  * Author: SecuPress
- * Version: 2.0
+ * Version: 2.3.13
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );

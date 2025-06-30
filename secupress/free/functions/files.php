@@ -1184,24 +1184,48 @@ function secupress_get_rewrite_bases() {
 }
 
 /**
+ * Return the correct data path depending on the plugin 
+ *
+ * @since 2.3.19.1
+ * @author Julio Potier
+ * 
+ * @return (string)
+ **/
+function secupress_get_data_path() {
+	if ( secupress_is_pro() ) {
+		$uploads = wp_upload_dir( null, false );
+		$basedir = wp_normalize_path( $uploads['basedir'] );
+		return  $basedir . '/secupress-data/';
+	}
+	return SECUPRESS_INC_PATH . 'data/';
+}
+
+/**
  * Return the files paths
  *
- * @since 2.3.13 Remove locations-en
+ * @since 2.3.19.1 Move the location to /wp-content/uploads/secupress-data/
+ * @since 2.3.13   Remove locations-en
  * @since 2.2.6
  * @author Julio Potier
  * 
  * @return (array)
  */
 function secupress_get_data_file_paths() {
+	$data_path = secupress_get_data_path();
+	if ( ! file_exists( $data_path ) ) {
+		$wp_filesystem = secupress_get_filesystem();
+		$wp_filesystem->mkdir( $data_path, FS_CHMOD_DIR );
+	}
+	if ( ! file_exists( $data_path ) ) {
+		return [];
+	}
 	return [
-		// Free
-		'SECUPRESS_INC_PATH'     => [ 'bad_user_agents', 'bad_url_contents', 'bad_host_contents', 'bad_request_keys', 'disallowed_logins_list' ],
-		// Pro
-		'SECUPRESS_PRO_INC_PATH' => [ 'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'IPv4', 'IPv6' ]
+		$data_path     => [ 'bad_user_agents', 'bad_url_contents', 'bad_host_contents', 'bad_request_keys', 'disallowed_logins_list', 'spam_disallowed_terms',
+							'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'IPv4', 'IPv6' ]
 	];
 }
 /**
- * Return the file path of a desited data file or false is not exists
+ * Return the file path of a desited data file or false if not exists
  *
  * @since 2.2.6
  * @author Julio Potier
@@ -1211,12 +1235,11 @@ function secupress_get_data_file_paths() {
  * @return (string|bool)
  */
 function secupress_get_data_file_path( $slug ) {
-	$paths = secupress_get_data_file_paths();
-	$slug  = sanitize_key( $slug );
-	if ( in_array( $slug, $paths['SECUPRESS_INC_PATH'] ) && file_exists( SECUPRESS_INC_PATH . 'data/' . $slug . '.data' ) ) {
-		return SECUPRESS_INC_PATH . 'data/' . $slug . '.data';
-	} elseif ( in_array( $slug, $paths['SECUPRESS_PRO_INC_PATH'] ) && file_exists( SECUPRESS_PRO_INC_PATH . 'data/' . $slug . '.data' ) ) {
-		return SECUPRESS_PRO_INC_PATH . 'data/' . $slug . '.data';
+	$paths     = secupress_get_data_file_paths();
+	$slug      = str_replace( '.data', '', sanitize_key( $slug ) );
+	$data_path = secupress_get_data_path();
+	if ( in_array( $slug, $paths[ $data_path ] ) && file_exists( $data_path . $slug . '.data' ) ) {
+		return $data_path . $slug . '.data';
 	}
 	// Transient timer
 	$transient_timer = MONTH_IN_SECONDS / DAY_IN_SECONDS;

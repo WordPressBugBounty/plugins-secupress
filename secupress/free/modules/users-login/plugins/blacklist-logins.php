@@ -4,10 +4,15 @@
  * Description: Forbid some usernames to be used.
  * Main Module: users_login
  * Author: SecuPress
- * Version: 2.3.19
+ * Version: 2.3.19.1
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
+
+// EMERGENCY BYPASS!
+if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS ) {
+	return;
+}
 
 add_action( 'admin_init', 'secupress_do_auth_redirect_early' );
 /**

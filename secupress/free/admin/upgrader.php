@@ -348,7 +348,12 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			secupress_delete_mu_plugin( 'no_plugins_installation' );
 			secupress_deactivate_submodule_silently( 'plugins-themes', 'plugin-installation' );
 			secupress_activate_submodule_silently( 'plugins-themes', 'plugin-installation' );
-			secupress_no_plugin_actions__deactivation();
+			if ( function_exists( 'secupress_no_plugin_actions__deactivation' ) ) {
+				secupress_no_plugin_actions__deactivation();
+			}
+			if ( function_exists( 'secupress_pro_no_plugin_actions__deactivation' ) ) {
+				secupress_pro_no_plugin_actions__deactivation();
+			}
 		}
 		// Removed
 		if ( secupress_is_pro() ) {
@@ -391,6 +396,12 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			) {
 				secupress_add_notice( sprintf( __( 'For information, the module "Password Lifespan" has been deactivated. We cannot reactivated it unless you activate the <a href="%s">module "Force Strong Passwords"</a>.', 'secupress' ), secupress_admin_url( 'modules', 'users-login#row-password-policy_strong_passwords' ) ), 'info', '' );
 			}
+		}
+	}
+	// < 2.3.20
+	if ( version_compare( $actual_version, '2.3.20', '<' ) ) {
+		if ( secupress_is_pro() ) {
+			wp_schedule_single_event( time(), 'secupress_malware_files' );
 		}
 	}
 	// DEV: DO NOT REDIRECT / DO NOT AUTOLOGIN / DO NOT USE $modulenow //
@@ -650,7 +661,7 @@ if ( ! secupress_is_white_label() ) {
 	 **/
 	function secupress_display_whats_new() {
 		$notice_id1 = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
-		// $notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
+		$notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
 		if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id1 ) ) {
 			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
 			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
@@ -665,27 +676,23 @@ if ( ! secupress_is_white_label() ) {
 			}
 			return;
 		} 
-		// else {
-		// 	if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
-		// 		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
-		// 		$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-		// 		$newitems  = [ 	
-		// 						__( 'Here are some key improvement for this version:', 'secupress' ),
-		// 						__( 'New Alert <strong>Module Deactivation</strong>. Be alerted when a module have been deactivated and not reactivated within the hour.', 'secupress' ),
-		// 						__( '<strong>Expert Mode</strong> has changed, it now shows powerful but more complex features dedicated to expert users only.', 'secupress' ),
-		// 						__( '<strong>No Actions on Plugins</strong> has been fixed, you should not find your plugins deactivated now.', 'secupress' ),
-		// 						__( 'Also for this module the new method "by FTP" is now running under Expert Mode in Pro version.', 'secupress' ),
-		// 						__( 'Being spam by DB Error email messages is gone.', 'secupress' ),
-		// 						__( 'Roles choice was gone for <strong>PasswordLess 2FA</strong>.', 'secupress' ),
-		// 						__( 'Some scanners have been improved to prevent false positives.', 'secupress' ),
-		// 						__( 'User names won‘t be renamed by a random name.', 'secupress' ),
-		// 						__( 'The BETA feature <strong>Block function names in requests</strong> has been removed.', 'secupress' ),
-		// 					];
-		// 		if ( ! empty( $newitems ) ) {
-		// 			$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-		// 			secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
-		// 		}
-		// 	}
-		// }
+		else {
+			if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
+				$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
+				$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+				$newitems  = [ 	
+								__( 'Here are some key improvement for this version:', 'secupress' ),
+								__( 'Fix: JS Error in Console related to delayed comments', 'secupress' ),
+								__( 'Improve: <em>"Strong Passwords"</em> and <em>"Bad Usernames"</em> module are now bypassable using the already existing constant <code>SECUPRESS_ALLOW_LOGIN_ACCESS</code>', 'secupress' ),
+							];
+				if ( secupress_is_pro() ) {
+					$newitems[] = __( 'Improve: Our data files are now stored in <code>/wp-content/secupress-data/</code> instead of inside the plugin to prevent data deletion on each plugin update.', 'secupress' );
+				}
+				if ( ! empty( $newitems ) ) {
+					$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
+					secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
+				}
+			}
+		}
 	}
 }

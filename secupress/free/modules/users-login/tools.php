@@ -14,9 +14,9 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 function secupress_get_blacklisted_usernames() {
 	// Disallowed usernames.
 	// usernames with "*" are basically from malwares where the joker "*" is a random number
-	$filename = SECUPRESS_INC_PATH . 'data/disallowed_logins_list.data';
+	$filename = secupress_get_data_file_path( 'disallowed_logins_list' );
 	$list     = [];
-	if ( file_exists( $filename ) ) {
+	if ( $filename ) {
 		$list = explode( ',', file_get_contents( $filename ) );
 	}
 	/**

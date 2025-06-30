@@ -187,6 +187,8 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 			'malwareScanStatus'    => $file_monitoring_running,
 			'malwareScanError'     => '<span class="dashicons dashicons-dismiss"></span> ' . __( 'AJAX Security Error: Please reload the page manually.', 'secupress' ),
 			'MalwareScanURI'       => secupress_admin_url( 'modules', 'file-system' ),
+			'malwareUpdateOK'      => __( 'Malware databases updated successfully.', 'secupress' ),
+			'malwareUpdateKO'      => __( 'Impossible to update the malware databases. Check your license status.', 'secupress' ),
 			// Move Login.
 			'moveLoginNonce'       => $move_login_nonce,
 			// Misc.

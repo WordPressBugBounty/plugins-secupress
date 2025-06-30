@@ -144,7 +144,7 @@ if ( ! secupress_is_expert_mode() ) {
 } else {
 	$update_button = sprintf( '<p class="secupress-show-expert"><a href="%s" class="button button-secondary">%s</a></p>',
 								wp_nonce_url( admin_url( 'admin-post.php?action=secupress_bad_plugins_update_data' ), 'secupress_bad_plugins_update_data' ),
-								__( 'Update the data', 'secupress' )
+								__( 'Update data', 'secupress' )
 							);
 	$this->add_field( array(
 		'title'        => __( 'Manual Update', 'secupress' ),

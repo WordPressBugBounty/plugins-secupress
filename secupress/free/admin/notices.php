@@ -80,7 +80,8 @@ function secupress_plugins_to_deactivate() {
 		secupress_add_notice( $message, 'error', 'deactivate-plugin' );
 	}
 
-	$plugins_to_warn = [ // deactivation not mandatory, dismissable
+	$plugins_to_warn = []; // deactivation not mandatory, dismissable
+	/*
 		'all-in-one-wp-security-and-firewall/wp-security.php', // repo
 		'better-wp-security/better-wp-security.php', // Solid Security Free repo
 		'ithemes-security-pro/ithemes-security-pro.php', // Solid Security Pro
@@ -103,7 +104,7 @@ function secupress_plugins_to_deactivate() {
 		'really-simple-ssl/really-simple-ssl.php', // repo
 		'really-simple-ssl-pro/really-simple-ssl-pro.php',
 	];
-
+*/
 	$plugins_to_warn = array_filter( $plugins_to_warn, 'is_plugin_active' );
 
 	if ( $plugins_to_warn ) {

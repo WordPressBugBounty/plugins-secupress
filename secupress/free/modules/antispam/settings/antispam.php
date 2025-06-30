@@ -88,7 +88,7 @@ $this->add_field( array(
 	'label_for'    => $this->get_field_name( 'better-blacklist-comment' ),
 	'type'         => 'checkbox',
 	'label'        => __( 'Yes, implement enhanced comment filtering with disallowed terms to detect spam', 'secupress' ),
-	'disabled'     => ! is_readable( SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data' ),
+	'disabled'     => ! secupress_get_data_path( 'spam-disallowed-terms' ),
 	'helpers' => array(
 		array(
 			'type'        => 'description',
@@ -96,7 +96,7 @@ $this->add_field( array(
 		),
 		array(
 			'type'        => 'warning',
-			'description' => ! is_readable( SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data' ) ? sprintf( __( 'As long as the %s file is not readable, this feature can’t be used.', 'secupress' ), '<code>' . SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data</code>' ) : null,
+			'description' => ! secupress_get_data_path( 'spam-disallowed-terms' ) ? sprintf( __( 'As long as the %s file is not readable, this feature can’t be used.', 'secupress' ), '<code>' . SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data</code>' ) : null,
 		),
 	),
 ) );

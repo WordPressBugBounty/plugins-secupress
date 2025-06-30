@@ -21,8 +21,8 @@ function secupress_firewall_bbq_headers_user_agents_list_default() {
 		return $list;
 	}
 
-	$filename = SECUPRESS_INC_PATH . 'data/bad_user_agents.data';
-	if ( file_exists( $filename ) ) {
+	$filename = secupress_get_data_file_path( 'bad_user_agents' );
+	if ( $filename ) {
 		$list = file_get_contents( $filename );
 	}
 	/**
@@ -53,8 +53,8 @@ function secupress_firewall_bbq_url_content_bad_contents_list_default() {
 		return $list;
 	}
 	
-	$filename = SECUPRESS_INC_PATH . 'data/bad_url_contents.data';
-	if ( file_exists( $filename ) ) {
+	$filename = secupress_get_data_file_path( 'bad_url_contents' );
+	if ( $filename ) {
 		$list = file_get_contents( $filename );
 	}
 	/**
@@ -86,8 +86,8 @@ function secupress_firewall_bbq_host_content_bad_contents_list_default() {
 		return $list;
 	}
 
-	$filename = SECUPRESS_INC_PATH . 'data/bad_host_contents.data';
-	if ( file_exists( $filename ) ) {
+	$filename = secupress_get_data_file_path( 'bad_host_contents' );
+	if ( $filename ) {
 		$list = file_get_contents( $filename );
 	}
 	/**
@@ -119,8 +119,8 @@ function secupress_firewall_bbq_referer_content_bad_contents_list_default() {
 		return $list;
 	}
 
-	$filename = SECUPRESS_PRO_INC_PATH . 'data/bad_referer_contents.data';
-	if ( file_exists( $filename ) ) {
+	$filename = secupress_get_data_file_path( 'bad_referer_contents' );
+	if ( $filename ) {
 		$list = file_get_contents( $filename );
 	}
 	/**
@@ -150,8 +150,8 @@ function secupress_firewall_bbq_request_content_bad_contents_list_default() {
 	} else {
 		$list = '';
 	}
-	$filename = SECUPRESS_INC_PATH . 'data/bad_request_keys.data';
-	if ( empty( $list ) && file_exists( $filename ) ) {
+	$filename = secupress_get_data_file_path( 'bad_request_keys' );
+	if ( empty( $list ) && $filename ) {
 		$list = explode( ',', file_get_contents( $filename ) );
 	}
 	/**
@@ -186,8 +186,8 @@ function secupress_firewall_bbq_referer_content_ai_bots_list_default() {
 		$list = '';
 	}
 
-	$filename = SECUPRESS_PRO_INC_PATH . 'data/ai_bots.data';
-	if ( file_exists( $filename ) ) {
+	$filename = secupress_get_data_file_path( 'ai_bots' );
+	if ( $filename ) {
 		$list = file_get_contents( $filename );
 	}
 	/**

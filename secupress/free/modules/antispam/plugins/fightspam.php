@@ -341,13 +341,12 @@ function secupress_fightspam_blacklist_as_spam_check( $approved, $commentdata ) 
  * @return (string) The blacklist.
  */
 function secupress_fightspam_better_blacklist_comment( $value ) {
-	$file = SECUPRESS_INC_PATH . 'data/spam-blacklist.data';
+	$file = secupress_get_data_path( 'spam-disallowed-terms' );
 
-	if ( is_readable( $file ) ) {
+	if ( file_exists( $file ) ) {
 		$spam_words = file( $file );
 		$value     .= "\n" . implode( "\n", $spam_words );
 	}
-
 	return trim( $value );
 }
 
@@ -775,8 +774,8 @@ add_action( 'wp_footer', 'secupress_fightspam_dont_comment_too_soon_timer' );
 /**
  * Add a timer to change and disabled the submit button on the comment form
  *
- * @author Julio Potier
  * @since 2.3
+ * @author Julio Potier
  **/
 function secupress_fightspam_dont_comment_too_soon_timer() {
 	// Do not do it if the setting is not set
@@ -784,12 +783,18 @@ function secupress_fightspam_dont_comment_too_soon_timer() {
 		return;
 	}
 	// Only do this if we are on a singular page which supports comments and where comments are open with a non logged in user
-	if ( ! is_singular() || is_user_logged_in() || post_type_supports( get_post_type(), 'comments' ) || comments_open() ) {
+	if ( ! ( is_singular() || is_user_logged_in() || post_type_supports( get_post_type(), 'comments' ) || comments_open() ) ) {
 		return;
 	}
 	// Set our timer in PHP with a filter
 	/**
 	 * Filter the default timer, 30 by default
+	 * 
+	 * @since 2.2.4.1
+	 * 
+	 * @param (int)
+	 * 
+	 * @return (int)
 	 */
 	$secupress_dcts_timer = (int) apply_filters( 'secupress.plugins.fightspam.comment_timer', 30 );
 	// Just check if it's correct (>0)
@@ -803,7 +808,12 @@ function secupress_fightspam_dont_comment_too_soon_timer() {
 	<script>
 	//<![CDATA[
 	// Get the submit from the WP comment form
-	var secupress_dcts_submit = document.getElementById('<?php echo esc_js( $comment_form_defaults['id_form'] ); ?>').querySelectorAll('#<?php echo esc_js( $comment_form_defaults['id_submit'] ); ?>');
+	var secupress_dcts_submit = [];
+	var commentForm = document.getElementById('<?php echo esc_js( $comment_form_defaults['id_form'] ); ?>');
+
+	if (commentForm !== null && typeof commentForm.querySelectorAll === 'function') {
+		secupress_dcts_submit = commentForm.querySelectorAll('#<?php echo esc_js( $comment_form_defaults['id_submit'] ); ?>');
+	}
 	// If there is not, bail.
 	if ( secupress_dcts_submit.length ) {
 		// Get the button label
@@ -842,7 +852,7 @@ function secupress_fightspam_dont_comment_too_soon_timer() {
         }
     };
 
-    xmlhttp.open("GET", "<?php echo esc_js( esc_url( admin_url( 'admin-ajax.php?action=secupress_dcts_timer' ) ) ); ?>", true);
+    xmlhttp.open("GET", "<?php echo esc_js( esc_url( admin_url( 'admin-ajax.php?action=secupress_dcts_timer&timer=' . time() ) ) ); ?>", true);
     xmlhttp.send();
 	}
 	//]]>

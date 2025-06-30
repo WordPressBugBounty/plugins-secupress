@@ -437,8 +437,8 @@ if ( $choices ) {
 
 
 $main_field_name  = $this->get_field_name( 'bad-url-access' );
-$is_plugin_active = (int) secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' );
-$forbid_mode      = secupress_get_module_option( 'content-protect_bad-url-access', 'disallowed', 'sensitive-data' );
+$value            = (int) secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' )     ? 'disallowed' : '';
+$value            = (int) secupress_is_submodule_active( 'sensitive-data', 'bad-url-access-pro' ) ? 'allowed'    : $value;
 $options          = [ 'disallowed' => __( 'Yes, block a list of <strong>disallowed</strong> URLs from WP core', 'secupress' ) ];
 if ( secupress_is_expert_mode() ) {
 	$options['allowed']     = __( 'Yes, only <strong>allow</strong> a list of URLs from WP core <em>(new)</em>', 'secupress' );
@@ -450,7 +450,7 @@ $this->add_field( array(
 	'label_for'         => $main_field_name,
 	'plugin_activation' => true,
 	'type'              => 'radioboxes',
-	'value'             => $forbid_mode,
+	'value'             => $value,
 	'options'           => $options,
 	'helpers'           => array(
 		array(
