@@ -112,13 +112,6 @@ function secupress_bad_url_access_get_regex_pattern( $rules_mode = 'disallowed' 
 			$patterns['root']        = '(index|wp-activate|wp-comments-post|wp-cron|wp-links-opml|wp-load|wp-login|wp-mail|wp-pass|wp-signup|wp-trackback|xmlrpc)\.php';
 			$patterns['wp-admin']    = 'wp-admin/(about|admin-ajax|admin-footer|admin-post|admin|async-upload|authorize-application|comment|contribute|credits|customize|edit-comments|edit-form-advanced|edit-form-blocks|edit-form-comment|edit-link-form|edit-tag-form|edit-tags|edit|erase-personal-data|export-personal-data|export|freedoms|import|index|link-add|link-manager|link|load-scripts|load-styles|maint/repair|media-new|media-upload|media|moderation|ms-admin|ms-delete-site|ms-edit|ms-options|ms-sites|ms-themes|ms-upgrade-network|ms-users|my-sites|nav-menus|network/about|network/admin|network/contribute|network/credits|network/edit|network/freedoms|network/index|network/plugin-editor|network/plugin-install|network/plugins|network/privacy|network/profile|network/settings|network/setup|network/site-info|network/site-new|network/site-settings|network/site-themes|network/site-users|network/sites|network/theme-editor|network/theme-install|network/themes|network/update-core|network/update|network/upgrade|network/user-edit|network/user-new|network/users|network|options-discussion|options-general|options-media|options-permalink|options-privacy|options-reading|options-writing|options|plugin-editor|plugin-install|plugins|post-new|post|press-this|privacy-policy-guide|privacy|profile|revision|site-editor|site-health|term|theme-editor|theme-install|themes|tools|update-core|update|upgrade|upload|user/about|user/admin|user/credits|user/freedoms|user/index|user/privacy|user/profile|user/user-edit|user-edit|user-new|users|widgets-form-blocks|widgets-form|widgets)\.php';
 			$patterns['wp-includes'] = 'wp-includes/js/tinymce/wp-tinymce\.php';
-			/**
-			 * Filter the URLs allowed to be reached
-			 * 
-			 * @since 2.2.6
-			 * @param (array) $patterns
-			 */
-			$patterns                = apply_filters( 'secupress.plugins.bad_url_access.regex_pattern', $patterns );
 		break;
 
 		default: // legacy
@@ -127,6 +120,16 @@ function secupress_bad_url_access_get_regex_pattern( $rules_mode = 'disallowed' 
 			$patterns                = '^(' . $bases['home_from'] . 'php\.ini|' . $bases['site_from'] . 'wp-config\.php|' . $bases['site_from'] . WPINC . '/.+\.php|' . $bases['site_from'] . 'wp-admin/(admin-functions|install|menu-header|setup-config|([^/]+/)?menu|upgrade-functions|includes/.+)\.php)$';
 		break;
 	}
+	/**
+	 * Filter the URLs allowed to be reached
+	 * 
+	 * @since 2.6 Add "rules_mode" and bring down the hook later
+	 * @since 2.2.6
+	 * 
+	 * @param (array) $patterns
+	 * @param (string) $rules_mode
+	 */
+	$patterns                = apply_filters( 'secupress.plugins.bad_url_access.regex_pattern', $patterns, $rules_mode );
 	return $patterns;
 }
 
@@ -414,4 +417,62 @@ function secupress_author_base_save_user_options() {
 		}
 		return $markup;
 	}
+}
+
+add_filter( 'template_include', 'secupress_blackhole_please_click_me', 1 );
+/**
+ * Use a custom template for our trap.
+ *
+ * @since 2.4.1 Moved here so we can use it for other cases
+ * @since 2.2.6 Manage the ban from here with a nonce now
+ * @author Julio Potier
+ *
+ * @since 1.0
+ * @author Grégory Viguier
+ *
+ * @param (string) $template Template path.
+ *
+ * @return (string) Template path.
+ */
+function secupress_blackhole_please_click_me( $template ) {
+	if ( is_user_logged_in() ) {
+		return $template;
+	}
+
+	$url     = trailingslashit( secupress_get_current_url() );
+	$dirname = secupress_get_hashed_folder_name( basename( __FILE__, '.php' ) );
+
+	if ( isset( $_REQUEST['token'] ) && wp_verify_nonce( $_REQUEST['token'], 'ban_me_please-' . date( 'ymdhi' ) ) ) {
+		$ip      = secupress_get_ip( 'REMOTE_ADDR' );
+		$ban_ips = get_site_option( SECUPRESS_BAN_IP );
+
+		if ( ! is_array( $ban_ips ) ) {
+			$ban_ips = array();
+		}
+
+		$ban_ips[ $ip ] = time() + MONTH_IN_SECONDS;
+
+		update_site_option( SECUPRESS_BAN_IP, $ban_ips );
+
+		/* This hook is documented in /inc/functions/admin.php */
+		do_action( 'secupress.ban.ip_banned', $ip, $ban_ips );
+
+		switch ( $_SERVER['REQUEST_METHOD'] ) {
+			case 'GET':
+				secupress_log_attack( 'bad_robots' );
+			break;
+			case 'POST':
+				secupress_log_attack( 'honeypot' );
+			break;
+		}
+
+		wp_die( 'Something went wrong.' ); // Do not use secupress_die() here.
+	}
+
+	if ( substr( $url, - strlen( $dirname ) ) === $dirname ) {
+		add_filter( 'nonce_user_logged_out', 'secupress_modify_userid_for_nonces' );
+		return dirname( __FILE__ ) . '/inc/php/blackhole/warning-template.php';
+	}
+
+	return $template;
 }

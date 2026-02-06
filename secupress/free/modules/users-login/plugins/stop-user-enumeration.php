@@ -1,6 +1,6 @@
 <?php
 /**
- * Module Name: Stop User Enumeration
+ * Module Name: Forbid User Enumeration
  * Description: Forbid the user listing from front with ?author=X and from REST API with /users/
  * Main Module: users_login
  * Author: SecuPress

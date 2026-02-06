@@ -301,7 +301,20 @@ function secupress_get_fake_users() {
 	$fake_users = array_merge( $temp_users, $fake_users );
 
 	$fake_users = array_unique( $fake_users );
-	$fake_users = array_map( 'get_user_by', array_fill( 0, count( $fake_users ), 'ID' ), $fake_users );
+	
+	// Convert IDs to user objects using our custom function that handles empty user_nicename
+	$fake_users = array_map( function( $user_id ) {
+		if ( ! $user_id ) {
+			return null;
+		}
+		// Use secupress_get_user_by() which handles empty user_nicename gracefully
+		$user = secupress_get_user_by( $user_id );
+		return $user ? $user : null;
+	}, $fake_users );
+	
+	// Remove null values (invalid users) and re-index array
+	$fake_users = array_filter( $fake_users );
+	$fake_users = array_values( $fake_users );
 
 	if ( class_exists( 'SecuPress_User_Protection' ) ) {
 		add_action( 'pre_get_users', array( $GLOBALS['SecuPress_User_Protection'], 'filter_fake_users' ) );
@@ -444,4 +457,264 @@ function secupress_get_emojiset( $set = 'random' ) {
 	}
 
 	return $sets[ $set ];
+}
+
+add_filter( 'authenticate', 'secupress_force_strong_encryption_remove_blind_password', 0, 3 );
+/**
+ * Remove the suffix and set back the old password when the module "Prevent Other Encryption System to Log In" is not active
+ * (Needed outside the module when deactivated)
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @see secupress_force_strong_encryption_blind_password_set_password()
+ * 
+ * @param (WP_User|WP_Error) $user
+ * @param (string) $username
+ * @param (string) $password
+ * 
+ * @return (WP_User|WP_Error)
+ **/
+function secupress_force_strong_encryption_remove_blind_password(
+	$user,
+	$username,
+	#[\SensitiveParameter]
+	$password
+) {
+	if ( secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ) {
+		return $user;
+	}
+
+	$_user   = secupress_get_user_by( $username );
+	if ( ! secupress_is_user( $_user ) ) {
+		return $user;
+	}
+
+	$suffix  = get_user_meta( $_user->ID, 'secupress-blind-password', true );
+	if ( ! $suffix ) {
+		return $user;
+	}
+
+	$hash    = secupress_generate_key_for_object( $_user->ID );
+	$passwor = $password . $hash;
+	$valid   = wp_check_password( $passwor, $_user->user_pass, $_user->ID );
+	
+	if ( ! $valid ) {
+		return $user;
+	}
+
+	// Do not warn, this is not a hack, nobody has to know that now.
+	remove_all_actions( 'wp_set_password' );
+	// Set back the old password
+	wp_set_password( $password, $_user->ID );
+
+	delete_user_meta( $_user->ID, 'secupress-blind-password' );
+
+	return $_user;
+}
+
+/**
+ * Get the best encryption algo for the installation
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @return (string)
+ **/
+function secupress_get_best_encryption_system() {
+	switch( true ) {
+		case defined( 'PASSWORD_ARGON2ID' ):
+			return PASSWORD_ARGON2ID;
+		break;
+		case defined( 'PASSWORD_ARGON2I' ):
+			return PASSWORD_ARGON2I;
+		break;
+		case defined( 'PASSWORD_BCRYPT' ):
+			return PASSWORD_BCRYPT;
+		break;
+		default:
+			return PASSWORD_DEFAULT;
+		break;
+	}
+}
+
+/**
+ * Get the name of the encryption algo
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @param (string) $system
+ * 
+ * @return (string)
+ **/
+function secupress_get_encryption_name( $system ) {
+	switch( $system ) {
+		case '2y':
+			return 'Bcrypt';
+		break;
+		case 'argon2i':
+			return 'Argon2I';
+		break;
+		case 'argon2id':
+			return 'Argon2ID';
+		break;
+		default:
+			return ucfirst( $system );
+		break;
+	}
+}
+
+/**
+ * Get the DB prefix for an algo
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @param (string) $system
+ * 
+ * @return (string)
+ **/
+function secupress_get_encryption_prefix( $system ) {
+	switch( $system ) {
+		case '2y': // WP BCRYPT
+			return '$wp$2y$';
+		break;
+		case 'argon2i':
+			return '$argon2i$';
+		break;
+		case 'argon2id':
+			return '$argon2id$';
+		break;
+		default: // DEF BCRYPT
+			return '$2y$';
+		break;
+	}
+}
+
+/**
+ * Get the best cost for an algo
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @param (string) $algo
+ * 
+ * @return 
+ **/
+function secupress_get_best_cost_by_algo( $algo ) {
+	$mem_max             = secupress_get_max_memory();
+	$args                = [];
+	$args['algo']        = $algo;
+	$args['memory_cost'] = $mem_max * 64; // 6.4% of max memory is enough
+	$args['cost']        = 4;
+	if ( '2y' === $algo ) {
+		$via_php      = version_compare( PHP_VERSION, '8.4', '>=' ) ? 12 : 10;
+		$thresholds   = [ 256, 512, 1024, 2048 ];
+		$args['cost'] = $via_php;
+
+		foreach ( $thresholds as $threshold ) {
+			if ( $mem_max >= $threshold ) {
+				++$args['cost'];
+			}
+		}
+	} elseif ( false !== strpos( $algo, 'argon' ) ) {
+		$args['cost']    = 3 + min( 4, max( 1, $mem_max === -1 ? 4 : (int) ( log( $mem_max ) / log( 2 ) - 6 ) ) ); // 6=128=2^7
+	}
+	$args                = apply_filters( 'secupress.algo.args', $args, $algo );
+	return $args;
+}
+
+/**
+ * Add a rehash meta to any user who needs it
+ * 
+ * @internal Starts with "_": DO NOT USE ANYWHERE!
+ * @see secupress_password_policy_settings_callback()
+ * 
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @return (bool) True if at least 1 user needed a rehash
+ **/
+function _secupress_force_strong_encryption_set_rehash_meta() {
+	global $wpdb;
+
+	$prefix = secupress_get_encryption_prefix( secupress_get_best_encryption_system() );
+	$sql    = $wpdb->prepare( 'SELECT ID FROM ' . $wpdb->users . ' WHERE user_pass NOT LIKE %s', $prefix . '%' );
+	$ids    = $wpdb->get_col( $sql );
+	if ( ! $ids ) {
+		return false;
+	}
+	foreach ( $ids as $_id ) {
+		// @see secupress_prevent_hash_reuse_password_needs_rehash()
+		update_user_meta( $_id, 'secupress-password-needs-rehash', 1 );
+	}
+	return true;
+}
+
+/**
+ * Return the max memory on this server/host
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @return (int) $mem
+ **/
+function secupress_get_max_memory() {
+	$mem = (int) ini_get('memory_limit');
+	if ( -1 === $mem ) {
+		$mem = 2; // Gb ; No limit? Let's say 2 Gb then
+	}
+	if ( $mem < 16 ) { // Mb ; Less than 16Mb? Should be Gb then, multiply.
+		$mem *= 1024;
+	}
+	return $mem;
+}
+
+/**
+ * Move Login: return the list of customizable login actions.
+ *
+ * @since 1.0
+ * @since 1.3.1 Remove all other slugs than "login"
+ * @since 1.3.2 Remove SFML hook, not compatible anymore
+ *
+ * @return (array) Return an array with the action names as keys and field labels as values.
+ */
+function secupress_move_login_slug_labels() {
+	$labels = [ // WP i18n strings.
+		'login'               => __( 'Log in' ),
+		'logout'              => __( 'Log out' ),
+		// 'register'           => __( 'Register' ),
+		'lostpassword'        => __( 'Lost Password' ),
+		'resetpass'           => __( 'Password Reset' ),
+		'confirm_admin_email' => __( 'Confirm Admin Email' ),
+	];
+	if ( '1' === get_option( 'users_can_register' ) ) {
+		$labels['register']   = __( 'Register' );
+	}
+
+	/**
+	 * Add custom actions to the list of customizable actions. Backcompat for SFML.
+	 *
+	 * @since 2.4.1
+	 *
+	 * @param (array) $new_slugs An array with the action names as keys and field labels as values. An empty array by default.
+	*/
+	$new_slugs = apply_filters( 'sfml_additional_slugs', [] );
+	/**
+	 * Add custom actions to the list of customizable actions.
+	 *
+	 * @since 2.4.1
+	 *
+	 * @param (array) $new_slugs An array with the action names as keys and field labels as values. An empty array by default.
+	*/
+	$new_slugs = apply_filters( 'secupress.plugins.movelogin.additional_slugs', $new_slugs );
+
+	if ( $new_slugs && is_array( $new_slugs ) ) {
+		$new_slugs = array_unique( $new_slugs );
+		$new_slugs = array_diff_key( $new_slugs, $labels );
+		$labels    = array_merge( $labels, $new_slugs );
+	}
+
+	return $labels;
 }

@@ -86,7 +86,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => __( 'Only compatible with any public theme from wp.org. Cannot be unchecked.', 'secupress' ),
+			'description' => __( 'Only compatible with any public theme from wp.org.', 'secupress' ) . ' ' . _x( ' Cannot be unchecked.', 'checkbox/option/setting', 'secupress' ),
 		),
 	),
 ) );

@@ -116,6 +116,8 @@ function secupress_login_protection_settings_callback( $modulenow, &$settings, $
 	if ( ! empty( $activate['login-protection_type'] ) ) {
 		$activate['login-protection_type'] = array_flip( $activate['login-protection_type'] );
 	}
+	secupress_manage_submodule( $modulenow, 'geoip-login', isset( $activate['login-protection_geoip_login'] ) );
+	secupress_manage_affected_roles( $settings, $modulenow, 'login-protection_geoip_login' );
 	secupress_manage_submodule( $modulenow, 'limitloginattempts', isset( $activate['login-protection_type']['limitloginattempts'] ) );
 	secupress_manage_submodule( $modulenow, 'passwordspraying', isset( $activate['login-protection_type']['passwordspraying'] ) );
 	secupress_manage_submodule( $modulenow, 'bannonexistsuser',   isset( $activate['login-protection_type']['bannonexistsuser'] ) );
@@ -132,7 +134,6 @@ function secupress_login_protection_settings_callback( $modulenow, &$settings, $
 	}
 }
 
-
 /**
  * Password policy plugin.
  *
@@ -143,6 +144,7 @@ function secupress_login_protection_settings_callback( $modulenow, &$settings, $
  * @param (array|bool) $activate  An array containing the fields related to the sub-module being activated. False if not on this module page.
  */
 function secupress_password_policy_settings_callback( $modulenow, &$settings, $activate ) {
+	global $wpdb;
 	// Settings + (De)Activation.
 	if ( secupress_is_pro() ) {
 		$settings['password-policy_password_expiration'] = ! empty( $settings['password-policy_password_expiration'] ) ? absint( $settings['password-policy_password_expiration'] ) : '0';
@@ -152,6 +154,40 @@ function secupress_password_policy_settings_callback( $modulenow, &$settings, $a
 			secupress_add_module_notice( '', __( 'Password Lifespan', 'secupress' ), $settings['password-policy_password_expiration'] > 0 ? 'activation' : 'deactivation' );
 		} else {
 			unset( $settings['password-policy_password_expiration'] );
+		}
+	}
+
+	// Do not use secupress_manage_submodule() to prevent to trigger the activation hook every time
+	if ( ! secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) && ! empty( $activate['double-auth_force-strong-encryption'] ) ) {
+		secupress_activate_submodule( $modulenow, 'force-strong-encryption' );
+	}
+	if ( secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) && empty( $activate['double-auth_force-strong-encryption'] ) ) {
+		secupress_deactivate_submodule( $modulenow, 'force-strong-encryption' );
+	}
+	if ( secupress_is_pro() && secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ) {
+		
+		$settings['double-auth_prevent-low-encryption'] = (int) isset( $settings['double-auth_prevent-low-encryption'] );
+		if ( $settings['double-auth_prevent-low-encryption'] !== secupress_get_module_option( 'double-auth_prevent-low-encryption', 0, 'users-login' ) ) {
+			secupress_add_module_notice( '', __( 'Prevent other encryption system to log in', 'secupress' ), (int) $settings['double-auth_prevent-low-encryption'] > 0 ? 'activation' : 'deactivation' );
+			_secupress_force_strong_encryption_set_rehash_meta();
+		} elseif ( ! isset( $settings['double-auth_prevent-low-encryption'] ) ) {
+			delete_metadata( 'user', false, 'secupress-password-needs-rehash', '', true );
+		}		
+
+		$settings['double-auth_prevent-hash-reuse'] = (int) isset( $settings['double-auth_prevent-hash-reuse'] );
+		if ( $settings['double-auth_prevent-hash-reuse'] !== secupress_get_module_option( 'double-auth_prevent-hash-reuse', 0, 'users-login' ) ) {
+			secupress_add_module_notice( '', __( 'Prevent Reuse of Password Hashes', 'secupress' ), (int) $settings['double-auth_prevent-hash-reuse'] > 0 ? 'activation' : 'deactivation' );
+			if ( (int) $settings['double-auth_prevent-hash-reuse'] ) {
+				$index_exists = $wpdb->get_row(
+					"SHOW INDEX FROM $wpdb->users WHERE Key_name = 'unique_user_pass'"
+				);
+
+				if ( ! $index_exists ) {
+					$wpdb->query( "ALTER TABLE $wpdb->users ADD UNIQUE INDEX unique_user_pass (user_pass)" );
+				}
+			} else {
+				$wpdb->query( "ALTER TABLE $wpdb->users DROP INDEX unique_user_pass" );
+			}
 		}
 	}
 
@@ -438,25 +474,3 @@ function secupress_install_users_login_module( $module ) {
 
 }
 */
-
-/** --------------------------------------------------------------------------------------------- */
-/** DEFAULT VALUES ============================================================================== */
-/** --------------------------------------------------------------------------------------------- */
-
-/**
- * Move Login: return the list of customizable login actions.
- *
- * @since 1.0
- * @since 1.3.1 Remove all other slugs than "login"
- * @since 1.3.2 Remove SFML hook, not compatible anymore
- *
- * @return (array) Return an array with the action names as keys and field labels as values.
- */
-function secupress_move_login_slug_labels() {
-	$labels = [ 'login' => __( 'New login page', 'secupress' ) ];
-	if ( '1' === get_option( 'users_can_register' ) ) {
-		$labels['register'] = __( 'New registration page', 'secupress' );
-	}
-
-	return $labels;
-}

@@ -111,8 +111,9 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	/**
 	 * Add a temporary admin notice.
 	 *
-	 * @since 1.0
+	 * @since 2.4 Fix duplicate notices (based on ID, not content)
 	 * @since 1.3 Added $notice_id parameter.
+	 * @since 1.0
 	 *
 	 * @param (string)      $message    The message to display in the notice.
 	 * @param (string)      $error_code Like WordPress notices: "error" "updated" "success" "warning" "info". Default is "updated".
@@ -123,9 +124,9 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	 * @param (null|string) $capa       A WordPress capability or role. "null" = secupress_get_capability()
 	 */
 	public function add_temporary( $message, $error_code = 'updated', $notice_id = false, $capa = null ) {
-		$notices    = secupress_get_transient( 'secupress-notices-' . get_current_user_id() );
-		$notices    = is_array( $notices ) ? $notices : array();
-		$notices[]  = compact( 'message', 'error_code', 'capa', 'notice_id' );
+		$notices               = secupress_get_transient( 'secupress-notices-' . get_current_user_id() );
+		$notices               = is_array( $notices ) ? $notices : array();
+		$notices[ $notice_id ] = compact( 'message', 'error_code', 'capa', 'notice_id' );
 		secupress_set_transient( 'secupress-notices-' . get_current_user_id(), $notices );
 	}
 
@@ -338,17 +339,23 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 					$plugin_name     = SECUPRESS_PLUGIN_NAME . ( secupress_has_pro() && ! secupress_is_white_label() ? ' Pro' : '' );
 					$label           = ! secupress_show_contextual_help() ? '' : '<label class="plugin-title">' . esc_html( $plugin_name ) . '</label>';
 					$lab_class       = ! secupress_show_contextual_help() ? '' : ' has-plugin-title';
+					$error_class     = str_replace( '_', ' ', $error_code );
+					if ( strpos( $error_class, 'no-plugin-title' ) !== false ) {
+						$error_class = str_replace( 'no-plugin-title', '', $error_class );
+						$lab_class   = '';
+						$label       = '';
+					}
 					if ( 'sp-dismissible' === $type ) {
 						foreach ( $messages as $notice_id => $message ) {
 							$button  = admin_url( 'admin-post.php?action=secupress_dismiss-notice&notice_id=' . $notice_id . '&_wp_http_referer=' . $referer );
 							$button  = wp_nonce_url( $button, 'secupress-notices' );
 							$button  = '<a href="' . esc_url( $button ) . '" class="notice-dismiss"><span class="screen-reader-text">' . __( 'Dismiss', 'secupress' ) . '</span></a>';
-							$message = strpos( $message, '<p>' ) === false && trim( $message ) ? '<p>' . $message . '</p>' : $message;
+							// $message = strpos( $message, '<p>' ) === false && trim( $message ) ? '<p>' . $message . '</p>' : $message;
 							if ( 'error' === $error_code && ! empty( trim( $message ) ) ) {
-								$message = sprintf( __( '<strong>Error</strong>: %s', 'secupress' ), $message );
+								$message = '<p>' . sprintf( __( '<strong>Error</strong>: %s', 'secupress' ), $message ) . '</p>';
 							}
 							?>
-							<div class="secupress-notice notice <?php echo $error_code . $lab_class; ?> secupress-is-dismissible" data-id="<?php echo $notice_id; ?>">
+							<div class="secupress-notice notice <?php echo $error_class . $lab_class; ?> secupress-is-dismissible" data-id="<?php echo $notice_id; ?>">
 								<?php echo $label; ?>
 								<?php echo $message; ?>
 								<?php echo $button; ?>
@@ -358,7 +365,7 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 						}
 					} elseif ( 'wp-dismissible' === $type ) {
 						?>
-						<div class="secupress-notice notice <?php echo $error_code . $lab_class; ?> secupress-is-dismissible">
+						<div class="secupress-notice notice <?php echo $error_class . $lab_class; ?> secupress-is-dismissible">
 							<?php echo $label; ?>
 							<?php
 							$message     = implode( '<br class="separator"/>', $messages );
@@ -372,7 +379,7 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 						<?php
 					} else {
 						?>
-						<div class="secupress-notice notice <?php echo $error_code . $lab_class; ?>">
+						<div class="secupress-notice notice <?php echo $error_class . $lab_class; ?>">
 							<?php echo $label; ?>
 							<?php
 							$message     = implode( '<br class="separator"/>', $messages );

@@ -678,11 +678,57 @@ function secupress_get_php_versions() {
 	$ver = array_slice( $ver, 0, 2 );
 	$ver = implode( '.', $ver );
 
+	$year  = (int) date( 'Y' );
+	$month = (int) date( 'n' );
+	$day   = (int) date( 'j' );
+
+	/**
+	 * PHP releases a new version around November 20th each year.
+	 * - Security Support: 4 years (ends December 31st)
+	 * - Active Support: 2 years (ends December 31st)
+	 * Base: PHP 8.0 released in 2020, one version per year.
+	 * Pattern: 8.0 (2020), 8.1 (2021), ..., 8.9/9.0 (2029/2030), 9.1 (2031), etc.
+	 */
+	$after_nov_release = ( $month > 11 ) || ( 11 === $month && $day >= 20 );
+
+	/**
+	 * Helper function to calculate PHP version from year offset.
+	 *
+	 * @param int $years_since_2020 Number of years since 2020.
+	 * @return string PHP version (e.g., "8.5", "9.0", "10.3").
+	 */
+	$get_version = function( $years_since_2020 ) {
+		$major = 8 + floor( $years_since_2020 / 10 );
+		$minor = $years_since_2020 % 10;
+		return $major . '.' . $minor;
+	};
+
+	// Calculate years since PHP 8.0 (released in 2020).
+	$years_offset = $year - 2020;
+
+	// mini: Oldest version with Security Support (expires end of current year).
+	// Security Support = 4 years, so mini expires this year.
+	// Example: In 2025, PHP 8.1 (2021) expires, so mini = 8.1.
+	$mini = $get_version( $years_offset - 4 );
+
+	// last: Oldest version with Active Support (expires Dec 31 of release_year + 2).
+	// Active Support = 2 years. Changes on January 1st.
+	// Example: In 2025, PHP 8.3 (2023) is the oldest with Active Support.
+	$last = $get_version( $years_offset - 2 );
+
+	// best: Latest stable version available.
+	// Changes on ~Nov 20th when new version is released.
+	if ( $after_nov_release ) {
+		$best = $get_version( $years_offset );
+	} else {
+		$best = $get_version( $years_offset - 1 );
+	}
+
 	$versions = array(
 		'current' => $ver,
-		'mini'    => '8.1',
-		'last'    => '8.3',
-		'best'    => '8.4',
+		'mini'    => $mini,
+		'last'    => $last,
+		'best'    => $best,
 	);
 
 	return $versions;
@@ -759,4 +805,36 @@ add_action( 'requests-curl.before_request', 'secupress_curl_before_request', SEC
  **/
 function secupress_curl_before_request( $curlhandle ) {
 	session_write_close();
+}
+
+add_filter( 'password_needs_rehash', 'secupress_prevent_hash_reuse_password_needs_rehash', 10, 3 );
+/**
+ * If the module "Prevent other encryption system to log in" is activated, only let the current users with this meta to rehash their password
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @param (bool) $needs_rehash
+ * @param (string) $hash
+ * @param (int) $user_id
+ * 
+ * @return (bool) $needs_rehash
+ **/
+function secupress_prevent_hash_reuse_password_needs_rehash( $needs_rehash, $hash, $user_id ) {
+	$active = (bool) secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) && secupress_get_module_option( 'double-auth_prevent-low-encryption', 0, 'users-login' );
+	$meta   = (bool) get_user_meta( $user_id, 'secupress-password-needs-rehash', true );
+	if ( $active ) {
+		if ( $meta ) {
+			delete_user_meta( $user_id, 'secupress-password-needs-rehash' );
+			return true;
+		}
+		$user = secupress_get_user_by( $user_id );
+		if ( ! secupress_is_user( $user ) ) {
+			return false;
+		}
+		$prefix = secupress_get_encryption_prefix( secupress_get_best_encryption_system() );
+		return strpos( $user->user_pass, $prefix ) === false;
+	}
+
+	return $needs_rehash;
 }

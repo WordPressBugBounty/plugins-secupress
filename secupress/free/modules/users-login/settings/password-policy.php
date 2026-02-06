@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
 
 $this->set_current_section( 'password_policy' );
-$this->add_section( __( 'Password Policy', 'secupress' ), array( 'with_roles' => true ) );
+$this->add_section( __( 'Password Policy', 'secupress' ) );
 
 $this->add_field( array(
 	'title'             => __( 'Force Strong Passwords', 'secupress' ),
@@ -26,6 +26,27 @@ $this->add_field( array(
 	'attributes'   => array(
 		'min' => 0,
 		'max' => 365,
+	),
+) );
+
+$this->add_field( array(
+	'title'        => '<span class="dashicons dashicons-groups"></span> ' . __( 'Affected Roles', 'secupress' ),
+	'description'  => __( 'Which roles does this module affect?', 'secupress' ),
+	'depends'      => $this->get_field_name( 'strong_passwords' ),
+	'row_class'    => 'affected-role-row',
+	'name'         => $this->get_field_name( 'affected_role' ),
+	'type'         => 'roles',
+	'label_screen' => __( 'Affected Roles', 'secupress' ),
+	'helpers'      => array(
+		array(
+			'type'        => 'description',
+			'description' => __( 'Future roles will be automatically selected', 'secupress' ),
+		),
+		array(
+			'type'        => 'warning',
+			'class'       => 'hide-if-js',
+			'description' => __( 'Select at least 1 role', 'secupress' ),
+		),
 	),
 ) );
 

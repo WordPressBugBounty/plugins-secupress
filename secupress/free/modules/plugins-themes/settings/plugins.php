@@ -162,7 +162,21 @@ if ( ! secupress_is_expert_mode() ) {
 }
 
 $this->add_field( array(
-	'depends'      => secupress_is_submodule_active( 'plugins-themes', 'detect-bad-plugins' ) ? $main_field_name : 'not_installed_yet',
+	'depends'           => $main_field_name,
+	'description'       => __( 'Highlight plugin updates based on how long the update has been available.', 'secupress' ),
+	'type'              => 'checkbox',
+	'label_for'         => 'highlight_plugin_updates',
+	'label'             => __( 'Yes, color-code plugin updates to help me prioritize them.', 'secupress' ),
+	'helpers'           => array(
+		array(
+			'type'        => 'description',
+			'description' => __( 'Only compatible with any public plugin from wp.org.', 'secupress' ),
+		),
+	),
+) );
+
+$this->add_field( array(
+	'depends'           => $main_field_name,
 	'description'       => __( 'Display a banner if a plugin has not been updated since 2 years, or has been closed from the official WordPress repository.', 'secupress' ),
 	'type'              => 'checkbox',
 	'disabled'          => true,
@@ -172,7 +186,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'description',
-			'description' => __( 'Only compatible with any public plugin from wp.org. Cannot be unchecked.', 'secupress' ),
+			'description' => __( 'Only compatible with any public plugin from wp.org.', 'secupress' ) . ' ' . _x( ' Cannot be unchecked.', 'checkbox/option/setting', 'secupress' ),
 		),
 	),
 ) );

@@ -1,10 +1,10 @@
-=== SecuPress Free with Simple SSL – Simple and Performant Security ===
+=== SecuPress with Simple SSL – Simple and Performant Security ===
 Contributors: SecuPress, juliobox, GregLone, Superment
 Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
-Tested up to: 6.8.1
-Requires PHP: 7.0
-Stable tag: 2.3.20.1
+Tested up to: 6.9
+Requires PHP: 7.2
+Stable tag: 2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,12 +185,23 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.3.20.1 =
-* 30 June 2025
-* Fix: Password not updating in "Force Strong Passwords" module
+= 2.6 =
+* 16 January 2026
+* New: GeoIP Location on Login
+* New: Search field in admin UI.
+* New: Scanner for malwares in our 35 scanners.
+* Improvement: UI for Malware Scanner has been improved, and will be again ;) You'll find a "WP File Integrity" which has always been there since 1.0, just not mentionned as is.
+* Improvement: Add WP 2FA compatibility to Easy Login scan
+* Fix: Dashboard Widget not displaying graphs
+* Fix: PHP Version Scanner was saying that the last version was "ok tier"
+* Fix: PasswordLess activation checkbox was not checked after reload
+* Fix: Remove secupress-data directory on uninstall (I forgot, my bad)
+* Fix: "wp-includes/version.php" should not be tagged "different" anymore if you use a localised zip (in malware scanners)
+* Fix: Possible fatal error when deactivating the module "Disable all actions on plugins" + "disable all actions on FTP"
+* Fix: Possible fatal error "Call to undefined method SecuPress_Background_Process_Bad_Plugins::is_processing()"
 
 == Upgrade Notice ==
-* SecuPress 2.3+ now requires PHP 7.0 minimum.
+* SecuPress 2.6+ now requires PHP 7.2 minimum.
 * SecuPress 2.3.18+ now requires WP 5.4 minimum.
 
 == TODO ==
@@ -204,13 +215,7 @@ replace %s by ###USERNAME### in emails
 .htaccess scanner
 login rest disclose scanner
 move EDD updater+white label into a mu to allow upgrade+rollback even with plugin deactivated
-chartjs graph on dashboard widget
 give possibility to rename logins
 target="_blank" on doc links
-remove <code> and <strong> in trads
-autologin after fix step3?
-file_upgrader where mu plugin files could be updated easily
-SECUPRESS_ALLOW_LOGIN_ACCESS as a function + do not deactivate modules when TRUE
-move login; allow fake wplogin message
-secupress_blacklist_logins_allowed_characters
-geoloc on login
+AI Scanner
+Improve malware scanner, again

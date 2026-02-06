@@ -26,7 +26,7 @@ function secupress_get_modules() {
 			'with_reset_box' => false,
 			'submodules'     => [
 							'module-secupress_display_apikey_options' => ! defined( 'SECUPRESS_HIDE_API_KEY' ) || SECUPRESS_HIDE_API_KEY ? __( 'License Information', 'secupress' ) : '',
-							'module-secupress_display_white_label'    => secupress_is_pro() && defined( 'WP_SWL' ) && WP_SWL ? __( 'White Label', 'secupress' ) : '',
+							'module-secupress_display_white_label'    => secupress_is_pro() && ( defined( 'WP_SWL' ) && constant( 'WP_SWL' ) ) ? __( 'White Label', 'secupress' ) : '',
 							'module-secupress_advanced_settings'      => __( 'Advanced Settings', 'secupress' ),
 							'module-import_export'                    => '*' . __( 'Settings, Import & Export', 'secupress' ),
 						]
@@ -46,7 +46,11 @@ function secupress_get_modules() {
 							'login-protection_type_passwordspraying'          => '*' . __( 'Bad Password Attempts', 'secupress' ),
 							'row-login-protection_sessions_control'           => '*' . __( 'Session Control', 'secupress' ),
 							'row-login-protection_login_errors'               => __( 'Login Errors', 'secupress' ),
+							'row-login-protection_geoip_login'                => '*' . __( 'GeoIP Login', 'secupress' ),
 							'row-double-auth_type'                            => '*' . __( '2 Factors Authentication', 'secupress' ),
+							'row-double-auth_force-strong-encryption'         => __( 'Force Strong Pass Encryption', 'secupress' ),
+							'row-double-auth_prevent-low-encryption'          => secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ? '*' . __( 'Prevent Other Encryption System', 'secupress' ) : '',
+							'row-double-auth_prevent-hash-reuse'              => secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ? '*' . __( 'Prevent Reuse of Password Hashes', 'secupress' ) : '',
 							'row-captcha_activate'                            => __( 'Captcha', 'secupress' ),
 							'row-password-policy_strong_passwords'            => '*' . __( 'Strong Password', 'secupress' ),
 							'row-password-policy_password_expiration'         => secupress_is_submodule_active( 'users-login', 'strong-passwords' ) ? '*' . __( 'Password Lifespan', 'secupress' ) : '',
@@ -160,7 +164,7 @@ function secupress_get_modules() {
 			// 'mark_as_pro'    => $should_be_pro,
 		],
 		'ssl'             => [
-			'new'         => true, //// remove this in 2.4
+			// 'new'         => true,
 			'title'       => __( 'SSL & HTTPS', 'secupress' ),
 			'icon'        => 'sensitive-data',
 			'dashicon'    => 'privacy',
@@ -890,6 +894,7 @@ function secupress_get_active_submodules() {
 /**
  * Check whether a sub-module is active.
  *
+ * @since 2.4.1 Add filters for $shortcut and $after_filter
  * @since 1.0
  *
  * @param (string) $module    A module.
@@ -901,6 +906,10 @@ function secupress_get_active_submodules() {
 function secupress_is_submodule_active( $module, $submodule ) {
 	$submodule = sanitize_key( $submodule );
 
+	$shortcut = apply_filters( 'secupress.is_submodule_active.shortcut', null, $module, $submodule );
+	if ( $shortcut !== null ) {
+		return $shortcut;
+	}
 	if ( wp_doing_ajax() ) {
 		$is_active = get_site_option( 'secupress_active_submodule_' . $submodule );
 		$is_active = $is_active && $module === $is_active;
@@ -924,6 +933,11 @@ function secupress_is_submodule_active( $module, $submodule ) {
 
 	if ( $is_active && ! secupress_is_pro() && secupress_submodule_is_pro( $module, $submodule ) ) {
 		return false;
+	}
+	
+	$after_filter = apply_filters( 'secupress.is_submodule_active.after', null, $module, $submodule );
+	if ( $after_filter !== null ) {
+		return $after_filter;
 	}
 
 	return $is_active;

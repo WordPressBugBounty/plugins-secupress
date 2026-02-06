@@ -5,6 +5,85 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /** REQUIRE FILES =============================================================================== */
 /** --------------------------------------------------------------------------------------------- */
 
+function secupress_get_malware_scanners() {
+	return [
+		[
+			'icon'  => 'radar',
+			'file'  => 'malware_keywords',
+			'name'  => __( 'Malware Scanner', 'secupress' ),
+			'desc'  => __( 'Identifies malware files, backdoors and suspicious PHP code patterns.', 'secupress' ),
+		],
+		[
+			'icon'  => 'data-base',
+			'file'  => 'malware_keywords_db',
+			'cback' => 'secupress_get_database_scanner',
+			'name'  => __( 'Database Scanner', 'secupress' ),
+			'desc'  => __( 'Detects malicious code injected in your database (posts, options, comments).', 'secupress' ),
+		],
+		[
+			'icon'  => 'cog',
+			'file'  => 'tag_attr',
+			'cback' => 'secupress_get_content_spam_scanner',
+			'name'  => __( 'SEO Poisoning Scanner', 'secupress' ),
+			'desc'  => __( 'Finds hidden spam links, suspect keywords and suspicious code in your contents.', 'secupress' ),
+		],
+		[
+			'icon'  => 'core',
+			'name'  => __( 'WordPress Core Files Integrity', 'secupress' ),
+			'cback' => 'secupress_file_scanner_get_full_filetree',
+			'desc'  => __( 'Verifies that WordPress core files have not been modified or compromised.', 'secupress' ),
+		],
+		/*
+		[
+			'icon'  => 'plugin',
+			'name'  => __( 'WordPress Plugin Files Integrity', 'secupress' ),
+			'desc'  => __( 'Checks plugin files against their original versions for unauthorized changes.', 'secupress' ),
+			'class' => 'unavailable',
+		],
+		[
+			'icon'  => 'folder',
+			'name'  => __( 'WordPress Theme Files Integrity', 'secupress' ),
+			'desc'  => __( 'Scans theme files to detect injected malicious code or modifications.', 'secupress' ),
+			'class' => 'unavailable',
+		],
+		[
+			'icon'  => 'radar',
+			'file'  => 'suspicious_activity',
+			'name'  => __( 'Suspicious Activity Scanner', 'secupress' ),
+			'desc'  => __( 'Detects suspicious activities, unusual user behavior, and potential threats to your website.', 'secupress' ),
+			'class' => 'unavailable',
+		],
+		[
+			'icon'  => 'block',
+			'file'  => 'blacklist',
+			'name'  => __( 'Blacklist Scanner', 'secupress' ),
+			'desc'  => __( 'Detects malicious URLs, IP addresses, and domains that are known to be used for spam, malware, and other threats.', 'secupress' ),
+			'class' => 'unavailable',
+		],
+		[
+			'icon'  => 'bitcoin',
+			'file'  => 'cryptocurrency_miner',
+			'name'  => __( 'Cryptocurrency Miner Scanner', 'secupress' ),
+			'desc'  => __( 'Detects cryptocurrency miners installed on your website to prevent energy theft and financial loss.', 'secupress' ),
+			'class' => 'unavailable',
+		],
+		*/
+		[
+			'icon'  => 'ai',
+			'name'  => __( 'A.I. Scanner', 'secupress' ) . ' ' . __( '(Under Development)', 'secupress' ),
+			'desc'  => __( 'AI-driven detection to distinguish real malware from false positives with greater accuracy.', 'secupress' ),
+			'class' => 'unavailable',
+		],
+	];
+}
+
+
+function secupress_get_malware_scan_last_time() {
+	$option_name = defined( 'SECUPRESS_MALWARE_SCAN_LAST_TIME' ) ? SECUPRESS_MALWARE_SCAN_LAST_TIME : 'secupress_malware_scan_last_time';
+
+	return (int) get_option( $option_name, 0 );
+}
+
 /**
  * Return the path to a class.
  *
@@ -118,6 +197,7 @@ function secupress_get_scanners() {
 			0 => 'Chmods',
 			1 => 'Directory_Listing',
 			2 => 'Bad_File_Extensions',
+			3 => 'Malware_Scanners',
 		),
 		'firewall' => array(
 			0 => 'Shellshock',
@@ -228,13 +308,19 @@ function secupress_get_scanner_counts( $type = '' ) {
 		} elseif ( $counts['percent'] >= 10 ) { // 6 less
 			$counts['grade'] = 'J';
 		} elseif ( 0 === $counts['percent'] ) { // 0...
-			$counts['grade'] = '∅';
+			$counts['grade'] = '—'; // Old (∅)
 		} else {
 			$counts['grade'] = 'K'; // < 10 %
 		}
 		$label = $counts['grade'];
 		$counts['temp_grade'] = $counts['grade'];
 		if ( isset( $scanners['bad_vuln_plugins']['status'] ) && 'bad' === $scanners['bad_vuln_plugins']['status'] ) {
+			$counts['temp_grade'] .= '-';
+			$label .= '-';
+		} elseif ( isset( $scanners['malware_scanners']['status'] ) && 'bad' === $scanners['malware_scanners']['status'] ) {
+			$counts['temp_grade'] .= '-';
+			$label .= '-';
+		} elseif ( isset( $scanners['bad_vuln_themes']['status'] ) && 'bad' === $scanners['bad_vuln_themes']['status'] ) {
 			$counts['temp_grade'] .= '-';
 			$label .= '-';
 		} elseif ( ( isset( $scanners['easy_login']['status'] ) && 'good' === $scanners['easy_login']['status'] ) ||
@@ -296,7 +382,7 @@ function secupress_get_scanner_counts( $type = '' ) {
 			case 'K':
 				$counts['text'] = __( 'Very very, really very bad.', 'secupress' );
 				break;
-			case '∅':
+			case '—': // Old (∅)
 				$counts['text'] = __( 'Error when saving the scanner results.', 'secupress' ); // Old (ᕗ‶⇀︹↼)ᕗ彡┻━┻
 				break;
 		}
@@ -363,6 +449,30 @@ function secupress_is_plugin_active_for_network( $plugin ) {
 	$plugins = get_site_option( 'active_sitewide_plugins' );
 
 	return isset( $plugins[ $plugin ] );
+}
+
+
+/**
+ * Check if a plugin is installed (by slug)
+ * 
+ * @since 2.4.1
+ * @author Julio Potier
+ * 
+ * @param string $plugin_slug The plugin slug (directory name)
+ * @return bool True if the plugin is installed
+ */
+function secupress_is_plugin_installed( $plugin_slug ) {
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	
+	$all_plugins = get_plugins();
+	foreach ( $all_plugins as $plugin_file => $plugin_data ) {
+		if ( dirname( $plugin_file ) === $plugin_slug ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -590,6 +700,9 @@ function secupress_is_scan_request() {
  */
 function secupress_admin_url( $page, $module = '' ) {
 	if ( 'get-pro' === $page ) {
+		if ( secupress_has_pro() ) {
+			return admin_url( 'admin.php?page=secupress_modules#module-secupress_display_apikey_options' );
+		}
 		return trailingslashit( set_url_scheme( SECUPRESS_WEB_MAIN, 'https' ) ) . _x( 'pricing', 'link to website (Only FR or EN!)', 'secupress' ) . $module;
 	}
 
@@ -1166,7 +1279,11 @@ function secupress_get_consumer_email() {
  * @return (string)
  */
 function secupress_get_consumer_key() {
-	return secupress_get_option( 'consumer_key' );
+	$key = secupress_get_option( 'consumer_key' );
+	if ( 'B5E0B5F8DD8689E6ACA49DD6E6E1A930' === $key ) {
+		return 'B5E0-nulled';
+	}
+	return $key;
 }
 
 
@@ -1230,6 +1347,9 @@ function secupress_feature_is_expert( $feature ) {
 		'advanced-settings_expert-mode-main'        => 1,
 		'plugins_installation-pro'                  => 1,
 		'blacklist-logins_lexicomatisation'         => 1,
+		'move-login_whattodo|honeypot'              => 1,
+		'login-protection_geoip_login_mode'         => 1,
+		'login-protection_geoip_login_device'       => 1,
 	];
 	return isset( $features[ $feature ] );
 }
@@ -1249,12 +1369,15 @@ function secupress_feature_is_pro( $feature ) {
 	$features = [
 		// Field names.
 		'login-protection_sessions_control'         => 1,
+		'login-protection_geoip_login'              => 1,
 		'blacklist-logins_prevent-user-creation'    => 1,
 		'double-auth_type'                          => 1,
 		'password-policy_force-logout'              => 1,
 		'password-policy_send-emails'               => 1,
 		'password-policy_password_expiration'       => 1,
 		'password-policy_strong_passwords'          => 1,
+		'double-auth_prevent-low-encryption'        => 1,
+		'double-auth_prevent-hash-reuse'            => 1,
 		'plugins_detect_bad_plugins'                => 1,
 		'plugins_installation-pro'                  => 1,
 		'themes_activation'                         => 1,
@@ -1263,7 +1386,7 @@ function secupress_feature_is_pro( $feature ) {
 		'uploads_uploads'                           => 1,
 		'content-protect_hotlink'                   => 1,
 		'content-protect_404guess'                  => 1,
-		'file-scanner_file-scanner'                 => 1,
+		// 'file-scanner_file-scanner'                 => 1, // no need to show the logo here, the UI is different.
 		'content-protect_bad-url-access|allowed'    => 1,
 		'backup-files_backup-file'                  => 1,
 		'backup-db_backup-db'                       => 1,
@@ -1293,6 +1416,7 @@ function secupress_feature_is_pro( $feature ) {
 		'daily-reporting_activated'                 => 1,
 		'move-login_whattodo|custom_error'          => 1,
 		'move-login_whattodo|custom_page'           => 1,
+		'move-login_whattodo|honeypot'              => 1,
 		'move-login_singlesignon'                   => 1,
 		'login-protection_type|passwordspraying'    => 1,
 		'database_db_prefix'                        => 1,
@@ -1330,12 +1454,12 @@ function secupress_is_affected_role( $module, $submodule, $user ) {
 		$user = secupress_get_user_by( $user );
 	}
 
-	if ( ! secupress_is_user( $user ) ) {
-		trigger_error( '$user is not a valid WP_User object.' );
+	$user = secupress_is_user( $user, true );
+	if ( ! $user ) {
 		return false;
 	}
 
-	return secupress_is_user( $user ) && ! array_intersect( $roles, $user->roles );
+	return secupress_is_user( $user) && ! array_intersect( $roles, $user->roles );
 }
 
 /**
@@ -1361,15 +1485,30 @@ function secupress_modify_userid_for_nonces( $uid = 0, $action = '' ) {
 /**
  * Tell if the param $user is a real user from your installation.
  *
+ * @since 2.4.1 Handle stdClass objects with valid user ID and optional conversion
  * @since 1.0
  * @author Julio Potier
  *
  * @param (mixed) $user The object to be tested to be a valid user.
+ * @param (bool) $convert_to_wp_user Optional. Whether to convert stdClass to WP_User object.
  *
- * @return (bool)
+ * @return (bool|WP_User) True if valid user (bool), WP_User object if $convert_to_wp_user is true
  */
-function secupress_is_user( $user ) {
-	return is_a( $user, 'WP_User' ) && user_can( $user, 'exist' );
+function secupress_is_user( $user, $convert_to_wp_user = false ) {
+	// Already a valid WP_User
+	if ( is_a( $user, 'WP_User' ) && user_can( $user, 'exist' ) ) {
+		return $convert_to_wp_user ? $user : true;
+	}
+	
+	// Check if it's a stdClass with valid user ID
+	if ( is_object( $user ) && get_class( $user ) === 'stdClass' && isset( $user->ID ) && is_numeric( $user->ID ) && $user->ID > 0 ) {
+		$wp_user = new WP_User( $user->ID );
+		if ( user_can( $wp_user, 'exist' ) ) {
+			return $convert_to_wp_user ? $wp_user : true;
+		}
+	}
+	
+	return false;
 }
 
 /**
@@ -1623,7 +1762,7 @@ function secupress_no_contextual_help() {
  * @return (bool|null)
  **/
 function secupress_is_expert_mode( $from_constant = false ) {
-	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'expert' ) ) ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( constant( 'SECUPRESS_MODE' ) ), 'expert' ) ) ) {
 		$constant = true;
 	}
 	if ( $from_constant ) {
@@ -1645,7 +1784,7 @@ function secupress_is_expert_mode( $from_constant = false ) {
  * @return (bool|null)
  **/
 function secupress_show_contextual_help( $from_constant = false ) {
-	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'help' ) ) ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( constant( 'SECUPRESS_MODE' ) ), 'help' ) ) ) {
 		$constant = false;
 	}
 	if ( $from_constant ) {
@@ -1666,7 +1805,7 @@ function secupress_show_contextual_help( $from_constant = false ) {
  * @return (bool|null)
  **/
 function secupress_show_adminbar( $from_constant = false ) {
-	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'adminbar' ) ) ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( constant( 'SECUPRESS_MODE' ) ), 'adminbar' ) ) ) {
 		$constant = false;
 	}
 	if ( $from_constant ) {
@@ -1687,7 +1826,7 @@ function secupress_show_adminbar( $from_constant = false ) {
  * @return (bool|null)
  **/
 function secupress_show_grade_system( $from_constant = false ) {
-	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( SECUPRESS_MODE ), 'grade' ) ) ) {
+	if ( defined( 'SECUPRESS_MODE' ) && ( false !== strpos( strtolower( constant( 'SECUPRESS_MODE' ) ), 'grade' ) ) ) {
 		$constant = false;
 	}
 	if ( $from_constant ) {
@@ -2040,10 +2179,30 @@ function secupress_format_message( $msgs, $test_name ) {
  **/
 function secupress_log_attack( $type ) {
 	$attack_types = get_option( SECUPRESS_ATTACKS, [] );
+	$current_date = date( 'md' ); // Format MMDD
+	
 	if ( ! isset( $attack_types[ $type ] ) ) {
-		$attack_types[ $type ] = 0;
+		$attack_types[ $type ] = [];
 	}
-	++$attack_types[ $type ];
+	
+	// Ensure it's an array (new format)
+	if ( ! is_array( $attack_types[ $type ] ) ) {
+		$attack_types[ $type ] = [];
+	}
+	
+	// Increment count for current date
+	if ( ! isset( $attack_types[ $type ][ $current_date ] ) ) {
+		$attack_types[ $type ][ $current_date ] = 0;
+	}
+	++$attack_types[ $type ][ $current_date ];
+	
+	// Increment "all" counter (non-dated cumulative total)
+	if ( ! isset( $attack_types['all'] ) ) {
+		$attack_types['all'] = 0;
+	}
+
+	++$attack_types['all'];
+	
 	update_option( SECUPRESS_ATTACKS, $attack_types );
 }
 
@@ -2057,11 +2216,13 @@ function secupress_log_attack( $type ) {
  **/
 function secupress_get_attacks( $type = 'all' ) {
 	$attack_types = get_option( SECUPRESS_ATTACKS, [] );
+	
 	if ( 'all' === $type ) {
 		return $attack_types;
 	}
 	if ( isset( $attack_types[ $type ] ) ) {
-		return (int) $attack_types[ $type ];
+		// Return the data as-is (can be array with dates or single value for backward compatibility)
+		return $attack_types[ $type ];
 	}
 	return false;
 }
@@ -2119,8 +2280,16 @@ function secupress_attacks_get_type_title( $type ) {
 			return __( 'Bad Request Content', 'secupress' );
 		break;
 		
-		default:
+		case 'honeypot':
+			return __( 'Honeypot', 'secupress' );
+		break;
+		
+		case 'all':
 			return _x( 'All', 'types of attacks', 'secupress' );
+		break;
+	
+		default:
+			return _x( 'Unknown', 'type of attack', 'secupress' );
 		break;
 	}
 }
@@ -2211,6 +2380,49 @@ function secupress_is_mobile( $ua = null ) {
 	return apply_filters( 'wp_is_mobile', $is_mobile );	
 }
 
+/**
+ * Get information about device, browser, OS, more accurate
+ *
+ * @since 2.6
+ * @author Julio Potier
+ * 
+ * @return (array)
+ **/
+function secupress_get_device_infos() {
+	require_once( SECUPRESS_MODULES_PATH . 'users-login/plugins/inc/php/BrowserDetection.php' );
+	$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : 'Mozilla/5.0 (Unknown) GenericBrowser/1.0';
+	$f_browser  = new foroco\BrowserDetection();
+	$data       = $f_browser->getAll( $user_agent );
+	$_64b_i18n  = $data['64bits_mode'] ? ' ' . __( '64 Bits', 'secupress' ) : '';
+	$browser    = 'unknown' !== $data['browser_name'] ? $data['browser_name'] : 'Unknown Browser'; // Do not translate this
+	$os         = 'unknown' !== $data['os_name']      ? $data['os_title'] . ', ' . ucwords( $data['os_family'] ) . $_64b_i18n : 'Unknown OS'; // Do not translate this
+	$device     = 'unknown' !== $data['device_type']  ? ucwords( $data['device_type'] )  : 'Unknown Device'; // Do not translate this
+
+	$sign_keys = [
+		'browser_name',
+		'browser_chrome_original',
+		'browser_firefox_original',
+		'browser_safari_original',
+		'browser_android_webview',
+		'browser_ios_webview',
+		'browser_desktop_mode',
+		'os_title',
+		'os_family',
+		'device_type',
+		'64bits_mode',
+	];
+	$sign_data = array_intersect_key( $data, array_flip( $sign_keys ) );
+
+	return [
+		'browser' => $browser,
+		'os'      => $os,
+		'device'  => $device,
+		'sign'    => md5( serialize( $sign_data ) ),
+		'raw_ua'  => $user_agent,
+	];
+}
+
+/**
 /**
  * Get info for a given plugin
  * 
@@ -2345,10 +2557,10 @@ function secupress_is_soft_request() {
 			( ! empty( $pagenow ) && 'admin-post.php' === $pagenow ) || 
 			wp_is_json_request() || wp_is_jsonp_request() || 
 			wp_doing_cron() || 
-			wp_is_xml_request() || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ||
-			( defined( 'APP_REQUEST' ) && APP_REQUEST ) ||
-			( defined( 'IS_WPCOM' ) && IS_WPCOM ) ||
-			( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'REST_API_REQUEST' ) && REST_API_REQUEST )
+			wp_is_xml_request() || ( defined( 'XMLRPC_REQUEST' ) && constant( 'XMLRPC_REQUEST' ) ) ||
+			( defined( 'APP_REQUEST' ) && constant( 'APP_REQUEST' ) ) ||
+			( defined( 'IS_WPCOM' ) && constant( 'IS_WPCOM' ) ) ||
+			( defined( 'REST_REQUEST' ) && constant( 'REST_REQUEST' ) ) || ( defined( 'REST_API_REQUEST' ) && constant( 'REST_API_REQUEST' ) ) 
 		);
 }
 
@@ -2468,7 +2680,9 @@ function secupress_get_user_data_by( $field, $value, $like = false, $sanitize_cb
 	if ( ! is_a( $user, 'WP_User' ) ) {
 		return false;
 	}
-	update_user_caches( $user );
+	if ( ! empty( $user->user_nicename ) ) {
+		update_user_caches( $user );
+	}
 
 	return $user;
 }
@@ -2476,6 +2690,7 @@ function secupress_get_user_data_by( $field, $value, $like = false, $sanitize_cb
 /**
  * Get a user by id, login or email
  *
+ * @since 2.4.1 Allow WP_Error object as value
  * @since 2.3.18.1 Revamp to use secupress_get_user_data_by()
  * @since 2.2.6
  * @author Julio Potier
@@ -2489,7 +2704,7 @@ function secupress_get_user_data_by( $field, $value, $like = false, $sanitize_cb
  */
 function secupress_get_user_by( $value, $return_field = '' ) {
 	// Already a user.
-	if ( secupress_is_user( $value ) ) {
+	if ( secupress_is_user( $value ) || is_a( $value, 'WP_Error' ) ) {
 		return $value;
 	}
 	$user = false;
@@ -2500,7 +2715,7 @@ function secupress_get_user_by( $value, $return_field = '' ) {
 		$user = secupress_get_user_data_by( $by, $value );
 	}
 	// Asking for an email or login?
-	if ( ! secupress_is_user( $user ) ) {
+	if ( ! secupress_is_user( $value ) ) {
 		$by   = is_email( $value ) ? 'email' : 'login';
 		$user = secupress_get_user_data_by( $by, $value );
 	}
@@ -2593,4 +2808,121 @@ function secupress_display_relogin_message( $errors ) {
 	}
 
 	return $errors;
+}
+
+/**
+ * A simple function to encrypt a key, 1 level better than B 64
+ * Compatible even without openssl available (but weaker)
+ *
+ * /!\ DO NOT USE WITH SENSITIVE DATA, BETTER DO A PASSWORD_VERIFY
+ * 
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @param (string) $key (in clear)
+ * 
+ * @return (string) encrypted $key
+ **/
+function secupress_encrypt_secret_key( $key ) {
+    $iv  = random_bytes( 16 );
+	if ( ! function_exists( 'openssl_encrypt' ) ) {
+		return base64_encode( $iv . $key );
+	}
+	$mk  = secupress_get_option( 'master_key' );
+    $enc = openssl_encrypt( $key, 'aes-256-cbc', $mk, 0, $iv );
+    return base64_encode( $iv . $enc );
+}
+
+/**
+ * A simple function to decrypt a key, 1 level better than B 64
+ * Compatible even without openssl available (but weaker)
+ * 
+ * /!\ DO NOT USE WITH SENSITIVE DATA, BETTER DO A PASSWORD_VERIFY
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @param (string) encrypted $key
+ * 
+ * @return (string) decrypted $key
+ **/
+function secupress_decrypt_secret_key( $enc ) {
+    $data = base64_decode( $enc );
+    $iv   = substr( $data, 0, 16 );
+    $key  = substr( $data, 16 );
+	if ( ! function_exists( 'openssl_encrypt' ) ) {
+		return $key;
+	}
+	$mk   = secupress_get_option( 'master_key' );
+    return openssl_decrypt( $key, 'aes-256-cbc', $mk, 0, $iv );
+}
+
+/**
+ * Create the main hash, that can change
+ * It's not exported!
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @return (string)
+ **/
+function secupress_create_hash_key() {
+	$hk   = secupress_get_option( 'hash_key' );
+	if ( $hk ) {
+		return $hk;
+	}
+	$hk   = secupress_generate_key( 64 );
+	// Do not use secupress_get_option() here.
+	$options             = get_site_option( SECUPRESS_SETTINGS_SLUG );
+	$options['hash_key'] = $hk;
+	secupress_update_options( $options );
+
+	return $hk;
+}
+/**
+ * Create another hash, master that should never change
+ * It's not exported!
+ *
+ * @since 2.3.21
+ * @author Julio Potier
+ * 
+ * @return (string)
+ **/
+function secupress_create_master_key() {
+	$mk   = secupress_get_option( 'master_key' );
+	if ( $mk ) {
+		return $mk;
+	}
+	$mk   = secupress_generate_key( 64 );
+	// Do not use secupress_get_option() here.
+	$options               = get_site_option( SECUPRESS_SETTINGS_SLUG );
+	$options['master_key'] = $mk;
+	secupress_update_options( $options );
+
+	return $mk;
+}
+
+/**
+ * Check if the number of users equals the number of administrators.
+ * This is used to determine if the Honeypot option should be available.
+ *
+ * @since 2.5
+ * @author Julio Potier
+ *
+ * @return (bool) True if all users are administrators, false otherwise.
+ */
+function secupress_is_honeypotable() {
+	$user_counts = count_users();
+	$total_users = $user_counts['total_users'];
+	$admin_count = isset( $user_counts['avail_roles']['administrator'] ) ? $user_counts['avail_roles']['administrator'] : 0;
+	$valid       = $total_users === $admin_count;
+	/**
+	 * Filter the result of secupress_is_honeypotable(), force true to always allow Honeypot.
+	 *
+	 * @since 2.5
+	 * @author Julio Potier
+	 *
+	 * @param (bool) $valid True if all users are administrators, false otherwise.
+	 */
+	return apply_filters( 'secupress.is_honeypotable', $valid );
 }

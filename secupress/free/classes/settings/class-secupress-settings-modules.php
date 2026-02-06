@@ -334,10 +334,17 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 	 */
 	protected function print_current_module() {
 		?>
-		<div class="secupress-tab-content-header">
+		<div class="secupress-tab-content-header secupress-flex secupress-flex-spaced secupress-vcenter">
 			<?php
 			$this->print_module_title();
 			?>
+			<div class="secupress-module-search-wrapper hide-if-no-js">
+				<label for="secupress-module-search" class="screen-reader-text"><?php _e( 'Search', 'secupress' ); ?></label>
+				<span class="dashicons dashicons-search secupress-search-icon" aria-hidden="true"></span>
+				<input type="search" id="secupress-module-search" name="secupress-module-search" class="secupress-module-search" placeholder="<?php esc_attr_e( 'Search...', 'secupress' ); ?>" />
+				<span class="spinner secupress-inline-spinner" style="float: none; margin: 0;"></span>
+				<ul id="secupress-module-search-results" class="secupress-module-search-results" style="display: none;"></ul>
+			</div>
 		</div>
 
 		<?php
@@ -906,13 +913,7 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 	 * @since 1.0
 	 */
 	protected function file_scanner() {
-		?>
-		<p class="submit">
-			<button type="button" disabled="disabled" class="secupress-button">
-				<?php _e( 'Search for malwares', 'secupress' ); ?>
-			</button>
-		</p>
-		<?php
+		secupress_print_scanner_ui();
 	}
 
 

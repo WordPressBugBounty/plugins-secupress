@@ -65,6 +65,7 @@ function secupress_get_removed_plugins() {
 /**
  * Get the plugins not update since 2 years from repo
  *
+ * @since 2.5 Filter plugins with updates older than 2 years
  * @since 2.2.6 Get from our option
  * @author Julio Potier
  * @since 1.0
@@ -73,8 +74,14 @@ function secupress_get_removed_plugins() {
  * @return (array|bool) The plugins from the repository not updated for 2 years
  */
 function secupress_get_notupdated_plugins() {
-	$plugins = get_site_option( SECUPRESS_OLD_PLUGINS );
-	return is_array( $plugins ) ? $plugins : [];
+	$all_plugins = get_site_option( SECUPRESS_OLD_PLUGINS, [] );
+	if ( ! is_array( $all_plugins ) || empty( $all_plugins ) ) {
+		return [];
+	}
+	$two_years_ago = time() - ( 2 * YEAR_IN_SECONDS );
+	return array_filter( $all_plugins, function( $timestamp ) use ( $two_years_ago ) {
+		return $timestamp < $two_years_ago;
+	} );
 }
 
 

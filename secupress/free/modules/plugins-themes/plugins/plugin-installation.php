@@ -41,11 +41,65 @@ add_filter( 'map_meta_cap', 'secupress_no_plugin_action_caps', 10, 2 );
  * @return (array) $caps
  **/
 function secupress_no_plugin_action_caps( $caps, $cap ) {
-	$disallowed_caps = apply_filters( 'secupress.plugins.plugin-installation.disallowed_caps', [ 'delete_plugins' => 1, 'install_plugins' => 1, 'upload_plugin' => 1, 'resume_plugin' => 1, 'activate_plugin' => 1, 'deactivate_plugin' => 1, 'deactivate_plugins' => 1/*, 'activate_plugins' => 1', manage_network_plugins' => 1*/ ] ); // DO NOT UNCOMMENT
-	if ( isset( $disallowed_caps[ $cap ] ) ) {
-		return ['do_not_allow'];
+	$disallowed_caps = apply_filters( 'secupress.plugins.plugin-installation.disallowed_caps', [ 'delete_plugins' => 1, 'install_plugins' => 1, 'upload_plugin' => 1, 'resume_plugin' => 1, 'activate_plugin' => 1, 'deactivate_plugin' => 1, 'deactivate_plugins' => 1/*, 'activate_plugins' => 1', manage_network_plugins' => 1*/ ] );
+	
+	if ( ! isset( $disallowed_caps[ $cap ] ) ) {
+		return $caps;
 	}
-	return $caps;
+	
+	if ( 'install_plugins' === $cap && secupress_is_readonly_plugin_info_request() ) {
+		return $caps;
+	}
+	
+	return ['do_not_allow'];
+}
+
+/**
+ * Check if the request is a read-only consultation (changelog, description, etc.)
+ * 
+ * @since 2.4.1
+ * @author Julio Potier
+ * 
+ * @return bool True if it's a read-only consultation request
+ */
+function secupress_is_readonly_plugin_info_request() {
+	if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'GET' !== $_SERVER['REQUEST_METHOD'] ) {
+		return false;
+	}
+	
+	if ( ! isset( $_GET['tab'] ) || 'plugin-information' !== $_GET['tab'] ) {
+		return false;
+	}
+	
+	$readonly_sections = [ 'changelog', 'description', 'faq', 'screenshots', 'reviews', 'other_notes' ];
+	if ( ! isset( $_GET['section'] ) || ! in_array( $_GET['section'], $readonly_sections, true ) ) {
+		return false;
+	}
+	
+	$install_actions = [ 'install', 'upload', 'activate', 'activate-selected', 'deactivate-selected' ];
+	foreach ( $install_actions as $action ) {
+		if ( isset( $_GET[ $action ] ) || isset( $_POST[ $action ] ) ) {
+			return false;
+		}
+	}
+	
+	if ( isset( $_GET['plugin'] ) ) {
+		$plugin_slug = sanitize_text_field( $_GET['plugin'] );
+		if ( secupress_is_plugin_installed( $plugin_slug ) ) {
+			return true;
+		}
+	}
+	
+	$referer = wp_get_referer();
+	if ( $referer && false !== strpos( $referer, 'plugins.php' ) ) {
+		return true;
+	}
+	
+	if ( isset( $_GET['TB_iframe'] ) && 'true' === $_GET['TB_iframe'] ) {
+		return true;
+	}
+	
+	return false;
 }
 
 add_filter( 'network_admin_plugin_action_links', 'secupress_no_plugin_action_links', SECUPRESS_INT_MAX, 2 );

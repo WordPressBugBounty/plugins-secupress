@@ -510,10 +510,12 @@ function secupress_create_deactivation_notice_muplugin( $plugin_id, $message ) {
 
 	$filesystem->put_contents( $filename, $contents );
 
-	$mus = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );
-	if ( $mus ) {
-		$mus[ basename( $filename ) ] = get_plugin_data( $filename );
-		update_option( SECUPRESS_INSTALLED_MUPLUGINS, $mus );
+	if ( defined( 'SECUPRESS_INSTALLED_MUPLUGINS' ) ) {
+		$mus = get_option( SECUPRESS_INSTALLED_MUPLUGINS, [] );
+		if ( $mus ) {
+			$mus[ basename( $filename ) ] = get_plugin_data( $filename );
+			update_option( SECUPRESS_INSTALLED_MUPLUGINS, $mus );
+		}
 	}
 }
 

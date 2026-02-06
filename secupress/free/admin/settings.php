@@ -84,6 +84,22 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 
 	wp_localize_script( 'secupress-wordpress-js', 'SecuPressi18n', $localize_wp );
 
+	// Dashboard widget.
+	if ( 'index.php' === $hook_suffix && current_user_can( secupress_get_capability() ) ) {
+		$chart_months = get_user_meta( get_current_user_id(), 'secupress_attacks_widget_chart_months', true );
+		$chart_months = ! $chart_months ? 6 : (int) $chart_months;
+		if ( $chart_months > 0 ) {
+			wp_enqueue_script( 'secupress-chartjs', SECUPRESS_ADMIN_JS_URL . 'chart' . $suffix . '.js', array(), '1.0.2.1', true );
+			wp_enqueue_script( 'secupress-widget-js', SECUPRESS_ADMIN_JS_URL . 'secupress-widget' . $suffix . '.js', array( 'jquery', 'secupress-chartjs' ), $version, true );
+			
+			// Prepare and localize chart data
+			$chart_data = secupress_prepare_widget_chart_data();
+			wp_localize_script( 'secupress-widget-js', 'SecuPressi18nWidget', array(
+				'chartData' => $chart_data,
+			) );
+		}
+	}
+
 	$pages = array(
 		'toplevel_page_' . SECUPRESS_PLUGIN_SLUG . '_scanners'  => 1,
 		SECUPRESS_PLUGIN_SLUG . '_page_' . SECUPRESS_PLUGIN_SLUG . '_modules'  => 1,
@@ -139,9 +155,9 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 
 		wp_localize_script( 'secupress-modules-js', 'SecuPressi18nModules', array(
 			// Roles.
-			'selectOneRoleMinimum' => __( 'Select 1 role minimum', 'secupress' ),
+			'selectOneRoleMinimum' => __( 'Select as least 1 role', 'secupress' ),
 			// Firewall.
-			'selectOneOptMinimum'  => __( 'Select 1 option minimum', 'secupress' ),
+			'selectOneOptMinimum'  => __( 'Select as least 1 option', 'secupress' ),
 			// Generic.
 			'confirmTitle'         => __( 'Are you sure?', 'secupress' ),
 			'confirmText'          => __( 'OK', 'secupress' ),
@@ -191,9 +207,15 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 			'malwareUpdateKO'      => __( 'Impossible to update the malware databases. Check your license status.', 'secupress' ),
 			// Move Login.
 			'moveLoginNonce'       => $move_login_nonce,
+			// Module Search.
+			'searchNonce'          => wp_create_nonce( 'secupress_search' ),
+			'version'              => SECUPRESS_VERSION,
 			// Misc.
 			'resetDefault'         => __( 'This will reset the setting values to default for this module.', 'secupress' ),
 			'regenKeys'            => sprintf( __( 'This will change the %d security keys for your installation.<br>You may need to sign back in.', 'secupress' ), 10 ),
+			// Delete files.
+			'confirmDeleteFiles'   => __( 'Are you sure you want to delete the selected files?<br>This action cannot be undone.', 'secupress-pro' ),
+			'yesDeleteFiles'       => __( 'Yes, delete files', 'secupress-pro' ),
 		) );
 
 	}

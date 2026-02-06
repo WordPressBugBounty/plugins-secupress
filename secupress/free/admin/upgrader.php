@@ -404,6 +404,29 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			wp_schedule_single_event( time(), 'secupress_malware_files' );
 		}
 	}
+	// < 2.3.21
+	if ( version_compare( $actual_version, '2.3.21', '<' ) ) {
+		secupress_create_master_key();
+	}
+	// < 2.4.1
+	if ( version_compare( $actual_version, '2.4.1', '<' ) ) {
+		// Migrate attacks data from old format to new format
+		$attack_types = get_option( SECUPRESS_ATTACKS, [] );
+		if ( ! empty( $attack_types ) ) {
+			secupress_migrate_attacks_data( $attack_types );
+		}
+	}
+	// < 2.6
+	if ( version_compare( $actual_version, '2.6', '<' ) ) {
+		delete_site_option( SECUPRESS_WP_CORE_FILES_HASHES );
+		
+		if ( defined( 'SECUPRESS_CONTENT_ALLOWED' ) ) {
+			$content_allowed = get_site_option( SECUPRESS_CONTENT_ALLOWED );
+			if ( is_array( $content_allowed ) ) {
+				update_site_option( SECUPRESS_CONTENT_ALLOWED, str_rot13( json_encode( $content_allowed ) ) );
+			}
+		}
+	}
 	// DEV: DO NOT REDIRECT / DO NOT AUTOLOGIN / DO NOT USE $modulenow //
 }
 
@@ -661,13 +684,17 @@ if ( ! secupress_is_white_label() ) {
 	 **/
 	function secupress_display_whats_new() {
 		$notice_id1 = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
-		$notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
+		// $notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
 		if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id1 ) ) {
 			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
 			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-			$blogpost  = __( 'https://secupress.me/blog/secupress-v2-3/', 'secupress' );
+			$blogpost  = __( 'https://secupress.me/blog/secupress-v2-6/', 'secupress' );
 			$newitems  = [ 	
-							sprintf( __( 'So many things have changed, read our dedicated blogpost %sSecuPress v2.3 aka Starboost%s!', 'secupress' ), sprintf( '<a href="%s" target="_blank">', $blogpost ), '</a>' ),
+							__( 'New: GeoIP Location on Login', 'secupress' ),
+							__( 'New: Search field in admin UI.', 'secupress' ),
+							__( 'Improvement: UI for Malware Scanner has been improved.', 'secupress' ),
+							__( '6 more fixes.', 'secupress' ),
+							make_clickable($blogpost)
 						];
 			if ( ! empty( $newitems ) ) {
 				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
@@ -676,23 +703,23 @@ if ( ! secupress_is_white_label() ) {
 			}
 			return;
 		} 
-		else {
-			if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
-				$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
-				$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-				$newitems  = [ 	
-								__( 'Here are some key improvement for this version:', 'secupress' ),
-								__( 'Fix: JS Error in Console related to delayed comments', 'secupress' ),
-								__( 'Improve: <em>"Strong Passwords"</em> and <em>"Bad Usernames"</em> module are now bypassable using the already existing constant <code>SECUPRESS_ALLOW_LOGIN_ACCESS</code>', 'secupress' ),
-							];
-				if ( secupress_is_pro() ) {
-					$newitems[] = __( 'Improve: Our data files are now stored in <code>/wp-content/secupress-data/</code> instead of inside the plugin to prevent data deletion on each plugin update.', 'secupress' );
-				}
-				if ( ! empty( $newitems ) ) {
-					$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-					secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
-				}
-			}
-		}
+		// else {
+		// 	if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
+		// 		$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
+		// 		$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+		// 		$newitems  = [ 	
+		// 						__( 'Here are some key improvement for this version:', 'secupress' ),
+		// 						__( 'Fix: JS Error in Console related to delayed comments', 'secupress' ),
+		// 						__( 'Improve: <em>"Strong Passwords"</em> and <em>"Bad Usernames"</em> module are now bypassable using the already existing constant <code>SECUPRESS_ALLOW_LOGIN_ACCESS</code>', 'secupress' ),
+		// 					];
+		// 		if ( secupress_is_pro() ) {
+		// 			$newitems[] = __( 'Improve: Our data files are now stored in <code>/wp-content/secupress-data/</code> instead of inside the plugin to prevent data deletion on each plugin update.', 'secupress' );
+		// 		}
+		// 		if ( ! empty( $newitems ) ) {
+		// 			$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
+		// 			secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
+		// 		}
+		// 	}
+		// }
 	}
 }

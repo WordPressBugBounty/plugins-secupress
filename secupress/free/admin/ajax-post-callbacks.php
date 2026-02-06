@@ -683,18 +683,19 @@ add_action( 'admin_post_nopriv_secupress_unlock_admin', 'secupress_unlock_admin_
  * @since 1.3.2
  **/
 function secupress_unlock_admin_ajax_post_cb() {
+	$message = __( 'If this email address exists, an email will be sent to it to unlock your account.', 'secupress' );
 	if ( ! isset( $_POST['_wpnonce'], $_POST['email'] ) || ! is_email( $_POST['email'] ) || ! check_ajax_referer( 'secupress-unban-ip-admin', '_wpnonce' ) ) { // WPCS: CSRF ok.
-		wp_die( 'Something went wrong.' );
+		secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 	}
 	$_CLEAN          = [];
 	$_CLEAN['email'] = is_email( $_POST['email'] );
 	if ( ! $_CLEAN['email'] ) {
-		wp_die( 'Something went wrong.' );
+		secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 	}
 	$user            = get_user_by( 'email', $_CLEAN['email'] );
 	$capa            = secupress_get_capability( true, 'unlock_administrator' );
 	if ( ! secupress_is_user( $user ) || ! user_can( $user, $capa ) ) {
-		wp_die( 'Something went wrong.' );
+		secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 	}
 	$url_remember = wp_login_url();
 
@@ -741,7 +742,7 @@ All at ###SITENAME###
 
 
 	$sent = secupress_send_mail( $_CLEAN['email'], $subject, $message );
-	secupress_die( $sent ? __( 'Email sent, check your mailbox.', 'secupress' ) : __( 'Email not sent, please contact the support.', 'secupress' ), __( 'Email', 'secupress' ), array( 'force_die' => true ) );
+	secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 }
 
 add_action( 'admin_post_nopriv_secupress_deactivate_module', 'secupress_deactivate_module_admin_post_cb' );
@@ -1066,4 +1067,102 @@ function secupress_check_malware_plugin_admin_post_cb() {
 	set_transient( $tr_name, $res, DAY_IN_SECONDS );
 
 	wp_send_json_success( $res );
+}
+
+
+add_action( 'wp_ajax_secupress_search', 'secupress_search_ajax_cb' );
+/**
+ * Used to handle search requests in modules page.
+ *
+ * @author Julio Potier
+ * @since 2.6
+ *
+ * @return (string) JSON
+ */
+function secupress_search_ajax_cb() {
+	secupress_check_user_capability();
+	secupress_check_admin_referer( 'secupress_search', 'secupress_search_nonce' );
+
+	$search_query = isset( $_POST['secupress_module_search'] ) ? trim( $_POST['secupress_module_search'] ) : '';
+
+	if ( empty( $search_query ) || strlen( $search_query ) < 2 ) {
+		wp_send_json_success( [] );
+	}
+
+	$results        = [];
+	$results_by_key = [];
+	$modules        = secupress_get_modules();
+	$search_query   = function_exists( 'mb_strtolower' ) ? mb_strtolower( $search_query ) : strtolower( $search_query );
+
+	foreach ( $modules as $module_key => $module_data ) {
+		if ( empty( $module_data['submodules'] ) || ! is_array( $module_data['submodules'] ) ) {
+			continue;
+		}
+
+		foreach ( $module_data['submodules'] as $submodule_key => $submodule_title ) {
+			if ( empty( $submodule_title ) ) {
+				continue;
+			}
+
+			$clean_title       = preg_replace( '/^[>*]+/', '', $submodule_title );
+			$clean_title       = trim( wp_strip_all_tags( $clean_title ) );
+			$clean_title_lower = function_exists( 'mb_strtolower' ) ? mb_strtolower( $clean_title ) : strtolower( $clean_title );
+			$title_words       = preg_split( '/\s+/', $clean_title_lower, -1, PREG_SPLIT_NO_EMPTY );
+			$best_score        = 0;
+			$has_exact_match   = false;
+
+			foreach ( $title_words as $title_word ) {
+				if ( $title_word === $search_query ) {
+					$has_exact_match = true;
+				}
+				$has_word_match    = false !== ( function_exists( 'mb_strpos' ) ? mb_strpos( $title_word, $search_query ) : strpos( $title_word, $search_query ) );
+				$levenshtein_score = function_exists( 'secupress_levenshtein' ) ? secupress_levenshtein( $title_word, $search_query ) : 0;
+				$prefix_len        = 0;
+				$max_prefix_len    = min( strlen( $title_word ), strlen( $search_query ) );
+				for ( $i = 0; $i < $max_prefix_len; $i++ ) {
+					if ( $title_word[$i] !== $search_query[$i] ) {
+						break;
+					}
+					$prefix_len++;
+				}
+				$prefix_score   = $prefix_len >= 3 ? 0.7 : 0;
+				$word_score     = $has_word_match ? 1 : max( $levenshtein_score, $prefix_score );
+				if ( $word_score > $best_score ) {
+					$best_score = $word_score;
+				}
+			}
+
+			if ( $best_score >= 0.7 ) {
+				$url            = secupress_admin_url( 'modules', $module_key ) . '#' . $submodule_key;
+				$result_key     = $module_key . '|' . $submodule_key;
+				if ( ! isset( $results_by_key[ $result_key ] ) || $best_score > $results_by_key[ $result_key ]['score'] ) {
+					$results_by_key[ $result_key ] = [
+						'title' => $clean_title,
+						'url'   => $url,
+						'score' => $best_score,
+						'exact' => $has_exact_match ? 1 : 0,
+					];
+				}
+			}
+		}
+	}
+
+	if ( $results_by_key ) {
+		$results = array_values( $results_by_key );
+		usort( $results, function( $left, $right ) {
+			if ( $left['exact'] !== $right['exact'] ) {
+				return ( $left['exact'] > $right['exact'] ) ? -1 : 1;
+			}
+			if ( $left['score'] === $right['score'] ) {
+				return 0;
+			}
+			return ( $left['score'] > $right['score'] ) ? -1 : 1;
+		} );
+		foreach ( $results as $index => $result ) {
+			unset( $results[ $index ]['score'] );
+			unset( $results[ $index ]['exact'] );
+		}
+	}
+
+	wp_send_json_success( $results );
 }

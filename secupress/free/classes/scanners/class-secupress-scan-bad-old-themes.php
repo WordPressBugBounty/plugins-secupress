@@ -63,6 +63,7 @@ class SecuPress_Scan_Bad_Old_Themes extends SecuPress_Scan implements SecuPress_
 	 * @return (string|array) A message if a message ID is provided. An array containing all messages otherwise.
 	 */
 	public static function get_messages( $message_id = null ) {
+		$_110 = ! secupress_is_pro() ? sprintf( __( 'The %sPRO version%s will be more accurate.', 'secupress' ), '<a href="' . secupress_admin_url( 'get-pro' ) . '">', '</a>' ) : ' ' . __( 'Scan it now.', 'secupress' );
 		$messages = [
 			// "good"
 			0   => __( 'You don’t use closed or old themes', 'secupress' ),
@@ -75,7 +76,7 @@ class SecuPress_Scan_Bad_Old_Themes extends SecuPress_Scan implements SecuPress_
 			103 => _n_noop( 'Sorry, the following theme could not be deleted: %s.', 'Sorry, the following themes could not be deleted: %s.', 'secupress' ),
 			/** Translators: %s is the theme name. */
 			104 => sprintf( __( 'You have a big network, %s must work on some data before being able to perform this scan.', 'secupress' ), '<strong>' . SECUPRESS_PLUGIN_NAME . '</strong>' ),
-			110 => sprintf( __( 'Your installation may contain old or closed plugins. The %sPRO version%s will be more accurate.', 'secupress' ), '<a href="' . secupress_admin_url( 'get-pro' ) . '">', '</a>' ),
+			110 => sprintf( __( 'Your installation may contain old or closed themes.%s', 'secupress' ), $_110 ),
 			// "bad"
 			/** Translators: 1 is a number, 2 is a theme name (or a list of theme names). */
 			200 => _n_noop( '<strong>%1$d theme</strong> is no longer in the WordPress repository: %2$s.', '<strong>%1$d themes</strong> are no longer in the WordPress repository: %2$s.', 'secupress' ),

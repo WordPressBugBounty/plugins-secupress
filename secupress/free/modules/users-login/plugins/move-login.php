@@ -72,7 +72,6 @@ function secupress_move_login_get_default_slugs() {
  */
 function secupress_move_login_get_slugs() {
 	$slugs = secupress_move_login_get_default_slugs();
-
 	foreach ( $slugs as $action => $dummy ) {
 		$slugs[ $action ] = secupress_get_module_option( 'move-login_slug-' . $action, $action, 'users-login' );
 		$slugs[ $action ] = sanitize_title( $slugs[ $action ], $action, 'display' );
@@ -82,7 +81,10 @@ function secupress_move_login_get_slugs() {
 	$slugs['confirmaction']           = 'confirmaction';
 	$slugs['confirm_admin_email']     = 'confirm_admin_email';
 	$slugs['lostpassword']            = 'lostpassword';
-
+	// If registration is disabled, we generate a random slug at each page load for the register page.
+	if ( '1' !== get_option( 'users_can_register' ) ) {
+		$slugs['register']   = secupress_generate_key();
+	}
 	return $slugs;
 }
 

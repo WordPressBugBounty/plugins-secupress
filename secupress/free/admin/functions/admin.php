@@ -149,10 +149,11 @@ function secupress_text_diff( $left_string, $right_string, $args = array() ) {
 	$text_diff    = new Text_Diff( $left_lines, $right_lines );
 	$renderer     = new SecuPress_Text_Diff_Renderer_Table( $args );
 	$diff         = $renderer->render( $text_diff );
-
+	$encoded_diff = urlencode( str_replace( __( 'Added:' ), '', trim( wp_strip_all_tags( $diff ) ) ) );
+	$compare_diff = '%26nbsp%3B+%24wp_local_package+%3D+%26%23039%3B'.$wp_local_package.'%26%23039%3B%3B';
 	if ( ( ! $wp_local_package && ! $diff ) ||
-		( $wp_local_package && ( ! $diff || trim( strip_tags( $diff ) ) === '&nbsp;&nbsp;$wp_local_package = \'' . $wp_local_package . '\';' ) )
-		) {
+		( $wp_local_package && ( ! $diff || strcmp( $compare_diff, $encoded_diff ) === 0 ) )
+	) {
 		$diff = '<tr><td>// ' . __( 'No differences', 'secupress' ) . '</td><td>// ' . __( 'No differences', 'secupress' ) . '</td></tr>';
 	}
 

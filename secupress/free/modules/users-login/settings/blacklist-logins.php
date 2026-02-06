@@ -144,22 +144,11 @@ $this->add_field( array(
 	'value'             => (int) secupress_is_submodule_active( 'users-login', 'stop-user-enumeration' ),
 	'label'             => __( 'Yes, prevent user and author enumeration', 'secupress' ),
 	'helpers'           => [
-							[ 'type' => 'warning', 'description' => sprintf( __( 'If you are using the %sWooCommerce Mobile App%s, do not activate this module.', 'secupress' ), '<a href="' . $woomobileurl . '" target="_blank" rel="noreferrer" rel="noopener">', '</a>' ), ],
+							[ 'type' => 'warning', 'description' => __( 'Author pages on the front end will redirect to your homepage to hide usernames.', 'secupress' ), ],
+							[ 'type' => 'warning', 'description' => secupress_is_plugin_active( 'woocommerce/cwoocommerce.php' ) ? sprintf( __( 'If you are using the %sWooCommerce Mobile App%s, do not activate this module.', 'secupress' ), '<a href="' . $woomobileurl . '" target="_blank" rel="noreferrer" rel="noopener">', '</a>' ) : '', ],
 						]
 ) );
-/*
-$this->add_field( array(
-	'title'             => __( 'Prevent Password Reset', 'secupress' ),
-	'label_for'         => $this->get_field_name( 'prevent-reset-password' ),
-	'plugin_activation' => true,
-	'type'              => 'checkbox',
-	'value'             => (int) secupress_is_submodule_active( 'users-login', 'prevent-reset-password' ),
-	'label'             => __( 'Yes, prevent the usage of Password Reset', 'secupress' ),
-	'helpers'           => [
-							[ 'type' => $e_helper_type, 'description' => $e_helper_desc, ],
-						]
-) );
-*/
+
 $main_field_name  = $this->get_field_name( 'default-role-activated' );
 $is_plugin_active = secupress_is_submodule_active( 'users-login', 'default-role' );
 $default_role     = secupress_translate_user_role( wp_roles()->roles[ get_option( 'default_role' ) ]['name'] );

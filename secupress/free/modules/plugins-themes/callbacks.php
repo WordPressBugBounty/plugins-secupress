@@ -75,7 +75,7 @@ function secupress_plugins_settings_callback( $modulenow, &$settings, $activate 
 
 	// (De)Activation.
 	if ( $plugins_actions && ! $confirmed ) {
-		secupress_add_transient_notice( sprintf( __( 'The <strong>%s</strong> module requires confirmation. Please try to activate it again.', 'secupress' ), __( 'Plugin Actions', 'secupress' ) ), 'warning', 'missing-confirmation' );
+		secupress_add_transient_notice( '<p>' . sprintf( __( 'The <strong>%s</strong> module requires confirmation. Please try to activate it again.', 'secupress' ) . '</p>', __( 'Plugin Actions', 'secupress' ) ), 'warning', 'missing-confirmation' );
 	}
 	secupress_manage_submodule( $modulenow, 'plugin-installation', $confirmed && $plugins_actions ); // keep the name "plugin-installation", it's the file
 

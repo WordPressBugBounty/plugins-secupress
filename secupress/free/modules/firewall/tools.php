@@ -253,7 +253,7 @@ function secupress_block_bad_content_but_what( $function, $server, $block_id ) {
 	if ( 'QUERY_STRING' !== $server && ! isset( $check_value[1] ) ) {
 		return;
 	}
-	$check_value  = end( $check_value );
+	$check_value  = urldecode( end( $check_value ) );
 	$bad_contents = "secupress_firewall_bbq_{$function}_content_bad_contents_list_default";
 	if ( ! function_exists( $bad_contents ) ) {
 		wp_die( esc_html( __FUNCTION__ ) ); // Should not happen in live.

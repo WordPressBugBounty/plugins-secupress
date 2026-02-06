@@ -953,3 +953,71 @@ function secupress_get_basic_auth_headers( $consumer_email = '', $consumer_key =
 
 	return [ 'Authorization' => 'Basic ' . base64_encode( $consumer_email . ':' . $consumer_key ) ];
 }
+
+/**
+ * Returns true if 2 given IPs are close enough
+ *
+ * @since 2.6
+ * @author Julio Potier
+ * 
+ * @param (string) $ip1
+ * @param (string) $ip2, default is current visitor IP
+ * @param (int) $network, default is 255
+ * 
+ * @return (bool)
+ **/
+function secupress_ips_are_close( $ip1, $ip2 = '', $network = 255 ) {
+	$ip2 = $ip2 ?: secupress_get_ip();
+
+	if ( ! secupress_ip_is_valid( $ip1 ) || ! secupress_ip_is_valid( $ip2 ) ) {
+		return false;
+	}
+
+	$is_ipv4_1 = filter_var( $ip1, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+	$is_ipv4_2 = filter_var( $ip2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+	$is_ipv6_1 = filter_var( $ip1, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 );
+	$is_ipv6_2 = filter_var( $ip2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 );
+
+	if ( $is_ipv4_1 && $is_ipv4_2 ) {
+		$network1 = preg_replace( '/\.[^.]+$/', '', $ip1 );
+		$network2 = preg_replace( '/\.[^.]+$/', '', $ip2 );
+
+		if ( 0 === strcmp( $network1, $network2 ) ) {
+			return true;
+		}
+
+		$ip_diff = abs( ip2long( $ip1 ) - ip2long( $ip2 ) );
+		return $ip_diff <= $network;
+	}
+
+	if ( $is_ipv6_1 && $is_ipv6_2 ) {
+		$bin1 = inet_pton( $ip1 );
+		$bin2 = inet_pton( $ip2 );
+
+		if ( false === $bin1 || false === $bin2 ) {
+			return false;
+		}
+
+		$bytes1 = unpack( 'n*', $bin1 );
+		$bytes2 = unpack( 'n*', $bin2 );
+
+		if ( ! $bytes1 || ! $bytes2 ) {
+			return false;
+		}
+
+		$segments_to_compare = min( 4, ceil( $network / 16 ) );
+
+		for ( $i = 1; $i <= $segments_to_compare; $i++ ) {
+			if ( ! isset( $bytes1[ $i ] ) || ! isset( $bytes2[ $i ] ) ) {
+				return false;
+			}
+			if ( $bytes1[ $i ] !== $bytes2[ $i ] ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}

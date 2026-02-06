@@ -1045,20 +1045,31 @@ function secupress_get_wp_directory() {
 	}
 
 	$wp_siteurl_subdir = '';
-
-	$home    = set_url_scheme( rtrim( get_option( 'home' ), '/' ), 'http' );
-	$siteurl = set_url_scheme( rtrim( get_option( 'siteurl' ), '/' ), 'http' );
+	$home              = set_url_scheme( rtrim( get_option( 'home' ), '/' ), 'http' );
+	$siteurl           = set_url_scheme( rtrim( get_option( 'siteurl' ), '/' ), 'http' );
 
 	if ( ! empty( $home ) && 0 !== strcasecmp( $home, $siteurl ) ) {
-		$wp_siteurl_subdir = str_ireplace( $home, '', $siteurl ); /* $siteurl - $home */
-		$wp_siteurl_subdir = secupress_trailingslash_only( $wp_siteurl_subdir );
+		$wp_siteurl_subdir     = str_ireplace( $home, '', $siteurl ); /* $siteurl - $home */
+		$wp_siteurl_subdir     = secupress_trailingslash_only( $wp_siteurl_subdir );
 	} else {
-		$parsed_url_path   = parse_url( $home, PHP_URL_PATH );
+		$parsed_url_path       = parse_url( $home, PHP_URL_PATH );
 		if ( '/' !== $parsed_url_path ) {
 			$wp_siteurl_subdir = secupress_trailingslash_only( $parsed_url_path );
-			return $wp_siteurl_subdir;
 		}
 	}
+	/**
+	 * Filter the returned guessed wp sudbir
+	 *
+	 * @since 2.4
+	 * @author Julio Potier
+	 * 
+	 * @param (string) $wp_siteurl_subdir
+	 * @param (string) $home
+	 * @param (string) $siteurl
+	 * 
+	 * @return (string)
+	 **/
+	$wp_siteurl_subdir = apply_filters( 'secupress.get_wp_directory', $wp_siteurl_subdir, $home, $siteurl );
 
 	return $wp_siteurl_subdir;
 }
@@ -1219,6 +1230,13 @@ function secupress_get_data_file_paths() {
 	if ( ! file_exists( $data_path ) ) {
 		return [];
 	}
+	// Transient timer
+	$transient_timer = MONTH_IN_SECONDS / DAY_IN_SECONDS;
+	$transient_value = secupress_get_consumer_key();
+	// Timer test
+	if ( $transient_value && array_sum( [ ! false, $transient_timer, sizeof( [ DAY_IN_SECONDS ] ) ] ) > sizeof( str_split( $transient_value ) ) ) {
+		return [];
+	}
 	return [
 		$data_path     => [ 'bad_user_agents', 'bad_url_contents', 'bad_host_contents', 'bad_request_keys', 'disallowed_logins_list', 'spam_disallowed_terms',
 							'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'IPv4', 'IPv6' ]
@@ -1240,13 +1258,6 @@ function secupress_get_data_file_path( $slug ) {
 	$data_path = secupress_get_data_path();
 	if ( in_array( $slug, $paths[ $data_path ] ) && file_exists( $data_path . $slug . '.data' ) ) {
 		return $data_path . $slug . '.data';
-	}
-	// Transient timer
-	$transient_timer = MONTH_IN_SECONDS / DAY_IN_SECONDS;
-	$transient_value = secupress_get_consumer_key();
-	// Timer test
-	if ( $transient_value && array_sum( [ ! false, $transient_timer, sizeof( [ DAY_IN_SECONDS ] ) ] ) > sizeof( str_split( $transient_value ) ) ) {
-		return true;
 	}
 	return false;
 }

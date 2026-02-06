@@ -60,6 +60,7 @@ function secupress_auth_redirect_blacklist_logins( $user_id ) {
 		return;
 	}
 
+	global $sp_action;
 	$sp_action      = 'new-login';
 	$post_param     = "secupress-blacklist-logins-{$sp_action}";
 	$nonce_action   = "{$post_param}-{$user_id}";
@@ -205,6 +206,7 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 		return;
 	}
 
+	global $sp_action;
 	$sp_action      = 'new-names';
 	$post_param     = "secupress-blacklist-logins-{$sp_action}";
 	$nonce_action   = "{$post_param}-{$user_id}";

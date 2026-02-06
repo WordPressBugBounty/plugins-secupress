@@ -445,3 +445,31 @@ function secupress_active_plugins_network_error() {
 				);
 	secupress_add_notice( $message, 'error', 'active-plugins-error' );
 }
+
+
+add_action( 'admin_notices', 'secupress_check_default_login_slug_notice' );
+/**
+ * Display a notice if the login slug is still set to the default value "login".
+ *
+ * @since 2.5
+ * @author Julio Potier
+ */
+function secupress_check_default_login_slug_notice() {
+	if ( ! current_user_can( secupress_get_capability() ) ) {
+		return;
+	}
+	if ( ! secupress_is_submodule_active( 'users-login', 'move-login' ) ) {
+		return;
+	}
+	$login_slug = secupress_get_module_option( 'move-login_slug-login', 'login', 'users-login' );
+	if ( 'login' === $login_slug ) {
+		$settings_url = secupress_admin_url( 'modules', 'users-login' );
+		$message = sprintf(
+			'<p>' . __( 'The login page slug is still set to its default value "%1$s". Please configure a custom slug in the %2$ssettings%3$s to secure your login page.', 'secupress' ) . '</p>',
+			'<code>login</code>',
+			sprintf( '<a href="%s">', esc_url( $settings_url ) ),
+			'</a>'
+		);
+		secupress_add_notice( $message, 'warning', 'default-login-slug' );
+	}
+}
