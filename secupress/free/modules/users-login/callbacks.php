@@ -92,7 +92,7 @@ function secupress_captcha_settings_callback( $modulenow, &$settings, $activate 
 	// (De)Activation.
 	if ( false !== $activate ) {
 		secupress_manage_submodule( $modulenow, 'login-captcha', ! empty( $activate['captcha_activate'] ) );
-		if ( 'challenge' === $settings['captcha_captcha-style'] ) {
+		if ( isset( $settings['captcha_captcha-style'] ) && 'challenge' === $settings['captcha_captcha-style'] ) {
 			$sets = secupress_get_emojiset( 'all' );
 			$settings['captcha_emoji-set'] = 'random' || isset( $sets[ $settings['captcha_emoji-set'] ] ) ? $settings['captcha_emoji-set'] : reset( $sets );
 		}

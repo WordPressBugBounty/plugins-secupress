@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2026-01-16 10:16+0100\n"
-"PO-Revision-Date: 2026-01-16 10:16+0100\n"
+"POT-Creation-Date: 2026-04-02 16:56+0200\n"
+"PO-Revision-Date: 2026-04-02 16:56+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: "
 "_x:1,2c;__;_e;_ex:1,2c;_n:1,2;_nx:4c,1,2;esc_html__;esc_html_e;esc_attr__;esc_attr_e;_n_noop:1,2;_nx_noop:4c,1,2;esc_attr_x;esc_html_x\n"
@@ -83,7 +83,7 @@ msgstr ""
 "Puisque votre fichier %1$s ne peut pas être édité. Merci d’ajouter ceci dans "
 "votre fichier : %2$s"
 
-#: free/activation.php:376 pro/activation.php:227
+#: free/activation.php:376 pro/activation.php:232
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit it manually. "
@@ -1593,7 +1593,7 @@ msgstr "Docs"
 msgid "Settings"
 msgstr "Réglages"
 
-#: free/admin/settings.php:454 pro/common.php:297
+#: free/admin/settings.php:454 pro/common.php:301
 msgctxt "Latest scans"
 msgid "M dS, Y \\a\\t h:ia"
 msgstr "l j F Y \\à G:i:s"
@@ -12198,12 +12198,12 @@ msgstr ""
 "Protégez votre WordPress avec SecuPress, analysez et assurez-vous de la "
 "sécurité de votre site quotidiennement."
 
-#: pro/activation.php:94
+#: pro/activation.php:99
 #, php-format
 msgid "[%s] PasswordLess 2FA: Validation required"
 msgstr "[%s] A2F PasswordLess : Validation requise"
 
-#: pro/activation.php:95
+#: pro/activation.php:100
 #, php-format
 msgid ""
 "Hello %1$s,\n"
@@ -12229,7 +12229,7 @@ msgstr ""
 "L’équipe de ###SITENAME###\n"
 "###SITEURL###"
 
-#: pro/activation.php:235
+#: pro/activation.php:240
 #, php-format
 msgid ""
 "It seems your %s file is not writable, you have to edit it manually. Please "
@@ -12238,12 +12238,12 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devez l’éditer "
 "manuellement. Merci de supprimer toutes les règles les marqueurs :"
 
-#: pro/activation.php:242 pro/activation.php:375
+#: pro/activation.php:247 pro/activation.php:380
 #, php-format
 msgid "%1$s and %2$s"
 msgstr "%1$s et %2$s"
 
-#: pro/activation.php:293
+#: pro/activation.php:298
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit it manually. "
@@ -12252,7 +12252,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devez l’éditer "
 "manuellement. Merci de supprimer tous les nœuds avec %2$s."
 
-#: pro/activation.php:304
+#: pro/activation.php:309
 #, php-format
 msgid ""
 "It seems your %1$s file is not writable, you have to edit it manually. "
@@ -12261,7 +12261,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devez l’éditer "
 "manuellement. Merci de supprimer tous les nœuds avec %2$s"
 
-#: pro/activation.php:360
+#: pro/activation.php:365
 #, php-format
 msgid ""
 "Your server runs <strong>Ngnix</strong>, you have to edit the configuration "
@@ -12272,7 +12272,7 @@ msgstr ""
 "votre fichier de configuration manuellement. Merci de supprimer toutes les "
 "règles entre %1$s et %2$s du fichier %3$s."
 
-#: pro/activation.php:368
+#: pro/activation.php:373
 #, php-format
 msgid ""
 "Your server runs <strong>Ngnix</strong>, you have to edit the configuration "
@@ -12283,7 +12283,7 @@ msgstr ""
 "votre fichier de configuration manuellement. Merci de supprimer toutes les "
 "règles du fichier %1$s entre les marqueurs suivants :"
 
-#: pro/activation.php:548
+#: pro/activation.php:553
 #, php-format
 msgid ""
 "There is a new version of SecuPress Pro available. <a href=\"%s\" "
@@ -12874,6 +12874,10 @@ msgstr "La base de virus a été mise à jour en version %s."
 #: pro/common.php:204
 msgid "Every week"
 msgstr "Toutes les semaines"
+
+#: pro/common.php:208
+msgid "Every month"
+msgstr "Tous les mois"
 
 #: pro/functions/common.php:236
 msgid "Insert/edit link"

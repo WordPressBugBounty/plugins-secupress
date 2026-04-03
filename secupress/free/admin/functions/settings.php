@@ -381,7 +381,7 @@ function secupress_print_scanner_ui( $scanner_results = [] ) {
 						<p class="secupress-help-banner-highlight"><?php _e( 'Need help cleaning your hacked website? Our security experts are here for you!', 'secupress' ); ?></p>
 					</div>
 					<div class="secupress-help-banner-cta">
-						<a class="secupress-button secupress-button-tertiary" href="<?php echo esc_url( secupress_admin_url( 'get-pro' ) ); ?>#services">
+						<a class="secupress-button secupress-button-tertiary" href="<?php echo esc_url( secupress_admin_url( 'modules', 'services' ) ); ?>">
 							<span class="dashicons dashicons-businessman"></span>
 							<?php _e( 'Ask an Expert', 'secupress' ); ?>
 						</a>

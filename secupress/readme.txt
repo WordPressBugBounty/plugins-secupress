@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 2.6
+Stable tag: 2.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,24 +185,19 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.6 =
-* 16 January 2026
-* New: GeoIP Location on Login
-* New: Search field in admin UI.
-* New: Scanner for malwares in our 35 scanners.
-* Improvement: UI for Malware Scanner has been improved, and will be again ;) You'll find a "WP File Integrity" which has always been there since 1.0, just not mentionned as is.
-* Improvement: Add WP 2FA compatibility to Easy Login scan
-* Fix: Dashboard Widget not displaying graphs
-* Fix: PHP Version Scanner was saying that the last version was "ok tier"
-* Fix: PasswordLess activation checkbox was not checked after reload
-* Fix: Remove secupress-data directory on uninstall (I forgot, my bad)
-* Fix: "wp-includes/version.php" should not be tagged "different" anymore if you use a localised zip (in malware scanners)
-* Fix: Possible fatal error when deactivating the module "Disable all actions on plugins" + "disable all actions on FTP"
-* Fix: Possible fatal error "Call to undefined method SecuPress_Background_Process_Bad_Plugins::is_processing()"
+= 2.6.1 =
+* 03 April 2026
+* Improvement: Remove the ping on google.com, set it to secupress.me.
+* Improvement: Refactored the database scan logic in SecuPress_File_Monitoring to use background processing for scanning posts, options, and custom post types for malware patterns. Better perf, quicker scans incoming on big sites.
+* Fix: (again) Possible fatal error "Call to undefined method SecuPress_Background_Process_Bad_Plugins::is_processing()" if WooCommerce is installed since THEY include the obsolete version of the async lib before us...
+* Fix: Warning notice when saving captcha style.
+* Fix: Re-add the "monthly" index for cron schedules.
+* Fix: Do not unvalidate passwordless email on plugin deactivation or licence deconnection
+* Fix: Remove the usage of shell_exec() and `host $ip` that can overconsume resources on your host, bringing down your site (even if this was in SecuPress since 8 years, only now this cause an issue)
 
 == Upgrade Notice ==
 * SecuPress 2.6+ now requires PHP 7.2 minimum.
-* SecuPress 2.3.18+ now requires WP 5.4 minimum.
+* SecuPress 2.3+ now requires WP 5.4 minimum.
 
 == TODO ==
 Create a trust score for each non WP file and displays it

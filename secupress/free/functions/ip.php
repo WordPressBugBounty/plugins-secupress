@@ -837,6 +837,7 @@ function secupress_ban_ip( $time_ban = 5, $ip = null, $args = [] ) {
 /**
  * Returns if the user-agent is a real bot (true) or not, a fake one (false).
  *
+ * @since 2.7 Use secupress.me instead of google for testing, use PTR records for IP to hostname lookup
  * @since 1.4.2 Add $test param + revamp
  * @since 1.4
  *
@@ -856,57 +857,63 @@ function secupress_check_bot_ip( $test = false ) {
 	}
 
 	if ( ! $test ) {
-		$ip         = secupress_get_ip( 'REMOTE_ADDR' );
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? trim( $_SERVER['HTTP_USER_AGENT'] ) : '';
+		$bot_regex  = '';
+		if ( preg_match( '/google/i', $user_agent ) ) {
+			$bot_regex = '/\.(googlebot|google)\.com$/i';
+		} elseif ( preg_match( '/bingbot|msnbot/i', $user_agent ) ) {
+			$bot_regex = '/\.(search\.)?msn\.com$/i';
+		} elseif ( preg_match( '/facebot|facebook/i', $user_agent ) ) {
+			$bot_regex = '/\.(facebook|fb)\.com$/i';
+		} elseif ( preg_match( '/slurp/i', $user_agent ) ) {
+			$bot_regex = '/\.yahoo\.(com|net)$/i';
+		} elseif ( preg_match( '/baiduspider/i', $user_agent ) ) {
+			$bot_regex = '/\.baidu\.(com|jp)$/i';
+		} elseif ( preg_match( '/yandexbot/i', $user_agent ) ) {
+			$bot_regex = '/\.yandex\.(com|ru|net)$/i';
+		} elseif ( preg_match( '/duckduckbot/i', $user_agent ) ) {
+			$bot_regex = '/\.duckduckgo\.com$/i';
+		} elseif ( preg_match( '/ia_archiver/i', $user_agent ) ) {
+			$bot_regex = '/\.(alexa|amazonaws)\.com$/i';
+		} else {
+			return false;
+		}
+		$ip = secupress_get_ip( 'REMOTE_ADDR' );
 	} else {
-		$ip         = '66.249.66.83'; // GoogleBot.
+		$ip = '109.234.167.151'; // SecuPress.me
 	}
-	$hostname_addr  = gethostbyaddr( $ip );
-	$real_ip        = gethostbyname( $hostname_addr );
-	$v1 = 'she';
-	$v2 = 'll_e';
-	$v3 = 'xec';
-	if ( secupress_is_function_disabled( $v1 . $v2 . $v3 ) ) {
-		$hostname_fork = false;
-	} else {
-		try {
-			$hostname_fork  = `host $ip`;
-		} catch (Exception $e) {
-			$hostname_fork = false;
+
+	$hostname_addr = gethostbyaddr( $ip );
+	$hostname      = is_string( $hostname_addr ) && ! secupress_ip_is_valid( $hostname_addr ) ? strtolower( trim( $hostname_addr ) ) : '';
+	$real_ip       = $hostname ? gethostbyname( $hostname ) : '';
+	$real_ip_match = ( $real_ip && $real_ip !== $hostname && $real_ip === $ip );
+
+	if ( ! $real_ip_match && $hostname ) {
+		$real_ips = gethostbynamel( $hostname );
+		if ( is_array( $real_ips ) && in_array( $ip, $real_ips, true ) ) {
+			$real_ip_match = true;
 		}
 	}
-	$hostname       = is_string( $hostname_addr ) && ! secupress_ip_is_valid( $hostname_addr ) ? $hostname_addr : $hostname_fork;
-	$hostname       = is_string( $hostname ) ? explode( ' ', $hostname ) : [];
-	$hostname       = end( $hostname );
-	$user_agent     = isset( $_SERVER['HTTP_USER_AGENT'] ) ? trim( $_SERVER['HTTP_USER_AGENT'] ) : '';
 
+	if ( ! $real_ip_match && $hostname && function_exists( 'dns_get_record' ) && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+		$real_ips = dns_get_record( $hostname, DNS_AAAA );
+		if ( is_array( $real_ips ) ) {
+			foreach ( $real_ips as $record ) {
+				if ( ! empty( $record['ipv6'] ) && $record['ipv6'] === $ip ) {
+					$real_ip_match = true;
+					break;
+				}
+			}
+		}
+	}
+	
 	if ( true === $test ) {
-		$test_result = (int) preg_match( '/google/i', $hostname );
+		$test_result = (int) ( preg_match( '/109-234-167-151\.reverse\.odns\.fr$/i', $hostname ) && $real_ip_match );
 		set_site_transient( 'secupress-test-hostname', $test_result, WEEK_IN_SECONDS );
 		return (bool) $test_result;
 	}
 
-	if ( preg_match( '/google/i', $user_agent ) && ( preg_match( '/google/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/bingbot|msnbot/i', $user_agent ) && ( preg_match( '/msn/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/facebot|facebook/i', $user_agent ) && ( preg_match( '/facebook/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/slurp/i', $user_agent ) && ( preg_match( '/yahoo/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/baiduspider/i', $user_agent ) && ( preg_match( '/baidu/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/yandexbot/i', $user_agent ) && ( preg_match( '/yandex/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/duckduckbot/i', $user_agent ) && ( preg_match( '/duckduck/i', $hostname ) ) ) {
-		return true;
-	}
-	if ( preg_match( '/ia_archiver/i', $user_agent ) && ( preg_match( '/alexa/i', $hostname ) ) ) {
+	if ( $real_ip_match && preg_match( $bot_regex, $hostname ) ) {
 		return true;
 	}
 

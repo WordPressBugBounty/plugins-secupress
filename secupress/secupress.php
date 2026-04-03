@@ -5,7 +5,7 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.6
+ * Version: 2.6.1
  * Code Name: Makeshift
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
