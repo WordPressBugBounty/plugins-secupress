@@ -174,12 +174,23 @@ function secupress_is_fake_user( $user_id ) {
 		return 'wrong_passwordhash';
 	}
 
+	if ( secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ) {
+		$prefix = secupress_get_encryption_prefix( secupress_get_best_encryption_system() );
+		if ( strpos( $_user->user_pass, $prefix ) !== 0 && ! get_user_meta( $user_id, 'secupress-password-needs-rehash', true ) ) {
+			return 'wrong_encryption';
+		}
+	}
+
 	if ( '0000-00-00 00:00:00' === $_user->user_registered ) {
 		return 'no_date';
 	}
 
 	if ( empty( $_user->user_nicename ) ) {
 		return 'no_nicename';
+	}
+
+	if ( secupress_is_submodule_active( 'users-login', 'same-email-domain' ) && secupress_email_domain_is_same( $_user->user_email ) && ! get_user_meta( $user_id, SECUPRESS_SAME_EMAIL_DOMAIN_OK, true ) ) {
+		return 'same_email';
 	}
 
 	$_meta = get_user_meta( $user_id, SECUPRESS_USER_PROTECTION, true );
@@ -196,10 +207,6 @@ function secupress_is_fake_user( $user_id ) {
 
 	if ( ! is_email( $_user->user_email ) ) {
 		return 'wrong_email_dom';
-	}
-
-	if ( secupress_is_submodule_active( 'users-login', 'same-email-domain' ) && secupress_email_domain_is_same( $_user->user_email ) ) {
-		return 'same_email';
 	}
 
 	if ( secupress_is_submodule_active( 'users-login', 'bad-email-domains' ) ) {
@@ -266,6 +273,17 @@ function secupress_get_fake_users() {
 	$temp_users = $wpdb->get_col( "SELECT ID FROM {$wpdb->users} WHERE LENGTH(user_pass) <= 32" ); // md5 length, do not change
 	$fake_users = array_merge( $temp_users, $fake_users );
 
+	// #4.5 Get fake users with wrong algo password and no rehash meta
+	if ( secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ) {
+		$prefix     = secupress_get_encryption_prefix( secupress_get_best_encryption_system() );
+		$temp_users = $wpdb->get_col( $wpdb->prepare(
+			"SELECT u.ID FROM {$wpdb->users} u LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = %s WHERE u.user_pass NOT LIKE %s AND um.umeta_id IS NULL",
+			'secupress-password-needs-rehash',
+			$prefix . '%'
+		) );
+		$fake_users = array_merge( $temp_users, $fake_users );
+	}
+
 	// #5 Get fake users with no nicename
 	$temp_users = $wpdb->get_col(
 		"SELECT ID FROM {$wpdb->users} WHERE LENGTH(user_nicename) = 0",
@@ -279,11 +297,13 @@ function secupress_get_fake_users() {
 		$fake_users = array_merge( $temp_users, $fake_users );
 	}
 
-	// #7 Get users with same domain name
+	// #7 Get users with same domain name but without the OK meta (existing users are whitelisted on activation).
 	if ( secupress_is_submodule_active( 'users-login', 'same-email-domain' ) ) {
 		$website_domain = secupress_get_current_url( 'domain' );
 		$temp_users     = $wpdb->get_col( $wpdb->prepare(
-			 "SELECT ID FROM {$wpdb->users} WHERE user_email LIKE %s", '%' . $wpdb->esc_like( $website_domain )
+			"SELECT u.ID FROM {$wpdb->users} u LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = %s WHERE u.user_email LIKE %s AND um.umeta_id IS NULL",
+			SECUPRESS_SAME_EMAIL_DOMAIN_OK,
+			'%@' . $wpdb->esc_like( $website_domain )
 			)
 		);
 		$fake_users = array_merge( $temp_users, $fake_users );

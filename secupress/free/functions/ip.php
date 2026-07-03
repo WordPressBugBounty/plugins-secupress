@@ -837,7 +837,7 @@ function secupress_ban_ip( $time_ban = 5, $ip = null, $args = [] ) {
 /**
  * Returns if the user-agent is a real bot (true) or not, a fake one (false).
  *
- * @since 2.7 Use secupress.me instead of google for testing, use PTR records for IP to hostname lookup
+ * @since 2.6.2 Use secupress.me instead of google for testing, use PTR records for IP to hostname lookup
  * @since 1.4.2 Add $test param + revamp
  * @since 1.4
  *

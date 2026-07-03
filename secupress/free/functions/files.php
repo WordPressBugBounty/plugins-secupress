@@ -1256,7 +1256,7 @@ function secupress_get_data_file_path( $slug ) {
 	$paths     = secupress_get_data_file_paths();
 	$slug      = str_replace( '.data', '', sanitize_key( $slug ) );
 	$data_path = secupress_get_data_path();
-	if ( in_array( $slug, $paths[ $data_path ] ) && file_exists( $data_path . $slug . '.data' ) ) {
+	if ( isset( $paths[ $data_path ] ) && in_array( $slug, $paths[ $data_path ] ) && file_exists( $data_path . $slug . '.data' ) ) {
 		return $data_path . $slug . '.data';
 	}
 	return false;

@@ -90,11 +90,11 @@ function secupress_stop_user_enumeration_rest( $response ) {
 	$rest_query_url = '/wp/v2/users';
 	$current_url    = rawurldecode( secupress_get_current_url( 'base' ) );
 	$is_request     = isset( $_REQUEST['rest_route'] );
-	$is_me_route    = preg_match( '#^' . preg_quote( $rest_base_url, '#' ) . '/me/?#', $current_url ) || ( $is_request && preg_match( '#^' . preg_quote( $rest_query_url, '#' ) . '/me/?#', $_REQUEST['rest_route'] ) );
+	$is_me_route    = preg_match( '#^' . preg_quote( $rest_base_url, '#' ) . '/me/?#i', $current_url ) || ( $is_request && preg_match( '#^' . preg_quote( $rest_query_url, '#' ) . '/me/?#i', $_REQUEST['rest_route'] ) );
 
 	if ( ! current_user_can( 'list_users' ) && ! $is_me_route && (
-		preg_match( '#^' . preg_quote( $rest_base_url, '#' ) . '/?#', $current_url ) ||
-		( $is_request && preg_match( '#^' . preg_quote( $rest_query_url, '#' ) . '/?#', $_REQUEST['rest_route'] ) )
+		preg_match( '#^' . preg_quote( $rest_base_url, '#' ) . '/?#i', $current_url ) ||
+		( $is_request && preg_match( '#^' . preg_quote( $rest_query_url, '#' ) . '/?#i', $_REQUEST['rest_route'] ) )
 	) ) {
 		wp_send_json( [
 			'code'    => 'rest_cannot_access',

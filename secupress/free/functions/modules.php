@@ -323,6 +323,8 @@ function secupress_activate_submodule( $module, $submodule, $incompatible_submod
 		return false;
 	}
 
+	secupress_require_module_tools( $module );
+
 	$is_active = secupress_is_submodule_active( $module, $submodule );
 	$submodule = sanitize_key( $submodule );
 
@@ -448,6 +450,8 @@ function secupress_activate_submodule_silently( $module, $submodule ) {
 	if ( ! $file_path ) {
 		return;
 	}
+
+	secupress_require_module_tools( $module );
 
 	// Remove deactivation notice.
 	secupress_remove_module_notice( $module, $submodule, 'deactivation' );
@@ -1049,5 +1053,36 @@ function secupress_get_submodule_file_path( $module, $submodule ) {
 		return $paths['pro'];
 	} else {
 		return $paths['free'];
+	}
+}
+
+
+/**
+ * Include a module tools file. Pro first, then free, same order as regular module loading.
+ *
+ * @since 2.6.2
+ * @author Julio Potier
+ *
+ * @param (string) $module The module.
+ */
+function secupress_require_module_tools( $module ) {
+	$module = sanitize_key( $module );
+
+	if ( ! $module ) {
+		return;
+	}
+
+	if ( secupress_has_pro() && defined( 'SECUPRESS_PRO_MODULES_PATH' ) ) {
+		$file = SECUPRESS_PRO_MODULES_PATH . $module . '/tools.php';
+
+		if ( file_exists( $file ) ) {
+			require_once( $file );
+		}
+	}
+
+	$file = SECUPRESS_MODULES_PATH . $module . '/tools.php';
+
+	if ( file_exists( $file ) ) {
+		require_once( $file );
 	}
 }

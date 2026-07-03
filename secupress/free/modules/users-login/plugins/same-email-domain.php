@@ -24,6 +24,9 @@ add_action( 'user_profile_update_errors', 'secupress_same_email_domain_validate_
  */
 function secupress_same_email_domain_validate_user_creation( $errors, $update, $user ) {
 	if ( secupress_email_domain_is_same( $user->user_email ) ) {
+		if ( $update && get_user_meta( $user->ID, SECUPRESS_SAME_EMAIL_DOMAIN_OK, true ) ) {
+			return $errors;
+		}
 		/**
 		 * Filter the message on same domain email registration
 		 * 
@@ -39,6 +42,54 @@ function secupress_same_email_domain_validate_user_creation( $errors, $update, $
 	}
 
 	return $errors;
+}
+
+add_action( 'secupress.modules.activate_submodule_same-email-domain', 'secupress_same_email_domain_add_ok_meta', 10, 1 );
+/**
+ * On first activation, whitelist existing users whose email matches the site domain.
+ *
+ * @since 2.6.2
+ * @author Julio Potier
+ *
+ * @param (bool) $is_active True if the sub-module was already active.
+ */
+function secupress_same_email_domain_add_ok_meta( $is_active ) {
+	if ( $is_active ) {
+		return;
+	}
+	global $wpdb;
+
+	$website_domain = secupress_get_current_url( 'domain' );
+	if ( ! $website_domain ) {
+		return;
+	}
+
+	$like  = '%@' . $wpdb->esc_like( $website_domain );
+	$query = $wpdb->prepare(
+		"INSERT INTO {$wpdb->usermeta} (user_id, meta_key, meta_value)
+		SELECT u.ID, %s, %s
+		FROM {$wpdb->users} u
+		LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = %s
+		WHERE u.user_email LIKE %s AND um.umeta_id IS NULL",
+		SECUPRESS_SAME_EMAIL_DOMAIN_OK,
+		'1',
+		SECUPRESS_SAME_EMAIL_DOMAIN_OK,
+		$like
+	);
+
+	$wpdb->query( $query ); // WPCS: unprepared SQL ok.
+}
+
+add_action( 'secupress.modules.deactivate_submodule_same-email-domain', 'secupress_same_email_domain_remove_ok_meta' );
+/**
+ * On deactivation, remove the whitelist meta from all users.
+ *
+ * @since 2.6.2
+ * @author Julio Potier
+ */
+function secupress_same_email_domain_remove_ok_meta() {
+	global $wpdb;
+	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key = %s", SECUPRESS_SAME_EMAIL_DOMAIN_OK ) ); // WPCS: unprepared SQL ok.
 }
 
 add_filter( 'registration_errors', 'secupress_same_email_domain_validate_user_registration', 10, 3 );

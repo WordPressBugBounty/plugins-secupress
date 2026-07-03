@@ -21,7 +21,9 @@ function secupress_welcome_settings_callback( $settings ) {
 	secupress_check_user_capability();
 	secupress_check_admin_referer( 'secupress_welcome_settings-options' );
 
-	$_FILES = apply_filters( 'wp_handle_upload_prefilter', $_FILES );
+	if ( ! empty( $_FILES ) && is_multisite() ) {
+		$_FILES = apply_filters( 'wp_handle_upload_prefilter', $_FILES );
+	}
 
 	// Handle Import.
 	if ( ! empty( $_FILES['import'] ) ) {

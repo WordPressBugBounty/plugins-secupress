@@ -5,7 +5,7 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.6.1
+ * Version: 2.6.2
  * Code Name: Makeshift
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
@@ -25,7 +25,7 @@
 
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-$secupress_is_playground = isset( $_SERVER['SERVER_NAME'] ) && 'playground.wordpress.net' === $_SERVER['SERVER_NAME'];
+$secupress_is_playground = isset( $_SERVER['SERVER_NAME'] ) && ( 'playground.wordpress.net' === $_SERVER['SERVER_NAME'] || 'my.wordpress.net' === $_SERVER['SERVER_NAME'] );
 add_action( 'admin_notices', 'secupress_does_not_work_on_playground' );
 /* :) */
 function secupress_does_not_work_on_playground() {
@@ -33,7 +33,8 @@ function secupress_does_not_work_on_playground() {
 	if ( ! $secupress_is_playground ) {
 		return;
 	}
-	echo '<div class="error"><p><strong>SecuPress</strong> does not work on <code>https://playground.wordpress.net/</code>.<br>Use <a href="https://demo.tastewp.com/secupress/">https://demo.tastewp.com/secupress/</a> to test the Free Version.<br>You can also <a href="https://secupress.me/pricing/">purchase a Pro Version</a> to test it (we refund during 14 days).</p></div>'; // DO NOT TRANSLATE
+	$server_name = isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'this host';
+	printf( '<div class="error"><p><strong>SecuPress</strong> does not work on <code>%s</code>.<br>Use <a href="https://demo.tastewp.com/secupress/">https://demo.tastewp.com/secupress/</a> to test the Free Version.<br>You can also <a href="https://secupress.me/pricing/">purchase a Pro Version</a> to test it (we refund during 14 days).</p></div>', esc_html( $server_name ) ); // DO NOT TRANSLATE
 }
 if ( $secupress_is_playground ) {
 	return; // DO NOT LOAD SECUPRESS
@@ -59,6 +60,7 @@ define( 'SECUPRESS_DATABASE_MALWARES'     , 'secupress_database_malwares' );
 define( 'SECUPRESS_FIX_DISTS'             , 'secupress_fix_dists' );
 define( 'SECUPRESS_BAN_IP'                , 'secupress_ban_ip' );
 define( 'SECUPRESS_USER_PROTECTION'       , 'secupress_user_protection' );
+define( 'SECUPRESS_SAME_EMAIL_DOMAIN_OK'  , 'secupress_same_email_domain_ok' );
 define( 'SECUPRESS_WHITE_IP'              , 'secupress_whitelist_ip' );
 define( 'SECUPRESS_ATTACKS'               , 'secupress_attacks_log' );
 define( 'SECUPRESS_BAD_THEMES'            , 'secupress_bad_themes__vuln' );

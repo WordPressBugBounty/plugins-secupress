@@ -109,7 +109,14 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 
 	$message = '';
 	if ( secupress_is_pro() ) {
-		$message = ( is_int( secupress_passwordless_is_activated() ) && secupress_passwordless_is_activated() === get_current_user_id() ) ? __( 'This module will not work until validated by a link sent to your email address when you activated it.', 'secupress' ) : __( 'This module will not work until the person who activated it has validated it by clicking a link sent to their email address.', 'secupress' );
+		$passwordless_activation = secupress_passwordless_is_activated();
+		if ( is_int( $passwordless_activation ) ) {
+			if ( $passwordless_activation === get_current_user_id() ) {
+				$message = __( 'This module will not work until validated by a link sent to your email address when you activated it.', 'secupress' );
+			} else {
+				$message = __( 'This module will not work until the person who activated it has validated it by clicking a link sent to their email address.', 'secupress' );
+			}
+		}
 	}
 	$this->add_field( array(
 		'title'             => __( 'Use a Two-Factor Authentication', 'secupress' ),

@@ -4,7 +4,7 @@ Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 2.6.1
+Stable tag: 2.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,15 +185,16 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.6.1 =
-* 03 April 2026
-* Improvement: Remove the ping on google.com, set it to secupress.me.
-* Improvement: Refactored the database scan logic in SecuPress_File_Monitoring to use background processing for scanning posts, options, and custom post types for malware patterns. Better perf, quicker scans incoming on big sites.
-* Fix: (again) Possible fatal error "Call to undefined method SecuPress_Background_Process_Bad_Plugins::is_processing()" if WooCommerce is installed since THEY include the obsolete version of the async lib before us...
-* Fix: Warning notice when saving captcha style.
-* Fix: Re-add the "monthly" index for cron schedules.
-* Fix: Do not unvalidate passwordless email on plugin deactivation or licence deconnection
-* Fix: Remove the usage of shell_exec() and `host $ip` that can overconsume resources on your host, bringing down your site (even if this was in SecuPress since 8 years, only now this cause an issue)
+= 2.6.2 =
+* 25 Juin 2026
+* Fix: Possible fatal error when the data files are not correctly extracted.
+* Fix: Users with same email domain present before the activation of the same  name module were still tagged as bad.
+* Fix: Fatal error on empty JSON
+* Fix: Users from REST API still visible, it's CASE SENSITIVE!?
+* Fix: Require module tools on submodule activation
+* Improvement: User secupress.me instead of google.com for testing
+* Improvement: Do not unvalidate passwordless email on plugin deactivation or licence deco
+
 
 == Upgrade Notice ==
 * SecuPress 2.6+ now requires PHP 7.2 minimum.

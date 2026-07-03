@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2026-04-02 16:56+0200\n"
-"PO-Revision-Date: 2026-04-02 16:56+0200\n"
+"POT-Creation-Date: 2026-06-24 12:29+0200\n"
+"PO-Revision-Date: 2026-06-24 12:30+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -41,7 +41,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-discloses.php:102
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:91
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:96
-#: free/functions/modules.php:745
+#: free/functions/modules.php:749
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please add the following lines at the "
@@ -101,7 +101,7 @@ msgstr ""
 "Il semble que votre fichier %1$s n’est pas en écriture, vous devrez l’éditer "
 "manuellement. Merci de supprimer tous les nœuds avec %2$s."
 
-#: free/activation.php:449 free/functions/modules.php:691
+#: free/activation.php:449 free/functions/modules.php:695
 #, php-format
 msgid ""
 "Your server runs <strong>Nginx</strong>. You have to edit the configuration "
@@ -724,7 +724,7 @@ msgstr ""
 
 #: free/admin/modal.php:70 free/admin/settings.php:318
 #: free/classes/settings/class-secupress-settings.php:1741
-#: free/modules/welcome/callbacks.php:427 pro/common.php:55
+#: free/modules/welcome/callbacks.php:443 pro/common.php:65
 msgctxt "link to website (Only FR or EN!)"
 msgid "support"
 msgstr "fr/support"
@@ -1195,9 +1195,9 @@ msgstr "Comment corriger ce problème"
 #: free/admin/settings.php:917
 #: free/classes/admin/class-secupress-admin-pro-upgrade.php:157
 #: free/classes/admin/class-secupress-admin-pro-upgrade.php:178
-#: free/modules/welcome/callbacks.php:427
-#: free/modules/welcome/callbacks.php:428
-#: free/modules/welcome/callbacks.php:579
+#: free/modules/welcome/callbacks.php:443
+#: free/modules/welcome/callbacks.php:444
+#: free/modules/welcome/callbacks.php:595
 #: pro/classes/admin/class-secupress-pro-admin-free-downgrade.php:163
 #: pro/classes/admin/class-secupress-pro-admin-free-downgrade.php:164
 msgid "Open in a new window."
@@ -1593,7 +1593,7 @@ msgstr "Docs"
 msgid "Settings"
 msgstr "Réglages"
 
-#: free/admin/settings.php:454 pro/common.php:301
+#: free/admin/settings.php:454 pro/common.php:317
 msgctxt "Latest scans"
 msgid "M dS, Y \\a\\t h:ia"
 msgstr "l j F Y \\à G:i:s"
@@ -1850,35 +1850,50 @@ msgid_plural "(based on %s ratings)"
 msgstr[0] "(basée sur %s vote)"
 msgstr[1] "(basée sur %s votes)"
 
-#: free/admin/upgrader.php:689
+#: free/admin/upgrader.php:708
 #, php-format
 msgid "What’s new in SecuPress %s%s"
 msgstr "Quoi de neuf dans SecuPress %s%s"
 
-#: free/admin/upgrader.php:690
+#: free/admin/upgrader.php:709
 msgid "Or read full changelog on secupress.me"
 msgstr "Ou lisez tout le journal des modifications sur secupress.me"
 
-#: free/admin/upgrader.php:691
-msgid "https://secupress.me/blog/secupress-v2-6/"
-msgstr "https://secupress.me/fr/blog/secupress-v2-6/"
-
-#: free/admin/upgrader.php:693
-msgid "New: GeoIP Location on Login"
-msgstr "Nouveau : Lieu de connexion par GeoIP"
-
-#: free/admin/upgrader.php:694
-msgid "New: Search field in admin UI."
-msgstr "Nouveau : Champ de recherche dans l‘interface admin"
-
-#: free/admin/upgrader.php:695
-msgid "Improvement: UI for Malware Scanner has been improved."
+#: free/admin/upgrader.php:711
+msgid "Improve: Remove the ping on google.com, set it to secupress.me."
 msgstr ""
-"Amélioration : L’interface utilisateur du scanner de virus a été améliorée."
 
-#: free/admin/upgrader.php:696
-msgid "6 more fixes."
-msgstr "6 correctifs de plus."
+#: free/admin/upgrader.php:712
+msgid ""
+"Improve: Refactored the database scan logic in SecuPress_File_Monitoring to "
+"use background processing for scanning posts, options, and custom post types "
+"for malware patterns. Better perf, quicker scans incoming on big sites."
+msgstr ""
+
+#: free/admin/upgrader.php:713
+msgid ""
+"Fix: (again) Possible fatal error \"Call to undefined method "
+"SecuPress_Background_Process_Bad_Plugins::is_processing()\" if WooCommerce "
+"is installed since THEY include the obsolete version of the async lib before "
+"us..."
+msgstr ""
+
+#: free/admin/upgrader.php:714
+msgid ""
+"Fix: Remove the usage of shell_exec() and `host $ip` that can overconsume "
+"resources on your host, bringing down your site (even if this was in "
+"SecuPress since 8 years, only now this cause an issue)"
+msgstr ""
+
+#: free/admin/upgrader.php:715
+msgid "Fix: Warning notice when saving captcha style."
+msgstr ""
+
+#: free/admin/upgrader.php:716
+msgid ""
+"Fix: Do not unvalidate passwordless email on plugin deactivation or licence "
+"deconnection"
+msgstr ""
 
 #: free/classes/admin/class-secupress-admin-notices.php:255
 msgctxt "verb"
@@ -1898,7 +1913,7 @@ msgstr "<strong>Erreur</strong> : %s"
 
 #: free/classes/admin/class-secupress-admin-offer-migration.php:270
 #: free/modules/services/settings/services.php:48
-#: free/modules/welcome/callbacks.php:428
+#: free/modules/welcome/callbacks.php:444
 #: free/modules/welcome/settings/api-key.php:168
 msgctxt "link to website (Only FR or EN!)"
 msgid "account"
@@ -1970,7 +1985,7 @@ msgstr ""
 
 #: free/classes/admin/class-secupress-admin-pro-upgrade.php:157
 #: free/classes/admin/class-secupress-admin-pro-upgrade.php:178
-#: free/modules/welcome/callbacks.php:579
+#: free/modules/welcome/callbacks.php:595
 msgid "SecuPress account"
 msgstr "Compte SecuPress"
 
@@ -2050,10 +2065,10 @@ msgstr "Identifiant"
 #: free/classes/common/class-secupress-log.php:294
 #: free/classes/common/class-secupress-logs.php:1380
 #: free/classes/common/class-secupress-logs.php:1384
-#: free/functions/modules.php:661 free/functions/modules.php:675
-#: free/functions/modules.php:688 free/functions/modules.php:742
-#: free/functions/modules.php:771 free/functions/modules.php:802
-#: free/functions/modules.php:817
+#: free/functions/modules.php:665 free/functions/modules.php:679
+#: free/functions/modules.php:692 free/functions/modules.php:746
+#: free/functions/modules.php:775 free/functions/modules.php:806
+#: free/functions/modules.php:821
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:65
 #: free/modules/logs/plugins/inc/php/404-logs/class-secupress-404-log.php:66
 #: free/modules/users-login/callbacks.php:421
@@ -2824,7 +2839,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-discloses.php:104
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:93
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:98
-#: free/functions/modules.php:785
+#: free/functions/modules.php:789
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please add the following lines inside the "
@@ -3902,7 +3917,7 @@ msgstr ""
 "des fichiers dans les dossiers ne peut pas être faite automatiquement."
 
 #: free/classes/scanners/class-secupress-scan-directory-listing.php:95
-#: free/functions/modules.php:776
+#: free/functions/modules.php:780
 #, php-format
 msgid ""
 "Your %1$s file is not writable. Please remove any previous %2$s tag and add "
@@ -4461,7 +4476,7 @@ msgstr ""
 "fichiers manuellement pour les supprimer ou les nettoyer."
 
 #: free/classes/scanners/class-secupress-scan-malware-scanners.php:95
-#: pro/admin/settings.php:1047
+#: pro/admin/settings.php:1048
 msgid "https://docs.secupress.me/article/235-malware-scanners"
 msgstr "https://fr.docs.secupress.me/article/236-scanner-de-virus"
 
@@ -6760,7 +6775,7 @@ msgstr "Activation des journaux des erreurs 404"
 
 #: free/functions/modules.php:210 free/functions/modules.php:252
 #: free/modules/schedules/settings/schedules-backups.php:6
-#: pro/admin/settings.php:1092
+#: pro/admin/settings.php:1093
 msgid "Backups"
 msgstr "Sauvegardes"
 
@@ -6861,11 +6876,11 @@ msgid "The page contains our services designed to help you with the plugin."
 msgstr ""
 "Cette page contient nos services faits pour vous aider avec l‘extension."
 
-#: free/functions/modules.php:540
+#: free/functions/modules.php:544
 msgid "(just for you)"
 msgstr "(pour vous)"
 
-#: free/functions/modules.php:664
+#: free/functions/modules.php:668
 #, php-format
 msgid ""
 "Your %1$s file is not writable, you have to edit it manually. Please remove "
@@ -6874,7 +6889,7 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture, vous devrez l’éditer manuellement. "
 "Merci de supprimer les règles entre %2$s et %3$s du fichier %1$s."
 
-#: free/functions/modules.php:678
+#: free/functions/modules.php:682
 #, php-format
 msgid ""
 "Your %1$s file is not writable, you have to edit it manually. Please remove "
@@ -6883,7 +6898,7 @@ msgstr ""
 "Votre fichier %1$s n’est pas en écriture, vous devrez l’éditer manuellement. "
 "Merci de supprimer les règles avec %2$s du fichier %1$s."
 
-#: free/functions/modules.php:805
+#: free/functions/modules.php:809
 #, php-format
 msgid ""
 "Your server runs <strong>Nginx</strong>. You have to edit the configuration "
@@ -6893,7 +6908,7 @@ msgstr ""
 "votre fichier de configuration manuellement. Merci d’ajouter le code suivant "
 "dans le fichier %1$s : %2$s"
 
-#: free/functions/modules.php:818
+#: free/functions/modules.php:822
 msgid ""
 "It seems your server does not use <strong>Apache</strong>, <strong>Nginx</"
 "strong>, nor <strong>IIS7</strong>. This module won’t work."
@@ -7032,7 +7047,7 @@ msgstr "Installée"
 msgid "By %s"
 msgstr "Par %s"
 
-#: free/modules/addons/tools.php:139 pro/admin/settings.php:1066
+#: free/modules/addons/tools.php:139 pro/admin/settings.php:1067
 #, php-format
 msgid "Last update: %s"
 msgstr "Dernière mise à jour : %s"
@@ -7549,7 +7564,7 @@ msgid "Incorrect data provided. Unable to proceed."
 msgstr "Donnée fournies incorrectes. Impossible de continuer."
 
 #: free/modules/discloses/plugins/wp-version.php:223
-#: pro/admin/settings.php:1065
+#: pro/admin/settings.php:1066
 #, php-format
 msgid "Version %s"
 msgstr "Version %s"
@@ -8938,7 +8953,7 @@ msgstr "La base de données Patchstack se met à jour quotidiennement"
 
 #: free/modules/plugins-themes/settings/plugins.php:147
 #: free/modules/plugins-themes/settings/themes.php:61
-#: pro/admin/settings.php:1067
+#: pro/admin/settings.php:1068
 msgid "Update data"
 msgstr "Mettre à jour les données"
 
@@ -8982,7 +8997,7 @@ msgstr "Oui, vérifier aussi les extensions non maintenues ou fermées."
 #: free/modules/plugins-themes/settings/themes.php:89
 msgctxt "checkbox/option/setting"
 msgid " Cannot be unchecked."
-msgstr "Ne peut pas être décochée."
+msgstr " Ne peut pas être décochée."
 
 #: free/modules/plugins-themes/settings/themes.php:6
 msgid ""
@@ -9308,7 +9323,7 @@ msgid "This feature is available only for sites with HTTPS."
 msgstr "Cette fonctionnalité n’est disponible que pour les sites en HTTPS."
 
 #: free/modules/sensitive-data/settings/content-protect.php:37
-#: free/secupress.php:415
+#: free/secupress.php:417
 #, php-format
 msgid ""
 "<strong>%1$s</strong> requires WordPress %2$s minimum, your website is "
@@ -10142,7 +10157,7 @@ msgid ""
 msgstr "Cette page n’existe pas, a été déplacée ou vous n’y avez pas accès."
 
 #: free/modules/users-login/plugins/move-login.php:538
-#: free/modules/users-login/plugins/same-email-domain.php:68
+#: free/modules/users-login/plugins/same-email-domain.php:119
 #: pro/modules/users-login/plugins/bad-email-domains.php:49
 msgid "<strong>Error</strong>: User registration is currently not allowed."
 msgstr ""
@@ -10158,7 +10173,7 @@ msgstr ""
 msgid "Log In"
 msgstr "Connexion"
 
-#: free/modules/users-login/plugins/same-email-domain.php:36
+#: free/modules/users-login/plugins/same-email-domain.php:39
 msgid "<strong>Error</strong>: The email address is not correct."
 msgstr "<strong>Erreur</strong> : L’adresse e-mail n’est pas correcte."
 
@@ -10789,27 +10804,27 @@ msgstr "De strict à souple"
 #: free/modules/users-login/settings/login-protection.php:144
 #, php-format
 msgid "Test Level: %d/%d."
-msgstr "Niveau de test: %d/%d"
+msgstr "Niveau de test: %d/%d."
 
 #: free/modules/users-login/settings/login-protection.php:124
 msgid "Strict IP Comparison is applied."
-msgstr "Comparaison par IP stricte appliquée"
+msgstr "Comparaison par IP stricte appliquée."
 
 #: free/modules/users-login/settings/login-protection.php:129
 msgid "Smooth IP Comparison is applied."
-msgstr "Comparaison par IP souple appliquée"
+msgstr "Comparaison par IP souple appliquée."
 
 #: free/modules/users-login/settings/login-protection.php:134
 msgid "City Name Comparison is applied."
-msgstr "Comparaison par nom de ville appliquée"
+msgstr "Comparaison par nom de ville appliquée."
 
 #: free/modules/users-login/settings/login-protection.php:139
 msgid "Region Name Comparison is applied."
-msgstr "Comparaison par nom de région appliquée"
+msgstr "Comparaison par nom de région appliquée."
 
 #: free/modules/users-login/settings/login-protection.php:144
 msgid "Country Name Comparison is applied."
-msgstr "Comparaison par nom de pays appliquée"
+msgstr "Comparaison par nom de pays appliquée."
 
 #: free/modules/users-login/settings/login-protection.php:150
 msgid "Device Check"
@@ -10995,417 +11010,422 @@ msgstr "Déconnecter tous les comptes en 1 clic (sauf vous !)"
 msgid "Disconnect everyone"
 msgstr "Déconnecter tout le monde"
 
-#: free/modules/users-login/tools.php:428
+#: free/modules/users-login/tools.php:448
 msgctxt "emoji"
 msgid "One"
 msgstr "le Un"
 
-#: free/modules/users-login/tools.php:428
+#: free/modules/users-login/tools.php:448
 msgctxt "emoji"
 msgid "Two"
 msgstr "le Deux"
 
-#: free/modules/users-login/tools.php:428
+#: free/modules/users-login/tools.php:448
 msgctxt "emoji"
 msgid "Three"
 msgstr "le Trois"
 
-#: free/modules/users-login/tools.php:428
+#: free/modules/users-login/tools.php:448
 msgctxt "emoji"
 msgid "Four"
 msgstr "le Quatre"
 
-#: free/modules/users-login/tools.php:428
+#: free/modules/users-login/tools.php:448
 msgctxt "emoji"
 msgid "Five"
 msgstr "le Cinq"
 
-#: free/modules/users-login/tools.php:429
+#: free/modules/users-login/tools.php:449
 msgctxt "emoji"
 msgid "Plus"
 msgstr "le Plus"
 
-#: free/modules/users-login/tools.php:429
+#: free/modules/users-login/tools.php:449
 msgctxt "emoji"
 msgid "Minus"
 msgstr "le Moins"
 
-#: free/modules/users-login/tools.php:429
+#: free/modules/users-login/tools.php:449
 msgctxt "emoji"
 msgid "Times"
 msgstr "la Croix"
 
-#: free/modules/users-login/tools.php:429
+#: free/modules/users-login/tools.php:449
 msgctxt "emoji"
 msgid "Divided"
 msgstr "le Divisé"
 
-#: free/modules/users-login/tools.php:429
+#: free/modules/users-login/tools.php:449
 msgctxt "emoji"
 msgid "Equal"
 msgstr "l‘Égal"
 
-#: free/modules/users-login/tools.php:430
+#: free/modules/users-login/tools.php:450
 msgctxt "emoji"
 msgid "Spade"
 msgstr "le Pique"
 
-#: free/modules/users-login/tools.php:430
-#: free/modules/users-login/tools.php:432
+#: free/modules/users-login/tools.php:450
+#: free/modules/users-login/tools.php:452
 msgctxt "emoji"
 msgid "Clover"
 msgstr "le Trèfle"
 
-#: free/modules/users-login/tools.php:430
+#: free/modules/users-login/tools.php:450
 msgctxt "emoji"
 msgid "Heart"
 msgstr "le Cœur"
 
-#: free/modules/users-login/tools.php:430
+#: free/modules/users-login/tools.php:450
 msgctxt "emoji"
 msgid "Diamond"
 msgstr "le Carreau"
 
-#: free/modules/users-login/tools.php:430
+#: free/modules/users-login/tools.php:450
 msgctxt "emoji"
 msgid "Square"
 msgstr "le Carré"
 
-#: free/modules/users-login/tools.php:431
+#: free/modules/users-login/tools.php:451
 msgctxt "emoji"
 msgid "Dog"
 msgstr "le Chien"
 
-#: free/modules/users-login/tools.php:431
+#: free/modules/users-login/tools.php:451
 msgctxt "emoji"
 msgid "Cat"
 msgstr "le Chat"
 
-#: free/modules/users-login/tools.php:431
+#: free/modules/users-login/tools.php:451
 msgctxt "emoji"
 msgid "Monkey"
 msgstr "le Singe"
 
-#: free/modules/users-login/tools.php:431
+#: free/modules/users-login/tools.php:451
 msgctxt "emoji"
 msgid "Pig"
 msgstr "le Cochon"
 
-#: free/modules/users-login/tools.php:431
+#: free/modules/users-login/tools.php:451
 msgctxt "emoji"
 msgid "Lion"
 msgstr "le Lion"
 
-#: free/modules/users-login/tools.php:432
+#: free/modules/users-login/tools.php:452
 msgctxt "emoji"
 msgid "Tree"
 msgstr "l‘Arbre"
 
-#: free/modules/users-login/tools.php:432
+#: free/modules/users-login/tools.php:452
 msgctxt "emoji"
 msgid "Logs"
 msgstr "les Buches"
 
-#: free/modules/users-login/tools.php:432
+#: free/modules/users-login/tools.php:452
 msgctxt "emoji"
 msgid "Leaf"
 msgstr "la Feuille"
 
-#: free/modules/users-login/tools.php:432
+#: free/modules/users-login/tools.php:452
 msgctxt "emoji"
 msgid "Flower"
 msgstr "la Fleur"
 
-#: free/modules/users-login/tools.php:433
+#: free/modules/users-login/tools.php:453
 msgctxt "emoji"
 msgid "Apple"
 msgstr "la Pomme"
 
-#: free/modules/users-login/tools.php:433
+#: free/modules/users-login/tools.php:453
 msgctxt "emoji"
 msgid "Banana"
 msgstr "la Banane"
 
-#: free/modules/users-login/tools.php:433
+#: free/modules/users-login/tools.php:453
 msgctxt "emoji"
 msgid "Lemon"
 msgstr "le Citron"
 
-#: free/modules/users-login/tools.php:433
+#: free/modules/users-login/tools.php:453
 msgctxt "emoji"
 msgid "Grapes"
 msgstr "le Raisin"
 
-#: free/modules/users-login/tools.php:433
+#: free/modules/users-login/tools.php:453
 msgctxt "emoji"
 msgid "Kiwi"
 msgstr "le Kiwi"
 
-#: free/modules/users-login/tools.php:434
+#: free/modules/users-login/tools.php:454
 msgctxt "emoji"
 msgid "Chili"
 msgstr "le Piment"
 
-#: free/modules/users-login/tools.php:434
+#: free/modules/users-login/tools.php:454
 msgctxt "emoji"
 msgid "Carrot"
 msgstr "la Carotte"
 
-#: free/modules/users-login/tools.php:434
+#: free/modules/users-login/tools.php:454
 msgctxt "emoji"
 msgid "Corn"
 msgstr "le Maïs"
 
-#: free/modules/users-login/tools.php:434
+#: free/modules/users-login/tools.php:454
 msgctxt "emoji"
 msgid "Avocado"
 msgstr "l‘Avocat"
 
-#: free/modules/users-login/tools.php:434
+#: free/modules/users-login/tools.php:454
 msgctxt "emoji"
 msgid "Tomato"
 msgstr "la Tomate"
 
-#: free/modules/users-login/tools.php:435
+#: free/modules/users-login/tools.php:455
 msgctxt "emoji"
 msgid "Robot"
 msgstr "le Robot"
 
-#: free/modules/users-login/tools.php:435
+#: free/modules/users-login/tools.php:455
 msgctxt "emoji"
 msgid "Clown"
 msgstr "le Clown"
 
-#: free/modules/users-login/tools.php:435
+#: free/modules/users-login/tools.php:455
 msgctxt "emoji"
 msgid "Ghost"
 msgstr "le Fantôme"
 
-#: free/modules/users-login/tools.php:435
+#: free/modules/users-login/tools.php:455
 msgctxt "emoji"
 msgid "Alien"
 msgstr "l‘Alien"
 
-#: free/modules/users-login/tools.php:435
+#: free/modules/users-login/tools.php:455
 msgctxt "emoji"
 msgid "Poo"
 msgstr "le Caca"
 
-#: free/modules/users-login/tools.php:436
+#: free/modules/users-login/tools.php:456
 msgctxt "emoji"
 msgid "Bread"
 msgstr "le Pain"
 
-#: free/modules/users-login/tools.php:436
+#: free/modules/users-login/tools.php:456
 msgctxt "emoji"
 msgid "Cheese"
 msgstr "le Fromage"
 
-#: free/modules/users-login/tools.php:436
+#: free/modules/users-login/tools.php:456
 msgctxt "emoji"
 msgid "Steak"
 msgstr "la Viande"
 
-#: free/modules/users-login/tools.php:436
+#: free/modules/users-login/tools.php:456
 msgctxt "emoji"
 msgid "Butter"
 msgstr "le Beurre"
 
-#: free/modules/users-login/tools.php:436
+#: free/modules/users-login/tools.php:456
 msgctxt "emoji"
 msgid "Salad"
 msgstr "la Salade"
 
-#: free/modules/users-login/tools.php:437
+#: free/modules/users-login/tools.php:457
 msgctxt "emoji"
 msgid "Taco"
 msgstr "le Taco"
 
-#: free/modules/users-login/tools.php:437
+#: free/modules/users-login/tools.php:457
 msgctxt "emoji"
 msgid "Hotdog"
 msgstr "le Hotdog"
 
-#: free/modules/users-login/tools.php:437
+#: free/modules/users-login/tools.php:457
 msgctxt "emoji"
 msgid "Pizza"
 msgstr "la Pizza"
 
-#: free/modules/users-login/tools.php:437
+#: free/modules/users-login/tools.php:457
 msgctxt "emoji"
 msgid "Burger"
 msgstr "le Burger"
 
-#: free/modules/users-login/tools.php:437
+#: free/modules/users-login/tools.php:457
 msgctxt "emoji"
 msgid "Fries"
 msgstr "les Frites"
 
-#: free/modules/users-login/tools.php:438
+#: free/modules/users-login/tools.php:458
 msgctxt "emoji"
 msgid "Earth"
 msgstr "la Terre"
 
-#: free/modules/users-login/tools.php:438
+#: free/modules/users-login/tools.php:458
 msgctxt "emoji"
 msgid "Stars"
 msgstr "les Étoiles"
 
-#: free/modules/users-login/tools.php:438
+#: free/modules/users-login/tools.php:458
 msgctxt "emoji"
 msgid "Moon"
 msgstr "la Lune"
 
-#: free/modules/users-login/tools.php:438
+#: free/modules/users-login/tools.php:458
 msgctxt "emoji"
 msgid "Sun"
 msgstr "le Soleil"
 
-#: free/modules/users-login/tools.php:438
+#: free/modules/users-login/tools.php:458
 msgctxt "emoji"
 msgid "Comet"
 msgstr "la Comète"
 
-#: free/modules/users-login/tools.php:439
+#: free/modules/users-login/tools.php:459
 msgctxt "emoji"
 msgid "Hat"
 msgstr "le Chapeau"
 
-#: free/modules/users-login/tools.php:439
+#: free/modules/users-login/tools.php:459
 msgctxt "emoji"
 msgid "Hand"
 msgstr "la Main"
 
-#: free/modules/users-login/tools.php:439
+#: free/modules/users-login/tools.php:459
 msgctxt "emoji"
 msgid "Eye"
 msgstr "l‘Oeil"
 
-#: free/modules/users-login/tools.php:439
+#: free/modules/users-login/tools.php:459
 msgctxt "emoji"
 msgid "Glasses"
 msgstr "les Lunettes"
 
-#: free/modules/users-login/tools.php:439
+#: free/modules/users-login/tools.php:459
 msgctxt "emoji"
 msgid "Car"
 msgstr "la Voiture"
 
-#: free/modules/users-login/tools.php:440
+#: free/modules/users-login/tools.php:460
 msgctxt "emoji"
 msgid "House"
 msgstr "la Maison"
 
-#: free/modules/users-login/tools.php:440
+#: free/modules/users-login/tools.php:460
 msgctxt "emoji"
 msgid "Piano"
 msgstr "le Piano"
 
-#: free/modules/users-login/tools.php:440
+#: free/modules/users-login/tools.php:460
 msgctxt "emoji"
 msgid "Ball"
 msgstr "le Ballon"
 
-#: free/modules/users-login/tools.php:440
+#: free/modules/users-login/tools.php:460
 msgctxt "emoji"
 msgid "Cookie"
 msgstr "le Cookie"
 
-#: free/modules/users-login/tools.php:440
+#: free/modules/users-login/tools.php:460
 msgctxt "emoji"
 msgid "Star"
 msgstr "l‘Étoile"
 
-#: free/modules/users-login/tools.php:685
+#: free/modules/users-login/tools.php:705
 msgid "Log in"
 msgstr "Connexion"
 
-#: free/modules/users-login/tools.php:686
+#: free/modules/users-login/tools.php:706
 msgid "Log out"
 msgstr "Se déconnecter"
 
-#: free/modules/users-login/tools.php:688
+#: free/modules/users-login/tools.php:708
 msgid "Lost Password"
-msgstr "Mot de passe perdu ?"
+msgstr "Mot de passe perdu"
 
-#: free/modules/users-login/tools.php:689
+#: free/modules/users-login/tools.php:709
 #: pro/modules/users-login/plugins/otp-auth.php:95
 msgid "Password Reset"
 msgstr "Réinitialisation du mot de passe"
 
-#: free/modules/users-login/tools.php:690
+#: free/modules/users-login/tools.php:710
 msgid "Confirm Admin Email"
 msgstr "Confirmer l’e-mail admin"
 
-#: free/modules/users-login/tools.php:693
+#: free/modules/users-login/tools.php:713
 msgid "Register"
 msgstr "S’inscrire"
 
-#: free/modules/welcome/callbacks.php:49
+#: free/modules/welcome/callbacks.php:51
 #: free/modules/welcome/settings/advanced-settings.php:13
 msgid "Admin Bar Menu"
 msgstr "Menu en barre admin"
 
-#: free/modules/welcome/callbacks.php:59
+#: free/modules/welcome/callbacks.php:61
 msgid "Hide Contextual Help & Tips"
 msgstr "Cacher les aides contextuelles et conseils"
 
-#: free/modules/welcome/callbacks.php:68
+#: free/modules/welcome/callbacks.php:70
 #: free/modules/welcome/settings/advanced-settings.php:62
 msgid "Expert Mode"
 msgstr "Mode Expert"
 
-#: free/modules/welcome/callbacks.php:74
+#: free/modules/welcome/callbacks.php:76
 #: free/modules/welcome/settings/advanced-settings.php:45
 msgid "Grade System"
 msgstr "Système de grade"
 
-#: free/modules/welcome/callbacks.php:186
+#: free/modules/welcome/callbacks.php:86 free/modules/welcome/callbacks.php:89
+#, php-format
+msgid "Distant Calls (%s)"
+msgstr "Appels Distants (%s)"
+
+#: free/modules/welcome/callbacks.php:202
 msgid "Your license has been successfully deactivated."
 msgstr "Votre licence a été correctement désactivée."
 
-#: free/modules/welcome/callbacks.php:188
+#: free/modules/welcome/callbacks.php:204
 msgid "Your license has been successfully activated."
 msgstr "Votre licence a été activée avec succès."
 
-#: free/modules/welcome/callbacks.php:242
+#: free/modules/welcome/callbacks.php:258
 msgid "Plugin has been renamed correctly."
 msgstr "Extension renommée correctement."
 
-#: free/modules/welcome/callbacks.php:427
+#: free/modules/welcome/callbacks.php:443
 #: pro/classes/admin/class-secupress-pro-admin-free-downgrade.php:163
 msgid "our support team"
 msgstr "notre équipe support"
 
-#: free/modules/welcome/callbacks.php:431
+#: free/modules/welcome/callbacks.php:447
 msgid "Please provide a valid email address and your license key."
 msgstr ""
 "Merci de fournir une adresse e-mail valide ainsi qu’une clé de licence."
 
-#: free/modules/welcome/callbacks.php:432
+#: free/modules/welcome/callbacks.php:448
 msgid "Please provide a valid email address."
 msgstr "Veuillez entrer une adresse e-mail valide."
 
-#: free/modules/welcome/callbacks.php:433
+#: free/modules/welcome/callbacks.php:449
 msgid "Please provide your license key."
 msgstr "Veuillez entrer votre clé de licence."
 
-#: free/modules/welcome/callbacks.php:436
+#: free/modules/welcome/callbacks.php:452
 #, php-format
 msgid "Your license key seems invalid. You may want %s."
 msgstr "Votre clé de licence semble non valide. Peut-être voudrez-vous %s."
 
-#: free/modules/welcome/callbacks.php:437
-#: free/modules/welcome/callbacks.php:451
+#: free/modules/welcome/callbacks.php:453
+#: free/modules/welcome/callbacks.php:467
 msgid "to verify these infos"
 msgstr "pour vérifier ces infos"
 
-#: free/modules/welcome/callbacks.php:439
-#: free/modules/welcome/callbacks.php:525
+#: free/modules/welcome/callbacks.php:455
+#: free/modules/welcome/callbacks.php:541
 msgid "Something on your website is preventing the request to be sent."
 msgstr "Quelque chose sur votre site empêche la requête d’être envoyée."
 
-#: free/modules/welcome/callbacks.php:441
+#: free/modules/welcome/callbacks.php:457
 #, php-format
 msgid ""
 "Our server is not accessible at the moment, please try again later or "
@@ -11414,7 +11434,7 @@ msgstr ""
 "Notre serveur n’est pas accessible pour le moment, veuillez réessayer "
 "ultérieurement ou contacter %s."
 
-#: free/modules/welcome/callbacks.php:443
+#: free/modules/welcome/callbacks.php:459
 #, php-format
 msgid ""
 "Our server returned an unexpected response and might be in error, please try "
@@ -11423,28 +11443,28 @@ msgstr ""
 "Notre serveur a retourné une réponse inattendue et peut être en erreur, "
 "veuillez réessayer ultérieurement ou contacter %s."
 
-#: free/modules/welcome/callbacks.php:445
+#: free/modules/welcome/callbacks.php:461
 #, php-format
 msgid "There is a problem with your license key, please contact %s."
 msgstr "Il y a un problème avec votre clé de licence, merci de contacter %s."
 
-#: free/modules/welcome/callbacks.php:446
+#: free/modules/welcome/callbacks.php:462
 msgid "The email address is invalid."
 msgstr "L’adresse e-mail est invalide."
 
-#: free/modules/welcome/callbacks.php:447
+#: free/modules/welcome/callbacks.php:463
 msgid "The license key is invalid."
 msgstr "Votre clé de licence semble invalide."
 
-#: free/modules/welcome/callbacks.php:450
+#: free/modules/welcome/callbacks.php:466
 #, php-format
 msgid "This email address is not in our database. You may want %s."
 msgstr ""
 "Cette adresse e-mail n’est pas dans notre base de données. Peut-être voudrez-"
 "vous %s."
 
-#: free/modules/welcome/callbacks.php:462
-#: free/modules/welcome/callbacks.php:464
+#: free/modules/welcome/callbacks.php:478
+#: free/modules/welcome/callbacks.php:480
 #, php-format
 msgid ""
 "There is a problem with your license key, please verify it. If you think "
@@ -11453,7 +11473,7 @@ msgstr ""
 "Il y a un problème avec votre clé de licence, merci de la vérifier. Si vous "
 "pensez qu’il s’agit d’une erreur, veuillez contacter %s."
 
-#: free/modules/welcome/callbacks.php:466
+#: free/modules/welcome/callbacks.php:482
 #, php-format
 msgid ""
 "This license key has been revoked. If you think there is a mistake, you "
@@ -11462,17 +11482,17 @@ msgstr ""
 "Cette clé de licence a été révoquée. Si vous pensez qu’il s’agit d’une "
 "erreur, veuillez contacter %s."
 
-#: free/modules/welcome/callbacks.php:469
+#: free/modules/welcome/callbacks.php:485
 #, php-format
 msgid "This license key expired. You may want %s."
 msgstr "Cette clé de licence a expirée. Peut-être voudrez-vous %s."
 
-#: free/modules/welcome/callbacks.php:470
+#: free/modules/welcome/callbacks.php:486
 #: pro/classes/admin/class-secupress-pro-admin-free-downgrade.php:186
 msgid "to renew your subscription"
 msgstr "renouveler votre abonnement"
 
-#: free/modules/welcome/callbacks.php:474
+#: free/modules/welcome/callbacks.php:490
 #, php-format
 msgid ""
 "You used as many sites as your license allows. You may want %s to add more "
@@ -11481,12 +11501,12 @@ msgstr ""
 "Vous avez utilisé autant de sites que votre licence le permet. Peut-être "
 "voudrez-vous %s pour ajouter plus de sites."
 
-#: free/modules/welcome/callbacks.php:475
+#: free/modules/welcome/callbacks.php:491
 #: pro/classes/admin/class-secupress-pro-admin-free-downgrade.php:192
 msgid "to upgrade your license"
 msgstr "mettre à niveau votre licence"
 
-#: free/modules/welcome/callbacks.php:488
+#: free/modules/welcome/callbacks.php:504
 #, php-format
 msgid ""
 "Something may be wrong with your license, please take a look at %1$s or "
@@ -11495,27 +11515,27 @@ msgstr ""
 "Quelque chose semble incorrect avec votre licence, merci de jeter un œil à "
 "%1$s ou de contacter %2$s."
 
-#: free/modules/welcome/callbacks.php:489
+#: free/modules/welcome/callbacks.php:505
 msgid "your account"
 msgstr "votre compte"
 
-#: free/modules/welcome/callbacks.php:533
+#: free/modules/welcome/callbacks.php:549
 msgid "Our server is not accessible at the moment."
 msgstr "Notre serveur n’est pas accessible pour le moment."
 
-#: free/modules/welcome/callbacks.php:545
+#: free/modules/welcome/callbacks.php:561
 #, php-format
 msgid "Our server returned an unexpected response and might be in error: %s"
 msgstr ""
 "Notre serveur a retourné une réponse inattendue, cela est surement une "
 "erreur : %s"
 
-#: free/modules/welcome/callbacks.php:553
+#: free/modules/welcome/callbacks.php:569
 #, php-format
 msgid "Our server returned an error: %s"
 msgstr "Notre serveur a retourné une erreur : %s"
 
-#: free/modules/welcome/callbacks.php:578
+#: free/modules/welcome/callbacks.php:594
 #, php-format
 msgid ""
 "Please deactivate this site from your %s (the «Manage Sites» link in your "
@@ -12177,7 +12197,7 @@ msgstr ""
 msgid "Change prefix"
 msgstr "Changer le préfixe"
 
-#: free/secupress.php:401
+#: free/secupress.php:403
 #, php-format
 msgid ""
 "<strong>%1$s</strong> requires PHP %2$s minimum, your website is actually "
@@ -12186,11 +12206,11 @@ msgstr ""
 "<strong>%1$s</strong> requiert PHP v%2$s minimum, votre site utilise "
 "actuellement la version %3$s."
 
-#: free/secupress.php:537
+#: free/secupress.php:539
 msgid "SecuPress Free with Simple SSL – Simple and Performant Security"
 msgstr "SecuPress Free avec Simple SSL – La sécurité simple et performante"
 
-#: free/secupress.php:539
+#: free/secupress.php:541
 msgid ""
 "Protect your WordPress with SecuPress, analyze and ensure the safety of your "
 "website daily."
@@ -12315,7 +12335,7 @@ msgstr "Base de GeoIP à jour."
 #: pro/admin/ajax-post-callbacks.php:291
 #, php-format
 msgid "Option \"%s\" deleted."
-msgstr "Option \"%s\" supprimée"
+msgstr "Option \"%s\" supprimée."
 
 #: pro/admin/ajax-post-callbacks.php:293
 #, php-format
@@ -12576,11 +12596,11 @@ msgstr "Les fichiers suivants sont d'anciens fichiers du cœur de WordPress"
 msgid "(Un)Select All"
 msgstr "(Dé)sélectionner tout"
 
-#: pro/admin/settings.php:1045
+#: pro/admin/settings.php:1046
 msgid "Malware Scanners are unavailable"
 msgstr "Scanner de virus indisponibles"
 
-#: pro/admin/settings.php:1047
+#: pro/admin/settings.php:1048
 #, php-format
 msgid ""
 "Please refer to our <a href=\"%s\" target=\"_blank\">documentation</a> on "
@@ -12589,11 +12609,11 @@ msgstr ""
 "Merci de vous référer à <a href=\"%s\" target=\"_blank\">la documentation</"
 "a> sur ce sujet."
 
-#: pro/admin/settings.php:1085
+#: pro/admin/settings.php:1086
 msgid "No backups found."
 msgstr "Aucune sauvegarde trouvée."
 
-#: pro/admin/settings.php:1089 pro/modules/backups/callbacks.php:89
+#: pro/admin/settings.php:1090 pro/modules/backups/callbacks.php:89
 #: pro/modules/backups/callbacks.php:132 pro/modules/backups/callbacks.php:221
 #, php-format
 msgid "%s available Backup"
@@ -12601,7 +12621,7 @@ msgid_plural "%s available Backups"
 msgstr[0] "%s sauvegarde disponible"
 msgstr[1] "%s sauvegardes disponibles"
 
-#: pro/admin/settings.php:1102
+#: pro/admin/settings.php:1103
 msgid "Delete all Backups"
 msgstr "Supprimer toutes les sauvegardes"
 
@@ -12834,7 +12854,7 @@ msgstr "l j F Y \\à G:i:s"
 msgid "You do not have permission to install plugin updates"
 msgstr "Vous n’avez pas la permission d’installer des extensions sur ce site"
 
-#: pro/common.php:55
+#: pro/common.php:65
 #, php-format
 msgid ""
 "The malware database files could not be updated due to a JSON issue: Error "
@@ -12843,7 +12863,7 @@ msgstr ""
 "La base de virus n‘a pas été mise à jour suite à une erreur de JSON: Erreur "
 "%1$s. Merci de %2$snous contacter%3$s pour plus d‘information"
 
-#: pro/common.php:71
+#: pro/common.php:81
 #, php-format
 msgid ""
 "The malware database file could not be updated due to a %1$s version issue. "
@@ -12853,12 +12873,12 @@ msgstr ""
 "version de %1$s. Le minimum requis est : %2$s. Merci de mettre à jour "
 "l‘extension en premier."
 
-#: pro/common.php:136 pro/modules/firewall/tools.php:70
+#: pro/common.php:149 pro/modules/firewall/tools.php:70
 #, php-format
 msgid "Empty content data from API with format %s."
 msgstr "Contenu des données de l‘API vide au format %s."
 
-#: pro/common.php:156
+#: pro/common.php:169
 #, php-format
 msgid ""
 "Undefined file format when downloading from API: %s<br>Expected ZIP or JSON."
@@ -12866,16 +12886,16 @@ msgstr ""
 "Format de fichier non défini après le téléchargement depuis l'API : "
 "%s<br>Attendu ZIP ou JSON."
 
-#: pro/common.php:164
+#: pro/common.php:178
 #, php-format
 msgid "The malware database file have been updated to version %s."
 msgstr "La base de virus a été mise à jour en version %s."
 
-#: pro/common.php:204
+#: pro/common.php:220
 msgid "Every week"
 msgstr "Toutes les semaines"
 
-#: pro/common.php:208
+#: pro/common.php:224
 msgid "Every month"
 msgstr "Tous les mois"
 
@@ -12899,9 +12919,39 @@ msgid "Unused"
 msgstr "Non utilisé"
 
 #: pro/functions/common.php:263
-msgctxt "theme or plugin"
-msgid "Security issue"
-msgstr "Faille de sécurité"
+msgctxt "Plugin closure reason"
+msgid "A security issue is known to exist within the plugin."
+msgstr "Un problème de sécurité est connu sur cette extension."
+
+#: pro/functions/common.php:266
+msgctxt "Plugin closure reason"
+msgid ""
+"The author of this plugin no longer supports it, and requested the plugin be "
+"closed."
+msgstr ""
+"La personne en charge de cette extension a arrêté son support et en a "
+"demandé la fermeture."
+
+#: pro/functions/common.php:269
+msgctxt "Plugin closure reason"
+msgid "The plugin has been suspended due to a Guideline Violation."
+msgstr ""
+"L‘extension a été suspendue à cause de violations des normes de conduites."
+
+#: pro/functions/common.php:272
+msgctxt "Plugin closure reason"
+msgid "The plugin has been suspended due to a Licensing/Trademark Violation."
+msgstr ""
+"L‘extension a été suspendue à cause de violations de licence ou de marque."
+
+#: pro/functions/common.php:275
+msgctxt "Plugin closure reason"
+msgid ""
+"This plugin is no longer required, as the functionality is now provided by "
+"WordPress."
+msgstr ""
+"Cette extension n‘est plus requise, sa fonctionnalité a été importée "
+"directement dans WordPress."
 
 #: pro/modules/alerts/plugins/inc/php/alerts/class-secupress-alerts.php:375
 msgctxt "a WP role"
@@ -13726,7 +13776,7 @@ msgstr "Trop de temps est passé depuis le début de la procédure."
 #: pro/modules/users-login/plugins/geoip-login.php:210
 #, php-format
 msgid "[###SITENAME###] %s will confirm your identity."
-msgstr "[###SITENAME###] %s confirme votre identité"
+msgstr "[###SITENAME###] %s confirme votre identité."
 
 #: pro/modules/users-login/plugins/geoip-login.php:213
 #, php-format
@@ -14696,16 +14746,16 @@ msgid "Show password"
 msgstr "Montrer le mot de passe"
 
 #: pro/modules/users-login/plugins/user-creation-protection.php:79
-#: pro/modules/users-login/plugins/user-creation-protection.php:804
+#: pro/modules/users-login/plugins/user-creation-protection.php:805
 msgid "Role"
 msgstr "Rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:193
+#: pro/modules/users-login/plugins/user-creation-protection.php:194
 #, php-format
 msgid "[%s] Activate an administrator account"
 msgstr "[%s] Activer un compte d‘administration"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:194
+#: pro/modules/users-login/plugins/user-creation-protection.php:195
 msgid ""
 "A user has been designated as `administrator` on your website. Please visit "
 "the users page to approve or delete their account: "
@@ -14713,109 +14763,113 @@ msgstr ""
 "Un compte a été désigné comme `administrateur` sur votre site Web. Merci de "
 "visiter la page des comptes pour approuver ou supprimer ce compte : "
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:226
+#: pro/modules/users-login/plugins/user-creation-protection.php:227
 msgid "Sorry, you are not allowed to grant `Super Admin` to this user."
 msgstr ""
 "Désolé, vous ne pouvez pas accorder le rôle `Super Admin` sur ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:227
+#: pro/modules/users-login/plugins/user-creation-protection.php:228
 msgid "Sorry, you are not allowed to revoke `Super Admin` to this user."
 msgstr ""
 "Désolé, vous ne pouvez pas révoquer le rôle `Super Admin`sur ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:228
+#: pro/modules/users-login/plugins/user-creation-protection.php:229
 msgid "Sorry, you are not allowed to edit this user."
 msgstr "Désolé, vous ne pouvez pas éditer ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:468
+#: pro/modules/users-login/plugins/user-creation-protection.php:469
 msgid "Pending User"
 msgid_plural "Pending Users"
 msgstr[0] "Compte en attente"
 msgstr[1] "Comptes en attente"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:478
+#: pro/modules/users-login/plugins/user-creation-protection.php:479
 msgid "Fake User"
 msgid_plural "Fake Users"
 msgstr[0] "Faux compte"
 msgstr[1] "Faux comptes"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:659
+#: pro/modules/users-login/plugins/user-creation-protection.php:660
 msgid "Fake Users"
 msgstr "Faux comptes"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:697
-#: pro/modules/users-login/plugins/user-creation-protection.php:710
+#: pro/modules/users-login/plugins/user-creation-protection.php:698
+#: pro/modules/users-login/plugins/user-creation-protection.php:711
 #, php-format
 msgctxt "user role"
 msgid "Activate as `%s`"
 msgstr "Activer comme `%s`"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:699
+#: pro/modules/users-login/plugins/user-creation-protection.php:700
 msgctxt "verb"
 msgid "Activate without role"
 msgstr "Activer sans rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:708
-#: pro/modules/users-login/plugins/user-creation-protection.php:719
+#: pro/modules/users-login/plugins/user-creation-protection.php:709
+#: pro/modules/users-login/plugins/user-creation-protection.php:720
 #, php-format
 msgctxt "user role"
 msgid "Downgrade as `%s`"
 msgstr "Rétrograder en `%s`"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:719
+#: pro/modules/users-login/plugins/user-creation-protection.php:720
 msgid "No role"
 msgstr "Aucun rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:750
-#: pro/modules/users-login/plugins/user-creation-protection.php:780
+#: pro/modules/users-login/plugins/user-creation-protection.php:751
+#: pro/modules/users-login/plugins/user-creation-protection.php:781
 msgid "User updated"
 msgstr "Compte mis à jour"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:805
+#: pro/modules/users-login/plugins/user-creation-protection.php:806
 msgid "Reason"
 msgstr "Raison"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:869
+#: pro/modules/users-login/plugins/user-creation-protection.php:870
 msgctxt "the user"
 msgid "Not Exist"
 msgstr "N‘existe pas"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:874
+#: pro/modules/users-login/plugins/user-creation-protection.php:875
 msgctxt "the user"
 msgid "Not Administrator"
 msgstr "Non administrateur"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:879
+#: pro/modules/users-login/plugins/user-creation-protection.php:880
 msgid "Too Short Pass Hash"
 msgstr "Hash du pass court"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:884
+#: pro/modules/users-login/plugins/user-creation-protection.php:885
 msgid "No Registration Date"
 msgstr "Pas de date d’inscription"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:889
+#: pro/modules/users-login/plugins/user-creation-protection.php:890
 msgid "Missing user_nicename"
 msgstr "`user_nicename` manquant"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:894
+#: pro/modules/users-login/plugins/user-creation-protection.php:895
 msgid "Missing Metadata"
 msgstr "Métadonnée manquante"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:899
+#: pro/modules/users-login/plugins/user-creation-protection.php:900
 msgid "Wrong Metadata Value"
 msgstr "Mauvaise valeur de métadonnée"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:904
+#: pro/modules/users-login/plugins/user-creation-protection.php:905
 msgid "Same Email Domain"
 msgstr "Domaine e-mail identique"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:909
+#: pro/modules/users-login/plugins/user-creation-protection.php:910
 msgid "Wrong Email MX"
 msgstr "Mauvais registre MX"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:914
+#: pro/modules/users-login/plugins/user-creation-protection.php:915
 msgid "Wrong Email Address"
 msgstr "Mauvaise adresse e-mail"
+
+#: pro/modules/users-login/plugins/user-creation-protection.php:920
+msgid "Wrong Password Encryption"
+msgstr "Chiffrement du mot de passe incorrect"
 
 #: pro/modules/users-login/tools.php:227
 #, php-format
@@ -14940,6 +14994,27 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#~ msgid "https://secupress.me/blog/secupress-v2-6/"
+#~ msgstr "https://secupress.me/fr/blog/secupress-v2-6/"
+
+#~ msgid "New: GeoIP Location on Login"
+#~ msgstr "Nouveau : Lieu de connexion par GeoIP"
+
+#~ msgid "New: Search field in admin UI."
+#~ msgstr "Nouveau : Champ de recherche dans l‘interface admin"
+
+#~ msgid "Improvement: UI for Malware Scanner has been improved."
+#~ msgstr ""
+#~ "Amélioration : L’interface utilisateur du scanner de virus a été "
+#~ "améliorée."
+
+#~ msgid "6 more fixes."
+#~ msgstr "6 correctifs de plus."
+
+#~ msgctxt "theme or plugin"
+#~ msgid "Security issue"
+#~ msgstr "Faille de sécurité"
 
 #, php-format
 #~ msgid ""
