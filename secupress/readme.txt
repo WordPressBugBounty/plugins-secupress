@@ -2,9 +2,9 @@
 Contributors: SecuPress, juliobox, GregLone, Superment
 Tags: wordpress security, malware, security plugin, security
 Requires at least: 5.4
-Tested up to: 6.9
+Tested up to: 7.0.2
 Requires PHP: 7.2
-Stable tag: 2.6.2
+Stable tag: 2.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,16 +185,11 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.6.2 =
-* 25 Juin 2026
-* Fix: Possible fatal error when the data files are not correctly extracted.
-* Fix: Users with same email domain present before the activation of the same  name module were still tagged as bad.
-* Fix: Fatal error on empty JSON
-* Fix: Users from REST API still visible, it's CASE SENSITIVE!?
-* Fix: Require module tools on submodule activation
-* Improvement: User secupress.me instead of google.com for testing
-* Improvement: Do not unvalidate passwordless email on plugin deactivation or licence deco
-
+= 2.6.3 =
+* 21 July 2026
+* Fix: "Uncaught TypeError: str_rot13(): Argument #1 ($string) must be of type string, array given"
+* Fix: antispam.min.js error
+* Fix: is_process_running() error again.
 
 == Upgrade Notice ==
 * SecuPress 2.6+ now requires PHP 7.2 minimum.
@@ -210,7 +205,6 @@ PHP 8.O min
 replace %s by ###USERNAME### in emails
 .htaccess scanner
 login rest disclose scanner
-move EDD updater+white label into a mu to allow upgrade+rollback even with plugin deactivated
 give possibility to rename logins
 target="_blank" on doc links
 AI Scanner
