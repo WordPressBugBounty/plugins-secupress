@@ -5,14 +5,14 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.6.3
+ * Version: 2.7
  * Code Name: Makeshift
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
  * License: GPLv2
  * Domain Path: /languages/
- * Requires at least: 5.4
- * Requires PHP: 7.0
+ * Requires at least: 5.5
+ * Requires PHP: 7.3
  * Copyright 2012-2026 SecuPress
  * 
  *  ██████╗███████╗ █████╗██╗   ██╗██████╗ ██████╗ ███████╗ ██████╗ ██████╗   ███╗   ███╗███████╗
@@ -198,6 +198,8 @@ add_action( 'secupress.loaded', 'secupress_load_plugins' );
  * @since 1.0
  */
 function secupress_load_plugins() {
+	secupress_maybe_expire_security_pause();
+
 	// All modules.
 	$modules = secupress_get_modules();
 
@@ -243,7 +245,7 @@ function secupress_load_plugins() {
 	// Active sub-modules.
 	$modules = secupress_get_active_submodules();
 
-	if ( $modules ) {
+	if ( $modules && ! secupress_is_security_paused() ) {
 		foreach ( $modules as $module => $plugins ) {
 			foreach ( $plugins as $plugin ) {
 				if ( secupress_is_pro() || ! secupress_submodule_is_pro( $module, $plugin ) ) {
@@ -286,7 +288,7 @@ function secupress_load_plugins() {
 		secupress_delete_site_transient( 'secupress_pro_activation' );
 
 		/**
-		 * Fires once SecuPress is activated, after the SecuPress's plugins are loaded.
+		 * Fires once SecuPress Pro is activated, after the SecuPress's plugins are loaded.
 		 *
 		 * @since 1.1.4
 		 * @see `secupress_pro_activation()`
@@ -296,7 +298,7 @@ function secupress_load_plugins() {
 
 	if ( $has_activation ) {
 		/**
-		 * Fires once SecuPress or SecuPress is activated, after the SecuPress's plugins are loaded.
+		 * Fires once SecuPress or SecuPress Pro is activated, after the SecuPress's plugins are loaded.
 		 *
 		 * @since 1.1.4
 		 */

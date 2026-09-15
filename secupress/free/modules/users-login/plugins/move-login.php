@@ -431,7 +431,7 @@ function secupress_move_login_maybe_deny_login_page( $secure = true ) {
 	$parsed = wp_parse_url( $_SERVER['REQUEST_URI'] );
 	$parsed = ! empty( $parsed['path'] ) ? $parsed['path'] : '';
 	$parsed = trim( $parsed, '/' );
-	$subdir = secupress_get_wp_directory();
+	$subdir = secupress_get_siteurl_subdir();
 	$slugs  = secupress_move_login_get_slugs();
 	if ( $subdir ) {
 		foreach ( $slugs as $action => $slug ) {
@@ -509,7 +509,7 @@ function secupress_fallback_slug_redirect( $wp, $test = false ) {
 		return;
 	}
 	$slugs  = secupress_move_login_get_slugs();
-	$base   = secupress_get_wp_directory();
+	$base   = secupress_get_siteurl_subdir();
 	$regex  = '^' . $base . '(' . implode( '|', $slugs ) . ')$';
 	$parsed = wp_parse_url( $_SERVER['REQUEST_URI'] );
 	$parsed = ! empty( $parsed['path'] ) ? $parsed['path'] : '';

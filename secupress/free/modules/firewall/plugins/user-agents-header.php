@@ -4,7 +4,7 @@
  * Description: Block requests received with bad user-agents.
  * Main Module: firewall
  * Author: SecuPress
- * Version: 1.4.7
+ * Version: 2.7
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
@@ -13,6 +13,10 @@ add_action( 'secupress.plugins.loaded', 'secupress_block_bad_user_agents', 5 );
 /**
  * Filter the user agent to block it or not
  *
+ * 8G FIREWALL
+ * https://perishablepress.com/8g-firewall/
+ *
+ * @since 2.7 Add 8G regex data file
  * @since 2.0 Empty user agent is fine
  * @since 1.4.6 Strip URLs from User-Agents to prevent false positive when the website contain a bad word (which is not bad)
  * @since 1.3.1 Remove empty user agent blocking
@@ -30,6 +34,10 @@ function secupress_block_bad_user_agents() {
 	// Empty is fine, can't harm anything.
 	if ( empty( $user_agent ) ) {
 		return;
+	}
+
+	if ( ! secupress_is_scan_request() ) {
+		secupress_firewall_block_regex_slug( 'ng_user_agent', $user_agent, 'UAHB' );
 	}
 
 	$user_agent = preg_replace( '/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i', '', $user_agent );

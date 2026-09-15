@@ -31,3 +31,59 @@ function secupress_next_prime( $n ) {
 		$c += 2;
 	}
 }
+
+
+if ( ! function_exists( 'mb_strtolower' ) ) {
+	/**
+	 * Fallback when the mbstring extension is not loaded.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (string) $string   The string being lowercased.
+	 * @param (string) $encoding Unused, kept for compatibility with mb_strtolower().
+	 *
+	 * @return (string)
+	 */
+	function mb_strtolower( $string, $encoding = null ) {
+		return strtolower( $string );
+	}
+}
+
+
+if ( ! function_exists( 'mb_strpos' ) ) {
+	/**
+	 * Fallback when the mbstring extension is not loaded.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (string) $haystack The string to search in.
+	 * @param (string) $needle   The string to search for.
+	 * @param (int)    $offset   The search offset.
+	 * @param (string) $encoding Unused, kept for compatibility with mb_strpos().
+	 *
+	 * @return (int|false)
+	 */
+	function mb_strpos( $haystack, $needle, $offset = 0, $encoding = null ) {
+		return strpos( $haystack, $needle, $offset );
+	}
+}
+
+
+if ( ! function_exists( 'mb_ord' ) ) {
+	/**
+	 * Fallback when the mbstring extension is not loaded.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (string) $string   A character.
+	 * @param (string) $encoding Unused, kept for compatibility with mb_ord().
+	 *
+	 * @return (int|false)
+	 */
+	function mb_ord( $string, $encoding = null ) {
+		return '' === $string ? false : ord( $string );
+	}
+}

@@ -4,6 +4,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * On wpconfig modules activation
  *
+ * @since 2.7 Added backup password constant.
  * @since 2.0
  * @author Julio Potier
  */
@@ -18,35 +19,26 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 		return;
 	}
 
-	$new_define = [];
-	$error      = [];
-	$const_err  = [];
+	$new_define     = [];
+	$new_define_raw = [];
+	$error          = [];
+	$const_err      = [];
 	foreach ( $constants as $constant => $correct_value ) {
+		$line = secupress_wpconfig_format_define( $constant, $correct_value );
+		if ( '' === $line ) {
+			continue;
+		}
 		$check = defined( $constant ) ? constant( $constant ) : null;
 		if ( $correct_value !== $check || $force_rewrite ) {
-			// This will be printed in the wp-config file.
-			if ( is_bool( $correct_value ) ) {
-				$new_define[] = sprintf( "define( '%s', %s );", $constant, var_export( $correct_value, true ) );
-			} elseif ( is_integer( $correct_value ) || 0 === strpos( $correct_value, '0' ) ) {
-				$new_define[] = "define( '$constant', " . $correct_value . " );";
-			} else {
-				$new_define[] = "define( '$constant', '" . $correct_value . "' );";
-			}
+			$new_define_raw[] = $line;
+			$new_define[]     = secupress_wpconfig_format_define( $constant, $correct_value, true );
 			if ( $force_rewrite ) {
 				continue;
 			}
-			// Remove the constant we could have previously set, and comment old value.
 			$replaced = secupress_comment_constant( $constant, $wpconfig_filepath, $marker );
 			if ( ! $replaced ) {
 				$const_err[] = $constant;
-				// The constant couldn't be removed or commented: display an error message.
-				if ( is_bool( $check ) ) {
-					$error[] = sprintf( "define( '%s', %s );", $constant, var_export( $check, true ) );
-				} elseif ( is_integer( $check ) || 0 === strpos( $check, '0' ) ) {
-					$error[] = "define( '$constant', " . $check . " );";
-				} else { // string.
-					$error[] = "define( '$constant', '" . $check . "' );";
-				}
+				$error[]     = secupress_wpconfig_format_define( $constant, $check, true );
 			}
 		}
 	}
@@ -64,14 +56,11 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 			);
 		}
 		secupress_add_settings_error( 'general', 'constant_not_removed', $messages, 'error' );
-		// return false; // Do not return now, we can still add the other constants.
 	}
-	// Add our constant now.
-	if ( ! empty( $new_define ) ) {
+	if ( ! empty( $new_define_raw ) ) {
 		$args  = [ 'marker' => $marker, 'put' => 'append', 'text' => '<?php' ];
 
-		if ( ! secupress_put_contents( $wpconfig_filepath, implode( "\n", $new_define ), $args ) ) {
-			// The constant couldn't be added: display an error message.
+		if ( ! secupress_put_contents( $wpconfig_filepath, implode( "\n", $new_define_raw ), $args ) ) {
 			$message = sprintf(
 				/** Translators: 1 is a file name, 2 is a small part of code. */
 				__( 'Cannot add the constants to the %1$s file. Please edit it and add the following at the beginning: %2$s', 'secupress' ),
@@ -110,12 +99,9 @@ function secupress_wpconfig_modules_deactivation( $marker ) {
 	if ( ! secupress_comment_constant( 'secupress_dummy_foobar', $wpconfig_filepath, $marker ) ) {
 		$new_define = [];
 		foreach ( $constants as $constant => $correct_value ) {
-			if ( is_bool( $correct_value ) ) {
-				$new_define[] = sprintf( "define( '%s', %s );", $constant, var_export( $correct_value, true ) );
-			} elseif ( is_integer( $correct_value ) || 0 === strpos( $correct_value, '0' ) ) {
-				$new_define[] = "define( '$constant', " . $correct_value . " );";
-			} else {
-				$new_define[] = "define( '$constant', '" . $correct_value . "' );";
+			$line = secupress_wpconfig_format_define( $constant, $correct_value, true );
+			if ( '' !== $line ) {
+				$new_define[] = $line;
 			}
 		}
 		$message = sprintf(
@@ -195,6 +181,15 @@ function secupress_get_constants_from_marker( $marker ) {
 			return [ 'CORE_UPGRADE_SKIP_NEW_BUNDLED' => true ];
 		break;
 
+		case 'backup_password':
+			$name  = function_exists( 'secupress_get_backup_password_constant_name' ) ? secupress_get_backup_password_constant_name( true ) : '';
+			$value = function_exists( 'secupress_backup_password_pending' ) ? secupress_backup_password_pending() : null;
+			if ( null === $value ) {
+				$value = ( $name && defined( $name ) ) ? constant( $name ) : '';
+			}
+			return [ $name => $value ];
+		break;
+
 		default:
 			wp_die( 'Missing or incorrect marker: ' . esc_html( $marker ) ); // Do not translate.
 		break;
@@ -213,6 +208,9 @@ function secupress_get_constants_from_marker( $marker ) {
  * @return (string) Translated text
  **/
 function secupress_get_wpconfig_constant_text( $constant, $value ) {
+	if ( secupress_wpconfig_constant_is_secret( $constant ) ) {
+		$value = '********';
+	}
 	return sprintf( __( 'The constant %s will be set on %s.', 'secupress' ), secupress_code_me( esc_html( $constant ) ), secupress_code_me( esc_html( $value ) ) );
 }
 
@@ -228,7 +226,55 @@ function secupress_get_wpconfig_constant_text( $constant, $value ) {
  * @return (string) Translated text
  **/
 function secupress_get_wpconfig_constant_error( $constant, $value ) {
+	if ( secupress_wpconfig_constant_is_secret( $constant ) ) {
+		$value = '********';
+	}
 	return sprintf( __( 'The constant %1$s should be set on %2$s.<br>Please deactivate and activate this module again.', 'secupress' ), secupress_code_me( esc_html( $constant ) ), secupress_code_me( esc_html( $value ) ) );
+}
+
+/**
+ * Tell if a wp-config constant name looks like a secret (password).
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (string) $constant Constant name.
+ *
+ * @return (bool)
+ */
+function secupress_wpconfig_constant_is_secret( $constant ) {
+	$upper = strtoupper( (string) $constant );
+	if ( preg_match( '/PASSWORD|PASSWD|PSSWRD|PSSWD/', $upper ) ) {
+		return true;
+	}
+	$stripped = str_replace( [ 'BYPASS', 'PASSIVE' ], '', $upper );
+	return false !== strpos( $stripped, 'PASS' );
+}
+
+/**
+ * Format a define() line for wp-config.php.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (string) $constant    Constant name.
+ * @param (mixed)  $value       Constant value.
+ * @param (bool)   $for_display Redact secret values.
+ *
+ * @return (string)
+ */
+function secupress_wpconfig_format_define( $constant, $value, $for_display = false ) {
+	$constant = (string) $constant;
+	if ( ! preg_match( '/^[A-Z_][A-Z0-9_]*$/i', $constant ) ) {
+		return '';
+	}
+	if ( $for_display && secupress_wpconfig_constant_is_secret( $constant ) ) {
+		$value = '********';
+	}
+	if ( ! is_scalar( $value ) ) {
+		return '';
+	}
+	return sprintf( 'define( %s, %s );', var_export( $constant, true ), var_export( $value, true ) );
 }
 
 add_filter( 'secupress.settings.section.submit_button_args', 'secupress_change_submit_button_label_for_db_prefix', 10, 2 );

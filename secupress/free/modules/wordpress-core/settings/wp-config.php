@@ -10,7 +10,7 @@ $is_after_save  = remove_query_arg( 'settings-updated', secupress_get_current_ur
 $mu_is_writable = wp_is_writable( WPMU_PLUGIN_DIR );
 $mu_description = '';
 if ( ! $mu_is_writable ) {
-	$mu_description = sprintf( __( 'The directory %s is not writable, so the constant cannot be modified.', 'secupress' ), secupress_code_me( esc_html( WPMU_PLUGIN_DIR ) ) );
+	$mu_description = sprintf( __( 'The directory %s is not writable or does not exists, so the constant cannot be modified.', 'secupress' ), secupress_code_me( esc_html( WPMU_PLUGIN_DIR ) ) );
 }
 
 $description = '';

@@ -623,6 +623,7 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 			case 'email' :
 			case 'tel' :
 			case 'text' :
+			case 'password' :
 			case 'color' :
 
 				echo $label_open; ?>
@@ -729,11 +730,12 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 					if ( ! is_array( $title ) ) {
 						$title = (array) $title;
 					}
-					if ( $key_as_val && $val ) {
+					$is_grouped = ! $key_as_val && is_array( $title ) && ! array_key_exists( 0, $title );
+					if ( ( $key_as_val || $is_grouped ) && $val ) {
 						echo '<h5>' . $val . '</h5>';
 					}
-					foreach ( $title as $_title ) {
-						$_value            = $key_as_val ? sanitize_title( $_title ) : $val;
+					foreach ( $title as $_key => $_title ) {
+						$_value            = $key_as_val ? sanitize_title( $_title ) : ( $is_grouped ? $_key : $val );
 						$args['label_for'] = $args['name'] . '_' . $_value;
 						$disabled          = ( static::is_pro_feature( $args['name'] . '|' . $_value ) && ! secupress_is_pro() ) ? ' disabled="disabled"' : $disabled;
 						$disabled          = $disabled || ( isset( $args['disabled_values'] ) && in_array( $_value, $args['disabled_values'] ) ) ? ' disabled="disabled"' : $disabled;

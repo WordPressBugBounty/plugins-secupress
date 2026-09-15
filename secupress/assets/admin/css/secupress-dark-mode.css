@@ -449,3 +449,55 @@ body #wpbody p.secupress-blob-title {
 .status-cantfix .secupress-carret {
     background: #50626f;
 }
+
+.secupress-security-status-active {
+	background: #1a3a38;
+	border-left-color: #30ceff;
+	color: #30ceff;
+}
+.secupress-security-status-paused {
+	background: #3a2a1a;
+	border-left-color: #f56e28;
+	color: #f56e28;
+}
+.secupress-security-status-idle {
+	background: #3a3218;
+	border-left-color: #f1c40f;
+	color: #f1c40f;
+}
+.secupress-security-status-active .secupress-button-secondary.secupress-button-secondary {
+	background: #F2295E;
+}
+.secupress-security-status-paused .secupress-button-primary.secupress-button-primary {
+	background: #2BCDC1;
+}
+.secupress-security-status-active .secupress-security-status-count:not(.secupress-security-status-grade) {
+	background: rgba(48, 206, 255, 0.15);
+	color: #30ceff;
+}
+.secupress-security-status-paused .secupress-security-status-count:not(.secupress-security-status-grade) {
+	background: rgba(245, 110, 40, 0.18);
+	color: #f56e28;
+}
+.secupress-security-status-idle .secupress-security-status-count:not(.secupress-security-status-grade) {
+	background: rgba(241, 196, 15, 0.16);
+	color: #f1c40f;
+}
+.secupress-security-status-active a.secupress-security-status-more:hover,
+.secupress-security-status-active a.secupress-security-status-more:focus,
+.secupress-security-status-active .secupress-security-status-info:hover,
+.secupress-security-status-active .secupress-security-status-info:focus {
+	color: #30ceff;
+}
+.secupress-security-status-paused a.secupress-security-status-more:hover,
+.secupress-security-status-paused a.secupress-security-status-more:focus,
+.secupress-security-status-paused .secupress-security-status-info:hover,
+.secupress-security-status-paused .secupress-security-status-info:focus {
+	color: #f56e28;
+}
+.secupress-security-status-idle a.secupress-security-status-more:hover,
+.secupress-security-status-idle a.secupress-security-status-more:focus,
+.secupress-security-status-idle .secupress-security-status-info:hover,
+.secupress-security-status-idle .secupress-security-status-info:focus {
+	color: #f1c40f;
+}

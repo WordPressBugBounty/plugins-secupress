@@ -25,6 +25,7 @@ function secupress_get_modules() {
 			'with_form'      => false,
 			'with_reset_box' => false,
 			'submodules'     => [
+							'module-secupress_security_status'        => '+sp27_pause_security+' . __( 'Security Status', 'secupress' ),
 							'module-secupress_display_apikey_options' => ! defined( 'SECUPRESS_HIDE_API_KEY' ) || SECUPRESS_HIDE_API_KEY ? __( 'License Information', 'secupress' ) : '',
 							'module-secupress_display_white_label'    => secupress_is_pro() && ( defined( 'WP_SWL' ) && constant( 'WP_SWL' ) ) ? __( 'White Label', 'secupress' ) : '',
 							'module-secupress_advanced_settings'      => __( 'Advanced Settings', 'secupress' ),
@@ -32,6 +33,7 @@ function secupress_get_modules() {
 						]
 		],
 		'users-login'     => [
+			// 'new'         => true,
 			'title'       => __( 'Users & Login', 'secupress' ),
 			'icon'        => 'user-login',
 			'dashicon'    => 'groups',
@@ -56,6 +58,7 @@ function secupress_get_modules() {
 							'row-password-policy_password_expiration'         => secupress_is_submodule_active( 'users-login', 'strong-passwords' ) ? '*' . __( 'Password Lifespan', 'secupress' ) : '',
 							'row-password-policy_send-emails'                 => '*' . __( 'Force Reset Passwords', 'secupress' ),
 							'row-password-policy_force-logout'                => '*' . __( 'Force Logout Everyone', 'secupress' ),
+							'row-password-policy_application-passwords'       => '+sp27_app_passwords+' . __( 'Application Passwords', 'secupress' ),
 							'row-blacklist-logins_user-creation-protection'   => '*' . __( 'Protect User Creation', 'secupress' ),
 							'row-blacklist-logins_prevent-user-creation'      => secupress_is_submodule_active( 'users-login', 'user-creation-protection' ) ? '>*' . __( 'Forbid User Creation', 'secupress' ) : '',
 							'row-blacklist-logins_bad-email-domains'          => '*' . __( 'Forbid Bad Email Domains', 'secupress' ),
@@ -892,6 +895,65 @@ function secupress_get_active_submodules() {
 	secupress_set_site_transient( SECUPRESS_ACTIVE_SUBMODULES, $active_submodules );
 
 	return $active_submodules;
+}
+
+
+/**
+ * Count active sub-modules that would actually run.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (int)
+ */
+function secupress_count_active_submodules() {
+	$modules = secupress_get_active_submodules();
+	$count   = 0;
+
+	if ( ! $modules ) {
+		return 0;
+	}
+
+	foreach ( $modules as $module => $plugins ) {
+		foreach ( (array) $plugins as $plugin ) {
+			if ( secupress_is_pro() || ! secupress_submodule_is_pro( $module, $plugin ) ) {
+				++$count;
+			}
+		}
+	}
+
+	return $count;
+}
+
+
+/**
+ * Get the labels of active sub-modules that would actually run.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (array)
+ */
+function secupress_get_active_submodule_labels() {
+	$modules = secupress_get_active_submodules();
+	$labels  = [];
+
+	if ( ! $modules ) {
+		return [];
+	}
+
+	foreach ( $modules as $module => $plugins ) {
+		foreach ( (array) $plugins as $plugin ) {
+			if ( secupress_is_pro() || ! secupress_submodule_is_pro( $module, $plugin ) ) {
+				$labels[] = secupress_get_module_data( $module, $plugin )['Name'];
+			}
+		}
+	}
+
+	$labels = array_unique( array_filter( $labels ) );
+	natcasesort( $labels );
+
+	return array_values( $labels );
 }
 
 

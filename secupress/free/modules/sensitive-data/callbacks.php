@@ -64,6 +64,19 @@ function secupress_content_protection_settings_callback( $modulenow, &$settings,
 	// (De)Activation.
 	secupress_manage_submodule( $modulenow,  '404guess', ! empty( $activate['content-protect_404guess'] ) && secupress_is_pro() );
 	secupress_manage_submodule( $modulenow,  'hotlink', ! empty( $activate['content-protect_hotlink'] ) && secupress_is_pro() );
+
+	$hotlink_redirs = [ 'pixel', '403', 'image' ];
+	if ( ! isset( $settings['content-protect_hotlink_redirection'] ) || ! in_array( $settings['content-protect_hotlink_redirection'], $hotlink_redirs, true ) ) {
+		$settings['content-protect_hotlink_redirection'] = secupress_get_module_option( 'content-protect_hotlink_redirection', '403', 'sensitive-data' );
+	}
+
+	$hotlink_allow_ids = function_exists( 'secupress_hotlink_get_default_allowed_referers' ) ? secupress_hotlink_get_default_allowed_referers() : [];
+	if ( secupress_is_expert_mode() ) {
+		$posted_allow = isset( $settings['content-protect_hotlink_allow'] ) ? (array) $settings['content-protect_hotlink_allow'] : [];
+		$settings['content-protect_hotlink_allow'] = array_values( array_intersect( $posted_allow, $hotlink_allow_ids ) );
+	} elseif ( ! isset( $settings['content-protect_hotlink_allow'] ) ) {
+		$settings['content-protect_hotlink_allow'] = secupress_get_module_option( 'content-protect_hotlink_allow', $hotlink_allow_ids, 'sensitive-data' );
+	}
 	secupress_manage_submodule( $modulenow,  'blackhole', ! empty( $activate['content-protect_blackhole'] ) && secupress_blackhole_is_robots_txt_enabled() );
 	secupress_manage_submodule( $modulenow,  'directory-listing', ! empty( $activate['content-protect_directory-listing'] ) );
 	secupress_manage_submodule( $modulenow,  'php-easter-egg', ! empty( $activate['content-protect_php-disclosure'] ) );

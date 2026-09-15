@@ -317,6 +317,85 @@ function secupress_warning_no_oneclick_scan_yet() {
 }
 
 
+add_action( 'admin_init', 'secupress_no_active_modules_notice' );
+/**
+ * Display a notice if no security module is active, after the first scan has been done.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_no_active_modules_notice() {
+	if ( wp_doing_ajax() ) {
+		return;
+	}
+
+	if ( ! current_user_can( secupress_get_capability() ) ) {
+		return;
+	}
+
+	$page = isset( $_GET['page'] ) ? $_GET['page'] : '';
+	$step = isset( $_GET['step'] ) ? (int) $_GET['step'] : 0;
+	if ( SECUPRESS_PLUGIN_SLUG . '_scanners' === $page && in_array( $step, [ 2, 3 ], true ) ) {
+		return;
+	}
+
+	$times = array_filter( (array) get_site_option( SECUPRESS_SCAN_TIMES ) );
+	if ( ! $times ) {
+		return;
+	}
+
+	if ( secupress_count_active_submodules() ) {
+		return;
+	}
+
+	$fix_url = secupress_admin_url( 'scanners', '&step=2' );
+	$message = sprintf(
+		/* translators: %s is the plugin name. */
+		__( 'Warning, no %s security modules are active.', 'secupress' ),
+		'<strong>' . SECUPRESS_PLUGIN_NAME . '</strong>'
+	);
+
+	if ( secupress_show_grade_system() ) {
+		$grade  = secupress_get_scanner_counts( 'grade' );
+		$letter = is_string( $grade ) ? substr( $grade, 0, 1 ) : '';
+		if ( $letter && ! in_array( $letter, [ 'A', 'B', 'C' ], true ) ) {
+			$message .= ' ' . sprintf(
+				/* translators: %s is a security grade letter, like D or E. */
+				__( 'The site security grade is currently %s.', 'secupress' ),
+				'<strong>' . esc_html( $grade ) . '</strong>'
+			);
+		}
+	}
+
+	$message  = '<p>' . $message;
+	$message .= ' <a href="' . esc_url( $fix_url ) . '" class="secupress-button secupress-button-tertiary secupress-button-mini secupress-ghost"><span class="icon"><i class="secupress-icon-wrench" aria-hidden="true"></i></span><span class="text">' . __( 'Open Auto-Fix', 'secupress' ) . '</span></a></p>';
+
+	secupress_add_notice( $message, 'notice-warning', 'no-active-modules' );
+}
+
+
+add_action( 'secupress.modules.deactivate_submodule', 'secupress_reinit_no_active_modules_notice', 10, 3 );
+/**
+ * Show again the "no active modules" notice when the last submodule is turned off.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (string) $submodule         The sub-module slug.
+ * @param (array)  $args              Unused.
+ * @param (bool)   $already_inactive  True if the sub-module was already inactive.
+ */
+function secupress_reinit_no_active_modules_notice( $submodule, $args, $already_inactive ) {
+	if ( $already_inactive ) {
+		return;
+	}
+	secupress_delete_site_transient( SECUPRESS_ACTIVE_SUBMODULES );
+	if ( ! secupress_count_active_submodules() ) {
+		secupress_reinit_notice( 'no-active-modules' );
+	}
+}
+
+
 add_action( 'in_plugin_update_message-' . plugin_basename( SECUPRESS_FILE ), 'secupress_updates_message', 10, 2 );
 /**
  * Display a message below our plugins to display the next update information if needed
@@ -472,4 +551,36 @@ function secupress_check_default_login_slug_notice() {
 		);
 		secupress_add_notice( $message, 'warning', 'default-login-slug' );
 	}
+}
+
+add_action( 'admin_init', 'secupress_security_paused_notice' );
+/**
+ * Display a permanent notice when SecuPress security is paused.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_security_paused_notice() {
+	if ( ! current_user_can( secupress_get_capability() ) ) {
+		return;
+	}
+	if ( ! secupress_is_security_paused() ) {
+		return;
+	}
+
+	$page   = isset( $_GET['page'] ) ? $_GET['page'] : '';
+	$module = isset( $_GET['module'] ) ? $_GET['module'] : '';
+	if ( SECUPRESS_PLUGIN_SLUG . '_modules' === $page && ( '' === $module || 'welcome' === $module ) ) {
+		return;
+	}
+
+	$resume_url = wp_nonce_url( admin_url( 'admin-post.php?action=secupress_toggle_security_pause' ), 'secupress_toggle_security_pause' );
+	$remaining  = secupress_get_security_pause_remaining_text();
+	$message    = '<p><strong>' . __( 'Security is paused', 'secupress' ) . '</strong> — ' . __( 'Attention, PHP modules are not protecting this site.', 'secupress' );
+	if ( $remaining ) {
+		$message .= ' ' . esc_html( $remaining );
+	}
+	$message   .= ' <a href="' . esc_url( $resume_url ) . '" class="button button-primary">' . __( 'Activate Security', 'secupress' ) . '</a></p>';
+
+	secupress_add_notice( $message, 'warning', false );
 }

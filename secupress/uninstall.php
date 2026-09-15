@@ -33,7 +33,7 @@ if ( is_array( $settings ) && ! empty( $settings['consumer_email'] ) && ! empty(
 
 		/** This filter is documented in wp-includes/class-http.php. */
 		$user_agent      = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) );
-		$version         = '2.6.3';
+		$version         = '2.7';
 		$args['headers'] = array(
 			'X-Requested-With' => sprintf( '%s;SecuPress|%s|%s|;', $user_agent, $version, esc_url( home_url() ) ),
 			'Authorization' => 'Basic ' . base64_encode( $settings['consumer_email'] . ':' . $settings['consumer_key'] )
@@ -101,3 +101,5 @@ wp_clear_scheduled_hook( 'secupress_bad_themes' );
 wp_clear_scheduled_hook( 'secupress_bad_themes_maybe_do_checks' );
 wp_clear_scheduled_hook( 'secupress_bad_plugins' );
 wp_clear_scheduled_hook( 'secupress_bad_plugins_maybe_do_checks' );
+wp_clear_scheduled_hook( 'secupress_security_resume_cron' );
+wp_clear_scheduled_hook( 'secupress_security_paused_email_cron' );

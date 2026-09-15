@@ -28,9 +28,12 @@ final class SecuPress_Admin_Pointers {
 	 * @param string $hook_suffix The current admin page.
 	 */
 	public static function enqueue_scripts( $hook_suffix ) {
-		if ( ! secupress_get_capability() ) {
+		if ( ! current_user_can( secupress_get_capability() ) ) {
 			return;
 		}
+
+		self::enqueue_tour( $hook_suffix );
+
 		/*
 		 * Register feature pointers
 		 *
@@ -45,10 +48,14 @@ final class SecuPress_Admin_Pointers {
 		 *         'secupress_page_secupress_xx' => 'spxx_foobar'
 		 *     )
 		 */
+		$modules_page         = SECUPRESS_PLUGIN_SLUG . '_page_' . SECUPRESS_PLUGIN_SLUG . '_modules';
 		$registered_pointers = [
-			'secupress_page_secupress_modules' => [
-				'any'          => [ 'sp22_ad' ],
-				//'logs'         => [ 'sp21_httplogs' ],
+			$modules_page              => [
+				'any' => [ 'sp22_ad' ],
+				//'logs'      => [ 'sp21_httplogs' ],
+			],
+			$modules_page . '-network' => [
+				'any' => [ 'sp22_ad' ],
 			],
 		];
 
@@ -57,8 +64,8 @@ final class SecuPress_Admin_Pointers {
 			return;
 		}
 		$pointers     = isset( $registered_pointers[ $hook_suffix ]['any'] ) ? $registered_pointers[ $hook_suffix ]['any'] : [];
-		$module       = isset( $_GET['module'] ) ? sanitize_key( $_GET['module' ] ) : 'any'; // Do not translate.
-		if ( isset( $registered_pointers[ $hook_suffix ][ $module ] ) ) {
+		$module       = isset( $_GET['module'] ) ? sanitize_key( $_GET['module'] ) : 'any'; // Do not translate.
+		if ( 'any' !== $module && isset( $registered_pointers[ $hook_suffix ][ $module ] ) ) {
 			$pointers = array_merge( $pointers, $registered_pointers[ $hook_suffix ][ $module ] );
 		}
 		$dismissed    = explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) );
@@ -76,6 +83,231 @@ final class SecuPress_Admin_Pointers {
 			add_action( 'admin_print_footer_scripts', array( 'SecuPress_Admin_Pointers', 'print_pointer_css_rules' ) );
 		}
 
+	}
+
+	/**
+	 * Get the pointer tours.
+	 *
+	 * @since 2.7
+	 *
+	 * @return (array)
+	 */
+	public static function get_tours() {
+		$app_passwords  = '<h3><span class="dashicons dashicons-star-filled"></span> ' . __( 'New: Application Passwords', 'secupress' ) . '</h3>';
+		$app_passwords .= '<h4>' . __( 'Get notified when an application password is created on your account', 'secupress' ) . '</h4>';
+		$app_passwords .= '<p>' . __( 'WordPress application passwords can grant REST API access to an account. Enable this setting to email the user (and the site admin if needed) whenever one is added.', 'secupress' ) . '</p>';
+
+		$pause_security  = '<h3><span class="dashicons dashicons-star-filled"></span> ' . __( 'New: Pause the security for 30 minutes', 'secupress' ) . '</h3>';
+		$pause_security .= '<p>' . __( 'You can now pause the security for 30 minutes to allow you to test the site without being protected.', 'secupress' ) . '</p>';
+
+		$widget  = '<h3><span class="dashicons dashicons-star-filled"></span> ' . __( 'New: Dashboard widget "System Status"', 'secupress' ) . '</h3>';
+		$widget .= '<p>' . __( 'This widget shows some useful information about the site. Keep an eye on it!', 'secupress' ) . '</p>';
+
+		$backups = '<h3><span class="dashicons dashicons-star-filled"></span> ' . __( 'New: Password protection for backups (Pro)', 'secupress' ) . '</h3>';
+		$backups .= '<p>' . __( 'You can now protect your backups with a password. This will prevent unauthorized access to your backups.', 'secupress' ) . '</p>';
+		$backups .= '<p>' . __( 'Backups are now stored outside of the site directory if possible.', 'secupress' ) . '</p>';
+
+		$hotlinks = '<h3><span class="dashicons dashicons-star-filled"></span> ' . __( 'New: Expert settings for Anti Hotlink', 'secupress' ) . '</h3>';
+		$hotlinks .= '<p>' . __( 'You can now configure settings for Anti Hotlink. This will allow you to be more accurate in blocking hotlinks.', 'secupress' ) . '</p>';
+		
+		$pointers = [
+			[
+				'id'       => 'sp27_pause_security',
+				'selector' => '.secupress-security-status',
+				'url'      => secupress_admin_url( 'modules', 'dashboard' ),
+				'content'  => $pause_security,
+				'options'  => [
+					'position'     => [
+						'edge'  => 'right',
+						'align' => 'bottom',
+					],
+					'pointerClass' => 'wp-pointer arrow-bottom',
+					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
+				],
+			],
+			[
+				'id'       => 'sp27_app_passwords',
+				'selector' => '.secupress-setting-row_password-policy_application-passwords',
+				'url'      => secupress_admin_url( 'modules', 'users-login' ) . '#row-password-policy_application-passwords',
+				'content'  => $app_passwords,
+				'options'  => [
+					'position'     => [
+						'edge'  => 'right',
+						'align' => 'bottom',
+					],
+					'pointerClass' => 'wp-pointer arrow-bottom',
+					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
+				],
+			],
+			[
+				'id'       => 'sp27_widget',
+				'selector' => '#secupress-system-widget',
+				'url'      => admin_url( 'index.php' ),
+				'content'  => $widget,
+				'options'  => [
+					'position'     => [
+						'edge'  => 'left',
+						'align' => 'top',
+					],
+					'pointerClass' => 'wp-pointer arrow-bottom',
+					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
+				],
+			],			
+			[
+				'id'       => 'sp27_backups',
+				'selector' => '.secupress-setting-row_backups-storage_password',
+				'url'      => secupress_admin_url( 'modules', 'backups' ) . '#row-backups-storage_password',
+				'content'  => $backups,
+				'options'  => [
+					'position'     => [
+						'edge'  => 'right',
+						'align' => 'top',
+					],
+					'pointerClass' => 'wp-pointer arrow-bottom',
+					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
+				],
+			],
+		];
+
+		if ( secupress_is_expert_mode() ) {
+			$pointers[] = [
+				'id'       => 'sp27_hotlinks',
+				'selector' => '.secupress-setting-row_content-protect_hotlink',
+				'url'      => secupress_admin_url( 'modules', 'sensitive-data' ) . '#row-content-protect_hotlink',
+				'content'  => $hotlinks,
+				'options'  => [
+					'position'     => [
+						'edge'  => 'right',
+						'align' => 'top',
+					],
+					'pointerClass' => 'wp-pointer arrow-bottom',
+					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
+				],
+			];
+		}
+
+		return $pointers;
+	}
+
+	/**
+	 * Get dismissed WP / SecuPress pointers for the current user.
+	 *
+	 * @since 2.7
+	 *
+	 * @return (array)
+	 */
+	public static function get_dismissed_pointers() {
+		static $dismissed;
+		if ( ! isset( $dismissed ) ) {
+			$dismissed = array_filter( explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) ) );
+		}
+		return $dismissed;
+	}
+
+	/**
+	 * Get remaining (not dismissed) tour steps.
+	 *
+	 * @since 2.7
+	 *
+	 * @return (array)
+	 */
+	public static function get_tour_remaining_steps() {
+		$dismissed = self::get_dismissed_pointers();
+		$remaining = [];
+		foreach ( self::get_tours() as $number => $step ) {
+			if ( in_array( $step['id'], $dismissed, true ) ) {
+				continue;
+			}
+			$step['number'] = $number + 1;
+			$remaining[]    = $step;
+		}
+		return $remaining;
+	}
+
+	/**
+	 * Whether the whole tour has been dismissed.
+	 *
+	 * @since 2.7
+	 *
+	 * @return (bool)
+	 */
+	public static function is_tour_dismissed() {
+		return ! self::get_tour_remaining_steps();
+	}
+
+	/**
+	 * HTML badge with the number of remaining tour steps.
+	 *
+	 * @since 2.7
+	 *
+	 * @return (string)
+	 */
+	public static function get_tour_badge_html() {
+		$count = count( self::get_tour_remaining_steps() );
+		if ( ! $count ) {
+			return '';
+		}
+		return ' <span class="secupress-tour-count">' . esc_html( $count ) . '</span>';
+	}
+
+	/**
+	 * Modules menu URL: first remaining pointer page, or the default modules screen.
+	 *
+	 * @since 2.7
+	 *
+	 * @return (string)
+	 */
+	public static function get_tour_modules_url() {
+		if ( self::is_tour_dismissed() ) {
+			return secupress_admin_url( 'modules' );
+		}
+		$first = reset( self::get_tour_remaining_steps() );
+		return add_query_arg(
+			[
+				'secupress_pointer_tour' => 1,
+				'secupress_pointer_step' => $first['id'],
+			],
+			$first['url']
+		);
+	}
+
+	/**
+	 * Enqueue a pointer tour when there are remaining steps.
+	 *
+	 * @since 2.7
+	 *
+	 * @param (string) $hook_suffix The current admin page.
+	 */
+	private static function enqueue_tour( $hook_suffix ) {
+		$is_sp_page = false !== strpos( $hook_suffix, SECUPRESS_PLUGIN_SLUG );
+		$has_query  = ! empty( $_GET['secupress_pointer_tour'] );
+		if ( ! $is_sp_page && ! $has_query ) {
+			return;
+		}
+
+		$steps = self::get_tour_remaining_steps();
+		if ( ! $steps ) {
+			return;
+		}
+
+		$start_id = isset( $_GET['secupress_pointer_step'] ) ? sanitize_key( wp_unslash( $_GET['secupress_pointer_step'] ) ) : '';
+
+		wp_enqueue_style( 'wp-pointer' );
+		wp_enqueue_script( 'wp-pointer' );
+		wp_enqueue_script( 'secupress-pointers', SECUPRESS_ADMIN_JS_URL . 'secupress-pointers.js', [ 'jquery', 'wp-pointer' ], SECUPRESS_VERSION, true );
+		wp_localize_script( 'secupress-pointers', 'SecuPressPointerTour', [
+			'id'      => 1,
+			'total'   => count( self::get_tours() ),
+			'startId' => $start_id,
+			'nonce'   => wp_create_nonce( 'dismiss-pointer-tour' ),
+			'steps'   => $steps,
+			'i18n'    => [
+				'next'    => html_entity_decode( __( 'Next &raquo;', 'secupress' ), ENT_QUOTES, 'UTF-8' ),
+				'gotIt'   => __( 'Got it', 'secupress' ),
+				'dismiss' => _x( 'Dismiss', 'verb', 'secupress' ),
+			],
+		] );
+		add_action( 'admin_print_footer_scripts', [ 'SecuPress_Admin_Pointers', 'print_pointer_css_rules' ] );
 	}
 
 	/**
@@ -159,6 +391,18 @@ final class SecuPress_Admin_Pointers {
 		}
 		.wp-pointer .wp-pointer-content h3:before {
 			display: none;
+		}
+		.wp-pointer .secupress-pointer-buttons {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+		}
+		.wp-pointer .secupress-pointer-nav {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-right: auto;
 		}
 		</style>
 	<?php

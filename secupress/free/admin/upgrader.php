@@ -134,10 +134,8 @@ add_action( 'secupress.first_install', 'secupress_install_users_login_module' );
  * @param (string) $module The module(s) that will be reset to default. `all` means "all modules".
  */
 function secupress_install_users_login_module( $module ) {
-	// First install.
-	if ( 'all' === $module ) {
-		// Activate "Ask for old password" submodule.
-		// secupress_activate_submodule_silently( 'users-login', 'ask-old-password' );
+	if ( 'all' === $module || 'users-login' === $module ) {
+		// secupress_activate_submodule_silently( 'users-login', 'application-passwords' );
 	}
 
 }
@@ -427,6 +425,39 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			}
 		}
 	}
+	// < 2.7
+	if ( version_compare( $actual_version, '2.7', '<' ) ) {
+		if ( secupress_is_pro() ) {
+			// Force a data pack refresh (new 8G ng_*.data files) even if the remote malwaredb version is unchanged.
+			secupress_set_option( 'malwaredb_version', '' );
+			wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'secupress_malware_files' );
+		}
+		delete_site_option( SECUPRESS_BAD_PLUGINS );
+		$like = $wpdb->esc_like( '_site_transient_secupress_auto_login_' ) . '%';
+		if ( is_multisite() ) {
+			$keys = $wpdb->get_col( $wpdb->prepare( "SELECT meta_key FROM {$wpdb->sitemeta} WHERE meta_key LIKE %s", $like ) );
+		} else {
+			$keys = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s", $like ) );
+		}
+		foreach ( $keys as $key ) {
+			delete_site_transient( substr( $key, strlen( '_site_transient_' ) ) );
+		}
+		if ( function_exists( 'secupress_migrate_backups_folder' ) ) {
+			secupress_migrate_backups_folder( secupress_get_legacy_parent_backups_path(), secupress_get_parent_backups_path() );
+		}
+		$rewrite_submodules = [
+			'discloses'      => [ 'wp-version', 'readmes' ],
+			'sensitive-data' => [ 'bad-file-extensions', 'bad-url-access' ],
+		];
+		foreach ( $rewrite_submodules as $module => $submodules ) {
+			foreach ( $submodules as $submodule ) {
+				if ( secupress_is_submodule_active( $module, $submodule ) ) {
+					secupress_deactivate_submodule( $module, $submodule );
+					secupress_activate_submodule( $module, $submodule );
+				}
+			}
+		}
+	}
 	// DEV: DO NOT REDIRECT / DO NOT AUTOLOGIN / DO NOT USE $modulenow //
 }
 
@@ -670,7 +701,7 @@ exit;
 }
 
 if ( ! secupress_is_white_label() ) {
-	// add_action( 'admin_notices', 'secupress_display_whats_new' );
+	add_action( 'admin_notices', 'secupress_display_whats_new' );
 	/**
 	 * Display a "what's new" notice when not in WhiteLabel and user has the correct capa
 	 *
@@ -683,46 +714,50 @@ if ( ! secupress_is_white_label() ) {
 	 * @return (void)
 	 **/
 	function secupress_display_whats_new() {
-		// $notice_id1 = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
-		$notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
-		// if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id1 ) ) {
-		// 	$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
-		// 	$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-		// 	$blogpost  = __( 'https://secupress.me/blog/secupress-v2-6/', 'secupress' );
-		// 	$newitems  = [ 	
-		// 					__( 'New: GeoIP Location on Login', 'secupress' ),
-		// 					__( 'New: Search field in admin UI.', 'secupress' ),
-		// 					__( 'Improvement: UI for Malware Scanner has been improved.', 'secupress' ),
-		// 					__( '6 more fixes.', 'secupress' ),
-		// 					make_clickable($blogpost)
-		// 				];
-		// 	if ( ! empty( $newitems ) ) {
-		// 		$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-		// 		secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id1 );
-		// 		// secupress_dismiss_notice( $notice_id2 ); // Do not show the second one.
-		// 	}
-		// 	return;
-		// } 
-		// else {
-			if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
-				$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
-				$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
-				$newitems  = [ 	
-								__( 'Improve: Remove the ping on google.com, set it to secupress.me.', 'secupress' ),
-								__( 'Improve: Refactored the database scan logic in SecuPress_File_Monitoring to use background processing for scanning posts, options, and custom post types for malware patterns. Better perf, quicker scans incoming on big sites.', 'secupress' ),
-								__( 'Fix: (again) Possible fatal error "Call to undefined method SecuPress_Background_Process_Bad_Plugins::is_processing()" if WooCommerce is installed since THEY include the obsolete version of the async lib before us...', 'secupress' ),
-								__( 'Fix: Remove the usage of shell_exec() and `host $ip` that can overconsume resources on your host, bringing down your site (even if this was in SecuPress since 8 years, only now this cause an issue)', 'secupress' ),
-								__( 'Fix: Warning notice when saving captcha style.', 'secupress' ),
-								__( 'Fix: Do not unvalidate passwordless email on plugin deactivation or licence deconnection', 'secupress' ),
-							];
-				if ( secupress_is_pro() ) {
-					// $newitems[] = __( 'Improve: Our data files are now stored in <code>/wp-content/secupress-data/</code> instead of inside the plugin to prevent data deletion on each plugin update.', 'secupress' );
-				}
-				if ( ! empty( $newitems ) ) {
-					$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-					secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
-				}
+		$notice_id1 = 'new-' . sanitize_key( SECUPRESS_MAJOR_VERSION );
+		// $notice_id2 = 'new-' . sanitize_key( SECUPRESS_VERSION );
+		if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id1 ) ) {
+			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_MAJOR_VERSION );
+			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+			$blogpost  = __( 'https://secupress.me/blog/secupress-v2-7/', 'secupress' );
+			$newitems  = [
+							__( 'New: Pause the security for 30 minutes.', 'secupress' ),
+							__( 'New: Dashboard widget “System Status”.', 'secupress' ),
+							__( 'New: Alerts when an application password is added to an account.', 'secupress' ),
+							__( 'New: Expert settings for Anti Hotlink.', 'secupress' ),
+							__( 'New: Password protection for backup ZIP files.', 'secupress' ),
+							__( 'Improvement: Firewall updated to 8G.', 'secupress' ),
+							__( 'Improvement: Store backups outside the web root when possible.', 'secupress' ),
+							make_clickable( $blogpost ),
+						];
+			if ( ! empty( $newitems ) ) {
+				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
+				secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id1 );
+				// secupress_dismiss_notice( $notice_id2 ); // Do not show the second one.
 			}
+			return;
+		} 
+		// else {
+			// if ( current_user_can( secupress_get_capability() ) && ! secupress_notice_is_dismissed( $notice_id2 ) ) {
+			// 	$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
+			// 	$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
+			// 	$newitems  = [ 	
+			// 					__( 'Improve: Remove the ping on google.com, set it to secupress.me.', 'secupress' ),
+			// 					__( 'Improve: Refactored the database scan logic in SecuPress_File_Monitoring to use background processing for scanning posts, options, and custom post types for malware patterns. Better perf, quicker scans incoming on big sites.', 'secupress' ),
+			// 					__( 'Fix: (again) Possible fatal error "Call to undefined method SecuPress_Background_Process_Bad_Plugins::is_processing()" if WooCommerce is installed since THEY include the obsolete version of the async lib before us...', 'secupress' ),
+			// 					__( 'Fix: Remove the usage of shell_exec() and `host $ip` that can overconsume resources on your host, bringing down your site (even if this was in SecuPress since 8 years, only now this cause an issue)', 'secupress' ),
+			// 					__( 'Fix: Warning notice when saving captcha style.', 'secupress' ),
+			// 					__( 'Fix: Do not unvalidate passwordless email on plugin deactivation or licence deconnection', 'secupress' ),
+			// 					__( 'Fix: Rewrite rules on subdirectory installs were prefixed twice and never matched (readme.html, changelogs, bad URL/file access).', 'secupress' ),
+			// 				];
+			// 	if ( secupress_is_pro() ) {
+			// 		// $newitems[] = __( 'Improve: Our data files are now stored in <code>/wp-content/secupress-data/</code> instead of inside the plugin to prevent data deletion on each plugin update.', 'secupress' );
+			// 	}
+			// 	if ( ! empty( $newitems ) ) {
+			// 		$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
+			// 		secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
+			// 	}
+			// }
 		// }
 	}
 }

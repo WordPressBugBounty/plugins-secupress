@@ -155,6 +155,59 @@ function secupress_mkdir_p( $target ) {
 
 
 /**
+ * Tell if a path is allowed by the PHP open_basedir restriction.
+ *
+ * @author Julio Potier
+ * @since 2.7
+ *
+ * @param (string) $path An absolute path.
+ *
+ * @return (bool)
+ */
+function secupress_path_is_allowed_by_open_basedir( $path ) {
+	$open_basedir = ini_get( 'open_basedir' );
+
+	if ( ! $open_basedir ) {
+		return true;
+	}
+
+	$path  = wp_normalize_path( $path );
+	$check = untrailingslashit( $path );
+
+	while ( $check && '/' !== $check && '.' !== $check && ! @file_exists( $check ) ) {
+		$parent = dirname( $check );
+		if ( $parent === $check ) {
+			break;
+		}
+		$check = $parent;
+	}
+
+	$resolved = @realpath( $check );
+	$resolved = false !== $resolved ? wp_normalize_path( $resolved ) : $check;
+	$resolved = untrailingslashit( $resolved );
+	$dirs     = explode( PATH_SEPARATOR, $open_basedir );
+
+	foreach ( $dirs as $dir ) {
+		$dir = trim( $dir );
+
+		if ( '' === $dir ) {
+			continue;
+		}
+
+		$dir_real = @realpath( $dir );
+		$dir      = wp_normalize_path( false !== $dir_real ? $dir_real : $dir );
+		$dir      = untrailingslashit( $dir );
+
+		if ( $resolved === $dir || 0 === strpos( $resolved, $dir . '/' ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Tell if a file located in the home folder is writable.
  * If the file does not exist, tell if the home folder is writable.
  *
@@ -1030,12 +1083,17 @@ function secupress_is_subfolder_install() {
 /**
  * Has WP its own directory?
  *
+ * Returns the path offset between home and siteurl ("Giving WordPress Its Own Directory").
+ * Empty when home and siteurl are identical. A subdirectory install is not an own directory:
+ * that path already lives in rewrite `base` / `RewriteBase`.
+ *
+ * @since 2.7 Stop returning the home subdirectory when home equals siteurl.
  * @since 1.0
  * @author Grégory Viguier
- * 
+ *
  * @see http://codex.wordpress.org/Giving_WordPress_Its_Own_Directory
  *
- * @return (string) The directory containing WP.
+ * @return (string) The directory containing WP, trailing slash, no leading slash. Empty string otherwise.
  */
 function secupress_get_wp_directory() {
 	static $wp_siteurl_subdir;
@@ -1049,29 +1107,46 @@ function secupress_get_wp_directory() {
 	$siteurl           = set_url_scheme( rtrim( get_option( 'siteurl' ), '/' ), 'http' );
 
 	if ( ! empty( $home ) && 0 !== strcasecmp( $home, $siteurl ) ) {
-		$wp_siteurl_subdir     = str_ireplace( $home, '', $siteurl ); /* $siteurl - $home */
-		$wp_siteurl_subdir     = secupress_trailingslash_only( $wp_siteurl_subdir );
-	} else {
-		$parsed_url_path       = parse_url( $home, PHP_URL_PATH );
-		if ( '/' !== $parsed_url_path ) {
-			$wp_siteurl_subdir = secupress_trailingslash_only( $parsed_url_path );
-		}
+		$wp_siteurl_subdir = str_ireplace( $home, '', $siteurl );
+		$wp_siteurl_subdir = secupress_trailingslash_only( $wp_siteurl_subdir );
 	}
 	/**
 	 * Filter the returned guessed wp sudbir
 	 *
 	 * @since 2.4
 	 * @author Julio Potier
-	 * 
+	 *
 	 * @param (string) $wp_siteurl_subdir
 	 * @param (string) $home
 	 * @param (string) $siteurl
-	 * 
+	 *
 	 * @return (string)
 	 **/
 	$wp_siteurl_subdir = apply_filters( 'secupress.get_wp_directory', $wp_siteurl_subdir, $home, $siteurl );
 
 	return $wp_siteurl_subdir;
+}
+
+
+/**
+ * Path from the domain root to the WordPress files (siteurl), for REQUEST_URI matching.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (string) Trailing slash, no leading slash. Empty string at domain root.
+ */
+function secupress_get_siteurl_subdir() {
+	static $subdir;
+
+	if ( isset( $subdir ) ) {
+		return $subdir;
+	}
+
+	$siteurl = set_url_scheme( rtrim( get_option( 'siteurl' ), '/' ), 'http' );
+	$subdir  = secupress_trailingslash_only( wp_parse_url( $siteurl, PHP_URL_PATH ) );
+
+	return $subdir;
 }
 
 
@@ -1191,7 +1266,7 @@ function secupress_get_rewrite_bases() {
 		}
 	}
 
-	return ( $bases = false );
+	return $bases;
 }
 
 /**
@@ -1239,7 +1314,8 @@ function secupress_get_data_file_paths() {
 	}
 	return [
 		$data_path     => [ 'bad_user_agents', 'bad_url_contents', 'bad_host_contents', 'bad_request_keys', 'disallowed_logins_list', 'spam_disallowed_terms',
-							'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'IPv4', 'IPv6' ]
+							'bad_referer_contents', 'bad_email_domains', 'good_email_domains', 'allowed_seo_domains', 'malware_keywords_db', 'malware_keywords', 'tag_attr', 'ai_bots', 'IPv4', 'IPv6',
+							'ng_query_string', 'ng_request_uri', 'ng_user_agent', 'ng_remote_host', 'ng_http_referer', 'ng_http_cookie' ]
 	];
 }
 /**

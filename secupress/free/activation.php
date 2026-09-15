@@ -336,6 +336,8 @@ function secupress_deactivation() {
 	 */
 	do_action( 'secupress.deactivation' );
 
+	secupress_resume_security();
+
 	/**
 	 * Fires once SecuPress is activated, after the SecuPress's plugins are loaded.
 	 *

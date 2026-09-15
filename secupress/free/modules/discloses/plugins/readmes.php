@@ -73,6 +73,7 @@ function secupress_readme_discloses_get_pattern( $base ) {
 /**
  * Get rules for apache.
  *
+ * @since 2.7 Match REQUEST_URI with site_dir so subdirectory and own-directory installs work.
  * @since 2.2.6 Custom 404
  * @author Julio Potier
  * @since 1.0
@@ -83,7 +84,7 @@ function secupress_readme_discloses_get_pattern( $base ) {
 function secupress_readme_discloses_rules_for_apache() {
 	$bases   = secupress_get_rewrite_bases();
 	$base    = $bases['base'];
-	$pattern = secupress_readme_discloses_get_pattern( $bases['site_from'] ) . ' [NC]';
+	$pattern = secupress_readme_discloses_get_pattern( '/' . ltrim( $bases['site_dir'], '/' ) ) . ' [NC]';
 
 	$rules   = "<IfModule mod_rewrite.c>\n";
 	$rules  .= "    RewriteEngine On\n";

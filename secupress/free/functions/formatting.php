@@ -92,7 +92,7 @@ function secupress_action_page( $title, $content, $args = array() ) {
  */
 function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 ) {
 	global $sp_action;
-
+	
 	if ( ! isset( $sp_action ) || ! $sp_action ) {
 		secupress_die( __( 'Something went wrong.', 'secupress' ), '', [ 'force_die' => true, 'context' => 'missing-sp_action', 'attack_type' => 'login' ] );
 	}
@@ -113,8 +113,11 @@ function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 
 			$ver  = get_bloginfo( 'version' );
 			$hash = secupress_generate_hash( $ver );
 			$url  = add_query_arg( 'ver', $hash, $url );
-			add_action( 'login_head', function() use( $url ) {
-				echo "<link rel='stylesheet' id='colors-css' href='{$url}' media='all' />";
+			add_action( 'login_head', function() use( $url, $hash ) {
+				$incurl  = site_url( WPINC . '/css/dist/block-editor/style.css' );
+				$incurl  = add_query_arg( 'ver', $hash, $incurl );
+				echo "<link rel='stylesheet' id='maincolors-css' href='{$incurl}' media='all' />\n";
+				echo "<link rel='stylesheet' id='colors-css' href='{$url}' media='all' />\n";
 			});
 		}
 	}
@@ -362,7 +365,7 @@ function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 
 	 * @param string $content
 	 */
 	$content = apply_filters( 'secupress_login_page.content', $content, $sp_action );
-
+	
 	echo $content . "\n";
 
 	wp_enqueue_script( 'user-profile' );

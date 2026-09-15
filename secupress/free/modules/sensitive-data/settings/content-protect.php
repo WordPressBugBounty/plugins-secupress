@@ -26,6 +26,86 @@ $this->add_field( array(
 	),
 ) );
 
+if ( secupress_is_expert_mode() && function_exists( 'secupress_hotlink_get_allowed_referers_catalog' ) ) {
+	$hotlink_img     = '<img src="' . esc_url( SECUPRESS_ADMIN_IMAGES_URL . 'hotlinking.png' ) . '" alt="" width="32" height="32" />';
+	$allow_options   = [
+		__( 'Search engines', 'secupress' )   => [],
+		__( 'Social networks', 'secupress' ) => [],
+	];
+	foreach ( secupress_hotlink_get_allowed_referers_catalog() as $allow_id => $allow_item ) {
+		$allow_group = isset( $allow_item['group'] ) && 'social' === $allow_item['group'] ? __( 'Social networks', 'secupress' ) : __( 'Search engines', 'secupress' );
+		$allow_options[ $allow_group ][ $allow_id ] = $allow_item['label'];
+	}
+
+	$this->add_field( array(
+		'title'             => __( 'Redirection Type', 'secupress' ),
+		'description'       => __( 'What to serve when a media is hotlinked.', 'secupress' ),
+		'depends'           => $main_field_name,
+		'name'              => $this->get_field_name( 'hotlink_redirection' ),
+		'type'              => 'radios',
+		'default'           => '403',
+		'value'             => secupress_hotlink_get_redirection_type(),
+		'options'           => [
+			'403'   => __( 'Error 403', 'secupress' ) . ' <em>(' . __( 'Recommended', 'secupress' ) . ')</em>',
+			'image' => sprintf( __( 'Replacement Image %s', 'secupress' ), $hotlink_img ),
+			'pixel' => __( 'Transparent Pixel 1x1', 'secupress' ) . ' <em>(' . __( 'Legacy', 'secupress' ) . ')</em>',
+		],
+	) );
+
+	$this->add_field( array(
+		'title'             => __( 'Allow:', 'secupress' ),
+		'description'       => __( 'These search engines and social networks will still be able to display your media.', 'secupress' ),
+		'depends'           => $main_field_name,
+		'name'              => $this->get_field_name( 'hotlink_allow' ),
+		'type'              => 'checkboxes',
+		'options'           => $allow_options,
+		'value'             => secupress_hotlink_get_selected_allowed_referers(),
+	) );
+}
+
+/**
+ * If nginx or if `.htaccess`/`web.config` is not writable, display a textarea containing the rewrite rules for the Anti Hotlink.
+ */
+if ( $is_plugin_active && function_exists( 'secupress_hotlink_get_apache_rules' ) ) {
+	$message = false;
+
+	// Nginx.
+	if ( $is_nginx ) {
+		/** Translators: 1 is a file name, 2 is a tag name. */
+		$message = sprintf( __( 'You need to add the following code to your %1$s file, inside the %2$s block:', 'secupress' ), '<code>nginx.conf</code>', '<code>server</code>' );
+		$rules   = secupress_hotlink_get_nginx_rules();
+	}
+	// Apache.
+	elseif ( $is_apache && ! secupress_root_file_is_writable( '.htaccess' ) ) {
+		/** Translators: %s is a file name. */
+		$message = sprintf( __( 'Your %s file is not writable. Please add the following code to it:', 'secupress' ), '<code>.htaccess</code>' );
+		$rules   = trim( secupress_hotlink_get_apache_rules() );
+		$rules   = "# BEGIN SecuPress hotlink\n$rules\n# END SecuPress";
+	}
+	// IIS7.
+	elseif ( $is_iis7 && ! secupress_root_file_is_writable( 'web.config' ) ) {
+		/** Translators: %s is a file name. */
+		$message = sprintf( __( 'Your %s file is not writable. Please add the following code to it:', 'secupress' ), '<code>web.config</code>' );
+		$rules   = secupress_hotlink_get_iis7_rules();
+	}
+
+	if ( $message ) {
+		$this->add_field( array(
+			'title'        => _x( 'Rules', 'rewrite rules', 'secupress' ),
+			'description'  => $message,
+			'depends'      => $main_field_name,
+			'label_for'    => $this->get_field_name( 'hotlink_rules' ),
+			'type'         => 'textarea',
+			'value'        => $rules,
+			'attributes'   => array(
+				'readonly' => 'readonly',
+				'rows'     => substr_count( $rules, "\n" ) + 1,
+			),
+		) );
+	}
+}
+
+
 global $wp_version;
 $main_field_name  = $this->get_field_name( '404guess' );
 $disabled         = version_compare( $wp_version, '5.5' ) < 0;
@@ -69,49 +149,6 @@ $this->add_field( array(
 		),
 	),
 ) );
-
-
-/**
- * If nginx or if `.htaccess`/`web.config` is not writable, display a textarea containing the rewrite rules for the Anti Hotlink.
- */
-if ( $is_plugin_active && function_exists( 'secupress_hotlink_get_apache_rules' ) ) {
-	$message = false;
-
-	// Nginx.
-	if ( $is_nginx ) {
-		/** Translators: 1 is a file name, 2 is a tag name. */
-		$message = sprintf( __( 'You need to add the following code to your %1$s file, inside the %2$s block:', 'secupress' ), '<code>nginx.conf</code>', '<code>server</code>' );
-		$rules   = secupress_hotlink_get_nginx_rules();
-	}
-	// Apache.
-	elseif ( $is_apache && ! secupress_root_file_is_writable( '.htaccess' ) ) {
-		/** Translators: %s is a file name. */
-		$message = sprintf( __( 'Your %s file is not writable. Please add the following code to it:', 'secupress' ), '<code>.htaccess</code>' );
-		$rules   = trim( secupress_hotlink_get_apache_rules() );
-		$rules   = "# BEGIN SecuPress hotlink\n$rules\n# END SecuPress";
-	}
-	// IIS7.
-	elseif ( $is_iis7 && ! secupress_root_file_is_writable( 'web.config' ) ) {
-		/** Translators: %s is a file name. */
-		$message = sprintf( __( 'Your %s file is not writable. Please add the following code to it:', 'secupress' ), '<code>web.config</code>' );
-		$rules   = secupress_hotlink_get_iis7_rules();
-	}
-
-	if ( $message ) {
-		$this->add_field( array(
-			'title'        => _x( 'Rules', 'rewrite rules', 'secupress' ),
-			'description'  => $message,
-			'depends'      => $main_field_name,
-			'label_for'    => $this->get_field_name( 'hotlink_rules' ),
-			'type'         => 'textarea',
-			'value'        => $rules,
-			'attributes'   => array(
-				'readonly' => 'readonly',
-				'rows'     => substr_count( $rules, "\n" ) + 1,
-			),
-		) );
-	}
-}
 
 
 $main_field_name  = $this->get_field_name( 'directory-listing' );

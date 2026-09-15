@@ -4,7 +4,7 @@
  * Description: Block requests containing bad keywords in URL.
  * Main Module: firewall
  * Author: SecuPress
- * Version: 2.2.6
+ * Version: 2.7
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
@@ -13,14 +13,26 @@ add_action( 'secupress.plugins.loaded', 'secupress_block_bad_url_contents', 5 );
 /**
  * Filter the query string to block the request or not
  *
+ * 8G FIREWALL
+ * https://perishablepress.com/8g-firewall/
+ *
+ * @since 2.7 Add 8G regex data files (query, URI, host, cookie)
  * @since 2.2.6 Add "request", move "referer"
  * @since 1.0
  * @author Julio Potier
  */
 function secupress_block_bad_url_contents() {
+	if ( ! secupress_is_scan_request() ) {
+		secupress_firewall_block_regex_slug( 'ng_query_string', secupress_firewall_get_request_value( 'QUERY_STRING' ), 'BUC' );
+		$uri = secupress_firewall_get_request_value( 'REQUEST_URI' );
+		if ( 'wp-mail.php' !== basename( $uri ) ) {
+			secupress_firewall_block_regex_slug( 'ng_request_uri', $uri, 'BURI' );
+		}
+		secupress_firewall_block_regex_slug( 'ng_remote_host', secupress_firewall_get_request_value( 'REMOTE_HOST' ), 'BHC' );
+		secupress_firewall_block_regex_slug( 'ng_http_cookie', secupress_firewall_get_request_value( 'HTTP_COOKIE' ), 'BCK' );
+	}
 	secupress_block_bad_content_but_what( 'url',     'QUERY_STRING',   'BUC' );
 	secupress_block_bad_content_but_what( 'host',    'REMOTE_HOST',    'BHC' );
-	// secupress_block_bad_content_but_what( 'referer', 'HTTP_REFERER',   'BRC' ); // Removed in 2.2.6, see secupress_pro_check_and_block_refs()
 	secupress_block_bad_content_but_what( 'request', 'REQUEST_METHOD', 'BRK' );
 }
 

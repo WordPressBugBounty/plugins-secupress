@@ -152,58 +152,47 @@ function secupress_check_ban_ips_maybe_send_unban_email( $ip ) {
 	// Check user.
 	$user = get_user_by( 'email', $email );
 
-	if ( ! secupress_is_user( $user ) || ! user_can( $user, secupress_get_capability( false, 'unban_email' ) ) ) {
-		return array(
-			'message'      => __( '<strong>Error</strong>: This email address does not belong to an authorized role.', 'secupress' ),
-			'display_form' => true,
-		);
+	if ( secupress_is_user( $user ) && user_can( $user, secupress_get_capability( false, 'unban_email' ) ) ) {
+		
+		// Send message.
+		$url     = str_replace( '&amp;', '&', esc_url_raw( wp_nonce_url( home_url( '?action=secupress_self-unban-ip' ), 'secupress_self-unban-ip-' . $ip ) ) );
+		$message = sprintf(
+			/** Translators: %s is a "unlock yourself" link. */
+			__( 'You got yourself locked out?
+			
+			No problem, simply follow this link to %s.
+			
+			Regards,
+			All at ###SITENAME###
+			###SITEURL###', 'secupress' ),
+			__( 'unlock yourself', 'secupress' ) . ' ( ' . $url . ' )'
+			);
+			
+		$subject = sprintf( __( '[%s] Unban yourself from %s', 'secupress' ), '###SITENAME###', home_url() );
+		/**
+		 * Filter the mail subject for blocklist_logins
+		 * @param (string) $subject
+		 * @param (WP_User) $user
+		 * @since 2.2
+		*/
+		$subject = apply_filters( 'secupress.mail.self_unban.subject', $subject, $user );
+		/**
+		 * Filter the mail message 
+		 * @param (string) $message
+		 * @param (WP_User) $user
+		 * @param (string) $ip
+		 * @param (string) $url
+		 * @since 2.2
+		*/
+		$message = apply_filters( 'secupress.mail.self_unban.message', $message, $user, $ip, $url );
+		$headers = [];
+		secupress_send_mail( $user->user_email, $subject, $message, $headers );
+			
 	}
-
-	// Send message.
-	$url     = str_replace( '&amp;', '&', esc_url_raw( wp_nonce_url( home_url( '?action=secupress_self-unban-ip' ), 'secupress_self-unban-ip-' . $ip ) ) );
-	$message = sprintf(
-		/** Translators: %s is a "unlock yourself" link. */
-		__( 'You got yourself locked out?
-
-No problem, simply follow this link to %s.
-
-Regards,
-All at ###SITENAME###
-###SITEURL###', 'secupress' ),
-		__( 'unlock yourself', 'secupress' ) . ' ( ' . $url . ' )'
-	);
-
-	$subject = sprintf( __( '[%s] Unban yourself from %s', 'secupress' ), '###SITENAME###', home_url() );
-	/**
-	 * Filter the mail subject for blocklist_logins
-	 * @param (string) $subject
-	 * @param (WP_User) $user
-	 * @since 2.2
-	 */
-	$subject = apply_filters( 'secupress.mail.self_unban.subject', $subject, $user );
-	/**
-	 * Filter the mail message 
-	 * @param (string) $message
-	 * @param (WP_User) $user
-	 * @param (string) $ip
-	 * @param (string) $url
-	 * @since 2.2
-	 */
-	$message = apply_filters( 'secupress.mail.self_unban.message', $message, $user, $ip, $url );
-	$headers = [];
-	$sent    = secupress_send_mail( $user->user_email, $subject, $message, $headers );
-
-	if ( ! $sent ) {
-		return array(
-			'title'        => __( 'Too bad', 'secupress' ),
-			'message'      => __( 'The message could not be sent. Sorry', 'secupress' ),
-			'display_form' => false,
-		);
-	}
-
+					
 	return array(
-		'title'        => __( 'Message sent', 'secupress' ),
-		'message'      => __( 'Everything went fine, your message is on its way to your mailbox.', 'secupress' ),
+		'title'        => __( 'Unlock your account', 'secupress' ),
+		'message'      => __( 'If this email address exists, an email will be sent to it to unlock your account.', 'secupress' ),
 		'display_form' => false,
 	);
 }
@@ -594,18 +583,24 @@ add_action( 'plugins_loaded', 'secupress_auto_username_login', 60 );
  * Will autologin the user found in the transient 'secupress_auto_login_' . $_GET['secupress_auto_login_token']
  *
  * @since 1.0
+ * @since 2.7 Uses a cryptographically random token, a 30s TTL, and an associative payload.
  */
 function secupress_auto_username_login() {
 	if ( ! isset( $_GET['secupress_auto_login_token'] ) ) {
 		return;
 	}
 
-	list( $username, $action, $message_str ) = secupress_get_site_transient( 'secupress_auto_login_' . $_GET['secupress_auto_login_token'] );
+	$transient_name = 'secupress_auto_login_' . $_GET['secupress_auto_login_token'];
+	$payload        = get_site_transient( $transient_name );
+	delete_site_transient( $transient_name );
 
-	secupress_delete_site_transient( 'secupress_auto_login_' . $_GET['secupress_auto_login_token'] );
-	if ( ! $username ) {
+	if ( ! is_array( $payload ) || empty( $payload['user_login'] ) ) {
 		return;
 	}
+
+	$username    = $payload['user_login'];
+	$action      = isset( $payload['module'] ) ? $payload['module'] : '';
+	$message_str = isset( $payload['message'] ) ? $payload['message'] : '';
 
 	add_filter( 'authenticate', 'secupress_give_him_a_user', 1, 2 );
 	$user = wp_signon( array( 'user_login' => $username ) );
@@ -750,13 +745,15 @@ if ( is_admin() ) {
  * Redirect the user on a specific URL to be autologged-in
  *
  * @since 2.0
+ * @since 2.7 Cryptographically random token, 30s TTL, associative payload with user_id.
  * @author Julio Potier
  *
- * @param (string)      $module The SecuPress module to be redirected
- * @param (WP_User|int) $user The user to be logged in
+ * @param (string)      $module      The SecuPress module to be redirected
+ * @param (WP_User|int) $user        The user to be logged in
+ * @param (string)      $message_str Optional notice displayed after login.
  **/
 function secupress_auto_login( $module, $user = null, $message_str = '' ) {
-	if( is_int( $user ) ) {
+	if ( is_int( $user ) ) {
 		$user = new WP_User( $user );
 	}
 	if ( is_a( $user, 'WP_User' ) ) {
@@ -767,8 +764,17 @@ function secupress_auto_login( $module, $user = null, $message_str = '' ) {
 	if ( ! $current_user ) {
 		return;
 	}
-	$token = md5( time() . $module );
-	secupress_set_site_transient( 'secupress_auto_login_' . $token, array( $current_user->user_login, $module, $message_str ), MINUTE_IN_SECONDS );
+	$token = secupress_generate_key( 32 );
+	secupress_set_site_transient(
+		'secupress_auto_login_' . $token,
+		[
+			'user_login' => $current_user->user_login,
+			'user_id'    => (int) $current_user->ID,
+			'module'     => $module,
+			'message'    => $message_str,
+		],
+		30
+	);
 
 	wp_safe_redirect( esc_url_raw( add_query_arg( 'secupress_auto_login_token', $token ) ) );
 	die();

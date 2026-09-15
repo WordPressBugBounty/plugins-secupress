@@ -1,6 +1,7 @@
 <?php
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
+$this->load_plugin_settings( 'security-status' );
 if ( secupress_is_pro() && defined( 'WP_SWL' ) && WP_SWL ) {
 	$this->load_plugin_settings( 'wl' );
 }

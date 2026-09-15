@@ -6,6 +6,30 @@ if ( ! secupress_show_adminbar() ) {
 }
 
 add_action( 'admin_bar_menu', 'secupress_admin_bar', 100 );
+add_action( 'wp_head', 'secupress_admin_bar_css' );
+add_action( 'admin_head', 'secupress_admin_bar_css' );
+/**
+ * Print CSS for the admin bar (paused state, new items tied to undismissed pointers).
+ *
+ * @since 2.7 New items (`+` prefix).
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_admin_bar_css() {
+	if ( ! is_admin_bar_showing() || ! current_user_can( secupress_get_capability() ) ) {
+		return;
+	}
+
+	$css  = '#wpadminbar .secupress-new-notice a,#wpadminbar .secupress-new-notice .ab-item,#wpadminbar .secupress-new-item{color:#F1C40F!important;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-weight:600}';
+	$css .= '#wpadminbar .secupress-tour-count,#adminmenu .secupress-tour-count{display:inline-block;min-width:18px;height:18px;margin:0 0 0 6px;padding:0 6px;border-radius:9px;background:#F7AB13;color:#fff!important;font-size:11px;line-height:18px;font-weight:600;text-align:center;vertical-align:middle;text-shadow:none}';
+
+	if ( secupress_is_security_paused() ) {
+		$css .= '#wpadminbar #wp-admin-bar-secupress.secupress-security-paused>.ab-item{background:#F2295E;color:#fff}#wpadminbar #wp-admin-bar-secupress-resume-security .ab-item{color:#F2295E!important;font-weight:600}';
+	}
+
+	echo '<style id="secupress-admin-bar">' . $css . '</style>';
+}
+
 /**
  * Add menu in tool bar.
  *
@@ -31,7 +55,18 @@ function secupress_admin_bar( $wp_admin_bar ) {
 	$wp_admin_bar->add_menu( array(
 		'id'    => 'secupress',
 		'title' => '<span class="ab-icon dashicons-shield-alt"></span><span class="screen-reader-text">' . SECUPRESS_PLUGIN_NAME . ' </span>' . $grade,
+		'meta'  => secupress_is_security_paused() ? [ 'class' => 'secupress-security-paused' ] : [],
 	) );
+
+	if ( secupress_is_security_paused() ) {
+		$resume_url = wp_nonce_url( admin_url( 'admin-post.php?action=secupress_toggle_security_pause' ), 'secupress_toggle_security_pause' );
+		$wp_admin_bar->add_menu( array(
+			'parent' => 'secupress',
+			'id'     => 'secupress-resume-security',
+			'title'  => __( 'Security is paused — Activate', 'secupress' ),
+			'href'   => $resume_url,
+		) );
+	}
 
 	// Scanners.
 	$wp_admin_bar->add_menu( array(
@@ -74,16 +109,23 @@ function secupress_admin_bar( $wp_admin_bar ) {
 		'meta'   => [ 'class' => secupress_is_pro() ? '' : 'secupress-pro-notice' ],
 	) );
 
+	if ( ! class_exists( 'SecuPress_Admin_Pointers' ) ) {
+		secupress_require_class( 'Admin', 'Pointers' );
+	}
+	$modules_url   = SecuPress_Admin_Pointers::get_tour_modules_url();
+	$modules_badge = SecuPress_Admin_Pointers::get_tour_badge_html();
+
 	// Modules.
 	$wp_admin_bar->add_menu( array(
 		'parent' => 'secupress',
 		'id' 	 => 'secupress-modules',
-		'title'  => __( 'Modules', 'secupress' ),
-		'href'   => esc_url( secupress_admin_url( 'modules' ) ),
+		'title'  => __( 'Modules', 'secupress' ) . $modules_badge,
+		'href'   => esc_url( $modules_url ),
 	) );
 
 	// Sub-Modules.
-	$modules = secupress_get_modules();
+	$modules   = secupress_get_modules();
+	$dismissed = array_filter( explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) ) );
 	foreach ( $modules as $module_slug => $module ) {
 		$wp_admin_bar->add_menu( array(
 			'parent' => 'secupress-modules',
@@ -104,12 +146,26 @@ function secupress_admin_bar( $wp_admin_bar ) {
 			if ( ! $submodule ) {
 				continue;
 			}
+			$item_class  = [];
+			$new_pointer = '';
+			if ( preg_match( '/\+([a-z0-9_-]+)\+/i', $submodule, $new_match ) ) {
+				$new_pointer = sanitize_key( $new_match[1] );
+				$submodule   = str_replace( $new_match[0], '', $submodule );
+			}
+			if ( false !== strpos( $submodule, '*' ) && ! secupress_is_pro() ) {
+				$item_class[] = 'secupress-pro-notice';
+			}
+			$title = str_replace( [ '*', '&rsaquo; >' ], [ '', '&nbsp;&raquo; ' ], '&rsaquo; ' . $submodule );
+			if ( $new_pointer && ! in_array( $new_pointer, $dismissed, true ) ) {
+				$item_class[] = 'secupress-new-notice';
+				$title        = '<span class="secupress-new-item">' . $title . '</span>';
+			}
 			$wp_admin_bar->add_menu( array(
 				'parent' => 'secupress-modules-' . $module_slug,
 				'id'     => 'secupress-submodules-' . $submodule_slug,
-				'title'  => str_replace( [ '*', '&rsaquo; >' ], [ '', '&nbsp;&raquo; ' ], '&rsaquo; ' . $submodule ),
+				'title'  => $title,
 				'href'   => esc_url( secupress_admin_url( 'modules', $module_slug . '#' . $submodule_slug ) ),
-				'meta'   => [ 'class' => false === strpos( $submodule, '*' ) || secupress_is_pro() ? '' : 'secupress-pro-notice' ],
+				'meta'   => [ 'class' => implode( ' ', $item_class ) ],
 			) );
 		}
 	}

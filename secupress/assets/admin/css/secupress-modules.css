@@ -49,10 +49,10 @@
 }
 .secupress-sh-logo,
 .secupress-sh-logo img {
-	width: 75px;
+	width: 60px;
 	-webkit-flex-basis: 75px;
 	-ms-flex-preferred-size: 75px;
-	flex-basis: 75px;
+	flex-basis: 60px;
 	-webkit-flex-shrink: 0;
 	-ms-flex-negative: 0;
 	flex-shrink: 0;
@@ -63,17 +63,26 @@
 .secupress-sh-name {
 	font-weight: bold;
 	font-size: 18px;
+	margin-top: 20px;
 }
 .secupress-sh-name p {
 	margin: 0;
 	color: #ECF0F1;
 }
 .secupress-sh-title {
-	font-size: 24px;
+	font-size: 21px;
 	font-family: "Arial Narrow";
 	font-weight: 800;
 	letter-spacing: 0.5px;
 	text-align: right;
+}
+.secupress-sh-title sup {
+	font-size: small;
+	color: #072B31;
+    background-color: #FFB81C;
+    padding: 1px 3px;
+    border-radius: 4px;
+	margin-left: 2px;
 }
 p.secupress-sh-subtitle {
 	margin-bottom: 5px;
@@ -374,6 +383,23 @@ input[type="text"]:required:invalid {
 /* An item inside a fieldset (type: checkboxes or radioboxes) */
 .secupress-fieldset-item {
 	margin: 0.5em 0;
+}
+.fieldname-content-protect_hotlink_allow.fieldtype-checkboxes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 1.5em;
+}
+.fieldname-content-protect_hotlink_allow.fieldtype-checkboxes > h5 {
+	flex: 1 0 100%;
+	margin: 1em 0 0.35em;
+}
+.fieldname-content-protect_hotlink_allow.fieldtype-checkboxes > h5:first-child {
+	margin-top: 0;
+}
+.fieldname-content-protect_hotlink_allow.fieldtype-checkboxes > .secupress-fieldset-item {
+	flex: 1 0 30%;
+	min-width: 140px;
+	margin: 0.25em 0;
 }
 .secupress-fieldset-item + .description {
 	margin-top: 1.5em;
@@ -2303,4 +2329,238 @@ li.secupress-status-success{
 }
 .secupress-scanner-results-content .secupress-section-title {
     margin-top: 0;
+}
+
+.secupress-tab-content-welcome .secupress-security-status-row {
+	position: relative;
+	z-index: 10;
+	max-width: 100%;
+	flex-basis: 100%;
+	width: 100%;
+	padding: 0;
+	margin-top: 0;
+	border-top: 0;
+}
+.secupress-tab-content-welcome .secupress-security-status-row .secupress-flex,
+.secupress-tab-content-welcome .secupress-security-status-row .secupress-setting-content-col {
+	width: 100%;
+	flex-basis: 100%;
+	max-width: 100%;
+}
+#secupress-settings-module_welcome--secupress_security_status + .secupress-settings-section {
+	margin-top: 30px;
+}
+.secupress-security-status {
+	position: relative;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px 24px;
+	padding: 18px 22px;
+	border-radius: 3px;
+	border-left: 4px solid;
+}
+.secupress-security-status-icon {
+	flex-shrink: 0;
+	width: 56px;
+	height: 56px;
+	display: block;
+	transform-origin: center;
+	animation: secupress-security-breath 2.4s ease-in-out infinite;
+}
+.secupress-security-status-paused .secupress-security-status-icon {
+	animation-name: secupress-security-beat;
+	animation-duration: 1.4s;
+}
+@keyframes secupress-security-breath {
+	0%, 100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.08);
+	}
+}
+@keyframes secupress-security-beat {
+	0%, 100% {
+		transform: scale(1) translateY(0);
+	}
+	15% {
+		transform: scale(1.14) translateY(-2px);
+	}
+	30% {
+		transform: scale(0.96) translateY(0);
+	}
+	45% {
+		transform: scale(1.1) translateY(-1px);
+	}
+	60% {
+		transform: scale(1);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.secupress-security-status-icon {
+		animation: none;
+	}
+}
+.secupress-security-status-texts {
+	flex: 1 1 280px;
+	min-width: 0;
+	overflow: visible;
+}
+.secupress-security-status-heading {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px 8px;
+	margin: 0 0 4px;
+}
+.secupress-security-status-message {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+.secupress-security-status-description {
+	margin: 0;
+	font-size: 13px;
+	opacity: 0.9;
+}
+.secupress-security-status-count {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	opacity: 1;
+	overflow: visible;
+}
+.secupress-security-status-count.secupress-security-status-grade {
+	background: rgba(var(--secupress-grade-color, 195, 34, 34), 0.2);
+	color: rgb(var(--secupress-grade-color, 195, 34, 34));
+}
+.secupress-security-status-active .secupress-security-status-count:not(.secupress-security-status-grade) {
+	background: rgba(43, 205, 193, 0.2);
+	color: #1A9E94;
+}
+.secupress-security-status-paused .secupress-security-status-count:not(.secupress-security-status-grade) {
+	background: rgba(203, 35, 79, 0.12);
+	color: #CB234F;
+}
+.secupress-security-status-idle .secupress-security-status-count:not(.secupress-security-status-grade) {
+	background: rgba(247, 171, 19, 0.18);
+	color: #C47D0A;
+}
+.secupress-security-status-more,
+.secupress-security-status-info {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 2px;
+	color: inherit;
+	text-decoration: none;
+	vertical-align: middle;
+}
+.secupress-security-status a.secupress-security-status-more,
+.secupress-security-status a.secupress-security-status-more:visited {
+	color: inherit;
+	font-weight: inherit;
+}
+.secupress-security-status-info {
+	position: relative;
+	cursor: help;
+}
+.secupress-security-status-more .dashicons,
+.secupress-security-status-info .dashicons {
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+	line-height: 1;
+}
+.secupress-security-status-tooltip {
+	display: none;
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	z-index: 1000;
+	min-width: 180px;
+	max-width: 280px;
+	width: max-content;
+	padding-top: 8px;
+	transform: translateX(-50%);
+	color: #FFF;
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0;
+	line-height: 1.4;
+	text-align: left;
+}
+.secupress-security-status-tooltip:before {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 2px;
+	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 0;
+	border-bottom-color: #393E46;
+}
+.secupress-security-status-tooltip-inner {
+	display: block;
+	max-height: 240px;
+	overflow: auto;
+	padding: 8px 12px;
+	background: #393E46;
+	border-radius: 3px;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.secupress-security-status-tooltip-item {
+	display: block;
+}
+.secupress-security-status-tooltip-item + .secupress-security-status-tooltip-item {
+	margin-top: 4px;
+}
+.secupress-security-status-info:hover .secupress-security-status-tooltip,
+.secupress-security-status-info:focus .secupress-security-status-tooltip,
+.secupress-security-status-info:focus-within .secupress-security-status-tooltip {
+	display: block;
+}
+.secupress-security-status-active a.secupress-security-status-more:hover,
+.secupress-security-status-active a.secupress-security-status-more:focus,
+.secupress-security-status-active .secupress-security-status-info:hover,
+.secupress-security-status-active .secupress-security-status-info:focus {
+	color: #26B3A9;
+}
+.secupress-security-status-paused a.secupress-security-status-more:hover,
+.secupress-security-status-paused a.secupress-security-status-more:focus,
+.secupress-security-status-paused .secupress-security-status-info:hover,
+.secupress-security-status-paused .secupress-security-status-info:focus {
+	color: #F2295E;
+}
+.secupress-security-status-idle a.secupress-security-status-more:hover,
+.secupress-security-status-idle a.secupress-security-status-more:focus,
+.secupress-security-status-idle .secupress-security-status-info:hover,
+.secupress-security-status-idle .secupress-security-status-info:focus {
+	color: #C47D0A;
+}
+.secupress-security-status .secupress-button {
+	flex-shrink: 0;
+	padding: 10px 22px;
+	font-size: 13px;
+}
+.secupress-security-status-active {
+	background: #E6F9F7;
+	border-left-color: #2BCDC1;
+	color: #1A9E94;
+}
+.secupress-security-status-paused {
+	background: #FFF6E5;
+	border-left-color: #F19B12;
+	color: #CB234F;
+}
+.secupress-security-status-idle {
+	background: #FFF8E8;
+	border-left-color: #F7AB13;
+	color: #C47D0A;
 }

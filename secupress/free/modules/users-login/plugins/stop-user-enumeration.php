@@ -1,7 +1,7 @@
 <?php
 /**
  * Module Name: Forbid User Enumeration
- * Description: Forbid the user listing from front with ?author=X and from REST API with /users/
+ * Description: Forbid the user listing from front with ?author=X and from REST API with /users/ or ?_embed=
  * Main Module: users_login
  * Author: SecuPress
  * Version: 2.2.6
@@ -71,12 +71,11 @@ function secupress_stop_user_enumeration_front() {
 }
 
 
-add_filter( 'rest_request_before_callbacks', 'secupress_stop_user_enumeration_rest' );
+add_filter( 'rest_request_before_callbacks', 'secupress_stop_user_enumeration_rest', 10, 3 );
 /**
- * Block the author page for REST API
+ * Block the users endpoints for REST API
  *
- * @param WP_Error|null   $response The current error object if any.
- * *
+ * @since 2.7 Match the REST route, language URL prefixes like /fr/ are ignored
  * @since 2.3.12 Let "/me/" being read
  * @since 2.2.6 Remove home_url() from strpos()
  * @since 2.2.5 Remove REST API calls made using query parameters + usage of rawurldecode()
@@ -84,26 +83,120 @@ add_filter( 'rest_request_before_callbacks', 'secupress_stop_user_enumeration_re
  * @since 2.0 'uri'
  * @since 1.0 'base'
  * @author Julio Potier
+ *
+ * @param (mixed)           $response The current error object if any.
+ * @param (array)           $handler  Route handler.
+ * @param (WP_REST_Request) $request  The REST request.
+ *
+ * @return (mixed)
  **/
-function secupress_stop_user_enumeration_rest( $response ) {
-	$rest_base_url  = home_url( 'wp-json/' . Secupress_WP_REST_Users_Controller::get_rest_base() );
-	$rest_query_url = '/wp/v2/users';
-	$current_url    = rawurldecode( secupress_get_current_url( 'base' ) );
-	$is_request     = isset( $_REQUEST['rest_route'] );
-	$is_me_route    = preg_match( '#^' . preg_quote( $rest_base_url, '#' ) . '/me/?#i', $current_url ) || ( $is_request && preg_match( '#^' . preg_quote( $rest_query_url, '#' ) . '/me/?#i', $_REQUEST['rest_route'] ) );
-
-	if ( ! current_user_can( 'list_users' ) && ! $is_me_route && (
-		preg_match( '#^' . preg_quote( $rest_base_url, '#' ) . '/?#i', $current_url ) ||
-		( $is_request && preg_match( '#^' . preg_quote( $rest_query_url, '#' ) . '/?#i', $_REQUEST['rest_route'] ) )
-	) ) {
-		wp_send_json( [
-			'code'    => 'rest_cannot_access',
-			'message' => __( 'Something went wrong.', 'secupress' ),
-			'data'    => [ 'status' => 401 ]
-			],
-		401 );
+function secupress_stop_user_enumeration_rest( $response, $handler, $request ) {
+	if ( current_user_can( 'list_users' ) || ! $request instanceof WP_REST_Request ) {
+		return $response;
 	}
 
-	return $response;
+	$users_base = Secupress_WP_REST_Users_Controller::get_rest_base();
+	$route      = trim( $request->get_route(), '/' );
+
+	if ( ! preg_match( '#(?:^|/)' . preg_quote( $users_base, '#' ) . '(?:/|$)#i', $route ) ) {
+		return $response;
+	}
+
+	if ( preg_match( '#(?:^|/)' . preg_quote( $users_base, '#' ) . '/me(?:/|$)#i', $route ) ) {
+		return $response;
+	}
+
+	wp_send_json( [
+		'code'    => 'rest_cannot_access',
+		'message' => __( 'Something went wrong.', 'secupress' ),
+		'data'    => [ 'status' => 401 ],
+	], 401 );
+}
+
+
+add_filter( 'rest_post_dispatch', 'secupress_stop_user_enumeration_rest_author', SECUPRESS_INT_MAX, 3 );
+/**
+ * Remove author links so they cannot be embedded via ?_embed=
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (WP_REST_Response|WP_HTTP_Response|WP_Error|mixed) $result  Result to send to the client.
+ * @param (WP_REST_Server)                                   $server  Server instance.
+ * @param (WP_REST_Request)                                  $request Request used to generate the response.
+ *
+ * @return (mixed)
+ **/
+function secupress_stop_user_enumeration_rest_author( $result, $server, $request ) {
+	if ( current_user_can( 'list_users' ) || ! $result instanceof WP_REST_Response ) {
+		return $result;
+	}
+
+	$result->remove_link( 'author' );
+
+	$data = $result->get_data();
+	if ( is_array( $data ) ) {
+		$result->set_data( secupress_stop_user_enumeration_strip_author( $data ) );
+	}
+
+	return $result;
+}
+
+
+add_filter( 'rest_pre_echo_response', 'secupress_stop_user_enumeration_rest_embedded', SECUPRESS_INT_MAX, 3 );
+/**
+ * Strip the embedded author node from REST responses, with or without ?_embed=
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (array)           $result  Response data to send to the client.
+ * @param (WP_REST_Server)  $server  Server instance.
+ * @param (WP_REST_Request) $request Request used to generate the response.
+ *
+ * @return (array)
+ **/
+function secupress_stop_user_enumeration_rest_embedded( $result, $server, $request ) {
+	if ( current_user_can( 'list_users' ) || ! is_array( $result ) ) {
+		return $result;
+	}
+
+	return secupress_stop_user_enumeration_strip_author( $result );
+}
+
+
+/**
+ * Recursively remove author HAL links and embedded author data.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (array) $data REST data.
+ *
+ * @return (array)
+ **/
+function secupress_stop_user_enumeration_strip_author( $data ) {
+	if ( ! is_array( $data ) ) {
+		return $data;
+	}
+
+	unset( $data['_links']['author'], $data['_embedded']['author'] );
+
+	if ( isset( $data['_links'] ) && ! $data['_links'] ) {
+		unset( $data['_links'] );
+	}
+
+	if ( isset( $data['_embedded'] ) && ! $data['_embedded'] ) {
+		unset( $data['_embedded'] );
+	}
+
+	foreach ( $data as $key => $value ) {
+		if ( ! is_array( $value ) || '_links' === $key ) {
+			continue;
+		}
+		$data[ $key ] = secupress_stop_user_enumeration_strip_author( $value );
+	}
+
+	return $data;
 }
 

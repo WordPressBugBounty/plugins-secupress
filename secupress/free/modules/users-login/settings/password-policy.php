@@ -85,3 +85,18 @@ $this->add_field( array(
 		),
 	),
 ) );
+
+$this->add_field( array(
+	'title'             => __( 'Application Passwords', 'secupress' ),
+	'label_for'         => $this->get_field_name( 'application-passwords' ),
+	'plugin_activation' => true,
+	'type'              => 'checkbox',
+	'value'             => (int) secupress_is_submodule_active( 'users-login', 'application-passwords' ),
+	'label'             => __( 'Yes, alert users when an Application Password is added to their account', 'secupress' ),
+	'helpers'           => array(
+		array(
+			'type'        => 'description',
+			'description' => __( 'If the user has the Administrator capability, the site admin will also receive an extra email.', 'secupress' ),
+		),
+	),
+) );

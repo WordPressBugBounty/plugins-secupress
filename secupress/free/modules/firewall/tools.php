@@ -279,6 +279,121 @@ function secupress_block_bad_content_but_what( $function, $server, $block_id ) {
 
 }
 
+/**
+ * Load regex patterns from an API data file (one pattern per line, # comments ignored).
+ *
+ * 8G FIREWALL
+ * https://perishablepress.com/8g-firewall/
+ *
+ * @author Julio Potier
+ * @since 2.7
+ *
+ * @param (string) $slug
+ *
+ * @return (array)
+ */
+function secupress_firewall_get_regex_patterns( $slug ) {
+	$cached = secupress_cache_data( __FUNCTION__ . '_' . $slug );
+	if ( null !== $cached ) {
+		return $cached;
+	}
+
+	$patterns = [];
+	$filename = secupress_get_data_file_path( $slug );
+	if ( $filename ) {
+		$contents = file_get_contents( $filename );
+		if ( false !== $contents && '' !== trim( $contents ) ) {
+			$lines = explode( "\n", str_replace( [ "\r\n", "\r" ], "\n", $contents ) );
+			foreach ( $lines as $line ) {
+				$line = trim( $line );
+				if ( '' === $line || '#' === $line[0] ) {
+					continue;
+				}
+				$error_level = error_reporting( 0 );
+				$is_valid    = false !== preg_match( '#' . $line . '#i', '' );
+				error_reporting( $error_level );
+				if ( $is_valid ) {
+					$patterns[] = $line;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Filters regex patterns loaded from a data file.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (array)  $patterns
+	 * @param (string) $slug
+	 */
+	$patterns = apply_filters( 'secupress.firewall.regex_patterns', $patterns, $slug );
+	secupress_cache_data( __FUNCTION__ . '_' . $slug, $patterns );
+
+	return $patterns;
+}
+
+/**
+ * Block the request if a regex pattern from a data file matches the value.
+ *
+ * 8G FIREWALL
+ * https://perishablepress.com/8g-firewall/
+ *
+ * @author Julio Potier
+ * @since 2.7
+ *
+ * @param (string) $slug
+ * @param (string) $value
+ * @param (string) $block_id
+ */
+function secupress_firewall_block_regex_slug( $slug, $value, $block_id ) {
+	if ( '' === (string) $value ) {
+		return;
+	}
+	foreach ( secupress_firewall_get_regex_patterns( $slug ) as $pattern ) {
+		if ( preg_match( '#' . $pattern . '#i', $value, $matches ) ) {
+			secupress_block( $block_id, [
+				'code'        => 403,
+				'b64'         => [ 'data' => $matches ],
+				'attack_type' => 'bad_request_content',
+			] );
+		}
+	}
+}
+
+/**
+ * Get the request value to test against regex data files.
+ *
+ * @author Julio Potier
+ * @since 2.7
+ *
+ * @param (string) $server
+ *
+ * @return (string)
+ */
+function secupress_firewall_get_request_value( $server ) {
+	if ( 'QUERY_STRING' === $server ) {
+		if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+			return $_SERVER['QUERY_STRING'];
+		}
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && false !== strpos( $_SERVER['REQUEST_URI'], '?' ) ) {
+			return (string) substr( strstr( $_SERVER['REQUEST_URI'], '?' ), 1 );
+		}
+		return '';
+	}
+
+	if ( 'REQUEST_URI' === $server ) {
+		$uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+		if ( false !== strpos( $uri, '?' ) ) {
+			$uri = strstr( $uri, '?', true );
+		}
+		return (string) $uri;
+	}
+
+	return isset( $_SERVER[ $server ] ) ? (string) $_SERVER[ $server ] : '';
+}
+
 add_filter( 'secupress_block_id', 'secupress_firewall_block_id' );
 /**
  * Translate block IDs into understandable things.
@@ -315,6 +430,8 @@ function secupress_firewall_block_id( $module ) {
 		'UAHT' => __( 'User-Agent With HTML Tags', 'secupress' ),
 		'UAHB' => __( 'User-Agent Disallowed', 'secupress' ),
 		'UAAI' => __( 'User-Agent is AI Bot', 'secupress' ),
+		'BURI' => __( 'Bad Request URI', 'secupress' ),
+		'BCK'  => __( 'Bad Cookie Contents', 'secupress' ),
 		// Users
 		'NOUSER' => __( 'Unknown User', 'secupress' ),
 		// Files & functions

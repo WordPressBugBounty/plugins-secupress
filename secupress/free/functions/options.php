@@ -183,6 +183,7 @@ function secupress_get_fix_results() {
  * This is almost the same function than `delete_site_transient()`, but without the timeout check: it saves database calls.
  *
  * @since 1.0
+ * @since 2.7 Also deletes the timeout option when not using an external object cache.
  * @since WP 2.9.0
  *
  * @param (string) $transient Transient name. Expected to not be SQL-escaped.
@@ -208,6 +209,7 @@ function secupress_delete_site_transient( $transient ) {
 	} else {
 		$option = '_site_transient_' . $transient;
 		$result = delete_site_option( $option );
+		delete_site_option( '_site_transient_timeout_' . $transient );
 	}
 
 	if ( $result ) {
@@ -290,20 +292,23 @@ function secupress_get_site_transient( $transient ) {
 /**
  * Set/update the value of a site transient.
  *
- * This is almost the same function than `set_site_transient()`, but without the timeout check.
+ * This is almost the same function than `set_site_transient()`, but without the timeout check when `$expiration` is 0.
  * You do not need to serialize values. If the value needs to be serialized, then it will be serialized before it is set.
  *
  * @since 1.0
+ * @since 2.7 `$expiration` parameter. Timeout is stored when `$expiration` is greater than 0.
  * @since WP 2.9.0
  *
  * @param (string) $transient  Transient name. Expected to not be SQL-escaped. Must be
  *                             40 characters or fewer in length.
  * @param (mixed)  $value      Transient value. Must be serializable if non-scalar.
  *                             Expected to not be SQL-escaped.
+ * @param (int)    $expiration Time until expiration in seconds. Default 0 (no timeout).
  *
  * @return (bool) False if value was not set and true if value was set.
  */
-function secupress_set_site_transient( $transient, $value ) {
+function secupress_set_site_transient( $transient, $value, $expiration = 0 ) {
+	$expiration = (int) $expiration;
 
 	/**
 	 * Filter a specific site transient before its value is set.
@@ -320,12 +325,18 @@ function secupress_set_site_transient( $transient, $value ) {
 	$value = apply_filters( 'pre_set_site_transient_' . $transient, $value, $transient );
 
 	if ( wp_using_ext_object_cache() ) {
-		$result = wp_cache_set( $transient, $value, 'site-transient' );
+		$result = wp_cache_set( $transient, $value, 'site-transient', $expiration );
 	} else {
 		$option = '_site_transient_' . $transient;
 		if ( false === get_site_option( $option ) ) {
+			if ( $expiration > 0 ) {
+				add_site_option( '_site_transient_timeout_' . $transient, time() + $expiration );
+			}
 			$result = add_site_option( $option, $value );
 		} else {
+			if ( $expiration > 0 ) {
+				update_site_option( '_site_transient_timeout_' . $transient, time() + $expiration );
+			}
 			$result = update_site_option( $option, $value );
 		}
 	}
@@ -342,10 +353,10 @@ function secupress_set_site_transient( $transient, $value ) {
 		 * @since WP 4.4.0 The `$transient` parameter was added.
 		 *
 		 * @param (mixed)  $value      Transient value.
-		 * @param (int)    $expiration Time until expiration in seconds, forced to 0.
+		 * @param (int)    $expiration Time until expiration in seconds.
 		 * @param (string) $transient  The name of the transient.
 		 */
-		do_action( 'set_site_transient_' . $transient, $value, 0, $transient );
+		do_action( 'set_site_transient_' . $transient, $value, $expiration, $transient );
 	}
 	return $result;
 }

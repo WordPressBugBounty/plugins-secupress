@@ -212,6 +212,13 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 			'version'              => SECUPRESS_VERSION,
 			// Misc.
 			'resetDefault'         => __( 'This will reset the setting values to default for this module.', 'secupress' ),
+			'confirmPauseSecurity' => sprintf(
+				/* translators: 1 is the pause duration, 2 is the email delay, like "30 minutes" and "5 minutes". */
+				__( 'PHP modules will be paused for %1$s, then security will resume automatically. Rules already written in .htaccess or robots.txt stay in place. An email will be sent to the site administrator after %2$s.', 'secupress' ),
+				human_time_diff( time(), time() + secupress_get_security_pause_duration() ),
+				human_time_diff( time(), time() + secupress_get_security_pause_email_delay() )
+			),
+			'yesPauseSecurity'     => __( 'Yes, pause security', 'secupress' ),
 			'regenKeys'            => sprintf( __( 'This will change the %d security keys for your installation.<br>You may need to sign back in.', 'secupress' ), 10 ),
 			// Delete files.
 			'confirmDeleteFiles'   => __( 'Are you sure you want to delete the selected files?<br>This action cannot be undone.', 'secupress-pro' ),
@@ -354,7 +361,8 @@ function secupress_create_menus() {
 
 	// Sub-menus.
 	add_submenu_page( SECUPRESS_PLUGIN_SLUG . '_scanners', __( 'Scanners', 'secupress' ), __( 'Scanners', 'secupress' ) . $count, $cap, SECUPRESS_PLUGIN_SLUG . '_scanners', 'secupress_scanners' );
-	add_submenu_page( SECUPRESS_PLUGIN_SLUG . '_scanners', __( 'Modules', 'secupress' ),  __( 'Modules', 'secupress' ),           $cap, SECUPRESS_PLUGIN_SLUG . '_modules',  'secupress_modules' );
+	$modules_badge = SecuPress_Admin_Pointers::get_tour_badge_html();
+	add_submenu_page( SECUPRESS_PLUGIN_SLUG . '_scanners', __( 'Modules', 'secupress' ), __( 'Modules', 'secupress' ) . $modules_badge, $cap, SECUPRESS_PLUGIN_SLUG . '_modules', 'secupress_modules' );
 
 	if ( ! secupress_is_white_label() ) {
 		$title = __( 'More Security', 'secupress' );
@@ -378,6 +386,28 @@ function secupress_create_menus() {
 		$url = secupress_has_pro() ? esc_url( secupress_admin_url( 'modules' ) . '#module-secupress_display_apikey_options' ) : esc_url( secupress_admin_url( 'get-pro' ) );
 		$submenu[ $key ][ count( $submenu[ $key ] ) -1 ] = array( $title, $cap, $url, $title );
 	}
+}
+
+
+add_action( 'load-' . SECUPRESS_PLUGIN_SLUG . '_page_' . SECUPRESS_PLUGIN_SLUG . '_modules', 'secupress_maybe_redirect_modules_to_tour' );
+/**
+ * Send the Modules screen to the first remaining pointer of the tour.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_maybe_redirect_modules_to_tour() {
+	if ( isset( $_GET['secupress_pointer_tour'] ) || isset( $_GET['module'] ) ) {
+		return;
+	}
+	if ( ! class_exists( 'SecuPress_Admin_Pointers' ) ) {
+		secupress_require_class( 'Admin', 'Pointers' );
+	}
+	if ( SecuPress_Admin_Pointers::is_tour_dismissed() ) {
+		return;
+	}
+	wp_safe_redirect( SecuPress_Admin_Pointers::get_tour_modules_url() );
+	exit;
 }
 
 

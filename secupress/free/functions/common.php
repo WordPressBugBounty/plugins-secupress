@@ -589,7 +589,7 @@ function secupress_block( $module, $args = array( 'code' => 403 ) ) {
 
 	// Preventing the display of possible sent passwords
 	$hidden = '***… // ' . sprintf( __( 'Hidden by %s.', 'secupress' ), SECUPRESS_PLUGIN_NAME );
-	foreach ( [ 'password', 'psswrd', 'pass', 'pwd', 'pw', 'user_pass', 'edd_user_pass' ] as $key ) {
+	foreach ( [ 'session', 'auth', 'token', 'password', 'psswrd', 'pass', 'pwd', 'pw', 'user_pass', 'edd_user_pass' ] as $key ) {
 		if ( isset( $_REQUEST[ $key ] ) ) {
 			$_REQUEST[ $key ] = $hidden;
 		}
@@ -598,6 +598,9 @@ function secupress_block( $module, $args = array( 'code' => 403 ) ) {
 		}
 		if ( isset( $_POST[ $key ] ) ) {
 			$_POST[ $key ] = $hidden;
+		}
+		if ( isset( $_COOKIE[ $key ] ) ) {
+			$_COOKIE[ $key ] = $hidden;
 		}
 	}
 
@@ -893,12 +896,13 @@ function secupress_get_logo( $atts = [], $return = 'html' ) {
  * @author Grégory Viguier
  * @since 1.0
  *
- * @param (array) $atts An array of HTML attributes.
- *
  * @return (string) The HTML tag.
  */
-function secupress_get_logo_word( $atts = array() ) {
-	return sprintf( '%s v%s', SECUPRESS_PLUGIN_NAME, SECUPRESS_VERSION );
+function secupress_get_logo_word() {
+	$version = SECUPRESS_VERSION;
+	$version = secupress_is_pro() ? 'PRO ' . $version : $version;
+	$word = sprintf( '%s<sup>%s</sup>', SECUPRESS_PLUGIN_NAME, $version );
+	return $word;
 }
 
 
@@ -932,7 +936,8 @@ function secupress_users_can_register() {
  * @return (string)
  */
 function secupress_get_email( $from_header = false ) {
-	$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+	$host     = isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : wp_parse_url( home_url(), PHP_URL_HOST );
+	$sitename = strtolower( (string) $host );
 
 	if ( substr( $sitename, 0, 4 ) === 'www.' ) {
 		$sitename = substr( $sitename, 4 );
@@ -1045,21 +1050,25 @@ function secupress_get_blogname() {
 /**
  * Return the current URL.
  *
+ * @since 2.7 Use the host (and port) from home_url(), keep subdirectory installs intact
  * @since 2.2.6 'domain' param
  * @since 2.0 Remove usage of HTTP_HOST and $port
  * @author Julio Potier
- * 
+ *
  * @since 1.0
  * @author Grégory Viguier
- * 
- * 
+ *
  * @param (string) $mode What to return: raw (all), base (before '?'), uri (before '?', without the domain), 'domain' (only the domain 'example.com').
  * @return (string)
  */
 function secupress_get_current_url( $mode = 'base' ) {
-	$host = str_replace( [ 'http://', 'https://', '/' ], '', home_url() );
-	$url  = ! empty( $GLOBALS['HTTP_SERVER_VARS']['REQUEST_URI'] ) ? $GLOBALS['HTTP_SERVER_VARS']['REQUEST_URI'] : ( ! empty( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' );
-	$url  = 'http' . ( secupress_server_is_ssl() ? 's' : '' ) . '://' . $host . str_replace( '//', '/', $url );
+	$parsed = wp_parse_url( home_url() );
+	$host   = isset( $parsed['host'] ) ? $parsed['host'] : '';
+	if ( ! empty( $parsed['port'] ) ) {
+		$host .= ':' . $parsed['port'];
+	}
+	$url = ! empty( $GLOBALS['HTTP_SERVER_VARS']['REQUEST_URI'] ) ? $GLOBALS['HTTP_SERVER_VARS']['REQUEST_URI'] : ( ! empty( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' );
+	$url = 'http' . ( secupress_server_is_ssl() ? 's' : '' ) . '://' . $host . str_replace( '//', '/', $url );
 
 	switch ( $mode ) {
 		case 'uri' :
@@ -1350,6 +1359,8 @@ function secupress_feature_is_expert( $feature ) {
 		'move-login_whattodo|honeypot'              => 1,
 		'login-protection_geoip_login_mode'         => 1,
 		'login-protection_geoip_login_device'       => 1,
+		'content-protect_hotlink_redirection'       => 1,
+		'content-protect_hotlink_allow'             => 1,
 	];
 	return isset( $features[ $feature ] );
 }
@@ -1837,6 +1848,220 @@ function secupress_show_grade_system( $from_constant = false ) {
 	}
 	return secupress_get_module_option( 'advanced-settings_grade-system', true, 'welcome' );
 }
+
+/**
+ * Get the security pause duration in seconds.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (int)
+ */
+function secupress_get_security_pause_duration() {
+	/**
+	 * Filter how long security stays paused.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (int) $duration Duration in seconds. Default 30 minutes.
+	 */
+	return (int) apply_filters( 'secupress.security.pause_duration', 30 * MINUTE_IN_SECONDS );
+}
+
+/**
+ * Get the delay before the pause warning email is sent.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (int)
+ */
+function secupress_get_security_pause_email_delay() {
+	/**
+	 * Filter how long to wait before sending the pause warning email.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (int) $delay Delay in seconds. Default 5 minutes.
+	 */
+	return (int) apply_filters( 'secupress.security.pause_email_delay', 5 * MINUTE_IN_SECONDS );
+}
+
+/**
+ * Tell if SecuPress security modules are paused.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (bool)
+ */
+function secupress_is_security_paused() {
+	$paused = (bool) get_site_option( 'secupress_security_paused' );
+	/**
+	 * Filter the paused state of SecuPress security modules.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 *
+	 * @param (bool) $paused True if security is paused.
+	 */
+	return (bool) apply_filters( 'secupress.security_paused', $paused );
+}
+
+/**
+ * Resume security if the pause duration has expired.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_maybe_expire_security_pause() {
+	if ( ! secupress_is_security_paused() ) {
+		return;
+	}
+	$since = secupress_get_security_paused_since();
+	if ( $since && ( $since + secupress_get_security_pause_duration() ) <= time() ) {
+		secupress_resume_security();
+	}
+}
+
+/**
+ * Clear scheduled pause crons.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_clear_security_pause_crons() {
+	wp_clear_scheduled_hook( 'secupress_security_resume_cron' );
+	wp_clear_scheduled_hook( 'secupress_security_paused_email_cron' );
+}
+
+/**
+ * Pause SecuPress security modules.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (bool)
+ */
+function secupress_pause_security() {
+	$updated = update_site_option( 'secupress_security_paused', time() );
+	secupress_clear_security_pause_crons();
+	wp_schedule_single_event( time() + secupress_get_security_pause_duration(), 'secupress_security_resume_cron' );
+	wp_schedule_single_event( time() + secupress_get_security_pause_email_delay(), 'secupress_security_paused_email_cron' );
+	/**
+	 * Fires once security has been paused.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 */
+	do_action( 'secupress.security.paused' );
+	return $updated;
+}
+
+/**
+ * Resume SecuPress security modules.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (bool)
+ */
+function secupress_resume_security() {
+	secupress_clear_security_pause_crons();
+	$deleted = delete_site_option( 'secupress_security_paused' );
+	/**
+	 * Fires once security has been resumed.
+	 *
+	 * @since 2.7
+	 * @author Julio Potier
+	 */
+	do_action( 'secupress.security.resumed' );
+	return $deleted;
+}
+
+/**
+ * Get the timestamp when security was paused.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (int)
+ */
+function secupress_get_security_paused_since() {
+	return (int) get_site_option( 'secupress_security_paused' );
+}
+
+/**
+ * Get the timestamp when paused security should resume.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (int)
+ */
+function secupress_get_security_pause_resume_at() {
+	$scheduled = wp_next_scheduled( 'secupress_security_resume_cron' );
+	if ( $scheduled ) {
+		return (int) $scheduled;
+	}
+	$since = secupress_get_security_paused_since();
+	return $since ? $since + secupress_get_security_pause_duration() : 0;
+}
+
+/**
+ * Get a sentence about the remaining pause duration.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (string)
+ */
+function secupress_get_security_pause_remaining_text() {
+	$resume_at = secupress_get_security_pause_resume_at();
+	if ( $resume_at <= time() ) {
+		return '';
+	}
+	return sprintf(
+		/* translators: %s is a human time diff like "25 minutes". */
+		__( 'Security will resume automatically in %s.', 'secupress' ),
+		human_time_diff( time(), $resume_at )
+	);
+}
+
+add_action( 'secupress_security_resume_cron', 'secupress_resume_security' );
+add_action( 'secupress_security_paused_email_cron', 'secupress_security_paused_send_email' );
+/**
+ * Email the administrator that security is still paused.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_security_paused_send_email() {
+	if ( ! secupress_is_security_paused() ) {
+		return;
+	}
+
+	$to      = get_option( 'admin_email' );
+	$subject = sprintf( __( '[%s] Security is paused', 'secupress' ), '###SITENAME###' );
+	$message = sprintf(
+		__( 'Hello,
+
+Security is currently paused on ###SITENAME### (###SITEURL###).
+PHP modules are not protecting the site. Rules already written in .htaccess or robots.txt stay in place.
+
+%1$s
+You can reactivate security now: %2$s
+
+If you did not pause security, please log in and activate it again.', 'secupress' ),
+		secupress_get_security_pause_remaining_text(),
+		secupress_admin_url( 'modules' )
+	);
+
+	secupress_send_mail( $to, $subject, $message );
+}
+
 /**
  * Set recursive chmod rights on a path
  *

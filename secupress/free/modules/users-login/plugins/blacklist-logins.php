@@ -396,22 +396,20 @@ function secupress_is_username_blacklisted( $username ) {
 	if ( secupress_get_module_option( 'blacklist-logins_admin', 0, 'users-login' ) && stripos( $username, 'admin' ) !== false && strtolower( $username ) !== 'admin' ) {
 		return ! isset( apply_filters( 'secupress.plugins.allowed_usernames', [] )[ $username ] );
 	}
-    $list           = secupress_get_blacklisted_usernames();
-    $list_flipped   = array_flip( $list );
-    $username_lower = mb_strtolower( $username );
+	$list           = secupress_get_blacklisted_usernames();
+	$list_flipped   = array_flip( $list );
+	$username_lower = mb_strtolower( $username );
 
-    // Cgeck for exact match
-    if ( isset( $list_flipped[ $username_lower ] ) ) {
-        return true;
-    }
+	if ( isset( $list_flipped[ $username_lower ] ) ) {
+		return true;
+	}
 
-    // Or check for match from start
-    foreach ( $list as $blacklisted_name ) {
-        $blacklisted_name_replaced = str_replace( '*', '', $blacklisted_name );
-        if ( strpos( $blacklisted_name, '*' ) > 0 && ( strpos( $username_lower, mb_strtolower( $blacklisted_name_replaced ) ) === 0 || isset( $list_flipped[ $blacklisted_name_replaced ] ) ) ) { // 0 = first char. // * = only these names have to be checked like that
-            return true;
-        }
-    }
+	foreach ( $list as $blacklisted_name ) {
+		$blacklisted_name_replaced = str_replace( '*', '', $blacklisted_name );
+		if ( strpos( $blacklisted_name, '*' ) > 0 && ( strpos( $username_lower, mb_strtolower( $blacklisted_name_replaced ) ) === 0 || isset( $list_flipped[ $blacklisted_name_replaced ] ) ) ) {
+			return true;
+		}
+	}
 
     return false;
 }

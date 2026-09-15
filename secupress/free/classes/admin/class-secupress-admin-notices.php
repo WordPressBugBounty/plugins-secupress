@@ -336,9 +336,10 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 					if ( ! current_user_can( $capa ) ) {
 						continue;
 					}
-					$plugin_name     = SECUPRESS_PLUGIN_NAME . ( secupress_has_pro() && ! secupress_is_white_label() ? ' Pro' : '' );
-					$label           = ! secupress_show_contextual_help() ? '' : '<label class="plugin-title">' . esc_html( $plugin_name ) . '</label>';
+					$plugin_name     = esc_html( SECUPRESS_PLUGIN_NAME ) . ( secupress_has_pro() && ! secupress_is_white_label() ? '<sup>PRO</sup>' : '' );
+					$label           = ! secupress_show_contextual_help() ? '' : '<label class="plugin-title">' . $plugin_name . '</label>';
 					$lab_class       = ! secupress_show_contextual_help() ? '' : ' has-plugin-title';
+					$lab_class      .= secupress_has_pro() && ! secupress_is_white_label() ? ' secupress-pro' : '';
 					$error_class     = str_replace( '_', ' ', $error_code );
 					if ( strpos( $error_class, 'no-plugin-title' ) !== false ) {
 						$error_class = str_replace( 'no-plugin-title', '', $error_class );
@@ -349,7 +350,7 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 						foreach ( $messages as $notice_id => $message ) {
 							$button  = admin_url( 'admin-post.php?action=secupress_dismiss-notice&notice_id=' . $notice_id . '&_wp_http_referer=' . $referer );
 							$button  = wp_nonce_url( $button, 'secupress-notices' );
-							$button  = '<a href="' . esc_url( $button ) . '" class="notice-dismiss"><span class="screen-reader-text">' . __( 'Dismiss', 'secupress' ) . '</span></a>';
+							$button  = '<a href="' . esc_url( $button ) . '" class="notice-dismiss"><span>' . __( 'Dismiss', 'secupress' ) . '</span></a>';
 							// $message = strpos( $message, '<p>' ) === false && trim( $message ) ? '<p>' . $message . '</p>' : $message;
 							if ( 'error' === $error_code && ! empty( trim( $message ) ) ) {
 								$message = '<p>' . sprintf( __( '<strong>Error</strong>: %s', 'secupress' ), $message ) . '</p>';

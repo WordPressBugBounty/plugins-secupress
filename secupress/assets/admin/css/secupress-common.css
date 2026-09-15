@@ -1406,6 +1406,13 @@ table.fixed .column-counter {
 .secupress-swal2.sweet-alert .sweet-confirm:focus {
 	background: #26B3A9!important;
 }
+.secupress-swal-danger.sweet-alert .sweet-confirm {
+	background: #F2295E!important;
+}
+.secupress-swal-danger.sweet-alert .sweet-confirm:hover,
+.secupress-swal-danger.sweet-alert .sweet-confirm:focus {
+	background: #CB234F!important;
+}
 .secupress-swal2.sweet-alert .sweet-cancel {
 	background: #5a626f!important;
 }

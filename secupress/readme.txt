@@ -1,10 +1,10 @@
 === SecuPress with Simple SSL – Simple and Performant Security ===
 Contributors: SecuPress, juliobox, GregLone, Superment
-Tags: wordpress security, malware, security plugin, security
-Requires at least: 5.4
-Tested up to: 7.0.2
-Requires PHP: 7.2
-Stable tag: 2.6.3
+Tags: security, malware, scanner, ssl, scan
+Requires at least: 5.5
+Tested up to: 7.1
+Requires PHP: 7.3
+Stable tag: 2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,15 +185,41 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.6.3 =
-* 21 July 2026
-* Fix: "Uncaught TypeError: str_rot13(): Argument #1 ($string) must be of type string, array given"
-* Fix: antispam.min.js error
-* Fix: is_process_running() error again.
+= 2.7 =
+* 12 Sep 2026
+* New: Pause the security for 30 minutes (settings kept, auto-resume, email warning).
+* New: Dashboard widget "System Status".
+* New: Alerts when an application password is added to an account.
+* New: Expert settings for Anti Hotlink (allowed referers, redirection type, webp/avif/svg).
+* New: Password protection for backup ZIP files.
+* Improvement: Application Passwords alerts are no longer enabled by default.
+* Improvement: Firewall updated to 8G (query, URI, host, cookie, user-agent, referer).
+* Improvement: Store backups outside the web root when possible.
+* Improvement: Strong passwords are now enforced on the password reset form. PasswordLess users cannot reset.
+* Improvement: Export/import restricted to configuration keys only (no logs, transients, scans, or banned IPs).
+* Improvement: HTTPS redirection now generates IIS rules.
+* Improvement: Compatibility fallbacks when the mbstring PHP extension is missing.
+* Improvement: Hide sensitive COOKIE values in block reports.
+* Improvement: Self-unban emails no longer leak whether an address exists.
+* Improvement: Updated forbidden file extensions list.
+* Fix: Rewrite rules and current URL for subdirectory, subdomain, siteurl and own-directory installs (readme.html, changelogs, bad URL/file access, Move Login).
+* Fix: User enumeration via REST routes, language URL prefixes like /fr/, and ?_embed=.
+* Fix: Possible PasswordLess bypass after last fix from Protect User Creation.
+* Fix: (again) Possible fatal error "Call to undefined method ::is_processing()" if WooCommerce loads an older async lib (file monitoring, bad plugins, bad themes).
+* Fix: Bad themes deactivation hooks.
+* Fix: Unlock admin callback used a wrong message.
+* Fix: A plugin returning to the repository was still listed as closed/old.
+* Fix: Fake Google Bots filter.
+* Fix: Wrong return type in rewrite bases helper.
+* Fix: String/array issue in the database malware scan.
+* Fix: Safely remove the PasswordLess option and fix the affected role check.
+* Security Fix: Unauthenticated Authentication Bypass via 'secupress_auto_login_token' Parameter. (Thanks to Wordfence Team)
+* Security Fix: Possible RCE when writing constants into wp-config.php.
+* Security Fix: SQL Injection by administrators when deleting logs.
 
 == Upgrade Notice ==
-* SecuPress 2.6+ now requires PHP 7.2 minimum.
-* SecuPress 2.3+ now requires WP 5.4 minimum.
+* SecuPress 2.7+ now requires WP 5.5 minimum.
+* SecuPress 2.7+ now requires PHP 7.3 minimum.
 
 == TODO ==
 Create a trust score for each non WP file and displays it
@@ -201,11 +227,10 @@ Create a "suspicious" status for alerts
 Revamp alerts
 Revamp logs
 Add http logs
-PHP 8.O min
 replace %s by ###USERNAME### in emails
 .htaccess scanner
 login rest disclose scanner
 give possibility to rename logins
 target="_blank" on doc links
 AI Scanner
-Improve malware scanner, again
+Improve malware scanner, again, always!

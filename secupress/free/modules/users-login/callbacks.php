@@ -36,43 +36,42 @@ function secupress_users_login_settings_callback( $settings ) {
 	if ( function_exists( 'secupress_pro_double_auth_settings_callback' ) ) {
 		secupress_pro_double_auth_settings_callback( $modulenow, $settings, $activate );
 	}
-
 	// Captcha.
 	secupress_captcha_settings_callback( $modulenow, $settings, $activate );
-
+	
 	// Login protection.
 	secupress_login_protection_settings_callback( $modulenow, $settings, $activate );
-
+	
 	// Password Policy.
 	secupress_password_policy_settings_callback( $modulenow, $settings, $activate );
-
+	
 	// Logins blacklist.
 	secupress_logins_blacklist_settings_callback( $modulenow, $settings, $activate );
-
+	
 	// Stop User Enumeration.
 	secupress_stopuserenumeration_settings_callback( $modulenow, $activate );
-
+	
 	// Prevent User Creation
 	secupress_preventusercreation_settings_callback( $modulenow, $settings, $activate );
-
+	
 	// Lock Default Role
 	secupress_lock_default_role_settings_callback( $modulenow, $settings, $activate );
-
+	
 	// Lock Membership
 	secupress_lock_membership_settings_callback( $modulenow, $activate );
-
+	
 	// Lock Admin Email
 	secupress_lock_admin_email_settings_callback( $modulenow, $activate );
-
-
+	
+	
 	/**
 	 * Filter the settings before saving.
-	 *
-	 * @since 1.4.9
-	 *
-	 * @param (array)      $settings The module settings.
-	 * @param (array\bool) $activate Contains the activation rules for the different modules
-	 */
+	*
+	* @since 1.4.9
+	*
+	* @param (array)      $settings The module settings.
+	* @param (array|bool) $activate Contains the activation rules for the different modules
+	*/
 	$settings = apply_filters( "secupress_{$modulenow}_settings_callback", $settings, $activate );
 
 	return $settings;
@@ -197,6 +196,7 @@ function secupress_password_policy_settings_callback( $modulenow, &$settings, $a
 	// (De)Activation.
 	if ( false !== $activate ) {
 		secupress_manage_submodule( $modulenow, 'strong-passwords', ! empty( $activate['password-policy_strong_passwords'] ) && secupress_is_pro() );
+		secupress_manage_submodule( $modulenow, 'application-passwords', ! empty( $activate['password-policy_application-passwords'] ) );
 	}
 }
 

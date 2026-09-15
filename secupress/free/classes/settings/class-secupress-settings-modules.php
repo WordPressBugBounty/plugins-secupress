@@ -238,7 +238,7 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 							</div>
 							<div class="secupress-sh-name">
 								<p class="secupress-sh-title">
-									<?php echo secupress_get_logo_word( array( 'width' => 81, 'height' => 19 ) ); ?>
+									<?php echo secupress_get_logo_word(); ?>
 								</p>
 							</div>
 						</div>

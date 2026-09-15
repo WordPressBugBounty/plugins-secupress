@@ -85,17 +85,17 @@ server {
 }
 
 function secupress_ssl_https_redirection_for_iis7() {
-	return '<rewrite>
-	<rules>
-		<rule name="WordPress" stopProcessing="true">
-			<match url="^(.*)$" ignoreCase="false" />
-			<conditions>
-				<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
-				<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
-			</conditions>
-			<action type="Rewrite" url="index.php/{R:1}" />
-		</rule>
-	</rules>
-</rewrite>
-';
+	$marker = 'https_redirection';
+	$spaces = str_repeat( ' ', 8 );
+
+	$rules  = "<rule name=\"SecuPress $marker\" stopProcessing=\"true\">\n";
+	$rules .= "$spaces  <match url=\"(.*)\" />\n";
+	$rules .= "$spaces  <conditions>\n";
+	$rules .= "$spaces    <add input=\"{HTTPS}\" pattern=\"off\" ignoreCase=\"true\" />\n";
+	$rules .= "$spaces    <add input=\"{HTTP_X_FORWARDED_PROTO}\" pattern=\"https\" ignoreCase=\"true\" negate=\"true\" />\n";
+	$rules .= "$spaces  </conditions>\n";
+	$rules .= "$spaces  <action type=\"Redirect\" url=\"https://{HTTP_HOST}/{R:1}\" redirectType=\"Permanent\" />\n";
+	$rules .= "$spaces</rule>";
+
+	return $rules;
 }

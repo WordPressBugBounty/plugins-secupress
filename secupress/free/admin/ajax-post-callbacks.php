@@ -605,6 +605,39 @@ function secupress_clear_ips_ajax_post_cb() {
 }
 
 
+add_action( 'admin_post_secupress_toggle_security_pause', 'secupress_admin_post_toggle_security_pause_cb' );
+/**
+ * Pause or resume SecuPress security modules.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_admin_post_toggle_security_pause_cb() {
+	secupress_check_admin_referer( 'secupress_toggle_security_pause' );
+	secupress_check_user_capability();
+
+	if ( secupress_is_security_paused() ) {
+		secupress_resume_security();
+		secupress_add_transient_notice( __( 'Security is active again.', 'secupress' ), 'updated', 'security-resumed' );
+	} elseif ( secupress_count_active_submodules() ) {
+		secupress_pause_security();
+		secupress_add_transient_notice(
+			sprintf(
+				/* translators: %s is a human time diff like "30 minutes". */
+				__( 'Security is paused for %s. Your settings are kept.', 'secupress' ),
+				human_time_diff( time(), time() + secupress_get_security_pause_duration() )
+			),
+			'warning',
+			'security-paused'
+		);
+	}
+
+	$goback = wp_get_referer() ? wp_get_referer() : secupress_admin_url( 'modules' );
+	wp_safe_redirect( esc_url_raw( $goback ) );
+	die();
+}
+
+
 add_action( 'admin_post_secupress_reset_settings', 'secupress_admin_post_reset_settings_post_cb' );
 /**
  * Reset SecuPress settings or module settings.
@@ -683,19 +716,19 @@ add_action( 'admin_post_nopriv_secupress_unlock_admin', 'secupress_unlock_admin_
  * @since 1.3.2
  **/
 function secupress_unlock_admin_ajax_post_cb() {
-	$message = __( 'If this email address exists, an email will be sent to it to unlock your account.', 'secupress' );
+	$default_message = __( 'If this email address exists, an email will be sent to it to unlock your account.', 'secupress' );
 	if ( ! isset( $_POST['_wpnonce'], $_POST['email'] ) || ! is_email( $_POST['email'] ) || ! check_ajax_referer( 'secupress-unban-ip-admin', '_wpnonce' ) ) { // WPCS: CSRF ok.
-		secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
+		secupress_die( $default_message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 	}
 	$_CLEAN          = [];
 	$_CLEAN['email'] = is_email( $_POST['email'] );
 	if ( ! $_CLEAN['email'] ) {
-		secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
+		secupress_die( $default_message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 	}
 	$user            = get_user_by( 'email', $_CLEAN['email'] );
 	$capa            = secupress_get_capability( true, 'unlock_administrator' );
 	if ( ! secupress_is_user( $user ) || ! user_can( $user, $capa ) ) {
-		secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
+		secupress_die( $default_message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 	}
 	$url_remember = wp_login_url();
 
@@ -742,7 +775,7 @@ All at ###SITENAME###
 
 
 	$sent = secupress_send_mail( $_CLEAN['email'], $subject, $message );
-	secupress_die( $message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
+	secupress_die( $default_message, __( 'Email', 'secupress' ), array( 'force_die' => true ) );
 }
 
 add_action( 'admin_post_nopriv_secupress_deactivate_module', 'secupress_deactivate_module_admin_post_cb' );
@@ -930,6 +963,7 @@ function secupress_accept_notification_admin_post_cb() {
 
 
 add_action( 'wp_ajax_dismiss-sp-pointer', 'secupress_dismiss_pointer_admin_post_cb' );
+add_action( 'wp_ajax_dismiss-sp-pointer-tour', 'secupress_dismiss_pointer_tour_admin_ajax_cb' );
 /**
  * Dismiss our pointers
  *
@@ -945,19 +979,40 @@ function secupress_dismiss_pointer_admin_post_cb( $_pointer = '' ) {
 		wp_send_json_error();
 	}
 
-	$dismissed = array_filter( explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) ) );
-
-	if ( ! $_pointer && in_array( $pointer, $dismissed, true ) ) {
-		wp_send_json_error();
-	}
-
-	$dismissed[] = $pointer;
-	$dismissed   = implode( ',', $dismissed );
-
-	update_user_meta( get_current_user_id(), 'dismissed_wp_pointers', $dismissed );
+	secupress_dismiss_pointers( [ $pointer ] );
 	if ( ! $_pointer ) {
 		wp_send_json_success();
 	}
+}
+
+/**
+ * Dismiss one or several pointers for the current user.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (array) $pointers Pointer IDs.
+ */
+function secupress_dismiss_pointers( $pointers ) {
+	$pointers  = array_filter( array_map( 'sanitize_key', (array) $pointers ) );
+	$dismissed = array_filter( explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) ) );
+	$dismissed = array_unique( array_merge( $dismissed, $pointers ) );
+	update_user_meta( get_current_user_id(), 'dismissed_wp_pointers', implode( ',', $dismissed ) );
+}
+
+/**
+ * Dismiss one or several pointers from a tour.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ */
+function secupress_dismiss_pointer_tour_admin_ajax_cb() {
+	if ( ! current_user_can( secupress_get_capability() ) || ! check_ajax_referer( 'dismiss-pointer-tour', '_ajaxnonce', false ) ) {
+		wp_send_json_error();
+	}
+	$pointers = isset( $_POST['pointers'] ) ? (array) wp_unslash( $_POST['pointers'] ) : [];
+	secupress_dismiss_pointers( $pointers );
+	wp_send_json_success();
 }
 
 //// add_action( 'admin_post_http_log_actions', 'secupress_http_log_actions_admin_post_cb' );
@@ -1092,7 +1147,7 @@ function secupress_search_ajax_cb() {
 	$results        = [];
 	$results_by_key = [];
 	$modules        = secupress_get_modules();
-	$search_query   = function_exists( 'mb_strtolower' ) ? mb_strtolower( $search_query ) : strtolower( $search_query );
+	$search_query   = mb_strtolower( $search_query );
 
 	foreach ( $modules as $module_key => $module_data ) {
 		if ( empty( $module_data['submodules'] ) || ! is_array( $module_data['submodules'] ) ) {
@@ -1104,9 +1159,10 @@ function secupress_search_ajax_cb() {
 				continue;
 			}
 
-			$clean_title       = preg_replace( '/^[>*]+/', '', $submodule_title );
+			$clean_title       = preg_replace( '/\+[a-z0-9_]+\+/', '', $submodule_title );
+			$clean_title       = preg_replace( '/^[>*]+/', '', $clean_title );
 			$clean_title       = trim( wp_strip_all_tags( $clean_title ) );
-			$clean_title_lower = function_exists( 'mb_strtolower' ) ? mb_strtolower( $clean_title ) : strtolower( $clean_title );
+			$clean_title_lower = mb_strtolower( $clean_title );
 			$title_words       = preg_split( '/\s+/', $clean_title_lower, -1, PREG_SPLIT_NO_EMPTY );
 			$best_score        = 0;
 			$has_exact_match   = false;
@@ -1115,7 +1171,7 @@ function secupress_search_ajax_cb() {
 				if ( $title_word === $search_query ) {
 					$has_exact_match = true;
 				}
-				$has_word_match    = false !== ( function_exists( 'mb_strpos' ) ? mb_strpos( $title_word, $search_query ) : strpos( $title_word, $search_query ) );
+				$has_word_match    = false !== mb_strpos( $title_word, $search_query );
 				$levenshtein_score = function_exists( 'secupress_levenshtein' ) ? secupress_levenshtein( $title_word, $search_query ) : 0;
 				$prefix_len        = 0;
 				$max_prefix_len    = min( strlen( $title_word ), strlen( $search_query ) );

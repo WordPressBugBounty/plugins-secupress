@@ -199,6 +199,7 @@ class SecuPress_Logs extends SecuPress_Singleton {
 	/**
 	 * Delete some Logs.
 	 *
+	 * @since 2.7 Sanitize IDs as integers and use prepared queries.
 	 * @since 1.0
 	 *
 	 * @return (int) Number of deleted Logs.
@@ -216,17 +217,24 @@ class SecuPress_Logs extends SecuPress_Singleton {
 			return 0;
 		}
 
+		$post_ids = array_filter( wp_parse_id_list( $post_ids ) );
+
 		if ( ! $post_ids ) {
 			return 0;
 		}
 
-		// Delete Postmeta.
-		$sql = sprintf( "DELETE FROM $wpdb->postmeta WHERE post_id IN (%s)", implode( ',', $post_ids ) );
-		$wpdb->query( $sql ); // WPCS: unprepared SQL ok.
+		$placeholders = implode( ',', array_fill( 0, count( $post_ids ), '%d' ) );
+		$post_ids     = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type = %s AND ID IN ($placeholders)", array_merge( [ $this->get_post_type() ], $post_ids ) ) );
 
-		// Delete Posts.
-		$sql = sprintf( "DELETE FROM $wpdb->posts WHERE ID IN (%s)", implode( ',', $post_ids ) );
-		$wpdb->query( $sql ); // WPCS: unprepared SQL ok.
+		if ( ! $post_ids ) {
+			return 0;
+		}
+
+		$post_type    = $this->get_post_type();
+		$placeholders = implode( ',', array_fill( 0, count( $post_ids ), '%d' ) );
+
+		$wpdb->query( $wpdb->prepare( "DELETE pm FROM $wpdb->postmeta pm INNER JOIN $wpdb->posts p ON p.ID = pm.post_id WHERE p.post_type = %s AND pm.post_id IN ($placeholders)", array_merge( [ $post_type ], $post_ids ) ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->posts WHERE post_type = %s AND ID IN ($placeholders)", array_merge( [ $post_type ], $post_ids ) ) );
 
 		return count( $post_ids );
 	}

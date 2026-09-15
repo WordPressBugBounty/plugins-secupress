@@ -43,7 +43,7 @@ function secupress_check_fake_bot() {
 	 *
 	 * @param (array) $user_agent_regex_not_list The list to be filtered.
 	 */
-	$user_agent_regex_not_list = apply_filters( 'secupress.fake_bot_ua_not_list', $user_agent_regex_test_list );
+	$user_agent_regex_not_list = apply_filters( 'secupress.fake_bot_ua_not_list', $user_agent_regex_not_list );
 
 	if ( ! preg_match( '/' . implode( '|', $user_agent_regex_test_list ) . '/i', $user_agent )
 	 || preg_match( '/' . implode( '|', $user_agent_regex_not_list ) . '/i', $user_agent )

@@ -17,3 +17,21 @@ function secupress_contextual_help_add_css_body_class( $classes ) {
 	}
 	return $classes;
 }
+
+add_filter( 'admin_body_class', 'secupress_security_paused_add_css_body_class' );
+/**
+ * Add a body class when security is paused.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @param (string) $classes
+ *
+ * @return (string)
+ */
+function secupress_security_paused_add_css_body_class( $classes ) {
+	if ( secupress_is_security_paused() ) {
+		$classes .= ' secupress-security-paused';
+	}
+	return $classes;
+}

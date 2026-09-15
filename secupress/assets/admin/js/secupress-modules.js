@@ -1688,6 +1688,32 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 
 } )(window, document, jQuery);
 
+(function($, d, w, undefined) {
+	function secupressSyncGroupedCheckboxes( $col ) {
+		var $items  = $col.find( '.secupress-grouped-checkboxes-item:enabled' ),
+			$toggle = $col.find( '.secupress-grouped-checkboxes-toggle' ),
+			checked = $items.filter( ':checked' ).length;
+
+		$toggle.prop( 'indeterminate', checked > 0 && checked < $items.length );
+		$toggle.prop( 'checked', 0 < $items.length && checked === $items.length );
+	}
+
+	$( '.secupress-grouped-checkboxes-col' ).each( function() {
+		var $col = $( this );
+
+		secupressSyncGroupedCheckboxes( $col );
+
+		$col.on( 'change', '.secupress-grouped-checkboxes-toggle', function() {
+			$col.find( '.secupress-grouped-checkboxes-item:enabled' ).prop( 'checked', this.checked ).trigger( 'change' );
+			secupressSyncGroupedCheckboxes( $col );
+		} );
+
+		$col.on( 'change', '.secupress-grouped-checkboxes-item', function() {
+			secupressSyncGroupedCheckboxes( $col );
+		} );
+	} );
+} )(jQuery, document, window);
+
 // Checked checkbox class ==========================================================================
 (function($, d, w, undefined) {
 	$( '.secupress-fieldset-item-checkboxes' ).each( function() {
@@ -2101,4 +2127,29 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 			}
 		} );
 	} )();
+} )(jQuery, document, window);
+
+(function($, d, w, undefined) {
+	$( ".secupress-pause-security" ).on( "click", function( e ) {
+		var _this = this;
+		e.preventDefault();
+		if ( $( this ).hasClass( "disabled" ) || "true" === $( this ).attr( "aria-disabled" ) ) {
+			return;
+		}
+		if ( "function" === typeof w.swal2 ) {
+			swal2( $.extend( {}, SecuPress.swal2Defaults, SecuPress.swal2ConfirmDefaults, {
+				text:              SecuPressi18nModules.confirmPauseSecurity,
+				confirmButtonText: SecuPressi18nModules.yesPauseSecurity,
+				type:              "warning",
+				reverseButtons:    true,
+				customClass:       "secupress-swal2 secupress-swal-danger"
+			} ) ).then( function ( isConfirm ) {
+				if ( isConfirm ) {
+					window.location = $( _this ).attr( "href" );
+				}
+			} );
+		} else if ( w.confirm( SecuPressi18nModules.confirmTitle + "\n" + SecuPressi18nModules.confirmPauseSecurity ) ) {
+			window.location = $( _this ).attr( "href" );
+		}
+	} );
 } )(jQuery, document, window);
