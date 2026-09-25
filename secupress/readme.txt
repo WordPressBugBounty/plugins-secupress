@@ -2,9 +2,9 @@
 Contributors: SecuPress, juliobox, GregLone, Superment
 Tags: security, malware, scanner, ssl, scan
 Requires at least: 5.5
-Tested up to: 7.1
+Tested up to: 7.1.2
 Requires PHP: 7.3
-Stable tag: 2.7
+Stable tag: 2.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,37 +185,23 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.7 =
-* 12 Sep 2026
-* New: Pause the security for 30 minutes (settings kept, auto-resume, email warning).
-* New: Dashboard widget "System Status".
-* New: Alerts when an application password is added to an account.
-* New: Expert settings for Anti Hotlink (allowed referers, redirection type, webp/avif/svg).
-* New: Password protection for backup ZIP files.
-* Improvement: Application Passwords alerts are no longer enabled by default.
-* Improvement: Firewall updated to 8G (query, URI, host, cookie, user-agent, referer).
-* Improvement: Store backups outside the web root when possible.
-* Improvement: Strong passwords are now enforced on the password reset form. PasswordLess users cannot reset.
-* Improvement: Export/import restricted to configuration keys only (no logs, transients, scans, or banned IPs).
-* Improvement: HTTPS redirection now generates IIS rules.
-* Improvement: Compatibility fallbacks when the mbstring PHP extension is missing.
-* Improvement: Hide sensitive COOKIE values in block reports.
-* Improvement: Self-unban emails no longer leak whether an address exists.
-* Improvement: Updated forbidden file extensions list.
-* Fix: Rewrite rules and current URL for subdirectory, subdomain, siteurl and own-directory installs (readme.html, changelogs, bad URL/file access, Move Login).
-* Fix: User enumeration via REST routes, language URL prefixes like /fr/, and ?_embed=.
-* Fix: Possible PasswordLess bypass after last fix from Protect User Creation.
-* Fix: (again) Possible fatal error "Call to undefined method ::is_processing()" if WooCommerce loads an older async lib (file monitoring, bad plugins, bad themes).
-* Fix: Bad themes deactivation hooks.
-* Fix: Unlock admin callback used a wrong message.
-* Fix: A plugin returning to the repository was still listed as closed/old.
-* Fix: Fake Google Bots filter.
-* Fix: Wrong return type in rewrite bases helper.
-* Fix: String/array issue in the database malware scan.
-* Fix: Safely remove the PasswordLess option and fix the affected role check.
-* Security Fix: Unauthenticated Authentication Bypass via 'secupress_auto_login_token' Parameter. (Thanks to Wordfence Team)
-* Security Fix: Possible RCE when writing constants into wp-config.php.
-* Security Fix: SQL Injection by administrators when deleting logs.
+= 2.7.1 =
+* 25 Sep 2026
+* New: Firewall Learning Mode for 8G (observe signatures, review hits, allow globally or per URL prefix, auto-calibrate).
+* Improvement: WAF revamp: 8G signatures are now optional per filter, with local exceptions.
+* Improvement: Block Bad Referers is now available in Free.
+* Improvement: Hide WP, WooCommerce and PHP session cookies from the Support ID.
+* Improvement: Malware scanner still lists malware files when WP core checksums are missing, and matches "file" signatures on the filename.
+* Improvement: Deactivating a wp-config module no longer leaves the file or the setting in a bad state.
+* Improvement: Anti-spam comment delay now finds the comment form via the WordPress core field, so custom theme form IDs no longer break the timer.
+* Fix: Mixed content replacement now handles namespaced XML/SVG.
+* Fix: Authors and other lower roles could not edit or create content with Stop User Enumeration.
+* Fix: Apache bad URL access rules were missing the "-" substitution, so flags were ignored.
+* Fix: "Expired license" displayed incorrectly on the dashboard widget.
+* Fix: PHP warning when headers are already sent.
+* Fix: Undefined variable notice in the System Status widget.
+* Fix: reset() call on the pointers tour steps.
+* Security Fix: Directory traversal in the class file loader (administrators).
 
 == Upgrade Notice ==
 * SecuPress 2.7+ now requires WP 5.5 minimum.

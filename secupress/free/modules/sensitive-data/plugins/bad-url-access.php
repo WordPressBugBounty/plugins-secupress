@@ -114,6 +114,7 @@ function secupress_bad_url_access_plugin_activate( $rules ) {
 /**
  * Get rules for apache.
  *
+ * @since 2.7 Add missing substitution "-" so Apache flags are applied.
  * @since 1.0
  * @author Grégory Viguier
  *
@@ -131,7 +132,7 @@ function secupress_bad_url_access_apache_rules() {
 	$rules .= "    RewriteEngine On\n";
 	$rules .= "    RewriteBase $base\n";
 	$rules .= "    RewriteCond %{REQUEST_URI} !{$site_from}wp-includes/js/tinymce/wp-tinymce\.php$\n";
-	$rules .= "    RewriteRule $pattern [R=404,L,NC]\n";
+	$rules .= "    RewriteRule $pattern - [R=404,L,NC]\n";
 	$rules .= "</IfModule>\n";			
 
 	return $rules;

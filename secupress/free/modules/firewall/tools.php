@@ -341,6 +341,8 @@ function secupress_firewall_get_regex_patterns( $slug ) {
  * https://perishablepress.com/8g-firewall/
  *
  * @author Julio Potier
+ * @since 2.7.1 Gate NG signatures behind the Pro setting.
+ * @since 2.7.1 Add source, slug, pattern hash, severity, and local exceptions.
  * @since 2.7
  *
  * @param (string) $slug
@@ -348,16 +350,32 @@ function secupress_firewall_get_regex_patterns( $slug ) {
  * @param (string) $block_id
  */
 function secupress_firewall_block_regex_slug( $slug, $value, $block_id ) {
+	if ( ! secupress_firewall_ng_is_enabled() ) {
+		return;
+	}
 	if ( '' === (string) $value ) {
 		return;
 	}
 	foreach ( secupress_firewall_get_regex_patterns( $slug ) as $pattern ) {
 		if ( preg_match( '#' . $pattern . '#i', $value, $matches ) ) {
+			$hash    = secupress_firewall_learning_pattern_hash( $slug, $pattern );
+			$matched = isset( $matches[0] ) ? (string) $matches[0] : '';
+			if ( secupress_firewall_ng_exception_applies( $hash, $matched ) ) {
+				return;
+			}
 			secupress_block( $block_id, [
-				'code'        => 403,
-				'b64'         => [ 'data' => $matches ],
-				'attack_type' => 'bad_request_content',
+				'code'         => 403,
+				'b64'          => [ 'data' => $matches ],
+				'attack_type'  => 'bad_request_content',
+				'source'       => 'ng',
+				'slug'         => $slug,
+				'pattern'      => $pattern,
+				'pattern_hash' => $hash,
+				'match'        => $matched,
+				'subject'      => (string) $value,
+				'severity'     => secupress_firewall_ng_get_severity( $slug, $pattern ),
 			] );
+			return;
 		}
 	}
 }
@@ -441,3 +459,5 @@ function secupress_firewall_block_id( $module ) {
 
 	return isset( $block_ids[ $module ] ) ? $block_ids[ $module ] : $module;
 }
+
+require_once( dirname( __FILE__ ) . '/inc/learning-mode.php' );

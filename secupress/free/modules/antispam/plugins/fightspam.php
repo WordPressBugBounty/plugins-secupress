@@ -852,15 +852,11 @@ function secupress_dcts_timer_script() {
 	if ( $dcts_timer <= 0 ) {
 		$dcts_timer = 30;
 	}
-	$gmt_offset            = get_option( 'gmt_offset' );
-	// Get the 2 filtered IDs for the form
-	$comment_form_defaults = [ 'id_form' => 'commentform', 'id_submit' => 'submit' ];
-	$comment_form_defaults = wp_parse_args( $comment_form_defaults, apply_filters( 'comment_form_defaults', $comment_form_defaults ) );
+	$gmt_offset = get_option( 'gmt_offset' );
 	wp_enqueue_script( 'secupress-dcts-timer', SECUPRESS_ADMIN_JS_URL . 'secupress-antispam' . $suffix . '.js', null, $version, true );
-	wp_localize_script( 'secupress-dcts-timer', 'secupressDctsTimer', 
+	wp_localize_script( 'secupress-dcts-timer', 'secupressDctsTimer',
 		[
-			'gmtOffset'  => $gmt_offset,
-			'dctsTimer'  => $dcts_timer,
-			'cfDefaults' => $comment_form_defaults,
+			'gmtOffset' => $gmt_offset,
+			'dctsTimer' => $dcts_timer,
 		] );
 }

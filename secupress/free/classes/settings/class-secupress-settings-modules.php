@@ -688,6 +688,403 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 		echo "</p>\n";
 	}
 
+	/**
+	 * Displays Firewall Learning Mode controls and the signature review list.
+	 *
+	 * @since 2.7.1
+	 * @author Julio Potier
+	 *
+	 * @param (array) $args An array of parameters. See `::field()`.
+	 */
+	protected function learning_mode( $args ) {
+		unset( $args );
+		$state        = secupress_firewall_learning_get_state();
+		$status       = $state['status'];
+		$ng_ready     = secupress_firewall_ng_is_enabled();
+		$last_started = secupress_firewall_learning_get_last_started();
+		$page_url     = secupress_admin_url( 'modules', 'firewall' );
+		if ( secupress_firewall_learning_bypass_sample() ) {
+			$page_url = add_query_arg( 'expertmode', '1', $page_url );
+		}
+		$referer      = '&_wp_http_referer=' . urlencode( esc_url_raw( $page_url . '#row-learning-mode_learning' ) );
+		$admin_post   = admin_url( 'admin-post.php' );
+		$options      = secupress_firewall_learning_duration_options();
+		$hits         = secupress_firewall_learning_get_hits();
+		$progress     = secupress_firewall_learning_progress( $state );
+		$advice_ready = ! empty( $progress['ready'] );
+		$pending = [];
+
+		foreach ( $hits as $hash => $hit ) {
+			if ( empty( $hit['decision'] ) || 'pending' === $hit['decision'] ) {
+				$pending[ $hash ] = $hit;
+			}
+		}
+
+		if ( $last_started ) {
+			echo '<input type="hidden" name="secupress_firewall_settings[learning-mode_last]" value="' . (int) $last_started . '" />';
+		}
+
+		if ( ! $ng_ready && 'running' !== $status && 'review' !== $status ) {
+			echo '<p class="secupress-warning">' . sprintf( __( 'Please, save the %s rules to activate the learning mode.', 'secupress' ), secupress_firewall_ng_name() ) . '</p>';
+		} elseif ( 'running' === $status ) {
+			if ( $advice_ready ) {
+				$until   = wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), (int) $state['ends'] );
+				$started = (int) $state['started'];
+				$ends    = (int) $state['ends'];
+				$now     = time();
+				$total   = max( 1, $ends - $started );
+				$remain  = max( 0, $ends - $now );
+				$pct     = min( 100, max( 0, ( $remain / $total ) * 100 ) );
+				echo '<p><strong>' . sprintf(
+					/* translators: %s: date */
+					__( 'Learning Mode is running until %s.', 'secupress' ),
+					esc_html( $until )
+				) . '</strong></p>';
+				echo '<div class="secupress-learning-countdown" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . (int) round( $pct ) . '">';
+				echo '<span class="secupress-learning-countdown-bar" style="--secupress-learning-remain:' . esc_attr( $pct ) . '%;--secupress-learning-duration:' . (int) $remain . 's"></span>';
+				echo '</div>';
+			}
+			if ( ! $hits ) {
+				echo '<p class="description">' . esc_html( sprintf(
+					/* translators: %s: firewall pack name (e.g. 8G) */
+					__( 'No calibrable %s signature has matched yet.', 'secupress' ),
+					secupress_firewall_ng_name()
+				) ) . '</p>';
+			}
+
+			$finish = wp_nonce_url( $admin_post . '?action=secupress-learning-finish' . $referer, 'secupress-learning-finish' );
+			$skip   = wp_nonce_url( $admin_post . '?action=secupress-learning-skip' . $referer, 'secupress-learning-skip' );
+			$extend = wp_nonce_url( $admin_post . '?action=secupress-learning-extend&duration=3' . $referer, 'secupress-learning-extend' );
+
+			echo '<div class="secupress-learning-manage">';
+			echo '<p class="secupress-learning-manage-label">' . esc_html__( 'Manage learning mode status', 'secupress' ) . '</p>';
+			echo '<div class="secupress-learning-manage-row">';
+			echo '<div class="secupress-learning-manage-extend">';
+			echo '<label class="screen-reader-text" for="secupress-learning-extend-duration">' . esc_html__( 'Extend by', 'secupress' ) . '</label>';
+			echo '<select id="secupress-learning-extend-duration">';
+			foreach ( $options as $days => $label ) {
+				echo '<option value="' . (int) $days . '"' . selected( $days, 3, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			echo '</select>';
+			echo '<a class="secupress-learning-manage-btn secupress-learning-manage-extend-btn" id="secupress-learning-extend-btn" href="' . esc_url( $extend ) . '">';
+			echo '<span class="dashicons dashicons-plus" aria-hidden="true"></span>';
+			echo esc_html__( 'Extend', 'secupress' );
+			echo '</a>';
+			echo '</div>';
+			echo '<div class="secupress-learning-manage-actions">';
+			echo '<a class="secupress-learning-manage-btn secupress-learning-manage-finish" href="' . esc_url( $finish ) . '">';
+			echo '<span class="dashicons dashicons-flag" aria-hidden="true"></span>';
+			echo esc_html__( 'Finish now', 'secupress' );
+			echo '</a>';
+			echo '<a class="secupress-learning-manage-btn secupress-learning-manage-block" href="' . esc_url( $skip ) . '">';
+			echo '<span class="dashicons dashicons-dismiss" aria-hidden="true"></span>';
+			echo esc_html__( 'Skip & block everything', 'secupress' );
+			echo '</a>';
+			echo '</div>';
+			echo '</div>';
+			echo '</div>';
+		} else {
+			if ( 'review' === $status ) {
+				echo '<p><strong>' . esc_html__( 'Learning Mode has ended. Review remaining signatures, then they will be blocked.', 'secupress' ) . '</strong></p>';
+			}
+
+			$start_default = 5;
+			$start_href    = wp_nonce_url( $admin_post . '?action=secupress-learning-start&duration=' . $start_default . '&trigger=manual' . $referer, 'secupress-learning-start' );
+
+			if ( $last_started ) {
+				echo '<p class="description">' . sprintf(
+					/* translators: %s: date */
+					esc_html__( 'Last Learning Mode: %s', 'secupress' ),
+					esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_started ) )
+				) . '</p>';
+			}
+
+			echo '<p>';
+			echo '<label for="secupress-learning-duration">' . esc_html__( 'Duration', 'secupress' ) . '</label> ';
+			echo '<select id="secupress-learning-duration">';
+			foreach ( $options as $days => $label ) {
+				echo '<option value="' . (int) $days . '"' . selected( $days, $start_default, false ) . '>' . esc_html( $label ) . '</option>';
+			}
+			echo '</select> ';
+			echo '<a class="secupress-button secupress-button-mini" id="secupress-learning-start-btn" href="' . esc_url( $start_href ) . '">' . esc_html__( 'Start Learning Mode', 'secupress' ) . '</a>';
+			echo '</p>';
+		}
+
+		$show_review     = $pending && ( ( 'running' === $status && $advice_ready ) || 'review' === $status );
+		$show_head       = ( 'running' === $status && ! $advice_ready ) || $show_review;
+		$show_review_box = $show_head;
+
+		if ( $show_review_box ) {
+			echo '<div class="secupress-learning-review">';
+		}
+
+		if ( $show_head ) {
+			$pending_count = count( $pending );
+			$pending_label = sprintf(
+				/* translators: %s: number of signatures */
+				_n( '%s signature to review.', '%s signatures to review.', $pending_count, 'secupress' ),
+				number_format_i18n( $pending_count )
+			);
+			echo '<h4 class="secupress-learning-review-title">' . esc_html__( 'Signatures to review', 'secupress' );
+			if ( $pending_count ) {
+				echo ' <span class="secupress-dot-bad secupress-learning-observed" title="' . esc_attr( $pending_label ) . '">';
+				echo esc_html( number_format_i18n( $pending_count ) );
+				echo '<span class="screen-reader-text">' . esc_html( $pending_label ) . '</span>';
+				echo '</span>';
+			}
+			echo '</h4>';
+		}
+
+		if ( 'running' === $status && ! $advice_ready ) {
+			$reflect = (float) $progress['percent'];
+			echo '<div class="secupress-learning-reflect" id="secupress-learning-reflect" data-nonce="' . esc_attr( wp_create_nonce( 'secupress-learning-progress' ) ) . '" data-ajax="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '">';
+			echo '<p class="description secupress-learning-reflect-message">' . secupress_firewall_learning_wait_message() . '</p>';
+			echo '<p class="secupress-learning-reflect-label">';
+			echo '<span class="secupress-learning-reflect-spinner" aria-hidden="true"></span> ';
+			echo '<span id="secupress-learning-reflect-percent">' . esc_html( number_format_i18n( $reflect, 1 ) . '%' ) . '</span>';
+			echo '</p>';
+			echo '<div class="secupress-learning-reflect-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . esc_attr( $reflect ) . '">';
+			echo '<span class="secupress-learning-reflect-bar" id="secupress-learning-reflect-bar" style="width:' . esc_attr( $reflect ) . '%"></span>';
+			echo '</div>';
+			echo '</div>';
+		} elseif ( $show_review ) {
+			$this->learning_mode_hits_table( $pending, $referer, true );
+		} elseif ( 'review' === $status && ! $hits ) {
+			echo '<p class="description">' . esc_html( sprintf(
+				/* translators: %s: firewall pack name (e.g. 8G) */
+				__( 'No calibrable %s signature has matched yet.', 'secupress' ),
+				secupress_firewall_ng_name()
+			) ) . '</p>';
+		}
+
+		if ( $show_review_box ) {
+			echo '</div>';
+		}
+
+		$start_base  = str_replace( '&amp;', '&', wp_nonce_url( $admin_post . '?action=secupress-learning-start&duration=__DAYS__&trigger=manual' . $referer, 'secupress-learning-start' ) );
+		$extend_base = str_replace( '&amp;', '&', wp_nonce_url( $admin_post . '?action=secupress-learning-extend&duration=__DAYS__' . $referer, 'secupress-learning-extend' ) );
+		?>
+		<script>
+		(function() {
+			var startSelect = document.getElementById('secupress-learning-duration');
+			var startBtn    = document.getElementById('secupress-learning-start-btn');
+			var startTpl    = <?php echo wp_json_encode( $start_base ); ?>;
+			if ( startSelect && startBtn ) {
+				var applyStart = function() {
+					startBtn.href = startTpl.replace('__DAYS__', encodeURIComponent(startSelect.value));
+				};
+				startSelect.addEventListener('change', applyStart);
+				applyStart();
+			}
+			var extendSelect = document.getElementById('secupress-learning-extend-duration');
+			var extendBtn    = document.getElementById('secupress-learning-extend-btn');
+			var extendTpl    = <?php echo wp_json_encode( $extend_base ); ?>;
+			if ( extendSelect && extendBtn ) {
+				var applyExtend = function() {
+					extendBtn.href = extendTpl.replace('__DAYS__', encodeURIComponent(extendSelect.value));
+				};
+				extendSelect.addEventListener('change', applyExtend);
+				applyExtend();
+			}
+			var reflect = document.getElementById('secupress-learning-reflect');
+			if ( reflect ) {
+				var reflectTimer = window.setInterval(function() {
+					var body = new window.FormData();
+					body.append('action', 'secupress-learning-progress');
+					body.append('_ajax_nonce', reflect.getAttribute('data-nonce'));
+					window.fetch(reflect.getAttribute('data-ajax'), {
+						method: 'POST',
+						credentials: 'same-origin',
+						body: body
+					}).then(function(response) {
+						return response.json();
+					}).then(function(payload) {
+						if ( ! payload || ! payload.success || ! payload.data ) {
+							return;
+						}
+						if ( payload.data.ready ) {
+							window.clearInterval(reflectTimer);
+							window.location.reload();
+							return;
+						}
+						var description = reflect.querySelector('.secupress-learning-reflect-message');
+						if ( description && payload.data.description ) {
+							description.innerHTML = payload.data.description;
+						}
+						var percent = parseFloat(payload.data.percent);
+						if ( isNaN(percent) ) {
+							return;
+						}
+						percent = Math.round(percent * 10) / 10;
+						var pretty = percent.toLocaleString(document.documentElement.lang || undefined, {
+							minimumFractionDigits: 1,
+							maximumFractionDigits: 1
+						});
+						var label = document.getElementById('secupress-learning-reflect-percent');
+						var bar = document.getElementById('secupress-learning-reflect-bar');
+						var track = reflect.querySelector('[role="progressbar"]');
+						if ( label ) {
+							label.textContent = pretty + '%';
+						}
+						if ( bar ) {
+							bar.style.width = percent + '%';
+						}
+						if ( track ) {
+							track.setAttribute('aria-valuenow', String(percent));
+						}
+					}).catch(function() {});
+				}, 31000);
+			}
+		})();
+		(function() {
+			var row = document.querySelector('.secupress-setting-row_learning-mode_learning');
+			if ( row ) {
+				row.style.display = 'none';
+			}
+		})();
+		jQuery(function($) {
+			var $row = $('.secupress-setting-row_learning-mode_learning');
+			var $ng = $('#learning-mode_8g');
+			var $modules = $('#learning-mode_bbx_user-agents-header, #learning-mode_bbx_bad-url-contents, #learning-mode_bbx_bad-referer');
+			function canShowLearningRow() {
+				return $ng.length && $ng.is(':checked') && $modules.filter(':checked').length;
+			}
+			function syncLearningRow( instant ) {
+				if ( ! $row.length ) {
+					return;
+				}
+				if ( canShowLearningRow() ) {
+					$row.show( instant ? 0 : 'fast' );
+				} else {
+					$row.hide( instant ? 0 : 'fast' );
+				}
+			}
+			$ng.add($modules).on('change', function() {
+				syncLearningRow( false );
+			});
+			$row.on('secupressaftershow secupressinitshow', function() {
+				if ( ! canShowLearningRow() ) {
+					$row.hide();
+				}
+			});
+			syncLearningRow( true );
+		});
+		</script>
+		<?php
+	}
+
+
+	/**
+	 * Learning Mode signatures as a compact list table.
+	 *
+	 * @since 2.7.1
+	 * @author Julio Potier
+	 *
+	 * @param (array)  $hits
+	 * @param (string) $referer
+	 * @param (bool)   $with_actions
+	 */
+	protected function learning_mode_hits_table( $hits, $referer, $with_actions ) {
+		echo '<table class="wp-list-table widefat fixed striped secupress-learning-table">';
+		echo '<thead><tr>';
+		echo '<th scope="col" class="column-primary column-string">' . esc_html__( 'String', 'secupress' ) . '</th>';
+		echo '<th scope="col" class="column-source">' . esc_html__( 'Source', 'secupress' ) . '</th>';
+		$advice_heading = $with_actions ? __( 'Suggested action', 'secupress' ) : __( 'Decision', 'secupress' );
+		echo '<th scope="col" class="column-advice">' . esc_html( $advice_heading ) . '</th>';
+		echo '<th scope="col" class="column-values">' . esc_html__( 'Values', 'secupress' ) . '</th>';
+		echo '<th scope="col" class="column-hits">' . esc_html__( 'Hits', 'secupress' ) . '</th>';
+		echo '</tr></thead><tbody>';
+		foreach ( $hits as $hash => $hit ) {
+			$this->learning_mode_hit_row( $hash, $hit, $referer, $with_actions );
+		}
+		echo '</tbody></table>';
+	}
+
+
+	/**
+	 * One Learning Mode signature row.
+	 *
+	 * @since 2.7.1
+	 * @author Julio Potier
+	 *
+	 * @param (string) $hash
+	 * @param (array)  $hit
+	 * @param (string) $referer
+	 * @param (bool)   $with_actions
+	 */
+	protected function learning_mode_hit_row( $hash, $hit, $referer, $with_actions ) {
+		$admin_post  = admin_url( 'admin-post.php' );
+		$label       = secupress_firewall_learning_slug_label( isset( $hit['slug'] ) ? $hit['slug'] : '' );
+		$match       = isset( $hit['match'] ) ? (string) $hit['match'] : '';
+		$pattern     = isset( $hit['pattern'] ) ? (string) $hit['pattern'] : '';
+		$hits_n      = isset( $hit['hits'] ) ? (int) $hit['hits'] : 0;
+		$subjects    = isset( $hit['subjects'] ) ? array_reverse( array_values( (array) $hit['subjects'] ) ) : [];
+		$advice      = $with_actions ? secupress_firewall_learning_recommend( $hit ) : [];
+
+		echo '<tr>';
+		echo '<td class="column-string column-primary has-row-actions">';
+		if ( '' !== $match ) {
+			echo '<div class="secupress-learning-keyword">';
+			echo '<span class="secupress-learning-field-label">' . esc_html__( 'Keyword:', 'secupress' ) . '</span> ';
+			echo '<strong><code class="secupress-learning-match">' . esc_html( $match ) . '</code></strong>';
+			echo '</div>';
+		}
+		if ( '' !== $pattern && $pattern !== $match ) {
+			echo '<div class="secupress-learning-pattern">';
+			echo '<span class="secupress-learning-field-label">' . esc_html__( 'Rule:', 'secupress' ) . '</span> ';
+			echo '<code>' . esc_html( $pattern ) . '</code>';
+			echo '</div>';
+		}
+		if ( $with_actions ) {
+			$allow_site = wp_nonce_url( $admin_post . '?action=secupress-learning-allow-site&hash=' . rawurlencode( $hash ) . $referer, 'secupress-learning-allow-site_' . $hash );
+			$keep       = wp_nonce_url( $admin_post . '?action=secupress-learning-keep-block&hash=' . rawurlencode( $hash ) . $referer, 'secupress-learning-keep-block_' . $hash );
+			echo '<div class="row-actions">';
+			echo '<span class="allow"><a href="' . esc_url( $allow_site ) . '">' . esc_html__( 'Allow', 'secupress' ) . '</a> | </span>';
+			echo '<span class="block"><a class="secupress-learning-keep" href="' . esc_url( $keep ) . '">' . esc_html__( 'Keep blocking', 'secupress' ) . '</a></span>';
+			echo '</div>';
+		}
+		echo '</td>';
+		echo '<td class="column-source">' . esc_html( $label ) . '</td>';
+		echo '<td class="column-advice">';
+		if ( $with_actions && ! empty( $advice['action'] ) ) {
+			$status_label = 'allow' === $advice['action'] ? __( 'Allow', 'secupress' ) : __( 'Block', 'secupress' );
+			echo '<span class="secupress-learning-status secupress-learning-advice-' . esc_attr( $advice['action'] ) . '">' . esc_html( $status_label ) . '</span>';
+			if ( ! empty( $advice['reason'] ) ) {
+				echo '<div class="secupress-learning-reason">' . esc_html( $advice['reason'] ) . '</div>';
+			}
+		} elseif ( ! $with_actions ) {
+			$decision = isset( $hit['decision'] ) ? $hit['decision'] : '';
+			$labels   = [
+				'allow_site'    => _x( 'Allowed for this site', 'learning mode keyword detected', 'secupress' ),
+				'allow_uri'     => _x( 'Allowed for a URL', 'learning mode keyword detected', 'secupress' ),
+				'force_enforce' => _x( 'Kept blocked', 'learning mode keyword detected', 'secupress' ),
+				'auto_allowed'  => _x( 'Auto-allowed for a URL', 'learning mode keyword detected', 'secupress' ),
+			];
+			echo isset( $labels[ $decision ] ) ? esc_html( $labels[ $decision ] ) : '—';
+		} else {
+			echo '—';
+		}
+		echo '</td>';
+		echo '<td class="column-values">';
+		if ( $subjects ) {
+			echo '<span class="secupress-learning-match-wrap" tabindex="0">';
+			echo '<span class="dashicons dashicons-editor-help" aria-hidden="true"></span>';
+			echo '<span class="screen-reader-text">' . esc_html__( 'Blocked values', 'secupress' ) . '</span>';
+			echo '<span class="secupress-learning-subjects" role="tooltip">';
+			echo '<span class="secupress-learning-subjects-inner">';
+			echo '<span class="secupress-learning-subjects-item">' . esc_html__( '10 last blocked values:', 'secupress' ) . '</span>';
+			foreach ( $subjects as $subject ) {
+				echo '<span class="secupress-learning-subjects-item">' . esc_html( $subject ) . '</span>';
+			}
+			echo '</span></span></span>';
+		} else {
+			echo '—';
+		}
+		echo '</td>';
+		echo '<td class="column-hits">' . esc_html( number_format_i18n( $hits_n ) ) . '</td>';
+		echo "</tr>\n";
+	}
+
 
 	/**
 	 * Displays the restrictions for HTTP Log

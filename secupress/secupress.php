@@ -5,7 +5,7 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.7
+ * Version: 2.7.1
  * Code Name: Makeshift
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
@@ -25,7 +25,22 @@
 
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
-$secupress_is_playground = isset( $_SERVER['SERVER_NAME'] ) && ( 'playground.wordpress.net' === $_SERVER['SERVER_NAME'] || 'my.wordpress.net' === $_SERVER['SERVER_NAME'] );
+/**
+ * Tell whether the runtime is WordPress Playground (PHP.wasm).
+ *
+ * @author Julio Potier
+ * @since 2.7.1
+ *
+ * @return (bool)
+ **/
+function secupress_is_wordpress_playground() {
+	if ( 'wasm' === PHP_SAPI ) {
+		return true;
+	}
+	return function_exists( 'php_uname' ) && false !== stripos( php_uname( 'm' ), 'wasm' );
+}
+
+$secupress_is_playground = secupress_is_wordpress_playground();
 add_action( 'admin_notices', 'secupress_does_not_work_on_playground' );
 /* :) */
 function secupress_does_not_work_on_playground() {
@@ -33,8 +48,7 @@ function secupress_does_not_work_on_playground() {
 	if ( ! $secupress_is_playground ) {
 		return;
 	}
-	$server_name = isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'this host';
-	printf( '<div class="error"><p><strong>SecuPress</strong> does not work on <code>%s</code>.<br>Use <a href="https://demo.tastewp.com/secupress/">https://demo.tastewp.com/secupress/</a> to test the Free Version.<br>You can also <a href="https://secupress.me/pricing/">purchase a Pro Version</a> to test it (we refund during 14 days).</p></div>', esc_html( $server_name ) ); // DO NOT TRANSLATE
+	echo '<div class="error"><p><strong>SecuPress</strong> does not work on WordPress Playground.<br>Use <a href="https://demo.tastewp.com/secupress/">https://demo.tastewp.com/secupress/</a> to test the Free Version.<br>You can also <a href="https://secupress.me/pricing/">purchase a Pro Version</a> to test it (we refund during 14 days).</p></div>'; // DO NOT TRANSLATE
 }
 if ( $secupress_is_playground ) {
 	return; // DO NOT LOAD SECUPRESS
@@ -63,6 +77,11 @@ define( 'SECUPRESS_USER_PROTECTION'       , 'secupress_user_protection' );
 define( 'SECUPRESS_SAME_EMAIL_DOMAIN_OK'  , 'secupress_same_email_domain_ok' );
 define( 'SECUPRESS_WHITE_IP'              , 'secupress_whitelist_ip' );
 define( 'SECUPRESS_ATTACKS'               , 'secupress_attacks_log' );
+define( 'SECUPRESS_FIREWALL_LEARNING'     , 'secupress_firewall_learning' );
+define( 'SECUPRESS_FIREWALL_LEARNING_HITS', 'secupress_firewall_learning_hits' );
+define( 'SECUPRESS_FIREWALL_LEARNING_PLUGINS', 'secupress_firewall_learning_plugins' );
+define( 'SECUPRESS_FIREWALL_LEARNING_NG'  , 'secupress_firewall_learning_ng' );
+define( 'SECUPRESS_FIREWALL_NG_EXCEPTIONS', 'secupress_firewall_ng_exceptions' );
 define( 'SECUPRESS_BAD_THEMES'            , 'secupress_bad_themes__vuln' );
 define( 'SECUPRESS_OLD_THEMES'            , 'secupress_bad_themes__old' );
 define( 'SECUPRESS_CLOSED_THEMES'         , 'secupress_bad_themes__closed' );
@@ -288,7 +307,7 @@ function secupress_load_plugins() {
 		secupress_delete_site_transient( 'secupress_pro_activation' );
 
 		/**
-		 * Fires once SecuPress Pro is activated, after the SecuPress's plugins are loaded.
+		 * Fires once SecuPress is activated, after the SecuPress's plugins are loaded.
 		 *
 		 * @since 1.1.4
 		 * @see `secupress_pro_activation()`
@@ -298,7 +317,7 @@ function secupress_load_plugins() {
 
 	if ( $has_activation ) {
 		/**
-		 * Fires once SecuPress or SecuPress Pro is activated, after the SecuPress's plugins are loaded.
+		 * Fires once SecuPress or SecuPress is activated, after the SecuPress's plugins are loaded.
 		 *
 		 * @since 1.1.4
 		 */

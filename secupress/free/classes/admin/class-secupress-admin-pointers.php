@@ -153,7 +153,10 @@ final class SecuPress_Admin_Pointers {
 					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
 				],
 			],			
-			[
+		];
+
+		if ( secupress_has_pro() ) {
+			$pointers[] = [
 				'id'       => 'sp27_backups',
 				'selector' => '.secupress-setting-row_backups-storage_password',
 				'url'      => secupress_admin_url( 'modules', 'backups' ) . '#row-backups-storage_password',
@@ -166,8 +169,8 @@ final class SecuPress_Admin_Pointers {
 					'pointerClass' => 'wp-pointer arrow-bottom',
 					'pointerWidth' => (int) _x( '400', 'pointerWidth', 'secupress' ),
 				],
-			],
-		];
+			];
+		}
 
 		if ( secupress_is_expert_mode() ) {
 			$pointers[] = [
@@ -261,7 +264,8 @@ final class SecuPress_Admin_Pointers {
 		if ( self::is_tour_dismissed() ) {
 			return secupress_admin_url( 'modules' );
 		}
-		$first = reset( self::get_tour_remaining_steps() );
+		$steps = self::get_tour_remaining_steps();
+		$first = reset( $steps );
 		return add_query_arg(
 			[
 				'secupress_pointer_tour' => 1,

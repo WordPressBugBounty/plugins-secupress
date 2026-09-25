@@ -132,7 +132,8 @@ function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 
 	<title><?php echo $title; ?></title>
 	<style>
 		.secupress-notice.has-plugin-title {margin-bottom: 33px !important; position: relative; }
-		.secupress-notice label.plugin-title {background: rgba(0, 0, 0, 0.3); color: #fff; padding: 2px 10px; position: absolute; top: 100%; border-top: 2px solid rgba(0, 0, 0, 0.1); border-radius: 0px 0px 2px 2px; }
+		.secupress-notice label.plugin-title {background: #00B0B9; color: #072B31; padding: 0px 4px; position: absolute; top: 100%; border-radius: 4px; margin-top: -0.45rem; font-size: smaller; }
+		.secupress-notice.has-plugin-title.secupress-pro label.plugin-title {background: #FFB81C; color: #382700; }
 	</style>
 	<?php
 	wp_enqueue_style( 'login' );
@@ -261,6 +262,7 @@ function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 
 			$plugin_name = SECUPRESS_PLUGIN_NAME . ( secupress_has_pro() && ! secupress_is_white_label() ? ' Pro' : '' );
 			$label       = ! secupress_show_contextual_help() ? '' : '<label class="plugin-title">' . esc_html( $plugin_name ) . '</label>';
 			$lab_class   = ! secupress_show_contextual_help() ? '' : 'secupress-notice has-plugin-title';
+			$lab_class  .= $lab_class && secupress_has_pro() && ! secupress_is_white_label() ? ' secupress-pro' : '';
 
 			wp_admin_notice(
 				$messages . $label,

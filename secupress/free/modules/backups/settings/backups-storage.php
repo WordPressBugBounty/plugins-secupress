@@ -29,7 +29,7 @@ if ( $outside_web ) {
 
 	$fallback_reason = function_exists( 'secupress_get_parent_backups_fallback_reason' ) ? secupress_get_parent_backups_fallback_reason() : '';
 	if ( 'open_basedir' === $fallback_reason ) {
-		$warning_local .= ' ' . __( 'The PHP open_basedir restriction prevents storing backups outside the web root.', 'secupress' );
+		$warning_local .= ' ' . __( 'Your server configuration prevents storing backups in a secure location.', 'secupress' );
 	} elseif ( 'not_writable' === $fallback_reason ) {
 		$warning_local .= ' ' . __( 'The parent folder is not writable.', 'secupress' );
 	}

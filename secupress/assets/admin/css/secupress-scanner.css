@@ -104,91 +104,108 @@
 	position: relative;
 }
 .secupress-scanner-steps ol {
-	margin: 4em 85px 1em;
+	overflow: visible;
+	margin: 1.25em 0 1em;
 }
 .secupress-scanner-steps li {
-	padding: 0;
+	position: relative;
+	z-index: 1;
+	flex: 1 1 0%;
+	width: auto;
+	max-width: none;
+	height: 34px;
+	margin: 0;
+	padding: 0 20px 0 14px;
+	background: #c8cdd4b8;
+	color: #23282d;
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+	clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+}
+.secupress-scanner-steps li:nth-child(1) {
+	z-index: 4;
+	border-radius: 17px 0 0 17px;
+}
+.secupress-scanner-steps li + li {
+	padding-left: 24px;
+	clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%);
+}
+.secupress-scanner-steps li:nth-child(2) {
+	z-index: 3;
+}
+.secupress-scanner-steps li:nth-child(3) {
+	z-index: 2;
 }
 .secupress-scanner-steps li:before {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-shrink: 0;
-	width: 32px;
-	height: 32px;
-	border: 2px solid #5A626F;
-	font-size: 16px;
-	font-weight: bold;
-	color: #5A626F;
+	width: 20px;
+	height: 20px;
+	margin-right: 6px;
+	border: 0;
 	border-radius: 50%;
-}
-.secupress-scanner-steps .secupress-past:before,
-.secupress-scanner-steps .secupress-current:before {
-	border-color: #F1C40F;
-	color: #F1C40F;
-}
-.secupress-step-name {
-	display: none;
-	flex-shrink: 0;
-	padding: 0 12px;
+	background: #23282d;
+	font-size: 11px;
 	font-weight: 600;
-	color: #F1C40F;
-}
-li.secupress-current .secupress-step-name {
-	display: block;
-}
-.secupress-not-scanned-yet .secupress-current .secupress-step-name {
-	display: none;
+	line-height: 1;
+	color: #fff;
 }
 .secupress-scanner-steps li:after {
-	content: "";
-	height: 2px;
-	flex-grow: 1;
-	flex-basis: 100%;
-	background: #5A626F;
+	display: none;
 }
-.secupress-scanner-steps li.secupress-past:after {
+.secupress-scanner-steps li:last-child {
+	padding-right: 14px;
+	border-radius: 0 17px 17px 0;
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 12px 50%);
+}
+.secupress-scanner-steps .secupress-past,
+.secupress-scanner-steps .secupress-current {
 	background: #F1C40F;
+	color: #23282d;
 }
-
-/* The third step */
+.secupress-scanner-steps .secupress-past:before {
+	background: #23282d;
+	color: #fff;
+}
+.secupress-scanner-steps .secupress-current:before {
+	width: 22px;
+	height: 22px;
+	background: #fff;
+	color: #23282d;
+	font-size: 12px;
+	font-weight: 700;
+	box-shadow: 0 0 0 2px #23282d;
+}
+.secupress-step-name {
+	display: block;
+	flex-shrink: 1;
+	min-width: 0;
+	padding: 0;
+	overflow: hidden;
+	font-weight: 500;
+	font-size: 13px;
+	color: inherit;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
 .secupress-scanner-steps .secupress-step-name.alt {
 	display: none;
-	order: 2;
 }
-.secupress-scanner-steps .secupress-past .secupress-step-name.alt {
-	display: block;
-}
-
-/* The fourth step */
-.secupress-scanner-steps li:nth-last-child(1) {
-	flex-basis: auto;
-	width: auto;
-}
-.secupress-scanner-steps li:nth-last-child(1):after {
-	display: none;
-}
-li.secupress-current:nth-last-child(1) .secupress-step-name {
-	position: absolute;
-	width: 1px; height: 1px;
-	clip: rect(1px, 1px, 1px, 1px);
-	overflow: hidden;
-}
-
-/* Arrow below current step */
-.secupress-scanner-steps .secupress-current .secupress-step-name {
-	position: relative;
-}
-.secupress-scanner-steps .secupress-current .secupress-step-name:after {
-	content: "";
-	position: absolute;
-	bottom: -50px; left: -44px;
-	border-bottom: 22px solid #F2F2F6;
-	border-left: 27px solid transparent;
-	border-right: 27px solid transparent;
-}
-.secupress-not-scanned-yet .secupress-scanner-steps .secupress-step-name:after {
-	display: none;
+@media (max-width: 782px) {
+	.secupress-scanner-steps .secupress-step-name {
+		display: none;
+	}
+	.secupress-scanner-steps li {
+		justify-content: center;
+		padding: 0 16px 0 12px;
+	}
+	.secupress-scanner-steps li + li {
+		padding-left: 20px;
+	}
+	.secupress-scanner-steps li:last-child {
+		padding-right: 12px;
+	}
 }
 
 /**
@@ -1129,7 +1146,16 @@ a + .secupress-row-actions {
 .secupress-group-new .secupress-sgh-title {
 	color: #FFF;
 }
-
+.secupress-lb-title sup {
+	font-size: 0.95rem;
+	color: #072B31;
+    background-color: #FFB81C;
+    padding: 1px 3px;
+    border-radius: 4px;
+	margin-left: 2px;
+	text-wrap-mode: nowrap;
+	font-weight: 600;
+}
 .secupress-sgh-actions button {
 	margin-left: 20px;
 	padding: 0 26px;

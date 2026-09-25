@@ -181,8 +181,10 @@ body #wpbody .secupress-setting-row.secupress-pro-row p {
     border: 0;
 }
 
-.secupress-scanner-steps .secupress-current .secupress-step-name:after {
-    border-bottom: 22px solid #bbc8d4;
+.secupress-scanner-steps .secupress-past,
+.secupress-scanner-steps .secupress-current {
+    background: #30ceff;
+    color: #191f25;
 }
 
 .secupress-item-details {
@@ -305,22 +307,21 @@ body #wpbody p.secupress-sgh-title {
     color: #30ceff;
 }
 
-.secupress-scanner-steps .secupress-past:before, .secupress-scanner-steps .secupress-current:before {
-    border-color: #30ceff;
-    color: #30ceff;
+.secupress-scanner-steps li {
+    background: #50626f;
+    color: #bbc8d4;
 }
 
-.secupress-step-name {
-    color: #30ceff;
+.secupress-scanner-steps li:before,
+.secupress-scanner-steps .secupress-past:before {
+    background: #191f25;
+    color: #fff;
 }
 
-scanner-steps .secupress-past:before, .secupress-scanner-steps .secupress-current:before {
-    border-color: #30ceff;
-    color: #30ceff;
-}
-
-.secupress-scanner-steps li.secupress-past:after {
-    background: #30ceff;
+.secupress-scanner-steps .secupress-current:before {
+    background: #fff;
+    color: #191f25;
+    box-shadow: 0 0 0 2px #191f25;
 }
 
 .secupress-progress-val-txt {

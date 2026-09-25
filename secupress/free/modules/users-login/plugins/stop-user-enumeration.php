@@ -75,6 +75,7 @@ add_filter( 'rest_request_before_callbacks', 'secupress_stop_user_enumeration_re
 /**
  * Block the users endpoints for REST API
  *
+ * @since 2.7 Allow the users route from the editor (edit and new), except pages
  * @since 2.7 Match the REST route, language URL prefixes like /fr/ are ignored
  * @since 2.3.12 Let "/me/" being read
  * @since 2.2.6 Remove home_url() from strpos()
@@ -95,6 +96,14 @@ function secupress_stop_user_enumeration_rest( $response, $handler, $request ) {
 		return $response;
 	}
 
+	if ( is_singular() && current_user_can( 'edit_post', get_the_ID() ) ) {
+		return $response;
+	}
+
+	if ( secupress_stop_user_enumeration_is_admin_editor() ) {
+		return $response;
+	}
+
 	$users_base = Secupress_WP_REST_Users_Controller::get_rest_base();
 	$route      = trim( $request->get_route(), '/' );
 
@@ -111,6 +120,72 @@ function secupress_stop_user_enumeration_rest( $response, $handler, $request ) {
 		'message' => __( 'Something went wrong.', 'secupress' ),
 		'data'    => [ 'status' => 401 ],
 	], 401 );
+}
+
+
+/**
+ * Whether this request comes from the editor for any post type except pages.
+ *
+ * A direct admin load is read from $pagenow. Block editor REST calls keep that screen in the referer.
+ *
+ * @since 2.7
+ * @author Julio Potier
+ *
+ * @return (bool)
+ */
+function secupress_stop_user_enumeration_is_admin_editor() {
+	$post_id   = 0;
+	$post_type = '';
+	$editing   = false;
+	$creating  = false;
+
+	if ( is_admin() ) {
+		global $pagenow;
+
+		if ( 'post.php' === $pagenow ) {
+			$editing = true;
+			$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : 0;
+		} elseif ( 'post-new.php' === $pagenow ) {
+			$creating  = true;
+			$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : 'post';
+		}
+	}
+
+	if ( ! $editing && ! $creating ) {
+		$referer = wp_get_referer();
+		if ( ! $referer ) {
+			return false;
+		}
+
+		$parts = wp_parse_url( $referer );
+		$path  = isset( $parts['path'] ) ? untrailingslashit( $parts['path'] ) : '';
+		$query = [];
+		if ( ! empty( $parts['query'] ) ) {
+			parse_str( $parts['query'], $query );
+		}
+
+		$edit_path = untrailingslashit( (string) wp_parse_url( admin_url( 'post.php' ), PHP_URL_PATH ) );
+		$new_path  = untrailingslashit( (string) wp_parse_url( admin_url( 'post-new.php' ), PHP_URL_PATH ) );
+
+		if ( $path === $edit_path && isset( $query['action'] ) && 'edit' === $query['action'] ) {
+			$editing = true;
+			$post_id = isset( $query['post'] ) ? (int) $query['post'] : 0;
+		} elseif ( $path === $new_path ) {
+			$creating  = true;
+			$post_type = isset( $query['post_type'] ) ? sanitize_key( $query['post_type'] ) : 'post';
+		}
+	}
+	if ( $editing && $post_id ) {
+		$post = get_post( $post_id );
+		return $post && 'page' !== $post->post_type && current_user_can( 'edit_post', $post_id );
+	}
+
+	if ( $creating && $post_type && 'page' !== $post_type ) {
+		$post_type_object = get_post_type_object( $post_type );
+		return $post_type_object && current_user_can( $post_type_object->cap->create_posts );
+	}
+	
+	return false;
 }
 
 

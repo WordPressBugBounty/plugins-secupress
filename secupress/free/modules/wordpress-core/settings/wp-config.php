@@ -10,7 +10,7 @@ $is_after_save  = remove_query_arg( 'settings-updated', secupress_get_current_ur
 $mu_is_writable = wp_is_writable( WPMU_PLUGIN_DIR );
 $mu_description = '';
 if ( ! $mu_is_writable ) {
-	$mu_description = sprintf( __( 'The directory %s is not writable or does not exists, so the constant cannot be modified.', 'secupress' ), secupress_code_me( esc_html( WPMU_PLUGIN_DIR ) ) );
+	$mu_description = sprintf( __( 'The directory %s is not writable or does not exists, so the configuration file cannot be modified.', 'secupress' ), secupress_code_me( esc_html( WPMU_PLUGIN_DIR ) ) );
 }
 
 $description = '';
@@ -19,8 +19,9 @@ if ( ! $is_writable ) {
 }
 
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-script-concat' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'CONCATENATE_SCRIPTS' ) && ! CONCATENATE_SCRIPTS && ! secupress_marker_exists_in_wpconfig( 'script_concat' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-script-concat', 'script_concat' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'CONCATENATE_SCRIPTS' ) && ! CONCATENATE_SCRIPTS && ! secupress_marker_exists_in_wpconfig( 'script_concat' ) );
 $this->add_field( array(
 	'title'             => __( 'Scripts Concatenation', 'secupress' ),
 	'description'       => __( 'Prevent scripts and styles concatenation in admin area to prevent a Deny of Service (DoS)', 'secupress' ),
@@ -39,11 +40,16 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-skip-bundle' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'CORE_UPGRADE_SKIP_NEW_BUNDLED' ) && CORE_UPGRADE_SKIP_NEW_BUNDLED && ! secupress_marker_exists_in_wpconfig( 'skip_bundle' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-skip-bundle', 'skip_bundle' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'CORE_UPGRADE_SKIP_NEW_BUNDLED' ) && CORE_UPGRADE_SKIP_NEW_BUNDLED && ! secupress_marker_exists_in_wpconfig( 'skip_bundle' ) );
 $this->add_field( array(
 	'title'             => __( 'Skip New Bundles', 'secupress' ),
 	'description'       => __( 'Every time WordPress upgrades itself, it downloads the new <em>twentytheme-à-la-mode</em>', 'secupress' ),
@@ -62,11 +68,16 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-debugging' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_DEBUG' ) && ! WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && ! WP_DEBUG_DISPLAY && ! secupress_marker_exists_in_wpconfig( 'debugging' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-debugging', 'debugging' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_DEBUG' ) && ! WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && ! WP_DEBUG_DISPLAY && ! secupress_marker_exists_in_wpconfig( 'debugging' ) );
 $this->add_field( array(
 	'title'             => __( 'Debugging', 'secupress' ),
 	'description'       => __( 'In a standard production environment you should prevent errors from being displayed.', 'secupress' ),
@@ -85,12 +96,17 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-locations' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'RELOCATE' ) && ! RELOCATE && defined( 'WP_SITEURL' ) && get_site_url() === WP_SITEURL && defined( 'WP_HOME' ) && get_home_url() === WP_HOME && ! secupress_marker_exists_in_wpconfig( 'locations' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-locations', 'locations' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'RELOCATE' ) && ! RELOCATE && defined( 'WP_SITEURL' ) && get_site_url() === WP_SITEURL && defined( 'WP_HOME' ) && get_home_url() === WP_HOME && ! secupress_marker_exists_in_wpconfig( 'locations' ) );
 $this->add_field( array(
 	'title'             => __( 'Locations', 'secupress' ),
 	'description'       => __( 'In a standard production environment there is no need to relocate your site and home URLs.', 'secupress' ),
@@ -109,11 +125,16 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-file-edit' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT && ! secupress_marker_exists_in_wpconfig( 'file_edit' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-file-edit', 'file_edit' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT && ! secupress_marker_exists_in_wpconfig( 'file_edit' ) );
 $this->add_field( array(
 	'title'             => __( 'File editing', 'secupress' ),
 	'description'       => __( 'Nobody (not even administrators) should have the ability to edit plugin and theme files directly within the WordPress administration area.', 'secupress' ),
@@ -132,12 +153,17 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-unfiltered-uploads' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'ALLOW_UNFILTERED_UPLOADS' ) && ! ALLOW_UNFILTERED_UPLOADS && ! secupress_marker_exists_in_wpconfig( 'unfiltered_uploads' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-unfiltered-uploads', 'unfiltered_uploads' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'ALLOW_UNFILTERED_UPLOADS' ) && ! ALLOW_UNFILTERED_UPLOADS && ! secupress_marker_exists_in_wpconfig( 'unfiltered_uploads' ) );
 $this->add_field( array(
 	'title'             => __( 'Unfiltered Uploads', 'secupress' ),
 	'description'       => __( 'Nobody (not even administrators) should be allowed to upload any type of file.', 'secupress' ),
@@ -156,12 +182,17 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-dieondberror' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DIEONDBERROR' ) && ! DIEONDBERROR && ! secupress_marker_exists_in_wpconfig( 'dieondberror' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-dieondberror', 'dieondberror' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'DIEONDBERROR' ) && ! DIEONDBERROR && ! secupress_marker_exists_in_wpconfig( 'dieondberror' ) );
 $this->add_field( array(
 	'title'             => __( 'Database Errors', 'secupress' ),
 	'description'       => __( 'Database errors shouldn’t be displayed on front-office to prevent attackers from accessing your database hostname, prefix, or table names.', 'secupress' ),
@@ -180,12 +211,17 @@ $this->add_field( array(
 			'type'        => 'warning',
 			'description' => $description,
 		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
+		),
 	),
 ) );
 
 
-$active   = (int) secupress_is_submodule_active( 'wordpress-core', 'wp-config-constant-repair' );
-$disabled = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_ALLOW_REPAIR' ) && ! WP_ALLOW_REPAIR && ! secupress_marker_exists_in_wpconfig( 'repair' ) );
+$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'wordpress-core', 'wp-config-constant-repair', 'repair' );
+$active      = $wpconfig_ui['active'];
+$disabled    = ! $is_writable || ( ! $is_after_save && ! $active && defined( 'WP_ALLOW_REPAIR' ) && ! WP_ALLOW_REPAIR && ! secupress_marker_exists_in_wpconfig( 'repair' ) );
 $this->add_field( array(
 	'title'             => __( 'Repairing Database', 'secupress' ),
 	'description'       => __( 'In a standard production environment, your repair page should not be accessible.', 'secupress' ),
@@ -203,6 +239,10 @@ $this->add_field( array(
 		array(
 			'type'        => 'warning',
 			'description' => $description,
+		),
+		array(
+			'type'        => 'force-warning',
+			'description' => $wpconfig_ui['warning'],
 		),
 	),
 ) );

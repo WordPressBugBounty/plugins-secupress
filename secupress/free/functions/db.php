@@ -106,13 +106,13 @@ function secupress_change_db_prefix( $new_prefix, $tables ) {
 	}
 
 	// $table_prefix = 'foobar';
-	secupress_replace_content(
+	secupress_replace_wpconfig_table_prefix(
 		$wpconfig_filepath,
 		'@^[\t ]*?\$table_prefix\s*=\s*(?:\'' . $old_prefix . '\'|"' . $old_prefix . '")\s*;.*?$@mU',
 		'$table_prefix = \'' . $new_prefix . "'; // Modified by SecuPress.\n/** Commented by SecuPress. */ // $0"
 	);
 	// $GLOBALS['table_prefix'] = 'foobar';
-	secupress_replace_content(
+	secupress_replace_wpconfig_table_prefix(
 		$wpconfig_filepath,
 		'@^[\t ]*?\$GLOBALS\[\'table_prefix\']\s*=\s*(?:\'' . $old_prefix . '\'|"' . $old_prefix . '")\s*;.*?$@mU',
 		'$GLOBALS[\'table_prefix\'] = \'' . $new_prefix . "'; // Modified by SecuPress.\n/** Commented by SecuPress. */ // $0"
@@ -124,6 +124,31 @@ function secupress_change_db_prefix( $new_prefix, $tables ) {
 	secupress_scanit( 'DB_Prefix' );
 
 	return $new_prefix;
+}
+
+/**
+ * Replace the table prefix in wp-config.php after the database has already been renamed.
+ * A sandbox network failure is not a reason to leave the file on the old prefix.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @param (string) $file        wp-config.php path.
+ * @param (string) $pattern     preg_replace pattern.
+ * @param (string) $replacement preg_replace replacement.
+ *
+ * @return (bool)
+ */
+function secupress_replace_wpconfig_table_prefix( $file, $pattern, $replacement ) {
+	secupress_wpconfig_sandbox_error( null, true );
+	$replaced = secupress_replace_content( $file, $pattern, $replacement );
+	if ( $replaced ) {
+		return true;
+	}
+	if ( is_wp_error( secupress_wpconfig_sandbox_error() ) ) {
+		return secupress_replace_content( $file, $pattern, $replacement, true );
+	}
+	return false;
 }
 
 /**

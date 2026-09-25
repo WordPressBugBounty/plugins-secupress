@@ -1222,3 +1222,215 @@ function secupress_search_ajax_cb() {
 
 	wp_send_json_success( $results );
 }
+
+/** --------------------------------------------------------------------------------------------- */
+/** FIREWALL LEARNING MODE ====================================================================== */
+/** --------------------------------------------------------------------------------------------- */
+
+add_action( 'admin_post_secupress-learning-start', 'secupress_learning_start_admin_post_cb' );
+/**
+ * Start Firewall Learning Mode.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_start_admin_post_cb() {
+	secupress_check_admin_referer( 'secupress-learning-start' );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	if ( secupress_firewall_learning_is_running() ) {
+		secupress_admin_send_message_die( [
+			'message'     => __( 'Learning Mode is already running.', 'secupress' ),
+			'code'        => 'learning_already_running',
+			'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+		] );
+	}
+
+	$trigger  = 'manual';
+	if ( isset( $_REQUEST['trigger'] ) ) {
+		$sent = sanitize_key( wp_unslash( $_REQUEST['trigger'] ) );
+		if ( in_array( $sent, [ 'plugin', 'core' ], true ) ) {
+			$trigger = $sent;
+		}
+	}
+	$default  = 'manual' === $trigger ? 7 : 2;
+	$duration = isset( $_REQUEST['duration'] ) ? secupress_firewall_learning_sanitize_duration( $_REQUEST['duration'] ) : $default;
+
+	if ( ! secupress_firewall_learning_start( $duration, $trigger ) ) {
+		secupress_admin_send_message_die( [
+			'message'     => sprintf(
+				/* translators: %s: firewall pack name (e.g. 8G) */
+				__( 'Learning Mode is available when %s signatures are enabled.', 'secupress' ),
+				secupress_firewall_ng_name()
+			),
+			'code'        => 'learning_ng_only',
+			'type'        => 'error',
+			'redirect_to' => secupress_admin_url( 'modules', 'firewall' ),
+		] );
+	}
+	secupress_firewall_learning_clear_proposals();
+	secupress_dismiss_notice( 'firewall-learning-mode-intro' );
+
+	secupress_admin_send_message_die( [
+		'message'     => sprintf(
+			/* translators: %s: number of days */
+			_n( 'Learning Mode started for %s day.', 'Learning Mode started for %s days.', $duration, 'secupress' ),
+			number_format_i18n( $duration )
+		),
+		'code'        => 'learning_started',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}
+
+add_action( 'admin_post_secupress-learning-finish', 'secupress_learning_finish_admin_post_cb' );
+/**
+ * Finish Learning Mode now (auto-allow + review).
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_finish_admin_post_cb() {
+	secupress_check_admin_referer( 'secupress-learning-finish' );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	secupress_firewall_learning_end( true, false, false );
+
+	secupress_admin_send_message_die( [
+		'message'     => __( 'Learning Mode finished. Remaining signatures will be blocked unless you allow them.', 'secupress' ),
+		'code'        => 'learning_finished',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}
+
+add_action( 'admin_post_secupress-learning-skip', 'secupress_learning_skip_admin_post_cb' );
+/**
+ * Skip Learning Mode and block everything.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_skip_admin_post_cb() {
+	secupress_check_admin_referer( 'secupress-learning-skip' );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	secupress_firewall_learning_end( false, true );
+
+	secupress_admin_send_message_die( [
+		'message'     => __( 'Learning Mode skipped. All observed signatures will be blocked.', 'secupress' ),
+		'code'        => 'learning_skipped',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}
+
+add_action( 'admin_post_secupress-learning-extend', 'secupress_learning_extend_admin_post_cb' );
+/**
+ * Extend a running Learning Mode period.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_extend_admin_post_cb() {
+	secupress_check_admin_referer( 'secupress-learning-extend' );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	$trigger = '';
+	if ( isset( $_REQUEST['trigger'] ) ) {
+		$sent = sanitize_key( wp_unslash( $_REQUEST['trigger'] ) );
+		if ( in_array( $sent, [ 'plugin', 'core' ], true ) ) {
+			$trigger = $sent;
+		}
+	}
+	$default  = $trigger ? 2 : 3;
+	$duration = isset( $_REQUEST['duration'] ) ? secupress_firewall_learning_sanitize_duration( wp_unslash( $_REQUEST['duration'] ) ) : $default;
+	$ok       = secupress_firewall_learning_extend( $duration );
+	if ( $ok && $trigger ) {
+		secupress_firewall_learning_accept_proposal( $trigger );
+	}
+
+	secupress_admin_send_message_die( [
+		'message'     => $ok
+			? sprintf(
+				/* translators: %s: number of days */
+				_n( 'Learning Mode extended by %s day.', 'Learning Mode extended by %s days.', $duration, 'secupress' ),
+				number_format_i18n( $duration )
+			)
+			: __( 'Learning Mode could not be extended (14 days maximum from the start).', 'secupress' ),
+		'code'        => $ok ? 'learning_extended' : 'learning_extend_failed',
+		'type'        => $ok ? 'success' : 'error',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}
+
+add_action( 'admin_post_secupress-learning-allow-site', 'secupress_learning_allow_site_admin_post_cb' );
+/**
+ * Allow a NG signature for the whole site.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_allow_site_admin_post_cb() {
+	$hash = isset( $_REQUEST['hash'] ) ? sanitize_key( wp_unslash( $_REQUEST['hash'] ) ) : '';
+	secupress_check_admin_referer( 'secupress-learning-allow-site_' . $hash );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	$ok = secupress_firewall_learning_apply_decision( $hash, 'allow_site' );
+
+	secupress_admin_send_message_die( [
+		'message'     => $ok ? __( 'Signature allowed for this site.', 'secupress' ) : __( 'This signature could not be updated.', 'secupress' ),
+		'code'        => $ok ? 'learning_allow_site' : 'learning_allow_site_failed',
+		'type'        => $ok ? 'success' : 'error',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}
+
+add_action( 'admin_post_secupress-learning-allow-uri', 'secupress_learning_allow_uri_admin_post_cb' );
+/**
+ * Allow a NG signature only for a URL prefix.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_allow_uri_admin_post_cb() {
+	$hash = isset( $_REQUEST['hash'] ) ? sanitize_key( wp_unslash( $_REQUEST['hash'] ) ) : '';
+	$uri  = isset( $_REQUEST['uri'] ) ? wp_unslash( $_REQUEST['uri'] ) : '';
+	secupress_check_admin_referer( 'secupress-learning-allow-uri_' . $hash );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	$ok = secupress_firewall_learning_apply_decision( $hash, 'allow_uri', $uri );
+
+	secupress_admin_send_message_die( [
+		'message'     => $ok ? __( 'Signature allowed for this URL.', 'secupress' ) : __( 'This signature could not be updated. Check the URL prefix.', 'secupress' ),
+		'code'        => $ok ? 'learning_allow_uri' : 'learning_allow_uri_failed',
+		'type'        => $ok ? 'success' : 'error',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}
+
+add_action( 'admin_post_secupress-learning-keep-block', 'secupress_learning_keep_block_admin_post_cb' );
+/**
+ * Keep blocking a NG signature, including during Learning Mode.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_learning_keep_block_admin_post_cb() {
+	$hash = isset( $_REQUEST['hash'] ) ? sanitize_key( wp_unslash( $_REQUEST['hash'] ) ) : '';
+	secupress_check_admin_referer( 'secupress-learning-keep-block_' . $hash );
+	secupress_check_user_capability();
+	secupress_firewall_learning_require_expert();
+
+	$ok = secupress_firewall_learning_apply_decision( $hash, 'force_enforce' );
+
+	secupress_admin_send_message_die( [
+		'message'     => $ok ? __( 'This signature will stay blocked.', 'secupress' ) : __( 'This signature could not be updated.', 'secupress' ),
+		'code'        => $ok ? 'learning_keep_block' : 'learning_keep_block_failed',
+		'type'        => $ok ? 'success' : 'error',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '#row-learning-mode_learning',
+	] );
+}

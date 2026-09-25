@@ -9,6 +9,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  * @author Julio Potier
  */
 function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false ) {
+	secupress_wpconfig_sandbox_error( null, true );
 
 	$constants         = secupress_get_constants_from_marker( $marker );
 	$wpconfig_filepath = secupress_is_wpconfig_writable();
@@ -44,16 +45,21 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 	}
 
 	if ( ! empty( $error ) ) {
-		$messages  = '';
-		foreach( $error as $i => $err ) {
-			$messages .= sprintf(
-				/** Translators: 1 is a constant name, 2 is a file name, 4 and 5 are a small parts of code. */
-				__( 'Cannot change the value of the constant %1$s in the %2$s file. Please edit it and replace the lines that states: %3$s by: %4$s', 'secupress' ),
-				secupress_code_me( $const_err[ $i ] ),
-				secupress_code_me( esc_html( $wpconfig_filename ) ),
-				secupress_code_me( $err ),
-				secupress_tag_me( $new_define[ $i ], 'pre' )
-			);
+		$messages        = '';
+		$sandbox_message = secupress_get_wpconfig_sandbox_error_message( $wpconfig_filename );
+		if ( $sandbox_message ) {
+			$messages = $sandbox_message;
+		} else {
+			foreach( $error as $i => $err ) {
+				$messages .= sprintf(
+					/** Translators: 1 is a constant name, 2 is a file name, 4 and 5 are a small parts of code. */
+					__( 'Cannot change the value of the constant %1$s in the %2$s file. Please edit it and replace the lines that states: %3$s by: %4$s', 'secupress' ),
+					secupress_code_me( $const_err[ $i ] ),
+					secupress_code_me( esc_html( $wpconfig_filename ) ),
+					secupress_code_me( $err ),
+					secupress_tag_me( $new_define[ $i ], 'pre' )
+				);
+			}
 		}
 		secupress_add_settings_error( 'general', 'constant_not_removed', $messages, 'error' );
 	}
@@ -78,10 +84,15 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 /**
  * On module deactivation, maybe set the constant back.
  *
+ * @since 2.7.1 Skip the sandbox before touching the file, and keep the module active if the write fails.
  * @since 2.0
  * @author Julio Potier
+ *
+ * @return (bool)
  */
 function secupress_wpconfig_modules_deactivation( $marker ) {
+	secupress_wpconfig_sandbox_error( null, true );
+
 	$constants = secupress_get_constants_from_marker( $marker );
 	if ( ! $constants ) {
 		wp_die( 'Missing or incorrect marker' ); // Do not translate.
@@ -90,11 +101,12 @@ function secupress_wpconfig_modules_deactivation( $marker ) {
 	$wpconfig_filepath = secupress_is_wpconfig_writable();
 	$wpconfig_filename = secupress_get_wpconfig_filename();
 
-	foreach ( $constants as $constant => $correct_value ) {
-		secupress_uncomment_constant( $constant, $wpconfig_filepath );
-	}
 	if ( ! defined( 'SECUPRESS_NO_SANDBOX' ) ) {
 		define( 'SECUPRESS_NO_SANDBOX', true );
+	}
+
+	foreach ( $constants as $constant => $correct_value ) {
+		secupress_uncomment_constant( $constant, $wpconfig_filepath );
 	}
 	if ( ! secupress_comment_constant( 'secupress_dummy_foobar', $wpconfig_filepath, $marker ) ) {
 		$new_define = [];
@@ -104,16 +116,64 @@ function secupress_wpconfig_modules_deactivation( $marker ) {
 				$new_define[] = $line;
 			}
 		}
-		$message = sprintf(
-			/** Translators: 1 is a constant name, 2 is a file name, 3 is a small part of code. */
-			__( 'Cannot remove the constant %1$s from the %2$s file. Please edit it and remove the following lines: %3$s', 'secupress' ),
-			'<code>' . implode( '</code>, <code>', array_keys( $constants ) ) . '</code>',
-			"<code>$wpconfig_filename</code>",
-			"<pre># BEGIN SecuPress $marker\n" . implode( "\n", $new_define ) . "\n# END SecuPress</pre>"
-		);
+		$sandbox_message = secupress_get_wpconfig_sandbox_error_message( $wpconfig_filename );
+		if ( $sandbox_message ) {
+			$message = $sandbox_message;
+		} else {
+			$message = sprintf(
+				/** Translators: 1 is a constant name, 2 is a file name, 3 is a small part of code. */
+				__( 'Cannot remove the constant %1$s from the %2$s file. Please edit it and remove the following lines: %3$s', 'secupress' ),
+				'<code>' . implode( '</code>, <code>', array_keys( $constants ) ) . '</code>',
+				"<code>$wpconfig_filename</code>",
+				"<pre># BEGIN SecuPress $marker\n" . implode( "\n", $new_define ) . "\n# END SecuPress</pre>"
+			);
+		}
 		secupress_add_settings_error( 'general', 'constant_not_removed', $message, 'error' );
-		return;
+		secupress_submodule_deactivation_failed( true );
+		return false;
 	}
+	return true;
+}
+
+/**
+ * Checkbox state and desync warning for a wp-config sub-module.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @param (string) $module    Module slug.
+ * @param (string) $submodule Sub-module slug.
+ * @param (string) $marker    wp-config marker name.
+ *
+ * @return (array) {
+ *     @type (int)    $active  1 if the module or the marker is present.
+ *     @type (string) $warning Desync warning, empty when in sync.
+ * }
+ */
+function secupress_get_wpconfig_setting_ui( $module, $submodule, $marker ) {
+	$is_active  = (bool) secupress_is_submodule_active( $module, $submodule );
+	$has_marker = (bool) secupress_marker_exists_in_wpconfig( $marker );
+	$warning    = '';
+	$filename   = secupress_get_wpconfig_filename();
+
+	if ( $has_marker && ! $is_active ) {
+		$warning = sprintf(
+			/** Translators: %s is a file name. */
+			__( 'This module is inactive in the database, but its block is still present in %s. Uncheck the box and save to remove it, or save with the box checked to restore the module.', 'secupress' ),
+			secupress_code_me( $filename )
+		);
+	} elseif ( $is_active && ! $has_marker ) {
+		$warning = sprintf(
+			/** Translators: %s is a file name. */
+			__( 'This module is active, but its block is missing from %s. Save this page to write it again.', 'secupress' ),
+			secupress_code_me( $filename )
+		);
+	}
+
+	return [
+		'active'  => (int) ( $is_active || $has_marker ),
+		'warning' => $warning,
+	];
 }
 
 

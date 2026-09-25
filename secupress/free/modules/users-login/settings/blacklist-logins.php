@@ -211,16 +211,17 @@ $this->add_field( array(
 
 
 $main_field_name  = $this->get_field_name( 'admin-email-activated' );
-$is_plugin_active = secupress_is_submodule_active( 'users-login', 'admin-email' );
+$wpconfig_ui      = secupress_get_wpconfig_setting_ui( 'users-login', 'admin-email', 'adminemail' );
 $this->add_field( array(
 	'title'             => __( 'Lock the Admin Email', 'secupress' ),
 	'description'       => __( 'Some attacks attempt to change the admin email. Lock the website’s admin email to prevent any future modifications.', 'secupress' ),
 	'label_for'         => $main_field_name,
 	'plugin_activation' => true,
 	'type'              => 'checkbox',
-	'value'             => (int) $is_plugin_active,
+	'value'             => $wpconfig_ui['active'],
 	'label'             => __( 'Yes, prevent the modification of the admin email', 'secupress' ),
 	'helpers'           => [
 							[ 'type' => 'description', 'description' => sprintf( __( 'For information, the admin email on this site is: %s', 'secupress' ), '<strong>' . esc_html( get_option( 'admin_email' ) ) . '</strong>' ), ],
+							[ 'type' => 'force-warning', 'description' => $wpconfig_ui['warning'] ],
 							]
 ) );

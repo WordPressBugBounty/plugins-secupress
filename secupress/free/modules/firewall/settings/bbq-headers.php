@@ -6,19 +6,6 @@ $this->set_current_section( 'bbq_headers' );
 $this->add_section( __( 'Bad Behaviors', 'secupress' ) );
 
 
-$main_field_name = $this->get_field_name( 'user-agents-header' );
-
-$this->add_field( array(
-	'title'             => __( 'Block Bad User Agents', 'secupress' ),
-	'label_for'         => $main_field_name,
-	'description'       => __( 'Bots often use custom headers with known bad user agents. You can block them to prevent unwanted visits.', 'secupress' ),
-	'plugin_activation' => true,
-	'type'              => 'checkbox',
-	'value'             => (int) secupress_is_submodule_active( 'firewall', 'user-agents-header' ),
-	'label'             => __( 'Yes, protect my site from bad user-agents', 'secupress' ),
-) );
-
-
 $this->add_field( array(
 	'title'             => __( 'Block Fake SEO Bots', 'secupress' ),
 	'description'       => __( 'Some servers falsely claim to be Googlebots or other reputable user agents. Detect and block them.', 'secupress' ),
@@ -31,33 +18,7 @@ $this->add_field( array(
 	'helpers'           => array(
 		array(
 			'type'        => 'warning',
-			'description' => ! secupress_check_bot_ip( true ) ? __( 'Unable to utilize this feature. Your server cannot accurately check a hostname. We apologize for the inconvenience.', 'secupress' ) : '',
-		),
-	),
-) );
-
-$main_field_name = $this->get_field_name( 'bad-referer' );
-$this->add_field( array(
-	'title'             => __( 'Block Bad Referers', 'secupress' ),
-	'description'       => __( 'You may want to restrict access to your site based on the origin of the requests.', 'secupress' ),
-	'label_for'         => $main_field_name,
-	'plugin_activation' => true,
-	'type'              => 'checkbox',
-	'value'             => (int) secupress_is_submodule_active( 'firewall', 'bad-referer' ),
-	'label'             => __( 'Yes, let me add bad referers in a list to protect my site from them', 'secupress' ),
-) );
-
-
-$this->add_field( array(
-	'title'        => __( 'Referers List', 'secupress' ),
-	'name'         => $this->get_field_name( 'bad-referer-list' ),
-	'type'         => 'textarea',
-	'depends'      => $main_field_name,
-	'attributes'   => array( 'rows' => 2 ),
-	'helpers'      => array(
-		array(
-			'type'        => 'description',
-			'description' => __( 'One URL per line.', 'secupress' ),
+			'description' => ! secupress_check_bot_ip( true ) ? __( 'This feature is unavailable because your server encountered an issue verifying the hostname. Please contact your hosting provider if the problem persists.', 'secupress' ) : '',
 		),
 	),
 ) );
@@ -74,4 +35,21 @@ $this->add_field( array(
 	'value'             => (int) secupress_is_submodule_active( 'firewall', 'block-ai' ),
 	'type'              => 'checkbox',
 	'label'             => sprintf( __( 'Yes, <strong>block</strong> %s AI Bots.', 'secupress' ), $_count_ai_bots ),
+	'helpers'      => array(
+		array(
+			'type'        => 'warning',
+			'description' => __( 'Blocking AI bots may impact your SEO, as their results now appear in search engines.', 'secupress' ),
+		),
+	),
+) );
+
+$this->add_field( array(
+	'title'             => __( 'Block 404 requests on PHP files', 'secupress' ),
+	'description'       => __( 'Allows you to redirect people who attempt to access hidden or malicious PHP files on a 404 page not found error.', 'secupress' ),
+	'label_for'         => 'bbq-url-content_ban-404-php',
+	'name'              => 'bbq-url-content_ban-404-php',
+	'plugin_activation' => true,
+	'type'              => 'checkbox',
+	'value'             => (int) secupress_is_submodule_active( 'firewall', 'ban-404-php' ),
+	'label'             => __( 'Yes, protect my site from 404 on .php files', 'secupress' ),
 ) );

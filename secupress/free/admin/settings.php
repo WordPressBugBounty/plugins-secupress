@@ -214,7 +214,7 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 			'resetDefault'         => __( 'This will reset the setting values to default for this module.', 'secupress' ),
 			'confirmPauseSecurity' => sprintf(
 				/* translators: 1 is the pause duration, 2 is the email delay, like "30 minutes" and "5 minutes". */
-				__( 'PHP modules will be paused for %1$s, then security will resume automatically. Rules already written in .htaccess or robots.txt stay in place. An email will be sent to the site administrator after %2$s.', 'secupress' ),
+				__( 'Some modules will be paused for %1$s, then security will resume automatically. Rules already written in .htaccess or robots.txt stay in place. An email will be sent to the site administrator after %2$s.', 'secupress' ),
 				human_time_diff( time(), time() + secupress_get_security_pause_duration() ),
 				human_time_diff( time(), time() + secupress_get_security_pause_email_delay() )
 			),

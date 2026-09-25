@@ -6,13 +6,20 @@ $this->set_section_description( __( 'Enforce your HTTP requests by using the sec
 $this->add_section( __( 'SSL Configuration', 'secupress' ) . ' — BETA' );
 
 if ( secupress_is_https_supported() ) {
+	$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'ssl', 'force-https', 'force_https' );
 	$this->add_field( array(
 		'title'             => __( 'Force HTTPS', 'secupress' ),
 		'label'             => __( 'Yes, force my website to be loaded over HTTPS', 'secupress' ),
 		'label_for'         => $this->get_field_name( 'force-https' ),
 		'type'              => 'checkbox',
 		'plugin_activation' => true,
-		'value'             => (int) secupress_is_submodule_active( 'ssl', 'force-https' ),
+		'value'             => $wpconfig_ui['active'],
+		'helpers'           => array(
+			array(
+				'type'        => 'force-warning',
+				'description' => $wpconfig_ui['warning'],
+			),
+		),
 	) );	
 
 	$this->add_field( array(
@@ -41,6 +48,7 @@ if ( secupress_is_https_supported() ) {
 
 } else {
 
+	$wpconfig_ui = secupress_get_wpconfig_setting_ui( 'ssl', 'force-https', 'force_https' );
 	$this->add_field( array(
 		'title'             => __( 'Force HTTPS', 'secupress' ),
 		'label'             => __( 'Yes, force my website to be loaded over HTTPS', 'secupress' ),
@@ -48,11 +56,15 @@ if ( secupress_is_https_supported() ) {
 		'type'              => 'checkbox',
 		'disabled'          => true,
 		'plugin_activation' => true,
-		'value'             => (int) secupress_is_submodule_active( 'ssl', 'force-https' ),
+		'value'             => $wpconfig_ui['active'],
 		'helpers'           => array(
 			array(
 				'type'        => 'warning',
 				'description' => __( 'Your website does NOT support HTTPS. You cannot force HTTPS.', 'secupress' ),
+			),
+			array(
+				'type'        => 'force-warning',
+				'description' => $wpconfig_ui['warning'],
 			),
 		),
 	) );

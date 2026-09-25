@@ -30,6 +30,7 @@ function secupress_block_bad_user_agents() {
 		echo 'SecuPress_Scan_Bad_User_Agent OK';
 		die();
 	}
+	
 	$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? trim( $_SERVER['HTTP_USER_AGENT'] ) : '';
 	// Empty is fine, can't harm anything.
 	if ( empty( $user_agent ) ) {
@@ -42,9 +43,9 @@ function secupress_block_bad_user_agents() {
 
 	$user_agent = preg_replace( '/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i', '', $user_agent );
 
-	if ( trim( wp_strip_all_tags( $user_agent ) ) !== trim( $user_agent ) ) {
-		secupress_block( 'UAHT', [ 'code' => 403, 'b64' => [ 'data' => $user_agent ] ] );
-	}
+	// if ( trim( wp_strip_all_tags( $user_agent ) ) !== trim( $user_agent ) ) {
+	// 	secupress_block( 'UAHT', [ 'code' => 403, 'b64' => [ 'data' => $user_agent ] ] );
+	// }
 
 	$bad_user_agents = secupress_firewall_bbq_headers_user_agents_list_default();
 

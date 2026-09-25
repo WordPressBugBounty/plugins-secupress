@@ -299,7 +299,7 @@ function secupress_attacks_render_dashboard_widget( $attacks = null ) {
     echo '</div>';
     echo '<div class="secupress-attack-all-right">';
     echo '<div class="secupress-attack-all-count">' . esc_html( $formatted_total ) . '</div>';
-    echo '<div class="secupress-attack-all-label">' . esc_html_x( 'Blocked', 'attacks', 'secupress' ) . '</div>';
+    echo '<div class="secupress-attack-all-label">' . esc_html( _nx( 'Blocked', 'Blocked', $all_attacks, 'attacks', 'secupress' ) ) . '</div>';
     echo '</div>';
     echo '</div>';
 
@@ -328,7 +328,7 @@ function secupress_attacks_render_dashboard_widget( $attacks = null ) {
                 echo '<h3 class="secupress-attack-title">' . esc_html( $title ) . '</h3>';
                 echo '</div>';
                 echo '<div class="secupress-attack-count">' . esc_html( $formatted_total ) . '</div>';
-                echo '<div class="secupress-attack-label">' . esc_html_x( 'Blocked', 'attacks', 'secupress' ) . '</div>';
+                echo '<div class="secupress-attack-label">' . esc_html( _nx( 'Blocked', 'Blocked', $total, 'attacks', 'secupress' ) ) . '</div>';
                 if ( $show_charts && $chart_id ) {
                     echo '<div class="secupress-attack-chart">';
                     echo '<canvas id="' . esc_attr( $chart_id ) . '" width="200" height="120"></canvas>';
@@ -435,7 +435,7 @@ function secupress_system_widget_wordpress_items() {
 	$theme_value   = trim( $theme->get( 'Name' ) . ' ' . $theme->get( 'Version' ) ) . ' — ' . $kind;
 	if ( $unused_themes ) {
 		$theme_value .= ' (' . sprintf(
-			_n( '%s unused', '%s unused', $unused_themes, 'secupress' ),
+			_nx( '%s unused', '%s unused', $unused_themes, 'themes', 'secupress' ),
 			number_format_i18n( $unused_themes )
 		) . ')';
 	}
@@ -461,10 +461,10 @@ function secupress_system_widget_wordpress_items() {
 	$active_plugins = array_intersect( $active_plugins, array_keys( $all_plugins ) );
 	$plugins_active = count( $active_plugins );
 	$plugins_update = count( get_plugin_updates() );
-	$plugins_value  = sprintf( '%s/%s activated', number_format_i18n( $plugins_active ), number_format_i18n( $plugins_total ) );
+	$plugins_value  = sprintf( _nx( '%s/%s activated', '%s/%s activated', $plugins_active, 'plugins', 'secupress' ), number_format_i18n( $plugins_active ), number_format_i18n( $plugins_total ) );
 	if ( $plugins_update ) {
 		$plugins_value .= ' (' . sprintf(
-			_n( '%s to update', '%s to update', $plugins_update, 'secupress' ),
+			_nx( '%s to update', '%s to update', $plugins_update, 'plugins', 'secupress' ),
 			number_format_i18n( $plugins_update )
 		) . ')';
 	}
@@ -537,7 +537,7 @@ function secupress_system_widget_wordpress_items() {
 	$items[] = [
 		'icon'    => 'core/search',
 		'label'   => __( 'Search engines', 'secupress' ),
-		'value'   => $blog_public ? __( 'Indexed', 'secupress' ) : __( 'Indexing discouraged', 'secupress' ),
+		'value'   => $blog_public ? _x( 'Indexed', 'website', 'secupress' ) : __( 'Indexing discouraged', 'secupress' ),
 		'status'  => $index_status,
 		'tooltip' => [],
 		'hint'    => $index_hint,
@@ -547,7 +547,7 @@ function secupress_system_widget_wordpress_items() {
 	$items[] = [
 		'icon'    => 'core/people',
 		'label'   => __( 'Registrations', 'secupress' ),
-		'value'   => $can_register ? __( 'Open', 'secupress' ) : __( 'Closed', 'secupress' ),
+		'value'   => $can_register ? _x( 'Open', 'registrations', 'secupress' ) : _x( 'Closed', 'registrations', 'secupress' ),
 		'status'  => '',
 		'tooltip' => [],
 	];
@@ -614,7 +614,7 @@ function secupress_system_widget_server_items() {
 	} elseif ( $is_iis7 ) {
 		$server = 'IIS';
 	} else {
-		$server = __( 'Unknown', 'secupress' );
+		$server = _x( 'Unknown', 'web server', 'secupress' );
 	}
 	$items[] = [
 		'icon'    => 'core/desktop',
@@ -628,7 +628,7 @@ function secupress_system_widget_server_items() {
 	$items[] = [
 		'icon'    => 'core/file',
 		'label'   => __( 'Physical robots.txt', 'secupress' ),
-		'value'   => $has_robots ? __( 'Present', 'secupress' ) : __( 'None', 'secupress' ),
+		'value'   => $has_robots ? _x( 'Present', 'file', 'secupress' ) : _x( 'None', 'file', 'secupress' ),
 		'status'  => '',
 		'tooltip' => [],
 	];
@@ -641,7 +641,7 @@ function secupress_system_widget_server_items() {
 		$items[] = [
 			'icon'    => 'core/file',
 			'label'   => '.htaccess',
-			'value'   => $exists ? __( 'Present', 'secupress' ) : __( 'Missing', 'secupress' ),
+			'value'   => $exists ? _x( 'Present', 'file', 'secupress' ) : _x( 'Missing', 'file', 'secupress' ),
 			'status'  => $exists ? '' : 'danger',
 			'tooltip' => [],
 			'hint'    => $exists ? '' : __( 'The .htaccess file is missing. Permalinks and server rules cannot be applied. Restore it from Settings → Permalinks.', 'secupress' ),
@@ -652,7 +652,7 @@ function secupress_system_widget_server_items() {
 		$items[] = [
 			'icon'    => 'core/file',
 			'label'   => 'web.config',
-			'value'   => $exists ? __( 'Present', 'secupress' ) : __( 'Missing', 'secupress' ),
+			'value'   => $exists ? _x( 'Present', 'file', 'secupress' ) : _x( 'Missing', 'file', 'secupress' ),
 			'status'  => $exists ? '' : 'danger',
 			'tooltip' => [],
 			'hint'    => $exists ? '' : __( 'The web.config file is missing. Restore it so IIS rewrite rules can be applied.', 'secupress' ),
@@ -673,11 +673,12 @@ function secupress_system_widget_server_items() {
 function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.2/7.3
 	$items = [];
 
-	$modules_count    = secupress_count_active_submodules();
+	$modules_count = secupress_count_active_submodules();
+	$modules_text  = '';
 	if ( secupress_is_expert_mode() ) {
 		$modules_text = __( 'Expert Mode', 'secupress' ) . ' — ';
 	}
-	$modules_text    .= sprintf(
+	$modules_text .= sprintf(
 		_n( '%s active module', '%s active modules', $modules_count, 'secupress' ),
 		number_format_i18n( $modules_count )
 	);
@@ -697,7 +698,7 @@ function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.
 			'value'   => __( 'Paused', 'secupress' ),
 			'status'  => 'danger',
 			'tooltip' => [],
-			'hint'    => __( 'Security modules are paused. PHP protection is off until it resumes. Re-activate security from SecuPress.', 'secupress' ),
+			'hint'    => __( 'Protection it currently paused. Turn it back on to keep your site secured.', 'secupress' ),
 		];
 	}
 
@@ -813,12 +814,25 @@ function secupress_system_widget_get_footer() {
 		];
 	}
 
-	$account = trailingslashit( set_url_scheme( SECUPRESS_WEB_MAIN, 'https' ) ) . _x( 'account', 'link to website (Only FR or EN!)', 'secupress' );
+	$license = secupress_get_option( 'license' );
+	$status  = is_array( $license ) && ! empty( $license['status'] ) ? $license['status'] : '';
+
+	if ( 'expired' === $status ) {
+		$account = trailingslashit( set_url_scheme( SECUPRESS_WEB_MAIN, 'https' ) ) . _x( 'account', 'link to website (Only FR or EN!)', 'secupress' );
+		return [
+			'type'   => 'expired',
+			'status' => 'danger',
+			'html'   => '<a href="' . esc_url( $account ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'License expired', 'secupress' ) . '</a>',
+			'hint'   => __( 'Your Pro license has expired. Renew it to keep updates and Pro features.', 'secupress' ),
+		];
+	}
+
+	$settings = secupress_admin_url( 'modules' );
 	return [
-		'type'   => 'expired',
-		'status' => 'danger',
-		'html'   => '<a href="' . esc_url( $account ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'License expired', 'secupress' ) . '</a>',
-		'hint'   => __( 'Your Pro license has expired. Renew it to keep updates and Pro features.', 'secupress' ),
+		'type'   => 'missing',
+		'status' => 'warning',
+		'html'   => '<a href="' . esc_url( $settings ) . '">' . esc_html__( 'Enter your license', 'secupress' ) . '</a>',
+		'hint'   => __( 'Pro is installed. Enter your license key to activate Pro features.', 'secupress' ),
 	];
 }
 

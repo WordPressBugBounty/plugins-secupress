@@ -24,10 +24,23 @@ function secupress_firewall_settings_callback( $settings ) {
 	}
 	$settings['sanitized'] = 1;
 
+	// Keep the last Learning Mode date even when NG checkboxes are unchecked (the field is not posted).
+	$old_last = (int) secupress_get_module_option( 'learning-mode_last', 0, $modulenow );
+	$new_last = isset( $settings['learning-mode_last'] ) ? (int) $settings['learning-mode_last'] : 0;
+	$keep     = max( $old_last, $new_last );
+	if ( $keep > 0 ) {
+		$settings['learning-mode_last'] = $keep;
+	} else {
+		unset( $settings['learning-mode_last'] );
+	}
+
 	/*
 	 * Each submodule has its own sanitization function.
 	 * The `$settings` parameter is passed by reference.
 	 */
+	// Web Application Firewall (BBQ filters + NG pack).
+	secupress_waf_settings_callback( $modulenow, $settings, $activate );
+
 	// Bad headers.
 	secupress_bad_headers_settings_callback( $modulenow, $settings, $activate );
 
@@ -48,6 +61,45 @@ function secupress_firewall_settings_callback( $settings ) {
 }
 
 /**
+ * Web Application Firewall plugins (BBQ filters + NG pack).
+ *
+ * @since 2.7.1
+ *
+ * @param (string)     $modulenow Current module.
+ * @param (array)      $settings  The module settings, passed by reference.
+ * @param (bool|array) $activate  Used to (de)activate plugins.
+ */
+function secupress_waf_settings_callback( $modulenow, &$settings, $activate ) {
+	if ( false !== $activate ) {
+		$bbx = array();
+		if ( ! empty( $activate['learning-mode_bbx'] ) && is_array( $activate['learning-mode_bbx'] ) ) {
+			$bbx = array_flip( $activate['learning-mode_bbx'] );
+		}
+		secupress_manage_submodule( $modulenow, 'user-agents-header', isset( $bbx['user-agents-header'] ) );
+		secupress_manage_submodule( $modulenow, 'bad-url-contents', isset( $bbx['bad-url-contents'] ) );
+		secupress_manage_submodule( $modulenow, 'bad-referer', isset( $bbx['bad-referer'] ) );
+
+		if ( secupress_is_pro() ) {
+			$settings['learning-mode_8g'] = ! empty( $settings['learning-mode_8g'] ) ? 1 : 0;
+			if ( ! $settings['learning-mode_8g'] ) {
+				secupress_firewall_learning_deactivate();
+			}
+		} else {
+			$previous = get_site_option( 'secupress_firewall_settings', array() );
+			if ( is_array( $previous ) && array_key_exists( 'learning-mode_8g', $previous ) ) {
+				$settings['learning-mode_8g'] = (int) $previous['learning-mode_8g'] ? 1 : 0;
+			} else {
+				unset( $settings['learning-mode_8g'] );
+			}
+		}
+	}
+
+	if ( ! empty( $settings['bbq-headers_bad-referer-list'] ) ) {
+		$settings['bbq-headers_bad-referer-list'] = trim( implode( ',', secupress_unique_sorted_list( $settings['bbq-headers_bad-referer-list'], "\n", 'array' ) ), ',' );
+	}
+}
+
+/**
  * Bad Headers plugins.
  *
  * @since 1.0
@@ -59,10 +111,6 @@ function secupress_firewall_settings_callback( $settings ) {
 function secupress_bad_headers_settings_callback( $modulenow, &$settings, $activate ) {
 	// (De)Activation.
 	if ( false !== $activate ) {
-		secupress_manage_submodule( $modulenow, 'user-agents-header', ! empty( $activate['bbq-headers_user-agents-header'] ) );
-		if ( secupress_is_pro() ) {
-			secupress_manage_submodule( $modulenow, 'bad-referer', ! empty( $activate['bbq-headers_bad-referer'] ) );
-		}
 		secupress_manage_submodule( $modulenow, 'fake-google-bots', ! empty( $activate['bbq-headers_fake-google-bots'] ) );
 	}
 	// Settings.
@@ -74,10 +122,6 @@ function secupress_bad_headers_settings_callback( $modulenow, &$settings, $activ
 
 	if ( empty( $settings['bbq-headers_user-agents-list'] ) ) {
 		$settings['bbq-headers_user-agents-list'] = secupress_firewall_bbq_headers_user_agents_list_default();
-	}
-
-	if ( secupress_is_pro() && ! empty( $settings['bbq-headers_bad-referer-list'] ) ) {
-		$settings['bbq-headers_bad-referer-list'] = trim( implode( ',', secupress_unique_sorted_list( $settings['bbq-headers_bad-referer-list'], "\n", 'array' ) ), ',' );
 	}
 }
 
@@ -93,7 +137,6 @@ function secupress_bad_headers_settings_callback( $modulenow, &$settings, $activ
 function secupress_bad_contents_settings_callback( $modulenow, &$settings, $activate ) {
 	// (De)Activation.
 	if ( false !== $activate ) {
-		secupress_manage_submodule( $modulenow, 'bad-url-contents', ! empty( $activate['bbq-url-content_bad-contents'] ) );
 		secupress_manage_submodule( $modulenow, 'ban-404-php', ! empty( $activate['bbq-url-content_ban-404-php'] ) );
 	}
 	// Settings.
@@ -124,9 +167,17 @@ add_action( 'secupress.first_install', 'secupress_install_firewall_module' );
  */
 function secupress_install_firewall_module( $module ) {
 	if ( 'all' === $module || 'firewall' === $module ) {
-		update_site_option( 'secupress_firewall_settings', array(
+		$previous = get_site_option( 'secupress_firewall_settings', array() );
+		$settings = array(
 			'bbq-headers_user-agents-list'      => secupress_firewall_bbq_headers_user_agents_list_default(),
 			'bbq-url-content_bad-contents-list' => secupress_firewall_bbq_url_content_bad_contents_list_default(),
-		) );
+		);
+		if ( ! empty( $previous['learning-mode_last'] ) ) {
+			$settings['learning-mode_last'] = (int) $previous['learning-mode_last'];
+		}
+		if ( is_array( $previous ) && array_key_exists( 'learning-mode_8g', $previous ) ) {
+			$settings['learning-mode_8g'] = (int) $previous['learning-mode_8g'] ? 1 : 0;
+		}
+		update_site_option( 'secupress_firewall_settings', $settings );
 	}
 }

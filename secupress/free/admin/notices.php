@@ -576,7 +576,7 @@ function secupress_security_paused_notice() {
 
 	$resume_url = wp_nonce_url( admin_url( 'admin-post.php?action=secupress_toggle_security_pause' ), 'secupress_toggle_security_pause' );
 	$remaining  = secupress_get_security_pause_remaining_text();
-	$message    = '<p><strong>' . __( 'Security is paused', 'secupress' ) . '</strong> — ' . __( 'Attention, PHP modules are not protecting this site.', 'secupress' );
+	$message    = '<p><strong>' . __( 'Security is paused', 'secupress' ) . '</strong> — ' . __( 'Your site isn‘t fully protected: several security features are currently inactive.', 'secupress' );
 	if ( $remaining ) {
 		$message .= ' ' . esc_html( $remaining );
 	}

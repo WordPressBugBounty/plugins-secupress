@@ -137,19 +137,21 @@ function secupress_get_modules() {
 						]
 		],
 		'firewall'        => [
-			'title'       => __( 'Firewall &amp; GeoIP', 'secupress' ),
-			'title-alt'   => __( 'Firewall &amp; GeoIP Management', 'secupress' ),
+			'title'       => __( 'WAF &amp; GeoIP', 'secupress' ),
+			'title-alt'   => __( 'WAF &amp; GeoIP Management', 'secupress' ),
 			'icon'        => 'firewall',
 			'dashicon'    => 'shield',
 			'summaries'   => [
 				'small'   => __( 'Block Bad Requests', 'secupress' ),
 			],
 			'submodules'  => [
-							'row-bbq-headers_user-agents-header'     => __( 'Block Bad User Agents', 'secupress' ),
+							'learning-mode_bbx_user-agents-header'     => __( 'Block Bad User Agents', 'secupress' ),
+							'learning-mode_bbx_bad-url-contents'       => __( 'Block Bad Content', 'secupress' ),
+							'learning-mode_bbx_bad-referer'            => __( 'Block Bad Referers', 'secupress' ),
+							'row-learning-mode_' . sanitize_key( secupress_firewall_ng_name() )     => '*' . sprintf( __( '%s WAF rules', 'secupress' ), secupress_firewall_ng_name() ),
+							'row-learning-mode_learning'               => function_exists( 'secupress_firewall_ng_is_enabled' ) && secupress_firewall_ng_is_enabled() ? '>*' . __( 'Learning Mode', 'secupress' ) : '',
 							'row-bbq-headers_fake-google-bots'       => __( 'Block Fake SEO Bots', 'secupress' ),
-							'row-bbq-headers_bad-referer'            => '*' . __( 'Block Bad Referers', 'secupress' ),
 							'row-bbq-headers_block-ai'               => '*' . __( 'Block AI Bots', 'secupress' ),
-							'row-bbq-url-content_bad-contents'       => __( 'Block Bad Content', 'secupress' ),
 							'row-bbq-url-content_ban-404-php'        => __( 'Block 404 requests on PHP files', 'secupress' ),
 							'module-geoip-system'                    => '*' . __( 'GeoIP Management', 'secupress' ),
 						]
@@ -256,7 +258,7 @@ function secupress_get_modules() {
 							'module-scanners'         => '*' . __( 'Scanners', 'secupress' ),
 							'module-files-monitoring' => '*' . __( 'File Monitoring', 'secupress' ),
 						]
-		],
+		],/*
 		'addons'          => [
 			'title'       => __( 'Add-ons', 'secupress' ),
 			'title-alt'   => __( 'Add-ons from Partners', 'secupress' ),
@@ -268,7 +270,7 @@ function secupress_get_modules() {
 			],
 			'with_form'      => false,
 			'with_reset_box' => false,
-		],
+		],*/ ////
 		'services'        => [ 
 			'title'       => __( 'Security Services', 'secupress' ),
 			'title-alt'   => __( 'Our Pro Services', 'secupress' ),
@@ -379,8 +381,29 @@ function secupress_activate_submodule( $module, $submodule, $incompatible_submod
 }
 
 /**
+ * Flag a sub-module deactivation as failed so the option and success notice can be rolled back.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @param (bool|null) $set True to flag a failure, false to reset, null to read.
+ *
+ * @return (bool)
+ */
+function secupress_submodule_deactivation_failed( $set = null ) {
+	static $failed = false;
+
+	if ( null !== $set ) {
+		$failed = (bool) $set;
+	}
+
+	return $failed;
+}
+
+/**
  * Deactivate a sub-module.
  *
+ * @since 2.7.1 Load the sub-module file before the hook, and roll back the option if the file write fails.
  * @since 1.0
  * @since 1.3 Moved to global scope.
  * @author Grégory Viguier
@@ -398,8 +421,25 @@ function secupress_deactivate_submodule( $module, $submodules ) {
 	$delete_cache = false;
 
 	foreach ( $submodules as $submodule ) {
-		$is_active   = secupress_is_submodule_active( $module, $submodule );
-		$submodule   = sanitize_key( $submodule );
+		$is_active = secupress_is_submodule_active( $module, $submodule );
+		$file_path = secupress_get_submodule_file_path( $module, $submodule );
+		$submodule = sanitize_key( $submodule );
+
+		secupress_require_module_tools( $module );
+
+		if ( $file_path ) {
+			if ( is_array( $file_path ) ) {
+				foreach ( $file_path as $path ) {
+					if ( file_exists( $path ) ) {
+						require_once( $path );
+					}
+				}
+			} elseif ( file_exists( $file_path ) ) {
+				require_once( $file_path );
+			}
+		}
+
+		secupress_submodule_deactivation_failed( false );
 
 		if ( $is_active ) {
 			// Deactivate the sub-module.
@@ -418,6 +458,13 @@ function secupress_deactivate_submodule( $module, $submodules ) {
 		 * @param (bool)  $is_active   False if the sub-module was already inactive.
 		 */
 		do_action( 'secupress.modules.deactivate_submodule_' . $submodule, [], ! $is_active );
+
+		if ( secupress_submodule_deactivation_failed() ) {
+			update_site_option( 'secupress_active_submodule_' . $submodule, $module );
+			secupress_remove_module_notice( $module, $submodule, 'deactivation' );
+			$delete_cache = true;
+			continue;
+		}
 
 		/**
 		 * Fires once any sub-module is deactivated.

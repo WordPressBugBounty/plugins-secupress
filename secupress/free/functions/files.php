@@ -315,6 +315,106 @@ function secupress_is_wpconfig_writable( $context = '' ) {
 }
 
 /**
+ * Tell if a file path is the `wp-config.php` file used by SecuPress.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @param (string) $file File path.
+ *
+ * @return (bool)
+ */
+function secupress_is_wpconfig_file( $file ) {
+	$wpconfig = secupress_find_wpconfig_path();
+	if ( ! $file || ! $wpconfig ) {
+		return false;
+	}
+
+	$file     = wp_normalize_path( (string) $file );
+	$wpconfig = wp_normalize_path( (string) $wpconfig );
+	if ( $file === $wpconfig ) {
+		return true;
+	}
+
+	$real_file     = realpath( $file );
+	$real_wpconfig = realpath( $wpconfig );
+	if ( $real_file && $real_wpconfig && $real_file === $real_wpconfig ) {
+		return true;
+	}
+
+	return basename( $file ) === basename( $wpconfig );
+}
+
+/**
+ * Store, retrieve or reset the last wp-config sandbox error.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @param (WP_Error|bool|null) $error Sandbox result to store. `false` means a 500, a WP_Error means a network/HTTP failure.
+ * @param (bool)               $reset Reset the stored value.
+ *
+ * @return (WP_Error|bool|null)
+ */
+function secupress_wpconfig_sandbox_error( $error = null, $reset = false ) {
+	static $stored = null;
+
+	if ( $reset ) {
+		$stored = null;
+		return null;
+	}
+
+	if ( 0 < func_num_args() ) {
+		$stored = $error;
+	}
+
+	return $stored;
+}
+
+/**
+ * Human-readable message for the last wp-config sandbox failure.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @param (string) $wpconfig_filename wp-config file name for display.
+ *
+ * @return (string) Empty when the last failure was not a sandbox issue.
+ */
+function secupress_get_wpconfig_sandbox_error_message( $wpconfig_filename ) {
+	$error = secupress_wpconfig_sandbox_error();
+
+	if ( is_wp_error( $error ) ) {
+		return sprintf(
+			/** Translators: 1 is a file name, 2 is an error message. */
+			__( 'The new %1$s file could not be verified because this site cannot reach itself (HTTP loopback). This often happens behind a CDN, a firewall, or a security plugin that challenges non-browser requests. %2$s', 'secupress' ),
+			secupress_code_me( $wpconfig_filename ),
+			esc_html( $error->get_error_message() )
+		);
+	}
+
+	if ( false === $error ) {
+		return sprintf(
+			/** Translators: %s is a file name. */
+			__( 'The new %s file triggered a server error in the sandbox, so it was not saved.', 'secupress' ),
+			secupress_code_me( $wpconfig_filename )
+		);
+	}
+
+	return '';
+}
+
+/**
+ * Reset the cached wp-config.php contents used by marker lookups.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ */
+function secupress_reset_wpconfig_content_cache() {
+	secupress_marker_exists_in_wpconfig( '', true );
+}
+
+/**
  * Check if a given muplugin is present in mu-plugins/ folder
  *
  * @since 2.3.7
@@ -344,19 +444,26 @@ function secupress_muplugin_exists( $filename_part ) {
 /**
  * Check if a given marker is present in wpconfig file
  *
+ * @since 2.7.1 `$reset` param to bust the file cache after a write.
  * @since 2.3.7
  * @author Julio Potier
  * 
  * @param (string) $marker
+ * @param (bool)   $reset Reset the cached file contents.
  * 
  * @return (bool) 
  **/
-function secupress_marker_exists_in_wpconfig( $marker ) {
+function secupress_marker_exists_in_wpconfig( $marker, $reset = false ) {
 	static $file_content = '';
 
-	$wpconfig_filepath   = secupress_is_wpconfig_writable();
+	if ( $reset ) {
+		$file_content = '';
+		return false;
+	}
 
-	if ( ! $wpconfig_filepath ) {
+	$wpconfig_filepath = secupress_find_wpconfig_path();
+
+	if ( ! $wpconfig_filepath || ! is_readable( $wpconfig_filepath ) ) {
 		return false;
 	}
 
@@ -365,13 +472,14 @@ function secupress_marker_exists_in_wpconfig( $marker ) {
 		$file_content    = $filesystem->get_contents( $wpconfig_filepath );
 	}
 
-	return preg_match( "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", $file_content );
+	return (bool) preg_match( "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", $file_content );
 }
 
 /**
  * Comment a constant definition in the `wp-config.php` file (or any other file).
  * If `$marker` is provided, our definition will be also removed.
  *
+ * @since 2.7.1 Skip the sandbox when removing a SecuPress marker block.
  * @since 2.0 Change the return values to let a possible TRUE if these are WP defaults + remove $new_value param (unused and not the purpose)
  * @author Julio Potier
  * @since 1.2.2
@@ -384,8 +492,6 @@ function secupress_marker_exists_in_wpconfig( $marker ) {
  * @return (bool)
  */
 function secupress_comment_constant( $constant, $wpconfig_filepath = false, $marker = false ) {
-	static $file_content   = '';
-
 	if ( ! $wpconfig_filepath ) {
 		$wpconfig_filepath = secupress_is_wpconfig_writable();
 
@@ -394,14 +500,12 @@ function secupress_comment_constant( $constant, $wpconfig_filepath = false, $mar
 		}
 	}
 
-	$filesystem       = secupress_get_filesystem();
-	if ( ! $file_content ) {
-		$file_content = $filesystem->get_contents( $wpconfig_filepath );
-	}
+	$filesystem   = secupress_get_filesystem();
+	$file_content = $filesystem->get_contents( $wpconfig_filepath );
 
 	if ( $marker && preg_match( "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", $file_content ) ) {
-		// Remove the constant we could have previously set.
-		return secupress_replace_content( $wpconfig_filepath, "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", '' );
+		// Remove the constant we could have previously set. Deleting our own marker is safe.
+		return secupress_replace_content( $wpconfig_filepath, "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", '', true );
 	}
 
 	// Comment old value.
@@ -442,8 +546,8 @@ function secupress_uncomment_constant( $constant, $wpconfig_filepath = false, $m
 	}
 
 	if ( $marker ) {
-		// Remove the constant we could have previously set.
-		$replaced = secupress_replace_content( $wpconfig_filepath, "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", '' );
+		// Remove the constant we could have previously set. Deleting our own marker is safe.
+		$replaced = secupress_replace_content( $wpconfig_filepath, "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", '', true );
 
 		if ( defined( $constant ) && ! $replaced ) {
 			/**
@@ -600,6 +704,10 @@ function secupress_put_contents( $file, $new_content = '', $args = array() ) {
 	$return = $filesystem->put_contents( $file, $file_content[ $file ], FS_CHMOD_FILE );
 	clearstatcache( true, $file );
 
+	if ( $return && secupress_is_wpconfig_file( $file ) ) {
+		secupress_reset_wpconfig_content_cache();
+	}
+
 	return $return;
 }
 
@@ -607,44 +715,58 @@ function secupress_put_contents( $file, $new_content = '', $args = array() ) {
 /**
  * File creation based on WordPress Filesystem.
  *
+ * @since 2.7.1 Skip the sandbox when `SECUPRESS_NO_SANDBOX` is true, when removing content, or when the file is not wp-config.php. Do not cache unwritten content.
  * @since 2.2.6 clearstatcache() usage
  * @author Julio potier
  * @since 1.3 Use a sandbox for the `wp-config.php` file.
  * @since 1.0
  * @author Grégory Viguier
  *
- * @param (string) $file        The path of file will be created.
- * @param (string) $old_content The content to be replaced from the file (preg_replace).
- * @param (string) $new_content The new content (preg_replace).
+ * @param (string) $file          The path of file will be created.
+ * @param (string) $old_content   The content to be replaced from the file (preg_replace).
+ * @param (string) $new_content   The new content (preg_replace).
+ * @param (bool)   $skip_sandbox  True to skip the wp-config sandbox.
  *
  * @return (bool)
  */
 function secupress_replace_content( $file, $old_content, $new_content, $skip_sandbox = false ) {
-	static $file_content = '';
+	static $file_contents = array();
 
 	if ( ! file_exists( $file ) ) {
 		return false;
 	}
 
-	$filesystem   = secupress_get_filesystem();
-	if ( ! $file_content ) {
-		$file_content = $filesystem->get_contents( $file );
+	$filesystem = secupress_get_filesystem();
+	if ( ! isset( $file_contents[ $file ] ) ) {
+		$file_contents[ $file ] = $filesystem->get_contents( $file );
 	}
 
-	$new_content  = preg_replace( $old_content, $new_content, $file_content );
-	if ( null === $new_content || $new_content === $file_content ) {
+	$replacement = $new_content;
+	$new_content = preg_replace( $old_content, $replacement, $file_contents[ $file ] );
+	if ( null === $new_content || $new_content === $file_contents[ $file ] ) {
 		return false;
 	}
 
-	$file_content = $new_content;
-	$filename     = preg_quote( secupress_get_wpconfig_filename() );
-	$skip_sandbox = ( ! defined( 'SECUPRESS_NO_SANDBOX' ) || ! SECUPRESS_NO_SANDBOX ) && $skip_sandbox;
-	if ( ! $skip_sandbox && false !== preg_match( '@/$filename$@', $file ) && true !== secupress_wpconfig_success_in_sandbox( $new_content ) ) {
-		return false;
+	$skip_sandbox = $skip_sandbox || ( '' === $replacement ) || ( defined( 'SECUPRESS_NO_SANDBOX' ) && SECUPRESS_NO_SANDBOX );
+
+	if ( ! $skip_sandbox && secupress_is_wpconfig_file( $file ) ) {
+		$sandbox = secupress_wpconfig_success_in_sandbox( $new_content );
+		if ( true !== $sandbox ) {
+			secupress_wpconfig_sandbox_error( $sandbox );
+			return false;
+		}
 	}
 
 	$return = $filesystem->put_contents( $file, $new_content, FS_CHMOD_FILE );
 	clearstatcache( true, $file );
+
+	if ( $return ) {
+		$file_contents[ $file ] = $new_content;
+		if ( secupress_is_wpconfig_file( $file ) ) {
+			secupress_reset_wpconfig_content_cache();
+			secupress_wpconfig_sandbox_error( null, true );
+		}
+	}
 
 	return $return;
 }
@@ -727,8 +849,27 @@ function secupress_wpconfig_success_in_sandbox( $content ) {
 		return $response;
 	}
 
+	$code = (int) wp_remote_retrieve_response_code( $response );
+	$body = wp_remote_retrieve_body( $response );
+
 	// Finally, the answer we were looking for.
-	return 500 !== wp_remote_retrieve_response_code( $response ) && false !== strpos( wp_remote_retrieve_body( $response ), 'SANDBOX OK' );
+	if ( false !== strpos( $body, 'SANDBOX OK' ) && 500 !== $code ) {
+		return true;
+	}
+
+	if ( 500 === $code ) {
+		return false;
+	}
+
+	return new WP_Error(
+		'sandbox_http_failed',
+		sprintf(
+			/** Translators: %s is an HTTP status code. */
+			__( 'The sandbox request returned HTTP %s instead of a successful loopback response.', 'secupress' ),
+			$code ? $code : '0'
+		),
+		array( 'status' => $code )
+	);
 }
 
 

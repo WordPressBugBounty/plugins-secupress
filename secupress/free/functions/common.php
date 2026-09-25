@@ -87,13 +87,14 @@ function secupress_get_malware_scan_last_time() {
 /**
  * Return the path to a class.
  *
+ * @since 2.7 The prefix and the class name are limited to [a-z0-9-], and the resolved file must stay inside the classes directory.
  * @since 1.0
  * @author Grégory Viguier
  *
  * @param (string) $prefix          Only one possible value so far: "scan".
  * @param (string) $class_name_part The classes name is built as follow: "SecuPress_{$prefix}_{$class_name_part}".
  *
- * @return (string) Path of the class.
+ * @return (string) Path of the class. Empty when the name is invalid or the file resolves outside the classes directory.
  */
 function secupress_class_path( $prefix, $class_name_part = '' ) {
 	$folders = array(
@@ -105,13 +106,42 @@ function secupress_class_path( $prefix, $class_name_part = '' ) {
 		'scanner-results'   => 'common',
 	);
 
+	if ( ! is_string( $prefix ) || ! is_string( $class_name_part ) ) {
+		return '';
+	}
+
 	$prefix = strtolower( str_replace( '_', '-', $prefix ) );
-	$folder = isset( $folders[ $prefix ] ) ? $folders[ $prefix ] : $prefix;
+	$prefix = preg_replace( '/[^a-z0-9-]/', '', $prefix );
 
+	if ( ! $prefix ) {
+		return '';
+	}
+
+	$folder          = isset( $folders[ $prefix ] ) ? $folders[ $prefix ] : $prefix;
 	$class_name_part = strtolower( str_replace( '_', '-', $class_name_part ) );
+	$class_name_part = preg_replace( '/[^a-z0-9-]/', '', $class_name_part );
 	$class_name_part = $class_name_part ? '-' . $class_name_part : '';
+	$path            = SECUPRESS_CLASSES_PATH . $folder . '/class-secupress-' . $prefix . $class_name_part . '.php';
+	$real            = realpath( $path );
 
-	return SECUPRESS_CLASSES_PATH . $folder . '/class-secupress-' . $prefix . $class_name_part . '.php';
+	if ( false === $real ) {
+		return $path;
+	}
+
+	$base = realpath( SECUPRESS_CLASSES_PATH );
+
+	if ( ! $base ) {
+		return '';
+	}
+
+	$base = wp_normalize_path( trailingslashit( $base ) );
+	$real = wp_normalize_path( $real );
+
+	if ( 0 !== strpos( $real, $base ) ) {
+		return '';
+	}
+
+	return $path;
 }
 
 
@@ -484,6 +514,7 @@ function secupress_is_plugin_installed( $plugin_slug ) {
  * Die with SecuPress format.
  *
  * @author Julio Potier
+ * @since 2.7 Set the response with status_header() when an HTTP status line is already present
  * @since 2.0 Add the response code
  * @author Grégory Viguier
  * @since 1.0
@@ -542,7 +573,7 @@ function secupress_die( $message = '', $title = '', $args = array() ) {
 			define( 'DONOTCACHEDB', true );
 		}
 		if ( ! empty( $args['response'] ) ) {
-			http_response_code( absint( $args['response'] ) );
+			status_header( absint( $args['response'] ) );
 		}
 		// https://core.trac.wordpress.org/ticket/53262
 		remove_filter( 'wp_robots', 'wp_robots_noindex_embeds' );
@@ -554,8 +585,57 @@ function secupress_die( $message = '', $title = '', $args = array() ) {
 
 
 /**
+ * Redacted copies of the request data for a block log.
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @return (array)
+ */
+function secupress_block_redact_input() {
+	$hidden  = '***… // ' . sprintf( __( 'Hidden by %s.', 'secupress' ), SECUPRESS_PLUGIN_NAME );
+	$keys    = [ 'session', 'auth', 'token', 'password', 'psswrd', 'pass', 'pwd', 'pw', 'user_pass', 'edd_user_pass', 'wordpress_logged_in', 'wordpress_sec', 'wordpress', 'wp_woocommerce_session', 'PHPSESSID' ];
+	$request = $_REQUEST;
+	$get     = $_GET;
+	$post    = $_POST;
+	$cookie  = $_COOKIE;
+
+	foreach ( [ &$request, &$get, &$post, &$cookie ] as &$global ) {
+		if ( ! is_array( $global ) ) {
+			continue;
+		}
+		foreach ( array_keys( $global ) as $name ) {
+			foreach ( $keys as $key ) {
+				$len = strlen( $key );
+				if ( 0 === strncasecmp( $name, $key, $len ) && ( strlen( $name ) === $len || '_' === substr( $name, $len, 1 ) ) ) {
+					$global[ $name ] = $hidden;
+					break;
+				}
+			}
+		}
+	}
+	unset( $global );
+
+	$request = apply_filters( 'secupress.block.remove_content_from._REQUEST', $request );
+	$get     = apply_filters( 'secupress.block.remove_content_from._GET', $get );
+	$post    = apply_filters( 'secupress.block.remove_content_from._POST', $post );
+	$cookie  = apply_filters( 'secupress.block.remove_content_from._COOKIE', $cookie );
+	$files   = apply_filters( 'secupress.block.remove_content_from._FILES', $_FILES );
+
+	return [
+		'request' => $request,
+		'get'     => $get,
+		'post'    => $post,
+		'cookie'  => $cookie,
+		'files'   => $files,
+	];
+}
+
+
+/**
  * Block a request and die with more informations.
  *
+ * @since 2.7.1 Hide WP, WooCommerce and PHP session cookies from the Support ID.
  * @since 1.0
  * @author Grégory Viguier
  *
@@ -586,37 +666,14 @@ function secupress_block( $module, $args = array( 'code' => 403 ) ) {
 		$args = array( 'content' => (string) $args ); // Cast to prevent recursion.
 	}
 	$args     = wp_parse_args( $args, array( 'code' => 403, 'content' => '', 'b64' => [], 'attack_type' => 'ban_ip' ) );
-
-	// Preventing the display of possible sent passwords
-	$hidden = '***… // ' . sprintf( __( 'Hidden by %s.', 'secupress' ), SECUPRESS_PLUGIN_NAME );
-	foreach ( [ 'session', 'auth', 'token', 'password', 'psswrd', 'pass', 'pwd', 'pw', 'user_pass', 'edd_user_pass' ] as $key ) {
-		if ( isset( $_REQUEST[ $key ] ) ) {
-			$_REQUEST[ $key ] = $hidden;
-		}
-		if ( isset( $_GET[ $key ] ) ) {
-			$_GET[ $key ] = $hidden;
-		}
-		if ( isset( $_POST[ $key ] ) ) {
-			$_POST[ $key ] = $hidden;
-		}
-		if ( isset( $_COOKIE[ $key ] ) ) {
-			$_COOKIE[ $key ] = $hidden;
-		}
-	}
-
-	// Use these filters to remove or modify contents
-	$_REQUEST = apply_filters( 'secupress.block.remove_content_from._REQUEST', $_REQUEST );
-	$_GET     = apply_filters( 'secupress.block.remove_content_from._GET',     $_GET     );
-	$_POST    = apply_filters( 'secupress.block.remove_content_from._POST',    $_POST    );
-	$_COOKIE  = apply_filters( 'secupress.block.remove_content_from._COOKIE',  $_COOKIE  );
-	$_FILES   = apply_filters( 'secupress.block.remove_content_from._FILES',   $_FILES   );
+	$redacted = secupress_block_redact_input();
 
 	$data     = var_export(
-			[   '$_REQUEST' => $_REQUEST,
-				'$_GET'     => $_GET,
-				'$_POST'    => $_POST,
-				'$_COOKIE'  => $_COOKIE,
-				'$_FILES'   => $_FILES,
+			[   '$_REQUEST' => $redacted['request'],
+				'$_GET'     => $redacted['get'],
+				'$_POST'    => $redacted['post'],
+				'$_COOKIE'  => $redacted['cookie'],
+				'$_FILES'   => $redacted['files'],
 			], true );
 
 	// Add some hardcoded b64 args to be printed for support help.
@@ -625,6 +682,41 @@ function secupress_block( $module, $args = array( 'code' => 403 ) ) {
 	$args['b64']['ID']   = $module;
 	$args['b64']['data'] = $data;
 	$args['b64']['user'] = is_user_logged_in() ? var_export( wp_get_current_user()->user_login, true ) : false;
+
+	/**
+	 * Whether the block should be enforced (die) or only observed.
+	 *
+	 * @since 2.7.1
+	 * @author Julio Potier
+	 *
+	 * @param (bool)   $enforce  True to block and die. False to observe and continue.
+	 * @param (string) $module   The module.
+	 * @param (string) $ip       The IP address.
+	 * @param (array)  $args     Block arguments.
+	 * @param (string) $block_id The block ID.
+	 */
+	$enforce = apply_filters( 'secupress.block.enforce', true, $module, $ip, $args, $block_id );
+	if ( ! $enforce ) {
+		/**
+		 * Fires when a block is observed instead of enforced (Learning Mode).
+		 *
+		 * @since 2.7.1
+		 * @author Julio Potier
+		 *
+		 * @param (string) $module   The module.
+		 * @param (string) $ip       The IP address.
+		 * @param (array)  $args     Block arguments.
+		 * @param (string) $block_id The block ID.
+		 */
+		do_action( 'secupress.block.observed', $module, $ip, $args, $block_id );
+		return;
+	}
+
+	$_REQUEST = $redacted['request'];
+	$_GET     = $redacted['get'];
+	$_POST    = $redacted['post'];
+	$_COOKIE  = $redacted['cookie'];
+	$_FILES   = $redacted['files'];
 
 	/**
 	 * Fires before a user is blocked by a certain module.
@@ -1432,8 +1524,7 @@ function secupress_feature_is_pro( $feature ) {
 		'login-protection_type|passwordspraying'    => 1,
 		'database_db_prefix'                        => 1,
 		'database_tables_selection'                 => 1,
-		'bbq-headers_bad-referer'                   => 1,
-		'bbq-headers_bad-referer-list'              => 1,
+		'learning-mode_8g'                          => 1,
 		'bbq-headers_block-ai'                      => 1,
 		'blacklist-logins_user-creation-protection' => 1,
 		'blacklist-logins_bad-email-domains'        => 1,
@@ -1544,6 +1635,7 @@ function secupress_get_user_metas( $meta_key ) {
 /**
  * Compress some data to be stored in the database.
  *
+ * @since 2.7.1 Unobfuscated version.
  * @since 1.0.6
  * @author Grégory Viguier
  *
@@ -1552,23 +1644,14 @@ function secupress_get_user_metas( $meta_key ) {
  * @return (string) The compressed data.
  */
 function secupress_compress_data( $data ) {
-	/** Little and gentle obfuscation to avoid being tagged as "malicious script", I hope you understand :) — Julio. */
-	$gz  = 'eta';
-	$gz  = 'gz' . strrev( $gz . 'lfed' );
-	$bsf = 'cne';
-	$bsf = strrev( 'edo' . $bsf );
-	$bsf = '64_' . $bsf;
-	$bsf = 'base' . $bsf;
-
-	return $bsf// Hey.
-		( $gz// Hoy.
-			( serialize( $data ) ) );
+	return base64_encode( gzdeflate( serialize( $data ) ) );
 }
 
 
 /**
  * Decompress some data coming from the database.
  *
+ * @since 2.7.1 Unobfuscated version.
  * @since 1.0.6
  * @author Grégory Viguier
  *
@@ -1581,30 +1664,19 @@ function secupress_decompress_data( $data ) {
 		return $data;
 	}
 
-	/** Little and gentle obfuscation to avoid being tagged as "malicious script", I hope you understand :) — Julio. */
-	$gz  = 'eta';
-	$gz  = 'gz' . strrev( $gz . 'lfni' );
-	$bsf = 'ced';
-	$bsf = strrev( 'edo' . $bsf );
-	$bsf = '64_' . $bsf;
-	$bsf = 'base' . $bsf;
+	$decoded = base64_decode( $data );
 
-	$data_tmp = $bsf// Hey.
-		( $data );
-
-	if ( ! $data_tmp ) {
+	if ( ! $decoded ) {
 		return $data;
 	}
 
-	$data     = $data_tmp;
-	$data_tmp = $gz// Hoy.
-		( $data );
+	$inflated = gzinflate( $decoded );
 
-	if ( ! $data_tmp ) {
-		return $data;
+	if ( ! $inflated ) {
+		return $decoded;
 	}
 
-	return maybe_unserialize( $data_tmp );
+	return maybe_unserialize( $inflated );
 }
 
 
@@ -3150,4 +3222,17 @@ function secupress_is_honeypotable() {
 	 * @param (bool) $valid True if all users are administrators, false otherwise.
 	 */
 	return apply_filters( 'secupress.is_honeypotable', $valid );
+}
+
+/**
+ * Public name of the NG firewall data pack.
+ * Update this label when the pack version changes (8G, 9G, …).
+ *
+ * @since 2.7.1
+ * @author Julio Potier
+ *
+ * @return (string)
+ */
+function secupress_firewall_ng_name() {
+	return '8G';
 }
