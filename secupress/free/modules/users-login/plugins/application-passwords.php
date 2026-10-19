@@ -1,6 +1,6 @@
 <?php
 /**
- * Module Name: Application Passwords
+ * Module Name: Application Passwords Alerts
  * Description: Alert users when a new application password is added to their account.
  * Main Module: users_login
  * Author: SecuPress

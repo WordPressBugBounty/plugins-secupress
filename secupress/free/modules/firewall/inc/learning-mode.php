@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /** --------------------------------------------------------------------------------------------- */
 
 /**
- * Tell if the NG signature pack is enabled (Pro setting, with retrocompat).
+ * Tell if the NG signature pack is enabled (Pro setting, saved as on).
  *
  * @since 2.7.1
  * @author Julio Potier
@@ -17,11 +17,7 @@ function secupress_firewall_ng_is_enabled() {
 	if ( ! secupress_is_pro() ) {
 		return false;
 	}
-	$value = secupress_get_module_option( 'learning-mode_8g', null, 'firewall' );
-	if ( null === $value ) {
-		return true;
-	}
-	return 1 === (int) $value;
+	return 1 === (int) secupress_get_module_option( 'learning-mode_8g', 0, 'firewall' );
 }
 
 /**
@@ -33,6 +29,9 @@ function secupress_firewall_ng_is_enabled() {
  * @return (bool)
  */
 function secupress_firewall_learning_is_running() {
+	if ( secupress_cache_data( 'firewall_learning_stopped' ) ) {
+		return false;
+	}
 	$state = get_site_option( SECUPRESS_FIREWALL_LEARNING, [] );
 	return is_array( $state )
 		&& isset( $state['status'] )
@@ -80,6 +79,9 @@ function secupress_firewall_learning_get_state() {
 		'requests_front'  => 0,
 		'requests_admin'  => 0,
 	];
+	if ( secupress_cache_data( 'firewall_learning_stopped' ) ) {
+		return $defaults;
+	}
 	$state = get_site_option( SECUPRESS_FIREWALL_LEARNING, [] );
 	$state = wp_parse_args( is_array( $state ) ? $state : [], $defaults );
 	if ( 'running' === $state['status'] && (int) $state['ends'] && time() >= (int) $state['ends'] ) {
@@ -113,6 +115,13 @@ function secupress_firewall_learning_set_state( $state ) {
 		'requests_admin'  => 0,
 	];
 	$state = wp_parse_args( (array) $state, $defaults );
+	if ( secupress_cache_data( 'firewall_learning_stopped' ) ) {
+		$state['status']         = 'off';
+		$state['started']        = 0;
+		$state['ends']           = 0;
+		$state['requests_front'] = 0;
+		$state['requests_admin'] = 0;
+	}
 	$state['requests_front'] = max( 0, (int) $state['requests_front'] );
 	$state['requests_admin'] = max( 0, (int) $state['requests_admin'] );
 	$state['status']   = in_array( $state['status'], [ 'off', 'running', 'review' ], true ) ? $state['status'] : 'off';
@@ -150,7 +159,6 @@ function secupress_firewall_learning_get_last_started() {
 
 /**
  * Store the timestamp of the last Learning Mode launch.
- * Refuses 0: unchecking NG features must not delete this date.
  *
  * @since 2.7.1
  * @author Julio Potier
@@ -693,7 +701,7 @@ function secupress_firewall_learning_has_pending_hits() {
  * @return (array)
  */
 function secupress_firewall_ng_watch_patterns() {
-	return [
+	$patterns = [
 		'([a-z0-9]{2000,})',
 		'([a-z0-9]{4000,})',
 		'(<|>|\\\'|%0A|%0D|%27|%00)',
@@ -702,23 +710,77 @@ function secupress_firewall_ng_watch_patterns() {
 		'(f?ckfinder|f?ckeditor|fullclick)',
 		'(/)(f?ckfinder|fck/|fckeditor|fullclick)',
 	];
+
+	/**
+	 * Filters the NG patterns observed during Learning Mode.
+	 *
+	 * @since 2.7.2
+	 * @author Julio Potier
+	 *
+	 * @param (array) $patterns
+	 */
+	return apply_filters( 'secupress.firewall.ng_watch_patterns', $patterns );
+}
+
+/**
+ * Request URI slugs observed during Learning Mode when they are the whole path.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ *
+ * @return (array)
+ */
+function secupress_firewall_ng_calibratable_uri_slugs() {
+	$slugs = [ 'beta', 'default', 'demo', 'dev', 'null', 'old' ];
+
+	/**
+	 * Filters the request URI slugs observed during Learning Mode when they are the whole path.
+	 *
+	 * @since 2.7.2
+	 * @author Julio Potier
+	 *
+	 * @param (array) $slugs
+	 */
+	return apply_filters( 'secupress.firewall.ng_calibratable_uri_slugs', $slugs );
+}
+
+/**
+ * Tell if a request URI match is a common page slug that Learning Mode can review.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ *
+ * @param (string) $slug
+ * @param (string) $match
+ *
+ * @return (bool)
+ */
+function secupress_firewall_ng_uri_slug_is_calibratable( $slug, $match ) {
+	if ( 'ng_request_uri' !== $slug ) {
+		return false;
+	}
+	$path = strtolower( (string) $match );
+	$path = trim( $path, '/' );
+	return in_array( $path, secupress_firewall_ng_calibratable_uri_slugs(), true );
 }
 
 /**
  * Get the severity of a NG regex pattern.
  *
+ * @since 2.7.2 Common request URI slugs are calibratable per matched path.
  * @since 2.7.1
  * @author Julio Potier
  *
  * @param (string) $slug
  * @param (string) $pattern
+ * @param (string) $match
  *
  * @return (string) `critical` or `calibratable`.
  */
-function secupress_firewall_ng_get_severity( $slug, $pattern ) {
+function secupress_firewall_ng_get_severity( $slug, $pattern, $match = '' ) {
 	$severity = 'critical';
 	$pattern  = (string) $pattern;
-	if ( in_array( $pattern, secupress_firewall_ng_watch_patterns(), true ) ) {
+	if ( in_array( $pattern, secupress_firewall_ng_watch_patterns(), true ) || secupress_firewall_ng_uri_slug_is_calibratable( $slug, $match ) ) {
 		$severity = 'calibratable';
 	}
 
@@ -1032,6 +1094,9 @@ add_action( 'shutdown', 'secupress_firewall_learning_count_request', 20 );
  * @author Julio Potier
  */
 function secupress_firewall_learning_count_request() {
+	if ( secupress_cache_data( 'firewall_learning_stopped' ) ) {
+		return;
+	}
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['action'] ) && 'secupress-learning-progress' === $_REQUEST['action'] ) {
 		return;
 	}
@@ -1439,19 +1504,29 @@ function secupress_firewall_learning_clear_schedule() {
 
 /**
  * Stop Learning Mode because the 8G pack was turned off.
+ * Pending signatures are discarded. Nothing is blocked.
  *
  * @since 2.7.1
  * @author Julio Potier
  */
 function secupress_firewall_learning_deactivate() {
+	secupress_cache_data( 'firewall_learning_stopped', 1 );
 	secupress_firewall_learning_clear_schedule();
+	delete_site_transient( 'secupress_firewall_learning_ended_notice' );
+	secupress_firewall_learning_set_hits( [] );
 	$state = get_site_option( SECUPRESS_FIREWALL_LEARNING, [] );
-	if ( ! is_array( $state ) || empty( $state['status'] ) || 'off' === $state['status'] ) {
-		return;
+	if ( ! is_array( $state ) ) {
+		$state = [];
 	}
-	$state['status'] = 'off';
-	$state['ends']   = time();
+	$state['status']         = 'off';
+	$state['started']        = 0;
+	$state['ends']           = 0;
+	$state['requests_front'] = 0;
+	$state['requests_admin'] = 0;
 	secupress_firewall_learning_set_state( $state );
+	if ( function_exists( 'secupress_reinit_notice' ) ) {
+		secupress_reinit_notice( 'firewall-learning-mode-intro' );
+	}
 }
 
 /**
@@ -2063,6 +2138,9 @@ add_action( 'current_screen', 'secupress_firewall_learning_admin_notices' );
  * @author Julio Potier
  */
 function secupress_firewall_learning_admin_notices() {
+	if ( ! is_admin() || ! function_exists( 'secupress_notice_is_dismissed' ) ) {
+		return;
+	}
 	if ( ! current_user_can( secupress_get_capability() ) ) {
 		return;
 	}

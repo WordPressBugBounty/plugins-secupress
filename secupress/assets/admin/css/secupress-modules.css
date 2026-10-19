@@ -2495,7 +2495,8 @@ li.secupress-status-success{
 	}
 }
 @media (prefers-reduced-motion: reduce) {
-	.secupress-security-status-icon {
+	.secupress-security-status-icon,
+	.secupress-firewall-dot:before {
 		animation: none;
 	}
 }
@@ -2522,6 +2523,10 @@ li.secupress-status-success{
 	font-size: 13px;
 	opacity: 0.9;
 }
+.secupress-security-status-description .secupress-attack-trend {
+	display: inline-flex;
+	font-size: 13px;
+}
 .secupress-security-status-count {
 	display: inline-block;
 	padding: 1px 8px;
@@ -2547,6 +2552,57 @@ li.secupress-status-success{
 .secupress-security-status-idle .secupress-security-status-count:not(.secupress-security-status-grade) {
 	background: rgba(247, 171, 19, 0.18);
 	color: #C47D0A;
+}
+.secupress-security-status .secupress-security-status-count.secupress-security-status-firewall {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.secupress-security-status .secupress-security-status-count.secupress-security-status-firewall.secupress-security-status-firewall-off {
+	background: rgba(203, 35, 79, 0.14);
+	color: #CB234F;
+}
+.secupress-security-status .secupress-security-status-count.secupress-security-status-firewall.secupress-security-status-firewall-partial {
+	background: rgba(241, 155, 18, 0.18);
+	color: #C47D0A;
+}
+.secupress-security-status .secupress-security-status-count.secupress-security-status-firewall.secupress-security-status-firewall-learning {
+	background: rgba(47, 128, 237, 0.16);
+	color: #1D6FD6;
+}
+.secupress-firewall-dot {
+	position: relative;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: currentColor;
+	flex-shrink: 0;
+}
+.secupress-firewall-dot:before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	background: currentColor;
+	animation: secupress-firewall-pulse 2.2s ease-out infinite;
+}
+.secupress-security-status-firewall-off .secupress-firewall-dot:before,
+.secupress-security-status-firewall-paused .secupress-firewall-dot:before {
+	animation: none;
+	opacity: 0;
+}
+.secupress-security-status-firewall-partial .secupress-firewall-dot:before {
+	animation-duration: 4.4s;
+}
+@keyframes secupress-firewall-pulse {
+	0% {
+		transform: scale(1);
+		opacity: 0.55;
+	}
+	100% {
+		transform: scale(2.6);
+		opacity: 0;
+	}
 }
 .secupress-security-status-more,
 .secupress-security-status-info {

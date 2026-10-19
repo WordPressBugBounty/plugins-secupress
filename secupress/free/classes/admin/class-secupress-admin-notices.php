@@ -14,8 +14,9 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  */
 class SecuPress_Admin_Notices extends SecuPress_Singleton {
 
-	const VERSION   = '1.1';
-	const META_NAME = 'dismissed_secupress_notices';
+	const VERSION     = '1.1';
+	const META_NAME   = 'dismissed_secupress_notices';
+	const SITE_OPTION = 'dismissed_secupress_notices_site';
 
 	/**
 	 * Singleton The reference to *Singleton* instance of this class.
@@ -197,8 +198,64 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 
 
 	/**
-	 * Tell if a notice is dismissed.
+	 * Dismiss a notice for the whole site.
 	 *
+	 * @author Julio Potier
+	 * @since 2.7.2
+	 *
+	 * @param (string) $notice_id The notice identifier.
+	 *
+	 * @return (bool) true on success.
+	 */
+	public static function dismiss_for_site( $notice_id ) {
+		$notice_id = $notice_id ? sanitize_title( $notice_id ) : $notice_id;
+
+		if ( ! $notice_id ) {
+			return false;
+		}
+
+		$dismissed = (string) get_option( self::SITE_OPTION, '' );
+		$dismissed = ',' . $dismissed . ',';
+
+		if ( false === strpos( $dismissed, ',' . $notice_id . ',' ) ) {
+			$dismissed = trim( $dismissed . $notice_id, ',' );
+			$dismissed = str_replace( ',,', ',', $dismissed );
+			update_option( self::SITE_OPTION, $dismissed );
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Tell if a notice is dismissed for the whole site.
+	 *
+	 * @author Julio Potier
+	 * @since 2.7.2
+	 *
+	 * @param (string) $notice_id The notice identifier.
+	 *
+	 * @return (bool)
+	 */
+	public static function is_dismissed_for_site( $notice_id ) {
+		if ( ! $notice_id ) {
+			return false;
+		}
+
+		$notice_id = sanitize_title( $notice_id );
+		$dismissed = explode( ',', (string) get_option( self::SITE_OPTION, '' ) );
+		$dismissed = array_flip( $dismissed );
+
+		return isset( $dismissed[ $notice_id ] );
+	}
+
+
+	/**
+	 * Tell if a notice is dismissed for the current user or for the whole site.
+	 *
+	 * @since 2.7.2 A site-wide dismissal hides the notice for every user.
+	 * @since 2.7.2 Sanitize the identifier, same as dismiss().
 	 * @since 1.0
 	 *
 	 * @param (string) $notice_id The notice identifier.
@@ -207,6 +264,10 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	 */
 	public static function is_dismissed( $notice_id ) {
 		if ( $notice_id ) {
+			$notice_id = sanitize_title( $notice_id );
+			if ( self::is_dismissed_for_site( $notice_id ) ) {
+				return true;
+			}
 			// Get dismissed notices.
 			$dismissed = explode( ',', (string) get_user_option( self::META_NAME, get_current_user_id() ) );
 			$dismissed = array_flip( $dismissed );
@@ -402,6 +463,7 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	/**
 	 * Ajax callback that stores the "dismissed" state.
 	 *
+	 * @since 2.7.2 An already dismissed notice is a success.
 	 * @since 2.2.6 Usage of the $capa param
 	 * @since 1.0
 	 */
@@ -422,12 +484,15 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 			_deprecated_hook( 'secupress.notices.dismiss_capability', '2.2.6', '(none)', 'A 4th parameter $capa has been added to secupress_add_notice()' );
 		}
 
+		// dismiss() returns false when the notice is already stored.
+		$dismissed = self::dismiss( $notice_id ) || self::is_dismissed( $notice_id );
+
 		if ( wp_doing_ajax() ) {
-			if ( self::dismiss( $notice_id ) ) {
+			if ( $dismissed ) {
 				wp_die( 1 );
 			}
 		} else {
-			if ( self::dismiss( $notice_id ) ) {
+			if ( $dismissed ) {
 				wp_safe_redirect( esc_url_raw( wp_get_referer() ) );
 				die();
 			}

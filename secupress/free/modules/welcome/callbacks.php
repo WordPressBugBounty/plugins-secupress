@@ -363,6 +363,7 @@ function secupress_global_settings_activate_pro_license( $new_values, $old_value
  * Trigger a settings error if the given API request failed.
  *
  * @since 1.0
+ * @since 2.7.2 A valid JSON body is read before the HTTP status, and a string "false" success is an error.
  * @author Grégory Viguier
  *
  * @param (mixed) $response The request response.
@@ -377,40 +378,38 @@ function secupress_global_settings_api_request_succeeded( $response ) {
 			$listMessages = $listMessages . ' - ' . $message;
 		}
 
-		// The request couldn't be sent.
 		secupress_add_settings_error( 'general', 'request_error', secupress_global_settings_pro_license_activation_error_message( 'request_error' ) . $listMessages );
 		return false;
 	}
 
+	$raw_body = wp_remote_retrieve_body( $response );
+	$body     = @json_decode( $raw_body );
+
+	if ( is_object( $body ) ) {
+		$is_success = isset( $body->success ) && wp_validate_boolean( $body->success );
+
+		if ( ! $is_success ) {
+			if ( ! empty( $body->data->error ) ) {
+				secupress_add_settings_error( 'general', $body->data->error, secupress_global_settings_pro_license_activation_error_message( $body->data->error ) );
+			} elseif ( ! empty( $body->data->code ) ) {
+				secupress_add_settings_error( 'general', $body->data->code, secupress_global_settings_pro_license_activation_error_message( $body->data->code ) );
+			} else {
+				secupress_add_settings_error( 'general', 'license_error', secupress_global_settings_pro_license_activation_error_message( 'license_error' ) );
+			}
+
+			return false;
+		}
+
+		return $body;
+	}
+
 	if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-		// The server couldn't be reached. Maybe a server error or something.
 		secupress_add_settings_error( 'general', 'server_error', secupress_global_settings_pro_license_activation_error_message( 'server_error' ) );
 		return false;
 	}
 
-	$body = wp_remote_retrieve_body( $response );
-	$body = @json_decode( $body );
-
-	if ( ! is_object( $body ) ) {
-		// The response is not a json.
-		secupress_add_settings_error( 'general', 'server_bad_response', secupress_global_settings_pro_license_activation_error_message( 'server_bad_response' ) );
-		return false;
-	}
-
-	if ( empty( $body->success ) ) {
-		// The response is an error.
-		if ( ! empty( $body->data->error ) ) {
-			secupress_add_settings_error( 'general', $body->data->error, secupress_global_settings_pro_license_activation_error_message( $body->data->error ) );
-		} elseif ( ! empty( $body->data->code ) ) {
-			secupress_add_settings_error( 'general', $body->data->code, secupress_global_settings_pro_license_activation_error_message( $body->data->code ) );
-		} else {
-			secupress_add_settings_error( 'general', 'license_error', secupress_global_settings_pro_license_activation_error_message( 'license_error' ) );
-		}
-
-		return false;
-	}
-
-	return $body;
+	secupress_add_settings_error( 'general', 'server_bad_response', secupress_global_settings_pro_license_activation_error_message( 'server_bad_response' ) );
+	return false;
 }
 
 

@@ -86,17 +86,56 @@ $this->add_field( array(
 	),
 ) );
 
+$field_name       = $this->get_field_name( 'application-passwords' );
+$is_plugin_active = [];
+$helpers          = [
+	[
+		'depends'     => $field_name . '_application-passwords',
+		'type'        => 'description',
+		'description' => __( 'If the user has the Administrator capability, the site admin will also receive an extra email.', 'secupress' ),
+	],
+	[
+		'depends'     => $field_name . '_disable-application-passwords',
+		'type'        => 'description',
+		'description' => __( 'Any authentication attempt using an Application Password will be refused and logged as a login attack. The Application Passwords section is also removed from user profiles, and new passwords cannot be created.', 'secupress' ),
+	],
+];
+
+if ( secupress_is_submodule_active( 'users-login', 'application-passwords' ) ) {
+	$is_plugin_active[] = 'application-passwords';
+}
+if ( secupress_is_submodule_active( 'users-login', 'disable-application-passwords' ) ) {
+	$is_plugin_active[] = 'disable-application-passwords';
+} else {
+	$app_passwords_users = secupress_get_application_passwords_user_count();
+	if ( $app_passwords_users ) {
+		$helpers[] = [
+			'depends'     => $field_name . '_disable-application-passwords',
+			'type'        => 'warning',
+			'description' => sprintf(
+				_n(
+					'%s account currently has an Application Password. It will become unusable.',
+					'%s accounts currently have Application Passwords. They will become unusable.',
+					$app_passwords_users,
+					'secupress'
+				),
+				number_format_i18n( $app_passwords_users )
+			),
+		];
+	}
+}
+
 $this->add_field( array(
 	'title'             => __( 'Application Passwords', 'secupress' ),
-	'label_for'         => $this->get_field_name( 'application-passwords' ),
+	'name'              => $field_name,
 	'plugin_activation' => true,
-	'type'              => 'checkbox',
-	'value'             => (int) secupress_is_submodule_active( 'users-login', 'application-passwords' ),
-	'label'             => __( 'Yes, alert users when an Application Password is added to their account', 'secupress' ),
-	'helpers'           => array(
-		array(
-			'type'        => 'description',
-			'description' => __( 'If the user has the Administrator capability, the site admin will also receive an extra email.', 'secupress' ),
-		),
+	'type'              => 'radioboxes',
+	'value'             => $is_plugin_active,
+	'default'           => array(),
+	'label_screen'      => __( 'Application Passwords', 'secupress' ),
+	'options'           => array(
+		'application-passwords'         => __( 'Yes, <strong>alert</strong> users when an Application Password is added to their account', 'secupress' ),
+		'disable-application-passwords' => __( 'Yes, <strong>disable</strong> Application Passwords on this site', 'secupress' ),
 	),
+	'helpers'           => $helpers,
 ) );

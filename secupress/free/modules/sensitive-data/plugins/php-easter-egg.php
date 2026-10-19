@@ -55,7 +55,7 @@ add_action( 'secupress.modules.activate_submodule_' . basename( __FILE__, '.php'
  */
 function secupress_php_disclosure_activation_file() {
 	secupress_php_disclosure_activation();
-	secupress_scanit( 'PHP_Disclosure', 3 );
+	secupress_scanit_async( 'PHP_Disclosure', 3 );
 }
 
 
@@ -67,7 +67,7 @@ add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.ph
  */
 function secupress_php_disclosure_deactivate() {
 	secupress_remove_module_rules_or_notice( 'php_disclosure', __( 'PHP Disclosure', 'secupress' ) );
-	secupress_scanit( 'PHP_Disclosure', 3 );
+	secupress_scanit_async( 'PHP_Disclosure', 3 );
 }
 
 

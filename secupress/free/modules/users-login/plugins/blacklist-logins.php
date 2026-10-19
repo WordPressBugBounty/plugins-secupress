@@ -153,6 +153,97 @@ function secupress_auth_redirect_blacklist_logins( $user_id ) {
 }
 
 
+add_action( 'auth_redirect', 'secupress_auth_redirect_blacklist_display_name', 13 );
+/**
+ * Ask a connected user to replace a disallowed display name before reaching the administration.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (int) $user_id User ID.
+ */
+function secupress_auth_redirect_blacklist_display_name( $user_id ) {
+	global $sp_action, $wp_errors;
+
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	$raw_user = get_userdata( $user_id );
+
+	if ( ! $raw_user || ! secupress_is_username_blacklisted( $raw_user->display_name ) ) {
+		return;
+	}
+
+	$sp_action    = 'new-display-name';
+	$post_param   = "secupress-blacklist-logins-{$sp_action}";
+	$nonce_action = "{$post_param}-{$user_id}";
+	$error        = '';
+
+	if ( isset( $_POST[ $post_param ], $_POST['sp_action'] ) && $sp_action === $_POST['sp_action'] ) {
+		$display_name = sanitize_text_field( wp_unslash( $_POST[ $post_param ] ) );
+
+		if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], $nonce_action ) ) {
+			secupress_die( __( 'Something went wrong.', 'secupress' ), '', [ 'force_die' => true, 'context' => 'bad_display_name_on_login', 'attack_type' => 'login' ] );
+		}
+
+		if ( '' === $display_name ) {
+			$error = __( 'Name required.', 'secupress' );
+		} elseif ( secupress_is_username_blacklisted( $display_name ) ) {
+			$error = __( 'Sorry, that display name is not allowed.', 'secupress' );
+		} else {
+			$updated = wp_update_user( [
+				'ID'           => $user_id,
+				'display_name' => $display_name,
+			] );
+			if ( is_wp_error( $updated ) ) {
+				$error = $updated->get_error_message();
+			}
+		}
+
+		if ( ! $error ) {
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), _x( 'Display Name', 'bad logins', 'secupress' ), secupress_tag_me( esc_html( $display_name ), 'strong' ) ), 'updated', 'display-name-updated', 'exist' );
+			return;
+		}
+	}
+
+	$message   = sprintf(
+		_n( 'Your current %s %s is not allowed.', 'Your current %s %s are not allowed.', 1, 'secupress' ),
+		_x( 'Display Name', 'bad logins', 'secupress' ),
+		secupress_tag_me( esc_html( $raw_user->display_name ), 'strong' )
+	);
+	$message  .= '<br>' . _n( 'You must update it to successfully log in.', 'You must update them to successfully log in.', 1, 'secupress' );
+
+	$wp_errors = new WP_Error();
+	$wp_errors->add( "{$sp_action}-message", $message, 'message' );
+	if ( $error ) {
+		$wp_errors->add( "{$sp_action}-error", $error, 'error' );
+		add_action( 'secupress_login_page.shake_js', '__return_true' );
+	}
+
+	ob_start();
+	?>
+	<form name="loginform" id="loginform" action="" method="post">
+		<p>
+			<label for="<?php echo $sp_action; ?>"><?php _e( 'New display name:', 'secupress' ); ?></label><br/>
+			<input type="text" id="<?php echo $sp_action; ?>" name="<?php echo $post_param; ?>" value="" maxlength="250" required="required" aria-required="true" autocorrect="off" autocapitalize="off"/>
+		</p>
+		<?php
+		submit_button( _x( 'Rename', 'verb', 'secupress' ) );
+		wp_nonce_field( $nonce_action );
+		?>
+		<input type="hidden" name="sp_action" value="<?php echo esc_attr( $sp_action ); ?>">
+	</form>
+	<?php
+	$content = ob_get_clean();
+
+	if ( ! secupress_is_soft_request() ) {
+		wp_send_json_error( [ 'error' => $error, 'message' => $message ] );
+	} else {
+		secupress_login_page( __( 'Please change your display name', 'secupress' ), $content, $wp_errors );
+	}
+}
+
 add_action( 'auth_redirect', 'secupress_pro_same_usernames_on_login', 12 );
 /**
  * Check the login same as nickname/display_name on login
@@ -225,6 +316,9 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 		}
 		if ( 0 === strcmp( $new_name, $raw_user->user_login ) ) {
 			$error = __( 'Sorry, this should be different from your login.', 'secupress' );
+		}
+		if ( ! $error && secupress_is_username_blacklisted( $new_name ) ) {
+			$error = __( 'Sorry, that display name is not allowed.', 'secupress' );
 		}
 		if ( secupress_get_user_by( $new_name ) ) {
 			$error = __( 'Sorry, that username already exists!', 'secupress' );
@@ -478,7 +572,35 @@ function secupress_blacklist_logins_user_profile_update_errors( $errors, $update
 	if ( secupress_is_username_blacklisted( $user->user_login ) ) {
 		$errors->add( 'user_name',  __( 'Sorry, that username is not allowed.', 'secupress' ) );
 	}
+	if ( ! empty( $user->display_name ) && secupress_is_username_blacklisted( $user->display_name ) ) {
+		$errors->add( 'display_name', __( 'Sorry, that display name is not allowed.', 'secupress' ) );
+	}
 	return $errors;
+}
+
+
+add_filter( 'rest_pre_insert_user', 'secupress_blacklist_logins_rest_display_name', 10, 2 );
+/**
+ * Refuse a disallowed display name sent through the REST API.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (object)          $prepared_user User object prepared for insert.
+ * @param (WP_REST_Request) $request       Request used to generate the user.
+ *
+ * @return (object|WP_Error)
+ */
+function secupress_blacklist_logins_rest_display_name( $prepared_user, $request ) {
+	if ( is_wp_error( $prepared_user ) ) {
+		return $prepared_user;
+	}
+
+	if ( ! empty( $prepared_user->display_name ) && secupress_is_username_blacklisted( $prepared_user->display_name ) ) {
+		return new WP_Error( 'display_name', __( 'Sorry, that display name is not allowed.', 'secupress' ) );
+	}
+
+	return $prepared_user;
 }
 
 
@@ -508,24 +630,33 @@ add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.ph
  * @since 2.0
  */
 function secupress_bad_logins_de_activate_file() {
-	secupress_scanit( 'Bad_Usernames' );
+	secupress_scanit_async( 'Bad_Usernames' );
 }
 
-add_filter( 'user_row_actions', 'secupress_bad_logins_css', 10, 2 );
-function secupress_bad_logins_css( $dummy, $user_object ) {
-	static $even;
-	$even++;
-	if ( secupress_is_username_blacklisted( $user_object->user_login ) ) {
-		$bg = $even % 2 !== 0 ? "background-image: linear-gradient(130deg, rgba(170, 170, 170, 0.07) 25%, transparent 25%, transparent 50%, rgba(170, 170, 170, 0.07) 50%, rgba(170, 170, 170, 0.07) 75%, transparent 75%, transparent 100%);"
-						: "background-image: linear-gradient(130deg, rgba(170, 170, 170, 0.13) 25%, transparent 25%, transparent 50%, rgba(170, 170, 170, 0.13) 50%, rgba(170, 170, 170, 0.13) 75%, transparent 75%, transparent 100%);";
-        echo "<style type='text/css'>
-            #user-{$user_object->ID} {
-        		{$bg}
-                background-size: 12px 15px;
-            }
-        </style>";
+add_action( 'admin_head-users.php', 'secupress_bad_logins_css' );
+/**
+ * Highlight blacklisted usernames in the users.php table.
+ *
+ * @since 2.2.6
+ * @author Julio Potier
+ */
+function secupress_bad_logins_css() {
+	$bad_user_ids = array_map( 'intval', secupress_get_bad_username_ids() );
+	if ( ! $bad_user_ids ) {
+		return;
 	}
-	return $dummy;
+
+	$user_row_ids = implode( ',', array_map( function( $user_id ) {
+		return '#user-' . $user_id;
+	}, $bad_user_ids ) );
+	?>
+	<style type="text/css">
+		<?php echo $user_row_ids; ?> {
+			background-image: linear-gradient(130deg, rgba(255, 70, 70, 0.125) 25%, transparent 25%, transparent 50%, rgba(255, 70, 70, 0.125) 50%, rgba(255, 70, 70, 0.125) 75%, transparent 75%, transparent 100%);
+			background-size: 12px 15px;
+		}
+	</style>
+	<?php
 }
 
 add_filter( 'views_users', 'secupress_bad_username_view' );
@@ -582,11 +713,12 @@ function secupress_get_bad_username_ids() {
     $list = implode( '\',\'', $list );
     if ( ! empty( $jokr ) ) {
 		$like .= ' OR ' . implode( ' OR ', array_map( function( $username ) {
-		return "user_login LIKE '" . str_replace( '*', '%', $username ) . "'";
+		$like_name = str_replace( '*', '%', $username );
+		return "user_login LIKE '" . $like_name . "' OR display_name LIKE '" . $like_name . "'";
 		}, $jokr ) );    	
     }
 	if ( secupress_get_module_option( 'blacklist-logins_admin', 0, 'users-login' ) ) {
-		$like .= " OR ( user_login LIKE '%admin%' AND user_login != 'admin')";
+		$like .= " OR ( user_login LIKE '%admin%' AND user_login != 'admin') OR ( display_name LIKE '%admin%' AND display_name != 'admin')";
 	}
 	$allowed_usernames = array_flip( apply_filters( 'secupress.plugins.allowed_usernames', [] ) );
 	if ( ! empty( $allowed_usernames ) ) {
@@ -595,15 +727,15 @@ function secupress_get_bad_username_ids() {
 		}, $allowed_usernames ) ) . ')';    	
 	}
     // No sanitization needed since it's hardcoded, no user input.
-    $sql      = "SELECT ID FROM {$wpdb->users} WHERE user_login in ('{$list}')" . $like;
+    $sql      = "SELECT ID FROM {$wpdb->users} WHERE user_login in ('{$list}') OR display_name in ('{$list}')" . $like;
     $user_ids = $wpdb->get_col( $sql );
 
     return $user_ids;
 }
 
-add_action( 'pre_get_users', 'secupress_bad_username_custom_modify_user_query' );
+add_action( 'pre_get_users', 'secupress_bad_username_custom_modify_user_query', 11 );
 /**
- * Modify the user query based on the "Connected users" filter.
+ * Exclude bad usernames from the default users list and include them on the dedicated view.
  *
  * @since 2.2.6
  * @author Julio Potier
@@ -613,20 +745,93 @@ add_action( 'pre_get_users', 'secupress_bad_username_custom_modify_user_query' )
  */
 function secupress_bad_username_custom_modify_user_query( $query ) {
 	global $pagenow;
+
 	if ( ! isset( $pagenow ) || 'users.php' !== $pagenow || ! is_admin() ) {
 		return $query;
 	}
-	$_user_ids = [];
-	remove_action( 'pre_get_users', 'secupress_bad_username_custom_modify_user_query' );
-	if ( isset( $_GET['secupress_bad_username'] ) && $_GET['secupress_bad_username'] === '1' ) {
-		$_user_ids = secupress_get_bad_username_ids();
-	}
-	add_action( 'pre_get_users', 'secupress_bad_username_custom_modify_user_query' );
 
-	if ( ! empty( $_user_ids ) ) {
-		$query->set( 'include', $_user_ids );
+	$bad_user_ids = array_map( 'intval', secupress_get_bad_username_ids() );
+	if ( ! $bad_user_ids ) {
+		return $query;
 	}
+
+	if ( isset( $_GET['secupress_bad_username'] ) && '1' === $_GET['secupress_bad_username'] ) {
+		$query->set( 'include', $bad_user_ids );
+		return $query;
+	}
+
+	if ( isset( $_GET['secupress_users'] ) ) {
+		return $query;
+	}
+
+	$exclude = $query->get( 'exclude' );
+	$exclude = is_array( $exclude ) ? $exclude : [];
+	$query->set( 'exclude', array_values( array_unique( array_merge( array_map( 'intval', $exclude ), $bad_user_ids ) ) ) );
+
 	return $query;
+}
+
+add_filter( 'pre_count_users', 'secupress_bad_username_count_users', 20, 3 );
+/**
+ * Subtract bad usernames from the default users.php counts.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (null|array) $result   Precomputed counts.
+ * @param (string)     $strategy Count strategy.
+ * @param (int)        $site_id  Site ID.
+ *
+ * @return (null|array)
+ **/
+function secupress_bad_username_count_users( $result, $strategy, $site_id ) {
+	global $pagenow;
+
+	if ( ! isset( $pagenow ) || 'users.php' !== $pagenow ) {
+		return $result;
+	}
+
+	$bad_user_ids = array_map( 'intval', secupress_get_bad_username_ids() );
+	if ( ! $bad_user_ids ) {
+		return $result;
+	}
+
+	if ( secupress_is_submodule_active( 'users-login', 'user-creation-protection' ) ) {
+		$fake_ids     = wp_list_pluck( secupress_get_fake_users(), 'ID' );
+		$bad_user_ids = array_values( array_diff( $bad_user_ids, array_map( 'intval', $fake_ids ) ) );
+		if ( ! $bad_user_ids ) {
+			return $result;
+		}
+	}
+
+	if ( null === $result ) {
+		remove_filter( 'pre_count_users', 'secupress_bad_username_count_users', 20 );
+		$result = count_users( $strategy, $site_id );
+		add_filter( 'pre_count_users', 'secupress_bad_username_count_users', 20, 3 );
+	}
+
+	if ( ! is_array( $result ) || ! isset( $result['total_users'] ) ) {
+		return $result;
+	}
+
+	foreach ( $bad_user_ids as $user_id ) {
+		$roles = secupress_get_user_roles( $user_id );
+		if ( ! $roles && isset( $result['avail_roles']['none'] ) ) {
+			$result['avail_roles']['none'] = max( 0, (int) $result['avail_roles']['none'] - 1 );
+		}
+		foreach ( $roles as $role ) {
+			if ( isset( $result['avail_roles'][ $role ] ) ) {
+				$result['avail_roles'][ $role ] = max( 0, (int) $result['avail_roles'][ $role ] - 1 );
+				if ( 0 === (int) $result['avail_roles'][ $role ] ) {
+					unset( $result['avail_roles'][ $role ] );
+				}
+			}
+		}
+	}
+
+	$result['total_users'] = max( 0, (int) $result['total_users'] - count( $bad_user_ids ) );
+
+	return $result;
 }
 
 add_filter( 'body_class', 'secupress_usernames_security_body_class', 100 );

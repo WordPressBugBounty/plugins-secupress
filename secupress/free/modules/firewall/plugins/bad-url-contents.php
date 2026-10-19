@@ -60,5 +60,5 @@ add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.ph
  * @since 2.0
  */
 function secupress_bad_url_contents_de_activate_file() {
-	secupress_scanit( 'SQLi' );
+	secupress_scanit_async( 'SQLi', 3 );
 }

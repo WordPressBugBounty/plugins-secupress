@@ -91,9 +91,8 @@ function secupress_content_protection_settings_callback( $modulenow, &$settings,
 		$settings['content-protect_bad-url-access_allowed-urls'] = implode( "\n", array_filter( explode( "\n", $settings['content-protect_bad-url-access_allowed-urls'] ), '_secupress_bad_url_access_allowed_url_filter' ) );
 		$settings['content-protect_bad-url-access_allowed-urls'] = _secupress_bad_url_access_allowed_urls_sanitize( $settings['content-protect_bad-url-access_allowed-urls'] );
 	}
-	secupress_manage_submodule( $modulenow, 'bad-url-access-pro',  'allowed'    === $settings['content-protect_bad-url-access'] );
-	secupress_manage_submodule( $modulenow, 'bad-file-extensions', 'disallowed' === $settings['content-protect_bad-url-access'] );
-	secupress_manage_submodule( $modulenow, 'bad-url-access',      'disallowed' === $settings['content-protect_bad-url-access'] );
+	secupress_manage_submodule( $modulenow, 'bad-url-access-pro', 'allowed'    === $settings['content-protect_bad-url-access'] );
+	secupress_manage_submodule( $modulenow, 'bad-url-access',     'disallowed' === $settings['content-protect_bad-url-access'] );
 
 	$plugin_disclose = ! empty( $activate['content-protect_plugin-version-discloses'] ) && is_array( $activate['content-protect_plugin-version-discloses'] ) ? array_flip( $activate['content-protect_plugin-version-discloses'] ) : array();
 	$wp_plugins      = array( 'woocommerce', 'wpml' );

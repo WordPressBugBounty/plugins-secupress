@@ -65,7 +65,7 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 			1   => __( 'Module activated: The users with a disallowed username will be asked to change it, also users with a nickname same as their login will be automatically renamed.', 'secupress' ),
 			2   => __( 'Users updated: The users with a login same as their nickname or display_name have been renamed, their login is still the same.', 'secupress' ),
 			// "bad"
-			200 => _n_noop( '<strong>%1$s user</strong> has a disallowed username: %2$s', '<strong>%1$s users</strong> have a disallowed username: %2$s', 'secupress' ),
+			200 => _n_noop( '<strong>%1$s user</strong> has a disallowed username or display name: %2$s', '<strong>%1$s users</strong> have a disallowed username or display name: %2$s', 'secupress' ),
 			201 => _n_noop( '<strong>%1$s user</strong> has the same display name as login: %2$s', '<strong>%1$s users</strong> have the same display name as login: %2$s', 'secupress' ),
 			202 => _n_noop( '<strong>%1$s user</strong> has the same nickname as login: %2$s', '<strong>%1$s users</strong> have the same nickname as login: %2$s', 'secupress' ),
 			// "cantfix"
@@ -119,7 +119,7 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 
 		// Blacklisted names.
 		$names  = static::get_blacklisted_usernames();
-		$sql    = "SELECT user_login from $wpdb->users WHERE user_login REGEXP '^($names)$'"; // WPCS: unprepared SQL ok.
+		$sql    = "SELECT user_login from $wpdb->users WHERE user_login REGEXP '^($names)$' OR display_name REGEXP '^($names)$'"; // WPCS: unprepared SQL ok.
 		$logins = $wpdb->get_col( $sql );
 		$ids    = count( $logins );
 
@@ -192,7 +192,7 @@ class SecuPress_Scan_Bad_Usernames extends SecuPress_Scan implements SecuPress_S
 
 		// Blacklisted names.
 		$names = static::get_blacklisted_usernames();
-		$ids   = $wpdb->get_col( "SELECT ID from $wpdb->users WHERE user_login REGEXP '^($names)$'" ); // WPCS: unprepared SQL ok.
+		$ids   = $wpdb->get_col( "SELECT ID from $wpdb->users WHERE user_login REGEXP '^($names)$' OR display_name REGEXP '^($names)$'" ); // WPCS: unprepared SQL ok.
 
 		if ( $ids ) {
 			$activated = secupress_is_submodule_active( 'users-login', 'blacklist-logins' );

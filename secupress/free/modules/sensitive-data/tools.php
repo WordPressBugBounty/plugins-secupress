@@ -443,7 +443,7 @@ function secupress_blackhole_please_click_me( $template ) {
 	$dirname = secupress_get_hashed_folder_name( basename( __FILE__, '.php' ) );
 
 	if ( isset( $_REQUEST['token'] ) && wp_verify_nonce( $_REQUEST['token'], 'ban_me_please-' . date( 'ymdhi' ) ) ) {
-		$ip      = secupress_get_ip( 'REMOTE_ADDR' );
+		$ip      = secupress_get_ip();
 		$ban_ips = get_site_option( SECUPRESS_BAN_IP );
 
 		if ( ! is_array( $ban_ips ) ) {

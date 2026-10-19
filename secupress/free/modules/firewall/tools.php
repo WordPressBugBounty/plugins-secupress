@@ -373,7 +373,7 @@ function secupress_firewall_block_regex_slug( $slug, $value, $block_id ) {
 				'pattern_hash' => $hash,
 				'match'        => $matched,
 				'subject'      => (string) $value,
-				'severity'     => secupress_firewall_ng_get_severity( $slug, $pattern ),
+				'severity'     => secupress_firewall_ng_get_severity( $slug, $pattern, $matched ),
 			] );
 			return;
 		}

@@ -16,6 +16,7 @@ if ( secupress_users_contains_duplicated_hashes() ) {
 	$helper_type  = 'warning';
 	$is_disabled  = true;
 	$helper_desc  = sprintf( __( 'Your database table %s contains duplicated password hashes, <strong>which is highly suspicious</strong>. This feature adds a unique INDEX to this table, and will not function properly. Please, address this issue as soon as possible.', 'secupress' ), secupress_code_me( 'users' ) );
+	$helper_desc  = sprintf( __( 'Suspicious duplicate password signatures were detected among your user accounts. A review on your user accounts is required.', 'secupress' ), secupress_code_me( 'users' ) );
 }
 $this->add_field( array(
 	'title'             => __( 'Protect User Creation', 'secupress' ),
@@ -104,7 +105,7 @@ $this->add_field( array(
 	'plugin_activation' => true,
 	'type'              => 'checkbox',
 	'value'             => (int) secupress_is_submodule_active( 'users-login', 'blacklist-logins' ),
-	'label'             => __( 'Yes, prevent users from using disallowed usernames', 'secupress' ),
+	'label'             => __( 'Yes, prevent users from using disallowed usernames and display names', 'secupress' ),
 ) );
 
 $user_login   = wp_get_current_user()->user_login;

@@ -55,13 +55,19 @@ $this->add_field( array(
 	'type'        => 'checkbox',
 	'value'       => (int) secupress_firewall_ng_is_enabled(),
 	/* translators: %s: firewall pack name (e.g. 8G) */
-	'label'       => sprintf( __( 'Yes, add %s signatures to the selected optionsThis feature is unavailable. Your server cannot verify hostnames accurately. We apologize for the inconvenience.', 'secupress' ), secupress_firewall_ng_name() ),
+	'label'       => sprintf( __( 'Yes, add %s signatures to the selected options.', 'secupress' ), secupress_firewall_ng_name() ),
 ) );
 
-$this->add_field( array(
-	'title'       => __( 'Firewall Learning Mode', 'secupress' ),
-	/* translators: %s: firewall pack name (e.g. 8G) */
-	'description' => sprintf( __( '%s rules adapt to this site instead of blocking blindly. Calibrable signatures are observed; critical exploits are always blocked.', 'secupress' ), secupress_firewall_ng_name() ),
-	'name'        => $this->get_field_name( 'learning' ),
-	'type'        => 'learning_mode',
-) );
+$learning_field = array(
+	'title' => __( 'Firewall Learning Mode', 'secupress' ),
+	'name'  => $this->get_field_name( 'learning' ),
+	'type'  => 'learning_mode',
+);
+if ( secupress_firewall_ng_is_enabled() ) {
+	$learning_field['description'] = sprintf(
+		/* translators: %s: firewall pack name (e.g. 8G) */
+		__( '%s rules adapt to this site instead of blocking blindly. Calibrable signatures are observed; critical exploits are always blocked.', 'secupress' ),
+		secupress_firewall_ng_name()
+	);
+}
+$this->add_field( $learning_field );

@@ -6,9 +6,39 @@ $this->set_current_section( 'login_auth2' );
 $this->add_section( __( 'Login Control', 'secupress' ) );
 
 
+$field_name = $this->get_field_name( 'number_attempts' );
+if ( secupress_feature_is_expert( $field_name ) && secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'        => __( 'How many attempts before a ban?', 'secupress' ),
+		'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '5 - 25' ),
+		'label_for'    => $field_name,
+		'type'         => 'number',
+		'default'      => '5',
+		'attributes'   => array(
+			'min' => 2,
+			'max' => 25,
+		),
+	) );
+}
+
+$field_name = $this->get_field_name( 'time_ban' );
+if ( secupress_feature_is_expert( $field_name ) && secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'        => __( 'How long should the ban last?', 'secupress' ),
+		'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '5 - 15' ),
+		'label_for'    => $field_name,
+		'type'         => 'number',
+		'label_after'  => _x( 'min', 'minute', 'secupress' ),
+		'default'      => '5',
+		'attributes'   => array(
+			'min' => 1,
+			'max' => 60,
+		),
+	) );
+}
+
 $is_plugin_active = array();
 $values           = array(
-	'bannonexistsuser'   => __( 'Ban attempts on non-existent usernames', 'secupress' ),
 	'limitloginattempts' => __( 'Restrict bad login attempts (Brute Force)', 'secupress' ),
 	'passwordspraying'   => __( 'Restrict bad password attempts (Password Spraying)', 'secupress' ),
 );
@@ -30,36 +60,6 @@ $this->add_field( array(
 	'options'           => $values,
 	'value'             => $is_plugin_active,
 	'default'           => array(),
-) );
-
-
-$this->add_field( array(
-	'title'        => __( 'How many attempts before a ban?', 'secupress' ),
-	'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '10 - 50' ),
-	'depends'      => $main_field_name . '_limitloginattempts',
-	'label_for'    => $this->get_field_name( 'number_attempts' ),
-	'type'         => 'number',
-	'default'      => '10',
-	// 'move_item'    => '.secupress-field-login-protection_type_limitloginattempts',
-	'attributes'   => array(
-		'min' => 3,
-		'max' => 99,
-	),
-) );
-
-
-$this->add_field( array(
-	'title'        => __( 'How long should the ban last?', 'secupress' ),
-	'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '5 - 15' ),
-	'depends'      => $main_field_name . '_limitloginattempts ' . $main_field_name . '_bannonexistsuser ' . $main_field_name . '_passwordspraying',
-	'label_for'    => $this->get_field_name( 'time_ban' ),
-	'type'         => 'number',
-	'label_after'  => _x( 'min', 'minute', 'secupress' ),
-	'default'      => '5',
-	'attributes'   => array(
-		'min' => 1,
-		'max' => 60,
-	),
 ) );
 
 $this->add_field( array(

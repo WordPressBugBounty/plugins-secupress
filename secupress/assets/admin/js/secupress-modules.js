@@ -1535,30 +1535,57 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 
 // Malware button "Update data" =======================================================================
 (function( w, d, $, undefined ) {
-	$( '#button-update-malware-data' ).on( 'click', function(e) {
+	$( d ).on( 'click', '#button-update-malware-data', function( e ) {
+		var $button  = $( this ),
+			original = $button.attr( 'href' ) || '',
+			href;
+
 		e.preventDefault();
-		var _this = $(this);
-		var href  = secupressPreAjaxCall( $(this).attr('href').replace('admin-post.php', 'admin-ajax.php'), e, 'button-update-malware-data' );
-		secupressDisableAjaxButton( $(this), null, 'button-update-malware-data' );
-		_this.find('.spinner').addClass('secupress-inline-spinner-active');
+
+		href = secupressPreAjaxCall( original.replace( 'admin-post.php', 'admin-ajax.php' ), e, 'button-update-malware-data' );
+
+		if ( ! href ) {
+			return;
+		}
+
+		if ( href.indexOf( 'admin-ajax.php' ) === -1 ) {
+			if ( original.indexOf( 'admin-post.php' ) !== -1 ) {
+				w.location.href = original;
+			}
+			return;
+		}
+
+		secupressDisableAjaxButton( $button, null, 'button-update-malware-data' );
+		$button.siblings( '.spinner' ).addClass( 'secupress-inline-spinner-active' );
+
 		$.getJSON( href )
 		.done( function( r ) {
-			if ( r.success ) {
-				if ( wp.a11y && wp.a11y.speak ) {
-					wp.a11y.speak( SecuPressi18nModules.malwareUpdateOK );
+			var message = SecuPressi18nModules.malwareUpdateKO;
+
+			if ( r && r.success ) {
+				if ( r.data ) {
+					if ( r.data.version ) {
+						$button.closest( 'p' ).find( '.secupress-malware-db-version' ).text( r.data.version );
+					}
+					if ( r.data.last_update ) {
+						$button.closest( 'p' ).find( '.secupress-malware-db-date' ).text( r.data.last_update );
+					}
 				}
-				$('p.description.warning.secupress-show-expert').text( SecuPressi18nModules.malwareUpdateOK ).removeClass('warning').addClass('help');
-				try {
-					location.reload();
-				} catch (e) {
-					window.location.href = window.location.href;
-				}				
-			} else {
-				secupressDisplayAjaxError( _this, SecuPressi18nModules.malwareUpdateKO, "data" );
+				secupressDisplayAjaxSuccess( $button, SecuPressi18nModules.malwareUpdateOK, 'button-update-malware-data' );
+				return;
 			}
+
+			if ( r && r.data && r.data.message ) {
+				message = r.data.message;
+			}
+
+			secupressDisplayAjaxError( $button, message, 'button-update-malware-data' );
 		} )
 		.fail( function() {
-			secupressDisplayAjaxError( _this, null, "data" );
+			secupressDisplayAjaxError( $button, null, 'button-update-malware-data' );
+		} )
+		.always( function() {
+			$button.siblings( '.spinner' ).removeClass( 'secupress-inline-spinner-active' );
 		} );
 	} );
 } )(window, document, jQuery);

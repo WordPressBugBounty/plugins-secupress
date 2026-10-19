@@ -167,10 +167,19 @@ function secupress_write_rules_on_activation( $rules ) {
 		}
 
 		foreach ( $rules as $marker => $new_rules ) {
+			if ( $file_content && secupress_marker_block_is_unclosed( $file_content, $marker ) ) {
+				secupress_notify_unclosed_marker( $file_path );
+				continue;
+			}
 			// Remove old content (shouldn't left anything).
 			if ( $file_content ) {
 				$pattern      = '/# BEGIN SecuPress ' . $marker . '(.*)# END SecuPress\s*?/isU';
-				$file_content = preg_replace( $pattern, '', $file_content );
+				$replaced     = preg_replace( $pattern, '', $file_content );
+				if ( null === $replaced ) {
+					secupress_notify_unclosed_marker( $file_path );
+					continue;
+				}
+				$file_content = $replaced;
 			}
 			// Create new content.
 			$new_content .= '# BEGIN SecuPress ' . $marker . PHP_EOL;
@@ -393,8 +402,16 @@ function secupress_maybe_remove_rules_on_deactivation() {
 		}
 
 		// Remove old content.
+		$unclosed_marker = secupress_get_unclosed_secupress_marker( $file_content );
+		if ( $unclosed_marker ) {
+			secupress_create_deactivation_notice_muplugin( 'apache_unclosed_marker', secupress_get_unclosed_marker_message( $file_path ) );
+			return;
+		}
 		$pattern      = '/# BEGIN SecuPress (.*)# END SecuPress\s*?/isU';
 		$file_content = preg_replace( $pattern, '', $file_content );
+		if ( null === $file_content ) {
+			return;
+		}
 
 		// Save the file.
 		$filesystem->put_contents( $file_path, $file_content, FS_CHMOD_FILE );

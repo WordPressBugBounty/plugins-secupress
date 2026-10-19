@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: SecuPress Free with Simple SSL – Simple and Performant Security
+ * Plugin Name: SecuPress Free – Simple and Performant Security
  * Plugin URI: https://secupress.me
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.7.1
+ * Version: 2.7.2
  * Code Name: Makeshift
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
@@ -73,6 +73,7 @@ define( 'SECUPRESS_FULL_FILETREE'         , 'secupress_full_filetree' );
 define( 'SECUPRESS_DATABASE_MALWARES'     , 'secupress_database_malwares' );
 define( 'SECUPRESS_FIX_DISTS'             , 'secupress_fix_dists' );
 define( 'SECUPRESS_BAN_IP'                , 'secupress_ban_ip' );
+define( 'SECUPRESS_BLOCKED_IP'            , 'secupress_blocked_ip' );
 define( 'SECUPRESS_USER_PROTECTION'       , 'secupress_user_protection' );
 define( 'SECUPRESS_SAME_EMAIL_DOMAIN_OK'  , 'secupress_same_email_domain_ok' );
 define( 'SECUPRESS_WHITE_IP'              , 'secupress_whitelist_ip' );

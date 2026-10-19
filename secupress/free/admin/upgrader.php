@@ -446,7 +446,7 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 		}
 		$rewrite_submodules = [
 			'discloses'      => [ 'wp-version', 'readmes' ],
-			'sensitive-data' => [ 'bad-file-extensions', 'bad-url-access' ],
+			'sensitive-data' => [ 'bad-url-access' ],
 		];
 		foreach ( $rewrite_submodules as $module => $submodules ) {
 			foreach ( $submodules as $submodule ) {
@@ -488,6 +488,16 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			secupress_deactivate_submodule( 'sensitive-data', 'bad-url-access' );
 			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 		}
+	}
+	// < 2.7.2
+	if ( version_compare( $actual_version, '2.7.2', '<' ) ) {
+		if ( secupress_is_submodule_active( 'sensitive-data', 'bad-url-access' ) ) {
+			secupress_deactivate_submodule( 'sensitive-data', 'bad-url-access' );
+			secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
+		}
+		secupress_migrate_attacks_md_to_ymd();
+		secupress_deactivate_submodule( 'users-login', 'bannonexistsuser' );
+		secupress_remove_old_plugin_file( SECUPRESS_MODULES_PATH . 'users-login/plugins/bannonexistsuser.php' );
 	}
 	// DEV: DO NOT REDIRECT / DO NOT AUTOLOGIN / DO NOT USE $modulenow //
 }
@@ -772,12 +782,13 @@ if ( ! secupress_is_white_label() ) {
 			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
 			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
 			$newitems  = [
-							__( 'New: Firewall Learning Mode for 8G (observe signatures, review hits, allow globally or per URL prefix).', 'secupress' ),
-							__( 'Improvement: Block Bad Referers is now available in Free!', 'secupress' ),
-							__( 'Improvement: Hide WP, WooCommerce and PHP session cookies from the Support ID.', 'secupress' ),
-							__( 'Improvement: Malware scanner still lists malware files when WP core checksums are missing.', 'secupress' ),
-							__( 'Improvement: Deactivating a wp-config module no longer leaves the file or the setting in a bad state.', 'secupress' ),
-							__( 'Fix: Authors and other lower roles could not edit or create content with Stop User Enumeration.', 'secupress' ),
+							__( 'Critical: Warn admins so they can check the backdoor and patch it.', 'secupress' ),
+							__( 'New: Passwordless login now uses a 6-digit code instead of a magic link.', 'secupress' ),
+							__( 'New: Disable Application Passwords: refuse and log any Application Password authentication attempt.', 'secupress' ),
+							__( 'New: Move Login scanner checks whether the default login page is still reachable.', 'secupress' ),
+							__( 'New: Dashboard attacks widget lists attack types, trends and blocked IPs.', 'secupress' ),
+							__( 'New: Reading a WordPress option known as malware is logged as an "option" attack.', 'secupress' ),
+							__( 'New: Disallowed usernames are also refused as display names.', 'secupress' ),
 						];
 			if ( ! empty( $newitems ) ) {
 				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';

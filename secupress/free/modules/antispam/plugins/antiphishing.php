@@ -125,11 +125,11 @@ function secupress_antiphishingcode_mail( $atts ) {
 	return $atts;
 }
 
-// add_filter( 'wp_new_user_notification_email', 'secupress_antiphishingcode_new_user' ); //// TBD
+add_filter( 'wp_new_user_notification_email', 'secupress_antiphishingcode_new_user' );
 /**
  * Add your message for any new user
  *
- * @since 2.2.6
+ * @since 2.7.2
  * @author Julio Potier
  * 
  * @param (array) $wp_new_user_notification_email
@@ -137,6 +137,6 @@ function secupress_antiphishingcode_mail( $atts ) {
  * @return (array) $wp_new_user_notification_email
  **/
 function secupress_antiphishingcode_new_user( $wp_new_user_notification_email ) {
-	$wp_new_user_notification_email['message'] .= "\n\n" . __( '[Anti-Phishing: You can setup a personal code for more email security in your profile.]', 'secupress' );
+	$wp_new_user_notification_email['message'] .= "\n\n" . sprintf( __( '[Anti-Phishing Protection: Add a personal code in your profile to guarantee that emails really come from %s]', 'secupress' ), esc_html( get_bloginfo( 'name' ) ) );
 	return $wp_new_user_notification_email;
 }

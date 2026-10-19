@@ -171,6 +171,58 @@ function secupress_3rd_compat__wp_2fa( $activated ) {
 	return $activated;
 }
 
+/**
+ * SecuPress_Scan_Move_Login
+ *
+ * @since 2.7.2
+ */
+
+// https://wordpress.org/plugins/sf-move-login/ — legacy plugin bundled as sf-move-login/sf-move-login.php.
+add_filter( 'secupress.scan.SecuPress_Scan_Move_Login.activated', 'secupress_3rd_compat__sf_move_login' );
+function secupress_3rd_compat__sf_move_login( $activated ) {
+	if ( ! $activated && ( defined( 'SFML_VERSION' ) || secupress_is_plugin_active( 'sf-move-login/sf-move-login.php' ) ) ) {
+		return 'SF Move Login';
+	}
+	return $activated;
+}
+
+// https://plugins.svn.wordpress.org/wps-hide-login/trunk/wps-hide-login.php
+add_filter( 'secupress.scan.SecuPress_Scan_Move_Login.activated', 'secupress_3rd_compat__wps_hide_login' );
+function secupress_3rd_compat__wps_hide_login( $activated ) {
+	if ( ! $activated && ( defined( 'WPS_HIDE_LOGIN_VERSION' ) || secupress_is_plugin_active( 'wps-hide-login/wps-hide-login.php' ) ) ) {
+		return 'WPS Hide Login';
+	}
+	return $activated;
+}
+
+// https://plugins.svn.wordpress.org/hide-my-wp/trunk/index.php — free defines HMWP_VERSION, pro defines HMW_VERSION.
+add_filter( 'secupress.scan.SecuPress_Scan_Move_Login.activated', 'secupress_3rd_compat__hide_my_wp' );
+function secupress_3rd_compat__hide_my_wp( $activated ) {
+	if ( $activated ) {
+		return $activated;
+	}
+	if ( defined( 'HMW_VERSION' ) || secupress_is_plugin_active( 'hide-my-wp-ghost/index.php' ) ) {
+		return 'Hide My WP Ghost';
+	}
+	if ( defined( 'HMWP_VERSION' ) || secupress_is_plugin_active( 'hide-my-wp/index.php' ) ) {
+		return 'Hide My WP';
+	}
+	return $activated;
+}
+
+// https://wordpress.org/plugins/rename-wp-admin-login/
+add_filter( 'secupress.scan.SecuPress_Scan_Move_Login.activated', 'secupress_3rd_compat__rename_wp_admin_login' );
+function secupress_3rd_compat__rename_wp_admin_login( $activated ) {
+	if ( $activated ) {
+		return $activated;
+	}
+	if ( defined( 'NS_Rename_WP_Admin_Login_Version' ) ) {
+		return 'Rename WP Admin Login';
+	}
+	return $activated;
+}
+
+
 /*
 For wpserveur.net
 */

@@ -33,7 +33,7 @@ if ( is_array( $settings ) && ! empty( $settings['consumer_email'] ) && ! empty(
 
 		/** This filter is documented in wp-includes/class-http.php. */
 		$user_agent      = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) );
-		$version         = '2.7.1';
+		$version         = '2.7.2';
 		$args['headers'] = array(
 			'X-Requested-With' => sprintf( '%s;SecuPress|%s|%s|;', $user_agent, $version, esc_url( home_url() ) ),
 			'Authorization' => 'Basic ' . base64_encode( $settings['consumer_email'] . ':' . $settings['consumer_key'] )
@@ -71,6 +71,11 @@ if ( is_multisite() ) {
 
 // User metas.
 $wpdb->query( "DELETE FROM $wpdb->usermeta WHERE meta_key LIKE '%secupress%'" );
+
+// Unique index on user_pass, added by "User Creation Protection" and "Prevent Reuse of Password Hashes".
+if ( $wpdb->get_row( "SHOW INDEX FROM $wpdb->users WHERE Key_name = 'unique_user_pass'" ) ) {
+	$wpdb->query( "ALTER TABLE $wpdb->users DROP INDEX unique_user_pass" );
+}
 
 // Delete muplugins
 $mu_plugins_dir = WPMU_PLUGIN_DIR;

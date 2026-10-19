@@ -78,6 +78,7 @@ function secupress_same_email_domain_add_ok_meta( $is_active ) {
 	);
 
 	$wpdb->query( $query ); // WPCS: unprepared SQL ok.
+	secupress_flush_user_meta_cache();
 }
 
 add_action( 'secupress.modules.deactivate_submodule_same-email-domain', 'secupress_same_email_domain_remove_ok_meta' );
@@ -90,6 +91,7 @@ add_action( 'secupress.modules.deactivate_submodule_same-email-domain', 'secupre
 function secupress_same_email_domain_remove_ok_meta() {
 	global $wpdb;
 	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->usermeta} WHERE meta_key = %s", SECUPRESS_SAME_EMAIL_DOMAIN_OK ) ); // WPCS: unprepared SQL ok.
+	secupress_flush_user_meta_cache();
 }
 
 add_filter( 'registration_errors', 'secupress_same_email_domain_validate_user_registration', 10, 3 );

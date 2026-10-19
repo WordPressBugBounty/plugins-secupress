@@ -83,8 +83,34 @@ function secupress_resolve_parent_backups_path( $get_reason = false ) {
 		return $get_reason ? $reason : $path;
 	}
 
+	if ( defined( 'SECUPRESS_BACKUPS_PATH' ) ) {
+		if ( ! realpath( ABSPATH . SECUPRESS_BACKUPS_PATH ) === $path ) {
+			$reason = 'invalid_path';
+			$path   = $legacy;
+			return $get_reason ? $reason : $path;
+		}
+		if ( ! wp_is_writable( SECUPRESS_BACKUPS_PATH ) ) {
+			$reason = 'not_writable';
+			$path   = $legacy;
+			return $get_reason ? $reason : $path;
+		}
+		$reason = '';
+		$path   = constant( 'SECUPRESS_BACKUPS_PATH' );
+		return $get_reason ? $reason : $path;
+	}
+	
+	/**
+	 * Filter the backups parent folder path if the SECUPRESS_BACKUPS_PATH constant is not defined.
+	 *
+	 * @since 2.7.2
+	 *
+	 * @param (string) $path     The backups parent folder path.
+	 * @param (string) $candidate The candidate backups parent folder path.
+	 *
+	 * @return (string) The backups parent folder path.
+	 */
+	$path   = apply_filters( 'secupress.backups.path', $candidate );
 	$reason = '';
-	$path   = $candidate;
 
 	return $get_reason ? $reason : $path;
 }

@@ -157,6 +157,7 @@ add_action( 'admin_footer-plugins.php', 'secupress_plugin_show_all_hack_css', SE
 /**
  * Handle the CSS case when a plugin use CSS to display:none
  *
+ * @since 2.7.2 Change the selector to use 'tr[data-plugin]:not(.plugin-update-tr)'
  * @author Julio Potier
  * @since 2.2.6
  * 
@@ -167,7 +168,7 @@ function secupress_plugin_show_all_hack_css() {
 <script>
 (function() {
 	function secupressFakePluginsCSSHide() {
-		const hiddenElements = Array.from(document.querySelectorAll('[data-plugin]:not(.plugin-update-tr)'))
+		const hiddenElements = Array.from(document.querySelectorAll('tr[data-plugin]:not(.plugin-update-tr)'))
 			.filter(element => {
 				const style  = window.getComputedStyle(element);
 				// console.log(element.getAttribute('data-slug')+' '+style.display);
@@ -239,7 +240,7 @@ function secupress_plugin_show_all_hack_js( $hook_suffix ) {
 		const sibling = document.querySelector(`.plugin-update-tr[data-plugin="${slug}"]`);
 		if (sibling) {
 			sibling.style.display          = 'table-row';
-			sibling.style.backgroundColor  = element.style.backgroundColor;
+			sibling.style.backgroundColor  = event.target.style.backgroundColor;
 		}
 
 		var childrenThTd                   = event.target.querySelectorAll('th, td');
@@ -268,11 +269,27 @@ function secupress_plugin_show_all_hack_js( $hook_suffix ) {
 		parentElement.insertBefore(event.target, parentElement.firstChild);
 	}
 
+	function secupressShouldRestoreRemovedPluginRow(removedNode) {
+		if (!(removedNode instanceof HTMLElement) || removedNode.tagName !== "TR" || !removedNode.hasAttribute("data-plugin")) {
+			return false;
+		}
+		if (removedNode.classList.contains("plugin-update-tr") || removedNode.classList.contains("plugin-deleted-tr")) {
+			return false;
+		}
+		if (!removedNode.classList.contains("active") && !removedNode.classList.contains("inactive")) {
+			return false;
+		}
+		const slug = removedNode.getAttribute("data-plugin");
+		return !Array.from(document.querySelectorAll("tr.plugin-deleted-tr")).some(function(row) {
+			return row.getAttribute("data-plugin") === slug;
+		});
+	}
+
 	const observer = new MutationObserver((mutationsList) => {
 		for (const mutation of mutationsList) {
 			if (mutation.type === "childList") {
 				for (const removedNode of mutation.removedNodes) {
-					if (removedNode instanceof HTMLElement && removedNode.tagName === "TR" && removedNode.hasAttribute("data-plugin")) {
+					if (secupressShouldRestoreRemovedPluginRow(removedNode)) {
 						secupressFakePluginsJqueryRemove({
 							target: removedNode
 						});

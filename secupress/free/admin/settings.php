@@ -86,18 +86,30 @@ function secupress_add_settings_scripts( $hook_suffix ) {
 
 	// Dashboard widget.
 	if ( 'index.php' === $hook_suffix && current_user_can( secupress_get_capability() ) ) {
-		$chart_months = get_user_meta( get_current_user_id(), 'secupress_attacks_widget_chart_months', true );
-		$chart_months = ! $chart_months ? 6 : (int) $chart_months;
-		if ( $chart_months > 0 ) {
-			wp_enqueue_script( 'secupress-chartjs', SECUPRESS_ADMIN_JS_URL . 'chart' . $suffix . '.js', array(), '1.0.2.1', true );
-			wp_enqueue_script( 'secupress-widget-js', SECUPRESS_ADMIN_JS_URL . 'secupress-widget' . $suffix . '.js', array( 'jquery', 'secupress-chartjs' ), $version, true );
-			
-			// Prepare and localize chart data
-			$chart_data = secupress_prepare_widget_chart_data();
-			wp_localize_script( 'secupress-widget-js', 'SecuPressi18nWidget', array(
-				'chartData' => $chart_data,
-			) );
-		}
+		global $wp_locale;
+
+		$widget_deps   = array( 'jquery' );
+
+		wp_enqueue_script( 'secupress-chartjs', SECUPRESS_ADMIN_JS_URL . 'chart' . $suffix . '.js', array(), '1.0.2.1', true );
+		$widget_deps[] = 'secupress-chartjs';
+
+		wp_enqueue_script( 'secupress-widget-js', SECUPRESS_ADMIN_JS_URL . 'secupress-widget' . $suffix . '.js', $widget_deps, $version, true );
+
+		wp_localize_script(
+			'secupress-widget-js',
+			'SecuPressi18nWidget',
+			array(
+				'typeCharts'      => secupress_attacks_widget_type_chart_payload(),
+				'overviewChart'   => secupress_attacks_widget_overview_chart(),
+				'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
+				'rangeNonce'      => wp_create_nonce( 'secupress_attacks_widget_range' ),
+				'counterDuration' => 3000,
+				'numberFormat'    => array(
+					'thousandsSep' => isset( $wp_locale->number_format['thousands_sep'] ) ? $wp_locale->number_format['thousands_sep'] : ',',
+					'decimalPoint' => isset( $wp_locale->number_format['decimal_point'] ) ? $wp_locale->number_format['decimal_point'] : '.',
+				),
+			)
+		);
 	}
 
 	$pages = array(

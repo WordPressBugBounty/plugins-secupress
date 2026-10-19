@@ -484,6 +484,18 @@ body #wpbody p.secupress-blob-title {
 	background: rgba(241, 196, 15, 0.16);
 	color: #f1c40f;
 }
+body .secupress-security-status .secupress-security-status-count.secupress-security-status-firewall.secupress-security-status-firewall-off {
+	background: rgba(255, 92, 122, 0.18);
+	color: #ff6b86;
+}
+body .secupress-security-status .secupress-security-status-count.secupress-security-status-firewall.secupress-security-status-firewall-partial {
+	background: rgba(255, 176, 32, 0.18);
+	color: #ffb020;
+}
+body .secupress-security-status .secupress-security-status-count.secupress-security-status-firewall.secupress-security-status-firewall-learning {
+	background: rgba(91, 168, 255, 0.18);
+	color: #5ba8ff;
+}
 .secupress-security-status-active a.secupress-security-status-more:hover,
 .secupress-security-status-active a.secupress-security-status-more:focus,
 .secupress-security-status-active .secupress-security-status-info:hover,

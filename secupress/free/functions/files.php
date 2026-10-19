@@ -503,6 +503,11 @@ function secupress_comment_constant( $constant, $wpconfig_filepath = false, $mar
 	$filesystem   = secupress_get_filesystem();
 	$file_content = $filesystem->get_contents( $wpconfig_filepath );
 
+	if ( $marker && secupress_marker_block_is_unclosed( $file_content, $marker ) ) {
+		secupress_notify_unclosed_marker( $wpconfig_filepath );
+		return false;
+	}
+
 	if ( $marker && preg_match( "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", $file_content ) ) {
 		// Remove the constant we could have previously set. Deleting our own marker is safe.
 		return secupress_replace_content( $wpconfig_filepath, "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", '', true );
@@ -546,6 +551,12 @@ function secupress_uncomment_constant( $constant, $wpconfig_filepath = false, $m
 	}
 
 	if ( $marker ) {
+		$filesystem   = secupress_get_filesystem();
+		$file_content = $filesystem->get_contents( $wpconfig_filepath );
+		if ( secupress_marker_block_is_unclosed( $file_content, $marker ) ) {
+			secupress_notify_unclosed_marker( $wpconfig_filepath );
+			return false;
+		}
 		// Remove the constant we could have previously set. Deleting our own marker is safe.
 		$replaced = secupress_replace_content( $wpconfig_filepath, "@[\t ]*?# BEGIN SecuPress {$marker}\s.*# END SecuPress\s*?@sU", '', true );
 
@@ -639,8 +650,154 @@ function secupress_is_theme_symlinked( $theme_slug ) {
 
 
 /**
+ * Tell if a SecuPress marker block is opened and not closed before the next one.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $content File content.
+ * @param (string) $marker  Marker suffix after "SecuPress ".
+ *
+ * @return (bool)
+ */
+function secupress_marker_block_is_unclosed( $content, $marker ) {
+	if ( ! is_string( $content ) || '' === $content || '' === $marker ) {
+		return false;
+	}
+
+	$begin      = '# BEGIN SecuPress ' . $marker;
+	$end        = '# END SecuPress';
+	$next_token = '# BEGIN SecuPress ';
+	$offset     = 0;
+	$begin_len  = strlen( $begin );
+
+	while ( false !== ( $pos = strpos( $content, $begin, $offset ) ) ) {
+		$after    = $pos + $begin_len;
+		$boundary = substr( $content, $after, 1 );
+		if ( '' !== $boundary && false === strpos( " \t\r\n", $boundary ) ) {
+			$offset = $after;
+			continue;
+		}
+		$end_pos  = strpos( $content, $end, $after );
+		$next_pos = strpos( $content, $next_token, $after );
+		if ( false === $end_pos || ( false !== $next_pos && $next_pos < $end_pos ) ) {
+			return true;
+		}
+		$offset = $end_pos + strlen( $end );
+	}
+
+	return false;
+}
+
+
+/**
+ * Return the first SecuPress marker whose block is not closed.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $content File content.
+ *
+ * @return (string) Marker suffix, or an empty string.
+ */
+function secupress_get_unclosed_secupress_marker( $content ) {
+	if ( ! is_string( $content ) || '' === $content ) {
+		return '';
+	}
+
+	$token  = '# BEGIN SecuPress ';
+	$offset = 0;
+	$seen   = [];
+
+	while ( false !== ( $pos = strpos( $content, $token, $offset ) ) ) {
+		$name_start = $pos + strlen( $token );
+		$line_end   = strpos( $content, "\n", $name_start );
+		$slice_end  = false === $line_end ? strlen( $content ) : $line_end;
+		$marker     = trim( substr( $content, $name_start, $slice_end - $name_start ) );
+		$offset     = $name_start;
+		if ( '' === $marker || isset( $seen[ $marker ] ) ) {
+			continue;
+		}
+		$seen[ $marker ] = true;
+		if ( secupress_marker_block_is_unclosed( $content, $marker ) ) {
+			return $marker;
+		}
+	}
+
+	return '';
+}
+
+
+/**
+ * Notice shown when a marker block cannot be removed because it is not closed.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $file File path.
+ *
+ * @return (string)
+ */
+function secupress_get_unclosed_marker_message( $file ) {
+	return sprintf(
+		/* Translators: 1 is the plugin name, 2 is a file name. */
+		__( '%1$s could not update its security rules in the %2$s file due to a manual edit and is now incomplete. Nothing was changed, so your site keeps working. Please ask the webmaster or hosting provider to repair it.', 'secupress' ),
+		esc_html( SECUPRESS_PLUGIN_NAME ),
+		'<code>' . esc_html( basename( $file ) ) . '</code>'
+	);
+}
+
+
+/**
+ * Tell if the last file write was refused because a marker block is not closed.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (bool|null) $set True or false to set the state. Null to read it.
+ *
+ * @return (bool)
+ */
+function secupress_put_contents_blocked_by_unclosed_marker( $set = null ) {
+	static $blocked = false;
+
+	if ( is_bool( $set ) ) {
+		$blocked = $set;
+	}
+
+	return $blocked;
+}
+
+
+/**
+ * Display an error when a marker block cannot be removed.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $file File path.
+ */
+function secupress_notify_unclosed_marker( $file ) {
+	static $sent = [];
+
+	secupress_put_contents_blocked_by_unclosed_marker( true );
+	if ( isset( $sent[ $file ] ) ) {
+		return;
+	}
+	$sent[ $file ] = true;
+
+	if ( ! function_exists( 'secupress_add_notice' ) ) {
+		return;
+	}
+
+	secupress_add_notice( secupress_get_unclosed_marker_message( $file ), 'error', '' );
+}
+
+
+/**
  * File creation based on WordPress Filesystem.
  *
+ * @since 2.7.2 Do not rewrite a file when the previous marker block has no closing marker.
  * @since 2.2.6 $file_content is now an array + clearstatcache() usage
  * @author Julio Potier
  * @since 1.0
@@ -665,14 +822,27 @@ function secupress_put_contents( $file, $new_content = '', $args = array() ) {
 	$filesystem   = secupress_get_filesystem();
 	$comment_char = pathinfo( $file, PATHINFO_EXTENSION ) !== 'ini' ? '#' : ';';
 
+	secupress_put_contents_blocked_by_unclosed_marker( false );
+
 	// Get the whole content of file and remove old marker content.
 	if ( file_exists( $file ) ) {
 		$pattern      = '/' . $comment_char . ' BEGIN SecuPress ' . $args['marker'] . '(.*)' . $comment_char . ' END SecuPress\s*?/isU';
 		$file_content[ $file ] = file_get_contents( $file );
+		if ( $args['marker'] && secupress_marker_block_is_unclosed( $file_content[ $file ], $args['marker'] ) ) {
+			secupress_notify_unclosed_marker( $file );
+			return false;
+		}
 		if ( $args['keep_old'] ) {
 			preg_match( $pattern, $file_content[ $file ], $keep_old );
 		}
-		$file_content[ $file ] = preg_replace( $pattern, '', $file_content[ $file ] );
+		$replaced = preg_replace( $pattern, '', $file_content[ $file ] );
+		if ( null === $replaced ) {
+			if ( $args['marker'] ) {
+				secupress_notify_unclosed_marker( $file );
+			}
+			return false;
+		}
+		$file_content[ $file ] = $replaced;
 	}
 
 	if ( ! empty( $new_content ) ) {
@@ -1425,6 +1595,35 @@ function secupress_get_data_path() {
 		return  $basedir . '/secupress-data/';
 	}
 	return SECUPRESS_INC_PATH . 'data/';
+}
+
+/**
+ * Remove a local secupress-data folder bundled inside the plugin and purge uploaded data copies.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ **/
+function secupress_remove_plugin_secupress_data_folder() {
+	$plugin_data_dir = wp_normalize_path( SECUPRESS_PATH . 'secupress-data' );
+
+	if ( ! is_dir( $plugin_data_dir ) ) {
+		return;
+	}
+
+	$filesystem = secupress_get_filesystem();
+	$filesystem->delete( trailingslashit( $plugin_data_dir ), true );
+
+	$uploads = wp_upload_dir( null, false );
+
+	if ( empty( $uploads['basedir'] ) ) {
+		return;
+	}
+
+	$uploads_data_dir = wp_normalize_path( $uploads['basedir'] ) . '/secupress-data/';
+
+	if ( is_dir( $uploads_data_dir ) ) {
+		$filesystem->delete( $uploads_data_dir, true );
+	}
 }
 
 /**

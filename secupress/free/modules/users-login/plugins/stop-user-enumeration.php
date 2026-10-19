@@ -4,7 +4,7 @@
  * Description: Forbid the user listing from front with ?author=X and from REST API with /users/ or ?_embed=
  * Main Module: users_login
  * Author: SecuPress
- * Version: 2.2.6
+ * Version: 2.7.2
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
@@ -75,7 +75,7 @@ add_filter( 'rest_request_before_callbacks', 'secupress_stop_user_enumeration_re
 /**
  * Block the users endpoints for REST API
  *
- * @since 2.7 Allow the users route from the editor (edit and new), except pages
+ * @since 2.7.1 Allow the users route from the editor (edit and new), except pages
  * @since 2.7 Match the REST route, language URL prefixes like /fr/ are ignored
  * @since 2.3.12 Let "/me/" being read
  * @since 2.2.6 Remove home_url() from strpos()
@@ -128,7 +128,7 @@ function secupress_stop_user_enumeration_rest( $response, $handler, $request ) {
  *
  * A direct admin load is read from $pagenow. Block editor REST calls keep that screen in the referer.
  *
- * @since 2.7
+ * @since 2.7.1
  * @author Julio Potier
  *
  * @return (bool)
@@ -150,7 +150,6 @@ function secupress_stop_user_enumeration_is_admin_editor() {
 			$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : 'post';
 		}
 	}
-
 	if ( ! $editing && ! $creating ) {
 		$referer = wp_get_referer();
 		if ( ! $referer ) {
@@ -175,12 +174,13 @@ function secupress_stop_user_enumeration_is_admin_editor() {
 			$post_type = isset( $query['post_type'] ) ? sanitize_key( $query['post_type'] ) : 'post';
 		}
 	}
+	
 	if ( $editing && $post_id ) {
 		$post = get_post( $post_id );
-		return $post && 'page' !== $post->post_type && current_user_can( 'edit_post', $post_id );
+		return $post && current_user_can( 'edit_post', $post_id );
 	}
 
-	if ( $creating && $post_type && 'page' !== $post_type ) {
+	if ( $creating && $post_type ) {
 		$post_type_object = get_post_type_object( $post_type );
 		return $post_type_object && current_user_can( $post_type_object->cap->create_posts );
 	}

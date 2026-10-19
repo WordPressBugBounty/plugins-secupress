@@ -698,9 +698,15 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 	 */
 	protected function learning_mode( $args ) {
 		unset( $args );
+		if ( ! secupress_firewall_ng_is_enabled() ) {
+			echo '<p class="description help"><span class="dashicons dashicons-editor-help" aria-hidden="true"></span> ';
+			esc_html_e( 'Save your changes. Learning Mode will be available when the page reloads.', 'secupress' );
+			echo '</p>';
+			$this->learning_mode_visibility_script();
+			return;
+		}
 		$state        = secupress_firewall_learning_get_state();
 		$status       = $state['status'];
-		$ng_ready     = secupress_firewall_ng_is_enabled();
 		$last_started = secupress_firewall_learning_get_last_started();
 		$page_url     = secupress_admin_url( 'modules', 'firewall' );
 		if ( secupress_firewall_learning_bypass_sample() ) {
@@ -724,9 +730,7 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 			echo '<input type="hidden" name="secupress_firewall_settings[learning-mode_last]" value="' . (int) $last_started . '" />';
 		}
 
-		if ( ! $ng_ready && 'running' !== $status && 'review' !== $status ) {
-			echo '<p class="secupress-warning">' . sprintf( __( 'Please, save the %s rules to activate the learning mode.', 'secupress' ), secupress_firewall_ng_name() ) . '</p>';
-		} elseif ( 'running' === $status ) {
+		if ( 'running' === $status ) {
 			if ( $advice_ready ) {
 				$until   = wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), (int) $state['ends'] );
 				$started = (int) $state['started'];
@@ -833,6 +837,8 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 				echo '</span>';
 			}
 			echo '</h4>';
+			$remain_debug = max( 0, (int) $state['ends'] - time() );
+			echo '<p class="description">Debug: ' . esc_html( number_format_i18n( $remain_debug ) ) . ' s</p>';
 		}
 
 		if ( 'running' === $status && ! $advice_ready ) {
@@ -936,6 +942,20 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 				}, 31000);
 			}
 		})();
+		</script>
+		<?php
+		$this->learning_mode_visibility_script();
+	}
+
+	/**
+	 * Show the Learning Mode row only while 8G and a request filter are checked.
+	 *
+	 * @since 2.7.1
+	 * @author Julio Potier
+	 */
+	protected function learning_mode_visibility_script() {
+		?>
+		<script>
 		(function() {
 			var row = document.querySelector('.secupress-setting-row_learning-mode_learning');
 			if ( row ) {

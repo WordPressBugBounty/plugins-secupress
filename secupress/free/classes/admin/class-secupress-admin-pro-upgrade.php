@@ -69,6 +69,9 @@ class SecuPress_Admin_Pro_Upgrade extends SecuPress_Admin_Offer_Migration {
 	 * @author Grégory Viguier
 	 */
 	public function maybe_warn_to_install_pro_version() {
+		if ( ! is_admin() ) {
+			return;
+		}
 		if ( static::is_update_page() ) {
 			return;
 		}

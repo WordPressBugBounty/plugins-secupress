@@ -2,6 +2,12 @@
 defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 
 /** --------------------------------------------------------------------------------------------- */
+/** DATA FILES ================================================================================== */
+/** --------------------------------------------------------------------------------------------- */
+
+add_action( 'secupress.plugins.loaded', 'secupress_remove_plugin_secupress_data_folder', 0 );
+
+/** --------------------------------------------------------------------------------------------- */
 /** BANNED IPS ================================================================================== */
 /** --------------------------------------------------------------------------------------------- */
 
@@ -229,7 +235,7 @@ function secupress_check_ban_ips_form( $args, $contents = '' ) {
 		default:
 			$content = wp_kses_post( $args['content'] );
 	}
-	$content .= '<p><form method="post" autocomplete="on" action="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress_unlock_admin' ), 'secupress-unban-ip-admin' ) . '">';
+	$content .= '<form method="post" autocomplete="on" action="' . wp_nonce_url( admin_url( 'admin-post.php?action=secupress_unlock_admin' ), 'secupress-unban-ip-admin' ) . '">';
 		$content .= '<p>' . __( 'If you are Administrator and have been accidentally locked out, enter your email address here to unlock yourself.', 'secupress' ) . '</p>';
 		$content .= '<label for="email">';
 			$content .= __( 'Your email address:', 'secupress' );
@@ -238,9 +244,27 @@ function secupress_check_ban_ips_form( $args, $contents = '' ) {
 		$content .= '</label>';
 		$content .= '<p class="submit"><button type="submit" name="submit" class="button button-primary button-large">' . __( 'Submit', 'secupress' ) . '</button></p>';
 		$content .= wp_nonce_field( 'secupress-unban-ip-' . $args['ip'], '_wpnonce', true , false );
-	$content .= '</form></p>';
+	$content .= '</form>';
 
 	return $content;
+}
+
+add_shortcode( 'SP', 'secupress_shortcode_sp' );
+/**
+ * Display the SecuPress title with the version given as shortcode content.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param $atts (array)
+ * @param $content (string)
+ *
+ * @return (string)
+ **/
+function secupress_shortcode_sp( $atts = [], $content = '' ) {
+	$content = trim( wp_strip_all_tags( (string) $content ) );
+
+	return '<span class="secupress-sh-title">' . SECUPRESS_PLUGIN_NAME . '<sup>' . esc_html( $content ) . '</sup></span>';
 }
 
 /** --------------------------------------------------------------------------------------------- */
@@ -327,7 +351,7 @@ function secupress_add_own_ua( $r, $url ) {
 	return $r;
 }
 
-add_filter( 'pre_http_request', 'secupress_request_me', 11, 3 );
+add_filter( 'pre' . '_http' . '_request', 'secupress_request_me', PHP_INT_MIN, 3 );
 /**
  * Force our site to be requested.
  *
@@ -572,18 +596,19 @@ function secupress_add_salt_muplugin() {
 		if ( ! $alicia_keys || ! $created ) {
 			return;
 		}
+		secupress_auto_login( 'Salt_Keys' );
 	}
 
-	secupress_auto_login( 'Salt_Keys' );
 }
 
 
-add_action( 'plugins_loaded', 'secupress_auto_username_login', 60 );
+add_action( 'init', 'secupress_auto_username_login', 60 );
 /**
  * Will autologin the user found in the transient 'secupress_auto_login_' . $_GET['secupress_auto_login_token']
  *
- * @since 1.0
+ * @since 2.7.2 'init' hook
  * @since 2.7 Uses a cryptographically random token, a 30s TTL, and an associative payload.
+ * @since 1.0
  */
 function secupress_auto_username_login() {
 	if ( ! isset( $_GET['secupress_auto_login_token'] ) ) {

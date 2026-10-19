@@ -119,12 +119,16 @@ function secupress_login_protection_settings_callback( $modulenow, &$settings, $
 	secupress_manage_affected_roles( $settings, $modulenow, 'login-protection_geoip_login' );
 	secupress_manage_submodule( $modulenow, 'limitloginattempts', isset( $activate['login-protection_type']['limitloginattempts'] ) );
 	secupress_manage_submodule( $modulenow, 'passwordspraying', isset( $activate['login-protection_type']['passwordspraying'] ) );
-	secupress_manage_submodule( $modulenow, 'bannonexistsuser',   isset( $activate['login-protection_type']['bannonexistsuser'] ) );
 	secupress_manage_submodule( 'discloses', 'login-errors-disclose', ! empty( $activate['login-protection_login_errors'] ) );
 
 	// Settings.
-	$settings['login-protection_number_attempts']  = ! empty( $settings['login-protection_number_attempts'] ) ? secupress_validate_range( $settings['login-protection_number_attempts'], 3, 99, 10 ) : 10;
-	$settings['login-protection_time_ban']         = ! empty( $settings['login-protection_time_ban'] )        ? secupress_validate_range( $settings['login-protection_time_ban'],        1, 60, 5 )  : 5;
+	if ( secupress_is_expert_mode() ) {
+		$settings['login-protection_number_attempts'] = ! empty( $settings['login-protection_number_attempts'] ) ? secupress_validate_range( $settings['login-protection_number_attempts'], 2, 50, 10 ) : 10;
+		$settings['login-protection_time_ban']        = ! empty( $settings['login-protection_time_ban'] )        ? secupress_validate_range( $settings['login-protection_time_ban'],        1, 60, 5 )  : 5;
+	} else {
+		$settings['login-protection_number_attempts'] = secupress_get_module_option( 'login-protection_number_attempts', 10, 'users-login' );
+		$settings['login-protection_time_ban']        = secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' );
+	}
 
 	// (De)Activation.
 	if ( false !== $activate ) {
@@ -175,17 +179,23 @@ function secupress_password_policy_settings_callback( $modulenow, &$settings, $a
 
 		$settings['double-auth_prevent-hash-reuse'] = (int) isset( $settings['double-auth_prevent-hash-reuse'] );
 		if ( $settings['double-auth_prevent-hash-reuse'] !== secupress_get_module_option( 'double-auth_prevent-hash-reuse', 0, 'users-login' ) ) {
-			secupress_add_module_notice( '', __( 'Prevent Reuse of Password Hashes', 'secupress' ), (int) $settings['double-auth_prevent-hash-reuse'] > 0 ? 'activation' : 'deactivation' );
-			if ( (int) $settings['double-auth_prevent-hash-reuse'] ) {
+			$hash_reuse_label = __( 'Prevent Reuse of Password Hashes', 'secupress' );
+			if ( $settings['double-auth_prevent-hash-reuse'] ) {
+				if ( secupress_add_unique_user_pass_index() ) {
+					secupress_add_module_notice( '', $hash_reuse_label, 'activation' );
+				} else {
+					$settings['double-auth_prevent-hash-reuse'] = 0;
+					secupress_add_transient_notice( secupress_get_unique_user_pass_index_error_message( $hash_reuse_label ), 'error', 'secupress-unique-user-pass-index' );
+				}
+			} else {
+				secupress_add_module_notice( '', $hash_reuse_label, 'deactivation' );
 				$index_exists = $wpdb->get_row(
 					"SHOW INDEX FROM $wpdb->users WHERE Key_name = 'unique_user_pass'"
 				);
-
-				if ( ! $index_exists ) {
-					$wpdb->query( "ALTER TABLE $wpdb->users ADD UNIQUE INDEX unique_user_pass (user_pass)" );
+				// The index is shared with "User Creation Protection".
+				if ( $index_exists && ! secupress_is_submodule_active( 'users-login', 'user-creation-protection' ) ) {
+					$wpdb->query( "ALTER TABLE $wpdb->users DROP INDEX unique_user_pass" );
 				}
-			} else {
-				$wpdb->query( "ALTER TABLE $wpdb->users DROP INDEX unique_user_pass" );
 			}
 		}
 	}
@@ -196,7 +206,9 @@ function secupress_password_policy_settings_callback( $modulenow, &$settings, $a
 	// (De)Activation.
 	if ( false !== $activate ) {
 		secupress_manage_submodule( $modulenow, 'strong-passwords', ! empty( $activate['password-policy_strong_passwords'] ) && secupress_is_pro() );
-		secupress_manage_submodule( $modulenow, 'application-passwords', ! empty( $activate['password-policy_application-passwords'] ) );
+		$app_passwords = isset( $activate['password-policy_application-passwords'][0] ) ? $activate['password-policy_application-passwords'][0] : '';
+		secupress_manage_submodule( $modulenow, 'application-passwords', 'application-passwords' === $app_passwords );
+		secupress_manage_submodule( $modulenow, 'disable-application-passwords', 'disable-application-passwords' === $app_passwords );
 	}
 }
 

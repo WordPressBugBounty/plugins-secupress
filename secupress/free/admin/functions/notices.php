@@ -54,6 +54,21 @@ function secupress_dismiss_notice( $notice_id, $user_id = 0 ) {
 
 
 /**
+ * Dismiss a notice for the whole site, not only the current user.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $notice_id The notice identifier.
+ *
+ * @return (bool) true on success.
+ */
+function secupress_dismiss_notice_for_site( $notice_id ) {
+	return SecuPress_Admin_Notices::dismiss_for_site( $notice_id );
+}
+
+
+/**
  * "Undismiss" a notice added with the SecuPress_Admin_Notices class.
  *
  * @since 1.0
@@ -71,6 +86,7 @@ function secupress_reinit_notice( $notice_id, $user_id = 0 ) {
 /**
  * Test if a notice added with the SecuPress_Admin_Notices class is dismissed.
  *
+ * @since 2.7.2 A site-wide dismissal counts as dismissed for every user.
  * @since 1.0
  *
  * @param (string) $notice_id The notice identifier.

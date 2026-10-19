@@ -2,9 +2,9 @@
 Contributors: SecuPress, juliobox, GregLone, Superment
 Tags: security, malware, scanner, ssl, scan
 Requires at least: 5.5
-Tested up to: 7.1.2
+Tested up to: 7.1.3
 Requires PHP: 7.3
-Stable tag: 2.7.1
+Stable tag: 2.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,23 +185,40 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.7.1 =
-* 25 Sep 2026
-* New: Firewall Learning Mode for 8G (observe signatures, review hits, allow globally or per URL prefix, auto-calibrate).
-* Improvement: WAF revamp: 8G signatures are now optional per filter, with local exceptions.
-* Improvement: Block Bad Referers is now available in Free.
-* Improvement: Hide WP, WooCommerce and PHP session cookies from the Support ID.
-* Improvement: Malware scanner still lists malware files when WP core checksums are missing, and matches "file" signatures on the filename.
-* Improvement: Deactivating a wp-config module no longer leaves the file or the setting in a bad state.
-* Improvement: Anti-spam comment delay now finds the comment form via the WordPress core field, so custom theme form IDs no longer break the timer.
-* Fix: Mixed content replacement now handles namespaced XML/SVG.
-* Fix: Authors and other lower roles could not edit or create content with Stop User Enumeration.
-* Fix: Apache bad URL access rules were missing the "-" substitution, so flags were ignored.
-* Fix: "Expired license" displayed incorrectly on the dashboard widget.
-* Fix: PHP warning when headers are already sent.
-* Fix: Undefined variable notice in the System Status widget.
-* Fix: reset() call on the pointers tour steps.
-* Security Fix: Directory traversal in the class file loader (administrators).
+= 2.7.2 =
+* 19 Oct 2026
+* Critical: Warn admins so they can check the backdoor and patch it.
+* New: Passwordless login now uses a 6-digit code instead of a magic link.
+* New: Disable Application Passwords: refuse and log any Application Password authentication attempt.
+* New: Move Login scanner checks whether the default login page is still reachable.
+* New: Dashboard attacks widget lists attack types, trends and blocked IPs.
+* New: Reading a WordPress option known as malware is logged as an "option" attack.
+* New: Disallowed usernames are also refused as display names.
+* Improvement: A magic-code request for an unknown identifier shows the same form as a real account.
+* Improvement: Bad login attempts now count unknown identifiers the same way as real accounts.
+* Improvement: Enhance login error handling and disclosures in Login Errors Disclose feature.
+* Improvement: Learning Mode can review common page slugs (demo, beta, etc.) instead of treating them as critical.
+* Improvement: Backup folder can be set with the SECUPRESS_BACKUPS_PATH constant or the secupress.backups.path filter.
+* Improvement: Activating Bad URL Access now also enables Bad File Extensions (and the reverse on deactivation).
+* Improvement: Pro update checks also run outside wp-admin, so new versions are visible everywhere.
+* Improvement: Security Status shows the firewall state, blocked attacks and daily trends.
+* Improvement: Application Password usage can trigger a critical alert.
+* Improvement: Anti-spam obfuscates email addresses in front-end content.
+* Improvement: Remove the ssl_verify false from EDD class.
+* Improvement: Better detection of fake WP filename and fake WP option name.
+* Update: Allowed IPs from different providers (meta, google, rocket)
+* Removal: Ban Non-Existent Users Feature. Unknown identifiers are no longer blocked on the first try. Use Limit Login Attempts now.
+* Fix: Escape sessions values late in Sessions Control feature, even if sanitized by WP first
+* Fix: A double notice when you have 3 (??) security plugins active was visible
+* Fix: Invisible login form when redirected from a Move Login page
+* Fix: Better feedback message to differenciate whenever out server it out or your licence key is incorrect
+* Fix: PHP Fatal error from JetFpack setting set_current_screen() during a REST Call
+* Fix: Better JS selector for "Show all plugins" feature to prevent some other plugins popups to show too early.
+* Fix: Security rules are no longer written when a previous SecuPress marker block has no closing marker, which could leave .htaccess or wp-config incomplete.
+* Fix: Async scans are not queued twice, and their delay is applied correctly.
+* Fix: Stop User Enumeration feature was blocking Editors to create or edit posts and pages.
+* Fix: Fatal error in the dashboard attacks widget (wrong count passed to _nx, seen with Divi).
+* Fix: File monitoring no longer reports the whole WordPress core as missing when the filetree is incomplete.
 
 == Upgrade Notice ==
 * SecuPress 2.7+ now requires WP 5.5 minimum.

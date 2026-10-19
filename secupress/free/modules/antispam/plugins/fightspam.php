@@ -860,3 +860,59 @@ function secupress_dcts_timer_script() {
 			'dctsTimer' => $dcts_timer,
 		] );
 }
+
+
+/** --------------------------------------------------------------------------------------------- */
+/** OBFUSCATE EMAILS ============================================================================ */
+/** --------------------------------------------------------------------------------------------- */
+
+add_filter( 'the_content',         'secupress_fightspam_obfuscate_emails', 20 );
+add_filter( 'the_excerpt',         'secupress_fightspam_obfuscate_emails', 20 );
+add_filter( 'comment_text',        'secupress_fightspam_obfuscate_emails', 20 );
+add_filter( 'widget_text',         'secupress_fightspam_obfuscate_emails', 20 );
+add_filter( 'widget_text_content', 'secupress_fightspam_obfuscate_emails', 20 );
+/**
+ * Obfuscate email addresses in front-end content to limit harvest by spam bots.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ *
+ * @param (string) $content The content.
+ *
+ * @return (string) The content with obfuscated emails.
+ */
+function secupress_fightspam_obfuscate_emails( $content ) {
+	if ( is_admin() || ! is_string( $content ) || false === strpos( $content, '@' ) ) {
+		return $content;
+	}
+
+	$pattern = '/<(script|style|textarea|pre|code)\b[^>]*>.*?<\/\1>(*SKIP)(*FAIL)|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/is';
+	$fixed   = preg_replace_callback( $pattern, 'secupress_fightspam_obfuscate_email', $content );
+
+	return is_string( $fixed ) ? $fixed : $content;
+}
+
+/**
+ * Obfuscate one email address with WordPress' antispambot().
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ *
+ * @param (array) $matches The regex matches.
+ *
+ * @return (string) The obfuscated email, or the original match if it is not an email.
+ */
+function secupress_fightspam_obfuscate_email( $matches ) {
+	$email = $matches[0];
+
+	// Keep retina/file naming like image@2x.png.
+	if ( preg_match( '/@\d+x\.(?:png|jpe?g|gif|webp|svg|avif|bmp|ico)$/i', $email ) ) {
+		return $email;
+	}
+
+	if ( ! is_email( $email ) ) {
+		return $email;
+	}
+
+	return antispambot( $email, 1 ); // 1 = enable hex encoding, WP 7.1+
+}

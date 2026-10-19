@@ -979,7 +979,13 @@ jQuery( document ).ready( function( $ ) {
 			}
 
 			$row.addClass( 'fixing' ).find( '.secupress-button-manual-fixit .secupress-icon-check' ).addClass( 'secupress-icon-shield' ).removeClass( 'secupress-icon-check' );
-			$row.find('button .text').text( SecuPressi18nScanner.fixInProgress );
+			$row.find( 'button .text' ).each( function() {
+				var $text = $( this );
+				if ( ! $text.data( 'secupress-label' ) ) {
+					$text.data( 'secupress-label', $text.text() );
+				}
+				$text.text( SecuPressi18nScanner.fixInProgress );
+			} );
 
 			$.post( ajaxurl, params, null, 'json' )
 			.done( function( r ) {
@@ -1125,7 +1131,17 @@ jQuery( document ).ready( function( $ ) {
 			* extra.data: data returned by the ajax call.
 			*/
 			var $row = $( '#secupress-mf-content-' + extra.test ),
-				href = $row.data( 'scan-url' );
+				href = $row.data( 'scan-url' ),
+				$text;
+
+			if ( extra.data && ( 'bad' === extra.data.class || 'cantfix' === extra.data.class ) ) {
+				$text = $row.find( 'button .text' );
+				if ( $text.data( 'secupress-label' ) ) {
+					$text.text( $text.data( 'secupress-label' ) );
+				}
+				secupressResetManualFix();
+				return;
+			}
 
 			// Go for a new scan.
 			secupressScanit( extra.test, $row, href, false );

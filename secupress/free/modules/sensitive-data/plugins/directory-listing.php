@@ -73,7 +73,7 @@ function secupress_directory_listing_activation_remove_rule( $file_content ) {
 add_action( 'secupress.modules.activate_submodule_' . basename( __FILE__, '.php' ), 'secupress_directory_listing_activation_file' );
 function secupress_directory_listing_activation_file() {
 	secupress_directory_listing_activation();
-	secupress_scanit( 'Directory_Listing', 3 );
+	secupress_scanit_async( 'Directory_Listing', 3 );
 }
 
 add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.php' ), 'secupress_directory_listing_deactivate' );
@@ -84,7 +84,7 @@ add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.ph
  */
 function secupress_directory_listing_deactivate() {
 	secupress_remove_module_rules_or_notice( 'directory_listing', __( 'Directory Listing', 'secupress' ) );
-	secupress_scanit( 'Directory_Listing', 3 );
+	secupress_scanit_async( 'Directory_Listing', 3 );
 }
 
 

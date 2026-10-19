@@ -128,7 +128,7 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 		'helpers'           => array(
 			array(
 				'type'        => 'description',
-				'description' => __( 'Users will just have to enter their email address when log in, then click on a link in the email they receive.', 'secupress' ),
+				'description' => __( 'Users will just have to enter their email address when log in, then enter the code received by email.', 'secupress' ),
 			),
 			array(
 				'type'        => 'warning',

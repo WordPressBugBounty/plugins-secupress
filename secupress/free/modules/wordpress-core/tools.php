@@ -67,6 +67,9 @@ function secupress_wpconfig_modules_activation( $marker, $force_rewrite = false 
 		$args  = [ 'marker' => $marker, 'put' => 'append', 'text' => '<?php' ];
 
 		if ( ! secupress_put_contents( $wpconfig_filepath, implode( "\n", $new_define_raw ), $args ) ) {
+			if ( secupress_put_contents_blocked_by_unclosed_marker() ) {
+				return false;
+			}
 			$message = sprintf(
 				/** Translators: 1 is a file name, 2 is a small part of code. */
 				__( 'Cannot add the constants to the %1$s file. Please edit it and add the following at the beginning: %2$s', 'secupress' ),

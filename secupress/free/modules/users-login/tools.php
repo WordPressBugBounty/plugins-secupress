@@ -160,10 +160,11 @@ function secupress_get_connected_user_ids() {
  * @author Julio Potier
  * @since 2.2.6
  * 
- * @param int $user_id The user ID.
+ * @param (int)  $user_id           The user ID.
+ * @param (bool) $ignore_encryption True to skip the strong-encryption prefix check.
  * @return (string|bool) Descriptive word if the user is a fake user, false otherwise.
  */
-function secupress_is_fake_user( $user_id ) {
+function secupress_is_fake_user( $user_id, $ignore_encryption = false ) {
 	$_user = new WP_User( $user_id );
 
 	if ( ! $_user->exists() ) {
@@ -174,19 +175,37 @@ function secupress_is_fake_user( $user_id ) {
 		return 'wrong_passwordhash';
 	}
 
-	if ( secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ) {
-		$prefix = secupress_get_encryption_prefix( secupress_get_best_encryption_system() );
-		if ( strpos( $_user->user_pass, $prefix ) !== 0 && ! get_user_meta( $user_id, 'secupress-password-needs-rehash', true ) ) {
-			return 'wrong_encryption';
-		}
-	}
-
 	if ( '0000-00-00 00:00:00' === $_user->user_registered ) {
 		return 'no_date';
 	}
 
 	if ( empty( $_user->user_nicename ) ) {
 		return 'no_nicename';
+	}
+
+	if ( secupress_is_submodule_active( 'users-login', 'blacklist-logins' ) && secupress_is_username_blacklisted( $_user->user_login ) ) {
+		return 'bad_username';
+	}
+
+	if ( ! is_email( $_user->user_email ) ) {
+		return 'wrong_email_dom';
+	}
+
+	if ( secupress_is_submodule_active( 'users-login', 'bad-email-domains' ) ) {
+		$domain   = strtolower( (string) substr( strrchr( $_user->user_email, '@' ), 1 ) );
+		$user_tld = strrchr( $domain, '.' );
+		if ( in_array( $user_tld, secupress_pro_bad_email_domain_get_bad_tld_for_email(), true )
+			|| secupress_pro_bad_email_domain_get_domain_status( $_user->user_email, 'bad' )
+		) {
+			return 'bad_email_domain';
+		}
+	}
+
+	if ( ! $ignore_encryption && secupress_is_submodule_active( 'users-login', 'force-strong-encryption' ) ) {
+		$prefix = secupress_get_encryption_prefix( secupress_get_best_encryption_system() );
+		if ( strpos( $_user->user_pass, $prefix ) !== 0 && ! get_user_meta( $user_id, 'secupress-password-needs-rehash', true ) ) {
+			return 'wrong_encryption';
+		}
 	}
 
 	if ( secupress_is_submodule_active( 'users-login', 'same-email-domain' ) && secupress_email_domain_is_same( $_user->user_email ) && ! get_user_meta( $user_id, SECUPRESS_SAME_EMAIL_DOMAIN_OK, true ) ) {
@@ -205,15 +224,10 @@ function secupress_is_fake_user( $user_id ) {
 		return 'no_modulo';
 	}
 
-	if ( ! is_email( $_user->user_email ) ) {
-		return 'wrong_email_dom';
-	}
-
 	if ( secupress_is_submodule_active( 'users-login', 'bad-email-domains' ) ) {
-		// special cache system here, this cost a lot and takes a long time to check.
 		if ( get_user_meta( $_user->ID, 'secupress-bad-mx-' . md5( $_user->user_email ), true ) ) {
 			return 'wrong_email_mx';
-		} else if ( secupress_pro_bad_email_domain_is_bad( $_user->user_email ) ) {
+		} else if ( ! secupress_pro_bad_email_domain_mx_domain_exists( strtolower( (string) substr( strrchr( $_user->user_email, '@' ), 1 ) ) ) ) {
 			update_user_meta( $_user->ID, 'secupress-bad-mx-' . md5( $_user->user_email ), 1 );
 			return 'wrong_email_mx';
 		}
@@ -290,11 +304,25 @@ function secupress_get_fake_users() {
 	);
 	$fake_users = array_merge( $temp_users, $fake_users );
 
-	// #6 Get users with bad domains MX
+	// #6 Get users with bad email domains, TLDs or listed addresses
 	if ( secupress_is_submodule_active( 'users-login', 'bad-email-domains' ) ) {
 		$domain_conditions = implode( '|', secupress_pro_bad_email_domain_get_bad_tld_for_email() );
-		$temp_users = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE user_email REGEXP CONCAT('.(', %s, ')$')", $domain_conditions ) );
+		$temp_users        = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->users WHERE user_email REGEXP CONCAT('.(', %s, ')$')", $domain_conditions ) );
+		$fake_users        = array_merge( $temp_users, $fake_users );
+
+		$email_users = $wpdb->get_results( "SELECT ID, user_email FROM {$wpdb->users}" );
+		$temp_users  = [];
+		foreach ( $email_users as $email_user ) {
+			if ( secupress_pro_bad_email_domain_get_domain_status( $email_user->user_email, 'bad' ) ) {
+				$temp_users[] = $email_user->ID;
+			}
+		}
 		$fake_users = array_merge( $temp_users, $fake_users );
+	}
+
+	// #6.5 Get users with a disallowed username
+	if ( secupress_is_submodule_active( 'users-login', 'blacklist-logins' ) ) {
+		$fake_users = array_merge( secupress_get_bad_username_ids(), $fake_users );
 	}
 
 	// #7 Get users with same domain name but without the OK meta (existing users are whitelisted on activation).
@@ -327,8 +355,7 @@ function secupress_get_fake_users() {
 		if ( ! $user_id ) {
 			return null;
 		}
-		// Use secupress_get_user_by() which handles empty user_nicename gracefully
-		$user = secupress_get_user_by( $user_id );
+		$user = secupress_get_user_by( (int) $user_id );
 		return $user ? $user : null;
 	}, $fake_users );
 	

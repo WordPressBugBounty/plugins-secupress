@@ -35,7 +35,7 @@ function secupress_readme_discloses_activate() {
 		'title'  => esc_html__( 'Protect Readme Files', 'secupress' ),
 	] );
 
-	secupress_scanit( $marker, 3 );
+	secupress_scanit_async( $marker, 3 );
 
 	return $rules;
 }
@@ -49,7 +49,7 @@ add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.ph
  */
 function secupress_readme_discloses_deactivate() {
 	secupress_remove_module_rules_or_notice( 'readme_discloses', __( 'Protect Readme Files', 'secupress' ) );
-	secupress_scanit( 'readme_discloses', 3 );
+	secupress_scanit_async( 'readme_discloses', 3 );
 }
 
 /** --------------------------------------------------------------------------------------------- */

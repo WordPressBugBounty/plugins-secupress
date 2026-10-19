@@ -9,6 +9,19 @@
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
 
+add_action( 'secupress.modules.activate_submodule_' . basename( __FILE__, '.php' ), 'secupress_move_login_rescan' );
+add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.php' ), 'secupress_move_login_rescan' );
+/**
+ * On module activation or deactivation, rescan.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ */
+function secupress_move_login_rescan() {
+	secupress_delete_site_transient( SECUPRESS_ACTIVE_SUBMODULES );
+	secupress_scanit_async( 'Move_Login' );
+}
+
 /** --------------------------------------------------------------------------------------------- */
 /** INCLUDES ==================================================================================== */
 /** --------------------------------------------------------------------------------------------- */

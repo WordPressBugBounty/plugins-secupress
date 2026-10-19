@@ -82,6 +82,7 @@ function secupress_scanit( $test_name, $format_response = false, $for_current_si
 /**
  * Scan a particular test asynchronously with a delay
  *
+ * @since 2.7.2 If the test is already in the queue, it will not be added again.
  * @since 2.0
  * @author Julio Potier
  *
@@ -89,6 +90,11 @@ function secupress_scanit( $test_name, $format_response = false, $for_current_si
  * @param (int)    $delay     A delay in seconds if needed
  */
 function secupress_scanit_async( $test_name, $delay = 0 ) {
+	static $uniq = array();
+	if ( in_array( $test_name, $uniq ) ) {
+		return;
+	}
+	$uniq[]    = $test_name;
 	$http_args = [
 		'timeout'   => 0.01,
 		'blocking'  => false,
@@ -215,6 +221,6 @@ function secupress_pre_check_php_version() {
 	}
 	$versions = secupress_get_php_versions();
 	if ( version_compare( $versions['current'], $versions['mini'] ) >= 0 ) {
-		secupress_scanit( 'PhpVersion' );
+		secupress_scanit_async( 'PhpVersion' );
 	}
 }

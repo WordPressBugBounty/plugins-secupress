@@ -245,12 +245,13 @@ class SecuPress_Scan_Bad_File_Extensions extends SecuPress_Scan implements SecuP
 	/**
 	 * Fix for Apache system.
 	 *
+	 * @since 2.7.2 Activate Bad URL Access, which also enables Bad File Extensions.
 	 * @since 1.0
 	 */
 	protected function fix_apache() {
 		global $wp_settings_errors;
 
-		secupress_activate_submodule( 'sensitive-data', 'bad-file-extensions' );
+		secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 
 		// Got error?
 		$last_error = is_array( $wp_settings_errors ) && $wp_settings_errors ? end( $wp_settings_errors ) : false;
@@ -271,12 +272,13 @@ class SecuPress_Scan_Bad_File_Extensions extends SecuPress_Scan implements SecuP
 	/**
 	 * Fix for IIS7 system.
 	 *
+	 * @since 2.7.2 Activate Bad URL Access, which also enables Bad File Extensions.
 	 * @since 1.0
 	 */
 	protected function fix_iis7() {
 		global $wp_settings_errors;
 
-		secupress_activate_submodule( 'sensitive-data', 'bad-file-extensions' );
+		secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 
 		// Got error?
 		$last_error = is_array( $wp_settings_errors ) && $wp_settings_errors ? end( $wp_settings_errors ) : false;
@@ -298,12 +300,13 @@ class SecuPress_Scan_Bad_File_Extensions extends SecuPress_Scan implements SecuP
 	/**
 	 * Fix for nginx system.
 	 *
+	 * @since 2.7.2 Activate Bad URL Access, which also enables Bad File Extensions.
 	 * @since 1.0
 	 */
 	protected function fix_nginx() {
 		global $wp_settings_errors;
 
-		secupress_activate_submodule( 'sensitive-data', 'bad-file-extensions' );
+		secupress_activate_submodule( 'sensitive-data', 'bad-url-access' );
 
 		// Get the error.
 		$last_error = is_array( $wp_settings_errors ) && $wp_settings_errors ? end( $wp_settings_errors ) : false;

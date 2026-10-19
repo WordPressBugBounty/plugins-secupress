@@ -31,7 +31,9 @@ if ( $outside_web ) {
 	if ( 'open_basedir' === $fallback_reason ) {
 		$warning_local .= ' ' . __( 'Your server configuration prevents storing backups in a secure location.', 'secupress' );
 	} elseif ( 'not_writable' === $fallback_reason ) {
-		$warning_local .= ' ' . __( 'The parent folder is not writable.', 'secupress' );
+		$warning_local .= ' ' . __( 'The backups folder is not writable.', 'secupress' );
+	} elseif ( 'invalid_path' === $fallback_reason ) {
+		$warning_local .= ' ' . __( 'The backups folder path is invalid.', 'secupress' );
 	}
 }
 

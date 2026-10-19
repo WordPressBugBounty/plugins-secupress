@@ -67,21 +67,6 @@ if ( ! secupress_show_contextual_help() ) {
 }
 
 
-add_filter( 'pre_http_request', 'secupress_filter_remote_url', 1, 3 );
-/**
- * Filter the URL to prevent calls to secupress.me if needed
- *
- * @since 2.0
- * @author Julio Potier
- **/
-function secupress_filter_remote_url( $val, $parsed_args, $url ) {
-	if ( secupress_is_pro() && 32 !== strlen( secupress_get_consumer_key() ) && 0 === strpos( $url, untrailingslashit( SECUPRESS_WEB_MAIN ) ) ) {
-		return new WP_Error();
-	}
-	return $val;
-}
-
-
 add_filter( 'manage_plugins_custom_column', 'secupress_add_malware_detection_column_content', 10, 3 );
 /**
  * Display if the not installed plugin contains malwares

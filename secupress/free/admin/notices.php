@@ -4,11 +4,14 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 add_action( 'current_screen', 'secupress_http_block_external_notice' );
 /**
  * This notice is displayed when external HTTP requests are blocked via the WP_HTTP_BLOCK_EXTERNAL constant
- *
- * @since 1.0
- * @author Julio Potier
- */
+*
+* @since 1.0
+* @author Julio Potier
+*/
 function secupress_http_block_external_notice() {
+	if ( ! is_admin() ) {
+		return;
+	}
 	global $current_screen;
 
 	if ( ! current_user_can( secupress_get_capability() ) ) {
@@ -45,6 +48,7 @@ add_action( 'admin_init', 'secupress_plugins_to_deactivate' );
 /**
  * This warning is displayed when some plugins may conflict with SecuPress.
  *
+ * @since 2.7.2 Use VERSION for the notice ID, removed the hash.
  * @since 1.0
  */
 function secupress_plugins_to_deactivate() {
@@ -64,7 +68,7 @@ function secupress_plugins_to_deactivate() {
 	$plugins_to_deactivate = array_filter( array_keys( $plugins_to_deactivate ), 'is_plugin_active' );
 
 	if ( $plugins_to_deactivate ) {
-		$message  = _n( 'The following plugin has been deactivated because we already included its features:', 'The following plugins has been deactivated because we already included its features:', count( $plugins_to_deactivate ), 'secupress' );
+		$message  = '<p>' . _n( 'The following plugin has been deactivated because we already included its features:', 'The following plugins has been deactivated because we already included its features:', count( $plugins_to_deactivate ), 'secupress' );
 		$message .= '</p><ul>';
 		foreach ( $plugins_to_deactivate as $plugin ) {
 			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugin );
@@ -80,11 +84,11 @@ function secupress_plugins_to_deactivate() {
 		secupress_add_notice( $message, 'error', 'deactivate-plugin' );
 	}
 
-	$plugins_to_warn = []; // deactivation not mandatory, dismissable
-	/*
+	$plugins_to_warn = [ // deactivation not mandatory, dismissable
+	
 		'all-in-one-wp-security-and-firewall/wp-security.php', // repo
-		'better-wp-security/better-wp-security.php', // Solid Security Free repo
-		'ithemes-security-pro/ithemes-security-pro.php', // Solid Security Pro
+		'better-wp-security/better-wp-security.php', // Kadence Security Free repo
+		'ithemes-security-pro/ithemes-security-pro.php', // Kadence Security Pro
 		'bulletproof-security/bulletproof-security.php', // repo
 		'getastra/astra-security.php', // repo
 		'gotmls/index.php', // repo
@@ -103,18 +107,19 @@ function secupress_plugins_to_deactivate() {
 		'sf-author-url-control/sf-author-url-control.php', // repo
 		'really-simple-ssl/really-simple-ssl.php', // repo
 		'really-simple-ssl-pro/really-simple-ssl-pro.php',
+		'wp-hide-security-enhancer-pro/wp-hide.php',
 	];
-*/
+
 	$plugins_to_warn = array_filter( $plugins_to_warn, 'is_plugin_active' );
 
 	if ( $plugins_to_warn ) {
 
-		$hash = md5( serialize( $plugins_to_warn ) );
-		if ( secupress_notice_is_dismissed( 'warn-plugin-' . $hash ) ) {
+		if ( secupress_notice_is_dismissed( SECUPRESS_VERSION . '-warn-plugins' ) ) {
 			return;
 		}
 
-		$message  = sprintf( _n( 'The following plugin may cause conflicts with %s:', 'The following plugins may cause conflicts with %s:', count( $plugins_to_warn ), 'secupress' ), SECUPRESS_PLUGIN_NAME );
+		$message  = '<p>';
+		$message .= sprintf( __( 'Please note that running other security plugins alongside %s can cause conflicts. For optimal performance, please deactivate other security tools as our plugin handles everything already.', 'secupress' ), SECUPRESS_PLUGIN_NAME );
 		$message .= '</p><ul>';
 		foreach ( $plugins_to_warn as $plugin ) {
 			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $plugin );
@@ -122,11 +127,11 @@ function secupress_plugins_to_deactivate() {
 			$page        = isset( $_GET['pages'] ) ? '&amp;paged=' . $_GET['paged'] : '';
 			$search      = isset( $_GET['s'] ) ? '&amp;s=' . $_GET['s'] : '';
 			$url         = wp_nonce_url( 'plugins.php?action=deactivate&amp;plugin=' . $plugin . $context . $page . $search, 'deactivate-plugin_' . $plugin );
-			$message    .= '<li>• ' . $plugin_data['Name'] . '</span> <a href="' . esc_url( $url ) . '" class="button-secondary alignright">' . _x( 'Deactivate', 'plugin', 'secupress' ) . '</a></li>';
+			$message    .= '<li><a href="' . esc_url( $url ) . '" class="secupress-button secupress-button-mini">' . _x( 'Deactivate', 'plugin', 'secupress' ) . '</a> ' . $plugin_data['Name'] . '</span></li>';
 		}
 		$message .= '</ul>';
 
-		secupress_add_transient_notice( $message, 'warning', SECUPRESS_MAJOR_VERSION . '-warn-plugin-' . $hash );
+		secupress_add_transient_notice( $message, 'warning', SECUPRESS_VERSION . '-warn-plugins' );
 	}
 
 }

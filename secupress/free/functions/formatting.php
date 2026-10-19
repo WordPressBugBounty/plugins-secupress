@@ -999,6 +999,82 @@ function secupress_migrate_attacks_data( $attack_types ) {
 }
 
 /**
+ * Migrate attacks daily keys from MMDD to YYMMDD.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ **/
+function secupress_migrate_attacks_md_to_ymd() {
+	$attack_types = get_option( SECUPRESS_ATTACKS, [] );
+
+	if ( ! is_array( $attack_types ) || empty( $attack_types ) ) {
+		return;
+	}
+
+	$today_md     = date( 'md' );
+	$current_yy   = date( 'y' );
+	$prev_yy      = gmdate( 'y', strtotime( '-1 year' ) );
+	$needs_update = false;
+	$migrated     = $attack_types;
+
+	foreach ( $migrated as $type => $data ) {
+		if ( 'all' === $type || ! is_array( $data ) ) {
+			continue;
+		}
+
+		$new_data = [];
+
+		foreach ( $data as $date_key => $value ) {
+			if ( ! is_numeric( $date_key ) || ! is_numeric( $value ) ) {
+				continue;
+			}
+
+			$date_key = (string) $date_key;
+			$value    = (int) $value;
+			$key_len  = strlen( $date_key );
+
+			if ( 6 === $key_len ) {
+				if ( ! isset( $new_data[ $date_key ] ) ) {
+					$new_data[ $date_key ] = 0;
+				}
+				$new_data[ $date_key ] += $value;
+				continue;
+			}
+
+			if ( 8 === $key_len ) {
+				$needs_update = true;
+				$new_key      = substr( $date_key, 2 );
+				if ( ! isset( $new_data[ $new_key ] ) ) {
+					$new_data[ $new_key ] = 0;
+				}
+				$new_data[ $new_key ] += $value;
+				continue;
+			}
+
+			if ( 4 !== $key_len ) {
+				$new_data[ $date_key ] = $value;
+				continue;
+			}
+
+			$needs_update = true;
+			$yy           = strcmp( $date_key, $today_md ) > 0 ? $prev_yy : $current_yy;
+			$new_key      = $yy . $date_key;
+
+			if ( ! isset( $new_data[ $new_key ] ) ) {
+				$new_data[ $new_key ] = 0;
+			}
+			$new_data[ $new_key ] += $value;
+		}
+
+		$migrated[ $type ] = $new_data;
+	}
+
+	if ( $needs_update ) {
+		update_option( SECUPRESS_ATTACKS, $migrated );
+	}
+}
+
+/**
  * Return the Flag emoji for a given country code like "FR" or "UK"
  *
  * @since 2.6

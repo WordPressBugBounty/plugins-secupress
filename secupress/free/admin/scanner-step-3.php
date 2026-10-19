@@ -177,7 +177,7 @@ if ( ! $secupress_tests ) {
 		$needs_pro              = 'pro' === $current_test->is_fixable() && ! secupress_is_pro();
 		$is_fixable             = true === $current_test->is_fixable() || 'pro' === $current_test->is_fixable() && secupress_is_pro();
 		$not_fixable_by_sp      = false === $current_test->is_fixable();
-		$is_fixable_with_action = $is_fixable && $has_actions;
+		$is_fixable_with_action = $has_actions && ( $is_fixable || $not_fixable_by_sp );
 		// Row css class.
 		$row_css_class  = 'secupress-item-' . $class_name_part;
 		$row_css_class .= ' status-' . sanitize_html_class( $scan_status );
@@ -293,7 +293,7 @@ if ( ! $secupress_tests ) {
 								<span class="text"><?php _e( 'Ignore it', 'secupress' ); ?></span>
 							</a>
 							<?php 
-							if ( $not_fixable_by_sp || 'cantfix' === $fix_status ) { ?>
+							if ( ( $not_fixable_by_sp && ! $has_actions ) || 'cantfix' === $fix_status ) { ?>
 								<a href="<?php echo esc_url( $scan_nonce_url ); ?>" class="secupress-button secupress-button-primary secupress-button-manual-scanit shadow">
 									<span class="icon">
 										<i class="secupress-icon-check" aria-hidden="true"></i>

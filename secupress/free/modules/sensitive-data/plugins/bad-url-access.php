@@ -51,14 +51,16 @@ function secupress_bad_url_access_activation() {
 
 add_action( 'secupress.modules.activate_submodule_' . basename( __FILE__, '.php' ), 'secupress_bad_url_access_activate' );
 /**
- * On module de/activation, rescan.
+ * On module activation, write the rules and activate Bad File Extensions.
  *
+ * @since 2.7.2 Activate Bad File Extensions with this module.
  * @since 2.0
  * @author Julio Potier
  */
 function secupress_bad_url_access_activate() {
+	secupress_activate_submodule( 'sensitive-data', 'bad-file-extensions' );
 	secupress_bad_url_access_activation();
-	secupress_scanit( 'Bad_URL_Access', 3 );
+	secupress_scanit_async( 'Bad_URL_Access', 3 );
 }
 
 
@@ -66,12 +68,14 @@ add_action( 'secupress.modules.deactivate_submodule_' . basename( __FILE__, '.ph
 /**
  * On module deactivation, maybe remove rewrite rules from the `.htaccess`/`web.config` file.
  *
+ * @since 2.7.2 Deactivate Bad File Extensions with this module.
  * @since 1.0
  * @author Grégory Viguier
  */
 function secupress_bad_url_access_deactivate() {
 	secupress_remove_module_rules_or_notice( 'bad_url_access', __( 'Bad URL Access', 'secupress' ) );
-	secupress_scanit( 'Bad_URL_Access', 3 );
+	secupress_deactivate_submodule( 'sensitive-data', 'bad-file-extensions' );
+	secupress_scanit_async( 'Bad_URL_Access', 3 );
 }
 
 

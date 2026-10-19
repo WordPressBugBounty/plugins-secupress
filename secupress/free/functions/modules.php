@@ -43,7 +43,6 @@ function secupress_get_modules() {
 			'submodules'  => [
 							'row-move-login_activated'                        => __( 'Move Login Page', 'secupress' ),
 							'row-move-login_singlesignon'                     => ! is_multisite() ? '' : '>' . __( 'Single Sign-On (SSO)', 'secupress' ),
-							'login-protection_type_bannonexistsuser'          => __( 'Ban Non-Existent Users', 'secupress' ),
 							'login-protection_type_limitloginattempts'        => __( 'Bad Login Attempts', 'secupress' ),
 							'login-protection_type_passwordspraying'          => '*' . __( 'Bad Password Attempts', 'secupress' ),
 							'row-login-protection_sessions_control'           => '*' . __( 'Session Control', 'secupress' ),
@@ -137,8 +136,8 @@ function secupress_get_modules() {
 						]
 		],
 		'firewall'        => [
-			'title'       => __( 'WAF &amp; GeoIP', 'secupress' ),
-			'title-alt'   => __( 'WAF &amp; GeoIP Management', 'secupress' ),
+			'title'       => __( 'Firewall &amp; GeoIP', 'secupress' ),
+			'title-alt'   => __( 'Firewall &amp; GeoIP Management', 'secupress' ),
 			'icon'        => 'firewall',
 			'dashicon'    => 'shield',
 			'summaries'   => [
@@ -148,7 +147,7 @@ function secupress_get_modules() {
 							'learning-mode_bbx_user-agents-header'     => __( 'Block Bad User Agents', 'secupress' ),
 							'learning-mode_bbx_bad-url-contents'       => __( 'Block Bad Content', 'secupress' ),
 							'learning-mode_bbx_bad-referer'            => __( 'Block Bad Referers', 'secupress' ),
-							'row-learning-mode_' . sanitize_key( secupress_firewall_ng_name() )     => '*' . sprintf( __( '%s WAF rules', 'secupress' ), secupress_firewall_ng_name() ),
+							'row-learning-mode_' . sanitize_key( secupress_firewall_ng_name() )     => '*' . sprintf( __( '%s Firewall rules', 'secupress' ), secupress_firewall_ng_name() ),
 							'row-learning-mode_learning'               => function_exists( 'secupress_firewall_ng_is_enabled' ) && secupress_firewall_ng_is_enabled() ? '>*' . __( 'Learning Mode', 'secupress' ) : '',
 							'row-bbq-headers_fake-google-bots'       => __( 'Block Fake SEO Bots', 'secupress' ),
 							'row-bbq-headers_block-ai'               => '*' . __( 'Block AI Bots', 'secupress' ),
@@ -712,6 +711,9 @@ function secupress_remove_module_rules_or_notice( $marker, $module_name ) {
 
 	// Apache.
 	if ( $is_apache && ! secupress_write_htaccess( $marker ) ) {
+		if ( secupress_put_contents_blocked_by_unclosed_marker() ) {
+			return false;
+		}
 		$message  = sprintf( __( '%s:', 'secupress' ), $module_name ) . ' ';
 		$message .= sprintf(
 			/** Translators: 1 is a file name, 2 and 3 are small parts of code. */
@@ -791,6 +793,9 @@ function secupress_add_module_rules_or_notice( $args ) {
 	if ( $is_apache ) {
 		// Write in `.htaccess` file.
 		if ( ! secupress_write_htaccess( $marker, $rules ) ) {
+			if ( secupress_put_contents_blocked_by_unclosed_marker() ) {
+				return false;
+			}
 			// File not writable.
 			$rules    = esc_html( $rules );
 			$message  = sprintf( __( '%s:', 'secupress' ), $title ) . ' ';

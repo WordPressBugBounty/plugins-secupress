@@ -109,10 +109,44 @@ function secupress_limitloginattempts_add_one_try( $user_id ) {
 	return $user_attempts;
 }
 
+add_action( 'set_auth_cookie', 'secupress_limitloginattempts_clear_attempts_on_cookie', 10, 4 );
+/**
+ * Clear the attempt counter when WordPress sets the auth cookie.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $auth_cookie Authentication cookie value.
+ * @param (int)    $expire      Grace period expiration timestamp.
+ * @param (int)    $expiration  Cookie expiration timestamp.
+ * @param (int)    $user_id     User ID.
+ */
+function secupress_limitloginattempts_clear_attempts_on_cookie( $auth_cookie, $expire, $expiration, $user_id ) {
+	secupress_limitloginattempts_clear_attempts( $user_id );
+}
+
+/**
+ * A successful login clears the bad-attempt counter, whichever path opened the session.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (int) $user_id
+ */
+function secupress_limitloginattempts_clear_attempts( $user_id ) {
+	$user_id = (int) $user_id;
+	if ( ! $user_id ) {
+		return;
+	}
+
+	delete_user_meta( $user_id, '_secupress_limitloginattempts' );
+}
+
 add_action( 'authenticate', 'secupress_limitloginattempts', SECUPRESS_INT_MAX, 2 );
 /**
- * 
+ * Count failed logins for a real account, and the same way for an unknown identifier.
  *
+ * @since 2.7.2 Unknown identifiers are counted in a transient, with the same limit and the same ban.
  * @since 2.2.6 Refactoring
  * @since 1.0
  *
@@ -123,25 +157,80 @@ add_action( 'authenticate', 'secupress_limitloginattempts', SECUPRESS_INT_MAX, 2
  * @return (null|object)
  */
 function secupress_limitloginattempts( $raw_user, $username ) {
-	global $wpdb;
 	static $done = false;
 
 	if ( $done ) {
 		return $raw_user;
 	}
-	$done        = true;
+	$done = true;
 
-	if ( empty( $_POST ) || ! is_wp_error( $raw_user ) || false === ( $uid = username_exists( $username ) ) || secupress_ip_is_whitelisted() ) { // WPCS: CSRF ok.
+	if ( empty( $_POST ) || secupress_ip_is_whitelisted() ) { // WPCS: CSRF ok.
+		return $raw_user;
+	}
+
+	if ( isset( $_POST['passwordless_get_magik_link'] ) && function_exists( 'secupress_passwordless_is_activated' ) && secupress_is_submodule_active( 'users-login', 'passwordless' ) && secupress_passwordless_is_activated() ) { // WPCS: CSRF ok.
+		return $raw_user;
+	}
+
+	if ( ! is_wp_error( $raw_user ) ) {
 		if ( ! empty( $raw_user->ID ) ) {
-			delete_user_meta( $raw_user->ID, '_secupress_limitloginattempts' );
+			secupress_limitloginattempts_clear_attempts( $raw_user->ID );
 		}
 
 		return $raw_user;
 	}
 
-	$max_attempts       = secupress_get_module_option( 'login-protection_number_attempts', 10, 'users-login' );
-	$ban_time           = (int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' );
-	$user_attempts      = secupress_limitloginattempts_add_one_try( $uid );
+	$username = is_string( $username ) ? $username : '';
+	$user     = secupress_limitloginattempts_get_user( $username );
+	if ( $user ) {
+		secupress_limitloginattempts_after_increment( secupress_limitloginattempts_add_one_try( $user->ID ) );
+		return $raw_user;
+	}
+
+	if ( '' === trim( $username ) || ! secupress_is_submodule_active( 'users-login', 'stop-user-enumeration' ) ) {
+		return $raw_user;
+	}
+
+	secupress_limitloginattempts_add_unknown_try( $username );
+
+	return $raw_user;
+}
+
+/**
+ * Find the account targeted by a login attempt.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $username Login or email.
+ *
+ * @return (WP_User|false)
+ */
+function secupress_limitloginattempts_get_user( $username ) {
+	$username = trim( (string) $username );
+	if ( '' === $username ) {
+		return false;
+	}
+
+	$user = get_user_by( 'login', $username );
+	if ( ! $user && is_email( $username ) ) {
+		$user = get_user_by( 'email', $username );
+	}
+
+	return secupress_is_user( $user ) ? $user : false;
+}
+
+/**
+ * Ban or warn once the shared attempt limit is reached.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (int) $user_attempts Attempts already stored.
+ */
+function secupress_limitloginattempts_after_increment( $user_attempts ) {
+	$max_attempts       = (int) secupress_get_module_option( 'login-protection_number_attempts', 10, 'users-login' );
+	$user_attempts      = (int) $user_attempts;
 	$user_attempts_left = $max_attempts - $user_attempts;
 
 	if ( $user_attempts >= $max_attempts ) {
@@ -154,8 +243,37 @@ function secupress_limitloginattempts( $raw_user, $username ) {
 		secupress_cache_data( 'limitloginattempts_user_attempts_left', $user_attempts_left );
 		add_filter( 'login_message', 'secupress_limitloginattempts_error_message' );
 	}
+}
 
-	return $raw_user;
+/**
+ * Hash an unknown identifier so the transient never stores it in clear.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $username Login or email as typed.
+ *
+ * @return (string)
+ */
+function secupress_limitloginattempts_unknown_hash( $username ) {
+	return hash_hmac( 'sha256', strtolower( trim( (string) $username ) ), wp_salt( 'auth' ) );
+}
+
+/**
+ * Count one failed login on an identifier that has no account.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $username Login or email as typed.
+ */
+function secupress_limitloginattempts_add_unknown_try( $username ) {
+	$bag          = secupress_get_site_transient( 'secupress_lla_unknown' );
+	$bag          = is_array( $bag ) ? $bag : [];
+	$hash         = secupress_limitloginattempts_unknown_hash( $username );
+	$bag[ $hash ] = isset( $bag[ $hash ] ) ? (int) $bag[ $hash ] + 1 : 1;
+	secupress_set_site_transient( 'secupress_lla_unknown', $bag );
+	secupress_limitloginattempts_after_increment( $bag[ $hash ] );
 }
 
 

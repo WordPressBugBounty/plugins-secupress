@@ -25,6 +25,36 @@ $attacks_text   = sprintf(
 	number_format_i18n( $attacks_total )
 );
 
+$firewall_active = count( secupress_firewall_learning_get_active_ng_modules() );
+$firewall_total  = count( secupress_firewall_learning_ng_submodules() );
+if ( $is_paused ) {
+	$firewall_state = 'paused';
+	$firewall_label = _x( 'Paused', 'security', 'secupress' );
+} elseif ( secupress_firewall_learning_is_running() ) {
+	$firewall_state = 'learning';
+	$firewall_label = _x( 'Under Learning Mode', 'firewall', 'secupress' );
+} elseif ( $firewall_total > 0 && $firewall_active >= $firewall_total ) {
+	$firewall_state = '';
+	$firewall_label = _x( 'Fully activated', 'firewall', 'secupress' );
+} elseif ( $firewall_active > 0 ) {
+	$firewall_state = 'partial';
+	$firewall_label = _x( 'Partially activated', 'firewall', 'secupress' );
+} else {
+	$firewall_state = 'off';
+	$firewall_label = _x( 'Not activated', 'firewall', 'secupress' );
+}
+if ( secupress_firewall_ng_is_enabled() ) {
+	/* translators: 1: firewall pack name (e.g. 8G), 2: firewall status */
+	$firewall_label = sprintf( __( 'Firewall %1$s: %2$s', 'secupress' ), secupress_firewall_ng_name(), $firewall_label );
+} else {
+	$firewall_label = sprintf( __( 'Firewall: %s', 'secupress' ), $firewall_label );
+}
+$attacks_trend_html = '';
+$firewall_class = 'secupress-security-status-count secupress-security-status-firewall';
+if ( $firewall_state ) {
+	$firewall_class .= ' secupress-security-status-firewall-' . $firewall_state;
+}
+
 if ( $is_paused ) {
 	$status_class   = 'secupress-security-status-paused';
 	$icon_file      = 'unlocked.png';
@@ -45,6 +75,33 @@ if ( $is_paused ) {
 	$message      = __( 'Security is active', 'secupress' );
 	$modules_text = sprintf( _n( '%s active module', '%s active modules', $modules_count, 'secupress' ), number_format_i18n( $modules_count ) );
 	$descriptions = [ __( 'Real-time defense is on.', 'secupress' ) ];
+	$attacks_trend = secupress_get_attacks_trend( 1 );
+	if ( is_array( $attacks_trend ) ) {
+		$today     = (int) $attacks_trend['today'];
+		$yesterday = (int) $attacks_trend['reference'];
+		$direction = $attacks_trend['direction'];
+		if ( 'up' === $direction ) {
+			$arrow = '↗';
+		} elseif ( 'down' === $direction ) {
+			$arrow = '↘';
+		} else {
+			$arrow = '→';
+		}
+		$attacks_trend_html  = '<div class="secupress-attack-trend">';
+		$attacks_trend_html .= '<span class="secupress-attack-trend-arrow" aria-hidden="true">' . esc_html( $arrow ) . '</span>';
+		$attacks_trend_html .= '<span class="secupress-attack-trend-label">' . esc_html( sprintf(
+			/* translators: 1: attacks blocked today, 2: attacks blocked yesterday. */
+			_n(
+				'%1$s attack blocked today thanks to the protections, %2$s yesterday',
+				'%1$s attacks blocked today thanks to the protections, %2$s yesterday',
+				$today,
+				'secupress'
+			),
+			number_format_i18n( $today ),
+			number_format_i18n( $yesterday )
+		) ) . '</span>';
+		$attacks_trend_html .= '</div>';
+	}
 } else {
 	$status_class = 'secupress-security-status-idle';
 	if ( secupress_has_pro() ) {
@@ -88,8 +145,18 @@ if ( secupress_is_attacks_dashboard_widget_visible() ) {
 	$html .= '</a>';
 }
 $html .= '</span>';
+$html .= '<span class="' . esc_attr( $firewall_class ) . '">';
+$html .= '<span class="secupress-firewall-dot" aria-hidden="true"></span>';
+$html .= esc_html( $firewall_label );
+$html .= '</span>';
 $html .= '</div>';
-$html .= '<div class="secupress-security-status-description">' . esc_html( implode( ' ', $descriptions ) ) . '</div>';
+$html .= '<div class="secupress-security-status-description">';
+if ( $attacks_trend_html ) {
+	$html .= $attacks_trend_html;
+} else {
+	$html .= esc_html( implode( ' ', $descriptions ) );
+}
+$html .= '</div>';
 $html .= '</div>';
 if ( $button_disabled ) {
 	$html .= '<span class="' . $button_class . '" aria-disabled="true">' . esc_html( $button_text ) . '</span>';

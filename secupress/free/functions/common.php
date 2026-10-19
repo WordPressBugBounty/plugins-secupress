@@ -197,6 +197,7 @@ function secupress_get_scanners() {
 			3 => 'Passwords_Strength',
 			4 => 'Bad_Usernames',
 			5 => 'Login_Errors_Disclose',
+			6 => 'Move_Login',
 		),
 		'plugins-themes' => array(
 			0 => 'Plugins_Update',
@@ -1382,7 +1383,16 @@ function secupress_get_consumer_email() {
 function secupress_get_consumer_key() {
 	$key = secupress_get_option( 'consumer_key' );
 	if ( 'B5E0B5F8DD8689E6ACA49DD6E6E1A930' === $key ) {
-		return 'B5E0-nulled';
+		return 'B5E0B5-nulled';
+	}
+	if ( '12345678901234567890123456789012' === $key ) {
+		return '123456-nulled';
+	}
+	if ( 'c6d0d7f8db6898d6aca49dc6c9f4b996' === $key ) {
+		return 'c6d0d7-nulled';
+	}
+	if ( 'weadown000000005603b1ebe59708542' === $key ) {
+		return 'weadown-nulled';
 	}
 	return $key;
 }
@@ -1451,6 +1461,8 @@ function secupress_feature_is_expert( $feature ) {
 		'move-login_whattodo|honeypot'              => 1,
 		'login-protection_geoip_login_mode'         => 1,
 		'login-protection_geoip_login_device'       => 1,
+		'login-protection_number_attempts'          => 1,
+		'login-protection_time_ban'                 => 1,
 		'content-protect_hotlink_redirection'       => 1,
 		'content-protect_hotlink_allow'             => 1,
 	];
@@ -1630,6 +1642,43 @@ function secupress_get_user_metas( $meta_key ) {
 		secupress_cache_data( __FUNCTION__ . $meta_key, $res );
 	}
 	return $res;
+}
+
+
+/**
+ * Count users who currently have at least one application password.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @return (int)
+ */
+function secupress_get_application_passwords_user_count() {
+	$count = secupress_get_site_transient( 'secupress_app_passwords_users' );
+
+	if ( false !== $count ) {
+		return (int) $count;
+	}
+
+	global $wpdb;
+
+	$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( DISTINCT user_id ) FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value NOT IN ( %s, %s )", '_application_passwords', '', 'a:0:{}' ) );
+	secupress_set_site_transient( 'secupress_app_passwords_users', $count );
+
+	return $count;
+}
+
+
+add_action( 'wp_create_application_password', 'secupress_delete_application_passwords_user_count_cache' );
+add_action( 'wp_delete_application_password', 'secupress_delete_application_passwords_user_count_cache' );
+/**
+ * Drop the cached application password user count.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ */
+function secupress_delete_application_passwords_user_count_cache() {
+	secupress_delete_site_transient( 'secupress_app_passwords_users' );
 }
 
 /**
@@ -2269,6 +2318,62 @@ function secupress_server_is_ssl( $with_cloudflare = true ) {
 	return apply_filters( 'secupress.is_sll', $is_ssl, $with_cloudflare );
 }
 
+/**
+ * Flush the user meta cache after a direct SQL query on the usermeta table.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ */
+function secupress_flush_user_meta_cache() {
+	global $wpdb;
+
+	if ( function_exists( 'wp_cache_supports' ) && wp_cache_supports( 'flush_group' ) ) {
+		wp_cache_flush_group( 'user_meta' );
+		return;
+	}
+
+	$user_ids = $wpdb->get_col( "SELECT ID FROM $wpdb->users" );
+	foreach ( $user_ids as $user_id ) {
+		wp_cache_delete( (int) $user_id, 'user_meta' );
+	}
+}
+
+/**
+ * Add the unique INDEX on the user_pass column of the users table, if not already there.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ *
+ * @return (bool) True if the index exists or has been added, false if it could not be added (duplicated hashes, no ALTER privilege…).
+ */
+function secupress_add_unique_user_pass_index() {
+	global $wpdb;
+
+	if ( $wpdb->get_row( "SHOW INDEX FROM $wpdb->users WHERE Key_name = 'unique_user_pass'" ) ) {
+		return true;
+	}
+
+	return false !== $wpdb->query( "ALTER TABLE $wpdb->users ADD UNIQUE INDEX unique_user_pass (user_pass)" );
+}
+
+/**
+ * Message displayed when the unique INDEX on the user_pass column could not be added.
+ *
+ * @since 2.7.2
+ * @author Julio Potier
+ *
+ * @param (string) $feature The feature name that has not been activated.
+ *
+ * @return (string)
+ */
+function secupress_get_unique_user_pass_index_error_message( $feature ) {
+	return sprintf(
+		/* translators: 1 is a feature name, 2 is a database table name. */
+		__( '%s inactive: suspicious duplicate password signatures were detected among your user accounts. A review on your user accounts is required.', 'secupress' ),
+		'<strong>' . esc_html( $feature ) . '</strong>'
+	);
+}
+
 
 /**
  * Update home and siteurl with HTTPS
@@ -2476,7 +2581,7 @@ function secupress_format_message( $msgs, $test_name ) {
  **/
 function secupress_log_attack( $type ) {
 	$attack_types = get_option( SECUPRESS_ATTACKS, [] );
-	$current_date = date( 'md' ); // Format MMDD
+	$current_date = date( 'ymd' );
 	
 	if ( ! isset( $attack_types[ $type ] ) ) {
 		$attack_types[ $type ] = [];
@@ -2501,6 +2606,41 @@ function secupress_log_attack( $type ) {
 	++$attack_types['all'];
 	
 	update_option( SECUPRESS_ATTACKS, $attack_types );
+
+	if ( 'ban_ip' === $type ) {
+		secupress_log_blocked_ip( secupress_get_ip() );
+	}
+}
+
+/**
+ * Store a blocked IP and increment its counter.
+ *
+ * @author Julio Potier
+ * @since 2.7.2
+ *
+ * @param (string) $ip The blocked IP address.
+ **/
+function secupress_log_blocked_ip( $ip ) {
+	if ( ! is_string( $ip ) || ! secupress_ip_is_valid( $ip ) ) {
+		return;
+	}
+
+	$blocked_ips = get_option( SECUPRESS_BLOCKED_IP, '' );
+
+	if ( is_string( $blocked_ips ) && '' !== $blocked_ips ) {
+		$blocked_ips = json_decode( $blocked_ips, true );
+	} else {
+		$blocked_ips = [];
+	}
+
+	if ( ! is_array( $blocked_ips ) ) {
+		$blocked_ips = [];
+	}
+
+	$count              = isset( $blocked_ips[ $ip ] ) ? (int) $blocked_ips[ $ip ] : 0;
+	$blocked_ips[ $ip ] = (string) ( $count + 1 );
+
+	update_option( SECUPRESS_BLOCKED_IP, wp_json_encode( $blocked_ips ), false );
 }
 
 /**
@@ -2541,8 +2681,16 @@ function secupress_attacks_get_type_title( $type ) {
 			return __( 'Plugin Interactions', 'secupress' );
 		break;
 		
-		case 'theme':
+		case 'themes':
 			return __( 'Theme Interactions', 'secupress' );
+		break;
+
+		case 'geoip':
+			return __( 'GeoIP', 'secupress' );
+		break;
+
+		case 'login':
+			return __( 'Login Protection', 'secupress' );
 		break;
 		
 		case 'zipfile':
@@ -2579,6 +2727,10 @@ function secupress_attacks_get_type_title( $type ) {
 		
 		case 'honeypot':
 			return __( 'Honeypot', 'secupress' );
+		break;
+
+		case 'option':
+			return __( 'Malicious options', 'secupress' );
 		break;
 		
 		case 'all':
@@ -3012,7 +3164,7 @@ function secupress_get_user_by( $value, $return_field = '' ) {
 		$user = secupress_get_user_data_by( $by, $value );
 	}
 	// Asking for an email or login?
-	if ( ! secupress_is_user( $value ) ) {
+	if ( ! secupress_is_user( $user ) ) {
 		$by   = is_email( $value ) ? 'email' : 'login';
 		$user = secupress_get_user_data_by( $by, $value );
 	}

@@ -60,7 +60,7 @@ class SecuPress_Scan_Bad_User_Agent extends SecuPress_Scan implements SecuPress_
 	public static function get_messages( $message_id = null ) {
 		/** Translators: 1 is the name of a protection, 2 is the name of a module. */
 		$activate_protection_message = sprintf( __( 'But you can activate the %1$s protection from the module %2$s.', 'secupress' ),
-			'<strong>' . __( 'Block bad User Agents', 'secupress' ) . '</strong>',
+			'<strong>' . __( 'Block Bad User Agents', 'secupress' ) . '</strong>',
 			'<a target="_blank" href="' . esc_url( secupress_admin_url( 'modules', 'firewall' ) ) . '#learning-mode_bbx_user-agents-header">' . __( 'Firewall', 'secupress' ) . '</a>'
 		);
 
@@ -114,8 +114,9 @@ class SecuPress_Scan_Bad_User_Agent extends SecuPress_Scan implements SecuPress_
 		}
 
 		$request_args = $this->get_default_request_args();
-		$request_args['user-agent'] = '<script>';
-		$response     = wp_remote_get( add_query_arg( secupress_generate_key( 6 ), secupress_generate_key( 8 ), user_trailingslashit( home_url() ) ), $request_args );
+		$request_args['user-agent'] = '<script></script>';
+		$url          = add_query_arg( secupress_generate_key( 6 ), secupress_generate_key( 8 ), user_trailingslashit( home_url() ) );
+		$response     = wp_remote_get( $url, $request_args );
 
 		if ( ! is_wp_error( $response ) ) {
 
