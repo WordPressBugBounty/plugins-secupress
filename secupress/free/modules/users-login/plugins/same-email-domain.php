@@ -48,6 +48,7 @@ add_action( 'secupress.modules.activate_submodule_same-email-domain', 'secupress
 /**
  * On first activation, whitelist existing users whose email matches the site domain.
  *
+ * @since 2.7.3 Accept a string or an array of domains.
  * @since 2.6.2
  * @author Julio Potier
  *
@@ -59,22 +60,30 @@ function secupress_same_email_domain_add_ok_meta( $is_active ) {
 	}
 	global $wpdb;
 
-	$website_domain = secupress_get_current_url( 'domain' );
+	$website_domain = secupress_get_current_url( 'domain', 'same_email_domain' );
+	$website_domain = array_values( array_filter( array_map( 'strval', (array) $website_domain ) ) );
 	if ( ! $website_domain ) {
 		return;
 	}
 
-	$like  = '%@' . $wpdb->esc_like( $website_domain );
+	$conditions = [];
+	$values     = [
+		SECUPRESS_SAME_EMAIL_DOMAIN_OK,
+		'1',
+		SECUPRESS_SAME_EMAIL_DOMAIN_OK,
+	];
+	foreach ( $website_domain as $domain ) {
+		$conditions[] = 'u.user_email LIKE %s';
+		$values[]     = '%@' . $wpdb->esc_like( $domain );
+	}
+
 	$query = $wpdb->prepare(
 		"INSERT INTO {$wpdb->usermeta} (user_id, meta_key, meta_value)
 		SELECT u.ID, %s, %s
 		FROM {$wpdb->users} u
 		LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = %s
-		WHERE u.user_email LIKE %s AND um.umeta_id IS NULL",
-		SECUPRESS_SAME_EMAIL_DOMAIN_OK,
-		'1',
-		SECUPRESS_SAME_EMAIL_DOMAIN_OK,
-		$like
+		WHERE ( " . implode( ' OR ', $conditions ) . ' ) AND um.umeta_id IS NULL',
+		$values
 	);
 
 	$wpdb->query( $query ); // WPCS: unprepared SQL ok.

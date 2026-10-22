@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecuPress\n"
 "Report-Msgid-Bugs-To: https://secupress.me/\n"
-"POT-Creation-Date: 2026-10-19 16:03+0200\n"
-"PO-Revision-Date: 2026-10-19 16:04+0200\n"
+"POT-Creation-Date: 2026-10-22 17:09+0200\n"
+"PO-Revision-Date: 2026-10-22 17:17+0200\n"
 "Last-Translator: Julio Potier <julio@secupress.me>\n"
 "Language-Team: French (France) <contact@secupress.me>\n"
 "Language: fr_FR\n"
@@ -439,24 +439,32 @@ msgstr ""
 "début)."
 
 #: free/admin/ajax-post-callbacks.php:1384
+msgid "Decision updated."
+msgstr "Décision mise à jour."
+
+#: free/admin/ajax-post-callbacks.php:1384
+msgid "This word could not be updated."
+msgstr "Ce mot n’a pas pu être mis à jour."
+
+#: free/admin/ajax-post-callbacks.php:1407
 msgid "Signature allowed for this site."
 msgstr "Signature autorisée pour ce site."
 
-#: free/admin/ajax-post-callbacks.php:1384
-#: free/admin/ajax-post-callbacks.php:1431
+#: free/admin/ajax-post-callbacks.php:1407
+#: free/admin/ajax-post-callbacks.php:1454
 msgid "This signature could not be updated."
 msgstr "La signature n’a pas pu être mise à jour."
 
-#: free/admin/ajax-post-callbacks.php:1408
+#: free/admin/ajax-post-callbacks.php:1431
 msgid "Signature allowed for this URL."
 msgstr "Signature autorisée pour cette URL."
 
-#: free/admin/ajax-post-callbacks.php:1408
+#: free/admin/ajax-post-callbacks.php:1431
 msgid "This signature could not be updated. Check the URL prefix."
 msgstr ""
 "La signature n’a pas pu être mise à jour. Vérifiez le préfixe de l’URL."
 
-#: free/admin/ajax-post-callbacks.php:1431
+#: free/admin/ajax-post-callbacks.php:1454
 msgid "This signature will stay blocked."
 msgstr "Cette signature restera bloquée."
 
@@ -1089,7 +1097,7 @@ msgstr ""
 "sera pas corrigé.<br>Visitez la %spage du module%s ou %s la documentation%s."
 
 #: free/admin/notices.php:482 free/admin/notices.php:520
-#: free/functions/common.php:1874 free/modules/plugins-themes/callbacks.php:78
+#: free/functions/common.php:1903 free/modules/plugins-themes/callbacks.php:78
 #: free/modules/plugins-themes/settings/plugins.php:17
 msgid "Plugin Actions"
 msgstr "Action des extensions"
@@ -1145,6 +1153,7 @@ msgstr "En savoir plus"
 
 #: free/admin/scanner-step-1-all.php:95 free/admin/scanner-step-1-new.php:93
 #: free/classes/common/class-secupress-logs-list.php:311
+#: free/classes/settings/class-secupress-settings-modules.php:969
 #: pro/modules/users-login/plugins/otp-auth.php:1747
 msgid "Close"
 msgstr "Fermer"
@@ -1637,7 +1646,7 @@ msgid "Yes, delete files"
 msgstr "Oui, supprimer les fichiers"
 
 #: free/admin/settings.php:257 free/admin/settings.php:579
-#: free/functions/common.php:2515
+#: free/functions/common.php:2544
 msgctxt "scan result"
 msgid "Good"
 msgstr "Bon"
@@ -1648,7 +1657,7 @@ msgid "Warning"
 msgstr "En attente"
 
 #: free/admin/settings.php:259 free/admin/settings.php:591
-#: free/functions/common.php:2514
+#: free/functions/common.php:2543
 msgctxt "scan result"
 msgid "Bad"
 msgstr "Mauvais"
@@ -1725,7 +1734,7 @@ msgstr "Docs"
 msgid "Settings"
 msgstr "Réglages"
 
-#: free/admin/settings.php:496 free/functions/widgets.php:1856
+#: free/admin/settings.php:496 free/functions/widgets.php:1859
 #: pro/common.php:381
 msgctxt "Latest scans"
 msgid "M dS, Y \\a\\t h:ia"
@@ -1757,7 +1766,7 @@ msgstr "Résultat du scanner"
 msgid "How does it work?"
 msgstr "Comment ça marche ?"
 
-#: free/admin/settings.php:585 free/functions/common.php:2516
+#: free/admin/settings.php:585 free/functions/common.php:2545
 msgctxt "scan result"
 msgid "Pending"
 msgstr "En attente"
@@ -2042,71 +2051,6 @@ msgstr ""
 "Nouveau : Les identifiants interdits sont aussi refusés comme noms "
 "d’affichage."
 
-#: free/admin/upgrader.php:789
-msgid ""
-"Improvement: Enhance login error handling and disclosures in Login Errors "
-"Disclose feature."
-msgstr ""
-"Amélioration : Meilleure gestion des erreurs de connexion et de leur "
-"divulgation dans la fonctionnalité Erreurs de connexion."
-
-#: free/admin/upgrader.php:790
-msgid ""
-"Improvement: Learning Mode can review common page slugs instead of treating "
-"them as critical."
-msgstr ""
-"Amélioration : Le mode apprentissage peut examiner les slugs de pages "
-"courants au lieu de les traiter comme critiques."
-
-#: free/admin/upgrader.php:791
-msgid ""
-"Improvement: Backup folder can be set with the SECUPRESS_BACKUPS_PATH "
-"constant or the secupress.backups.path filter."
-msgstr ""
-"Amélioration : Le dossier des sauvegardes peut être défini avec la constante "
-"SECUPRESS_BACKUPS_PATH ou le filtre secupress.backups.path."
-
-#: free/admin/upgrader.php:792
-msgid ""
-"Improvement: Activating Bad URL Access now also enables Bad File Extensions "
-"(and the reverse on deactivation)."
-msgstr ""
-"Amélioration : L’activation d’« Accès aux mauvaises URLs » active aussi "
-"« Mauvaises extensions de fichiers » (et l’inverse à la désactivation)."
-
-#: free/admin/upgrader.php:793
-msgid ""
-"Improvement: Pro update checks also run outside wp-admin, so new versions "
-"are visible everywhere."
-msgstr ""
-"Amélioration : La vérification des mises à jour Pro s’exécute aussi hors de "
-"wp-admin, les nouvelles versions sont donc visibles partout."
-
-#: free/admin/upgrader.php:794
-msgid ""
-"Removal: Ban Non-Existent Users Feature. Unknown identifiers are no longer "
-"blocked on the first try. Use Limit Login Attempts now."
-msgstr ""
-"Retrait : fonctionnalité « Bannir les identifiants inexistants ». Les "
-"identifiants inconnus ne sont plus bloqués dès la première tentative. "
-"Utilisez désormais « Tentatives de connexion »."
-
-#: free/admin/upgrader.php:795
-msgid ""
-"Fix: Stop User Enumeration feature was blocking Editors to create or edit "
-"posts and pages."
-msgstr ""
-"Correction : « Interdire l’énumération des comptes » empêchait le rôle "
-"éditeur de créer ou de modifier des articles et des pages."
-
-#: free/admin/upgrader.php:796
-msgid ""
-"Fix: Fatal error in the dashboard attacks widget (wrong count passed to _nx, "
-"seen with Divi)."
-msgstr ""
-"Correction : Erreur fatale dans le widget des attaques du tableau de bord "
-"(mauvais nombre transmis à _nx, constaté avec Divi)."
-
 #: free/classes/admin/class-secupress-admin-notices.php:316
 #: free/classes/admin/class-secupress-admin-pointers.php:311
 msgctxt "verb"
@@ -2125,7 +2069,7 @@ msgid "<strong>Error</strong>: %s"
 msgstr "<strong>Erreur</strong> : %s"
 
 #: free/classes/admin/class-secupress-admin-offer-migration.php:270
-#: free/functions/widgets.php:1967
+#: free/functions/widgets.php:1970
 #: free/modules/services/settings/services.php:48
 #: free/modules/welcome/callbacks.php:429
 #: free/modules/welcome/settings/api-key.php:168
@@ -2311,11 +2255,11 @@ msgstr ""
 msgid "Congratulations, your Pro version has been installed 🎉."
 msgstr "Félicitations, votre version Pro a été installée 🎉."
 
-#: free/classes/admin/class-secupress-admin-wp-background-process.php:778
+#: free/classes/admin/class-secupress-admin-wp-background-process.php:784
 msgid "Every Minute"
 msgstr "Toutes les minutes"
 
-#: free/classes/admin/class-secupress-admin-wp-background-process.php:780
+#: free/classes/admin/class-secupress-admin-wp-background-process.php:786
 #, php-format
 msgid "Every %d Minutes"
 msgstr "Toutes les %d minutes"
@@ -2804,7 +2748,7 @@ msgstr ""
 #: free/classes/scanners/class-secupress-scan-passwords-strength.php:89
 #: free/classes/scanners/class-secupress-scan-php-404.php:78
 #: free/classes/scanners/class-secupress-scan-php-disclosure.php:97
-#: free/classes/scanners/class-secupress-scan-phpversion.php:80
+#: free/classes/scanners/class-secupress-scan-phpversion.php:89
 #: free/classes/scanners/class-secupress-scan-plugins-update.php:77
 #: free/classes/scanners/class-secupress-scan-readme-discloses.php:102
 #: free/classes/scanners/class-secupress-scan-salt-keys.php:77
@@ -3790,7 +3734,7 @@ msgstr ""
 
 #: free/classes/scanners/class-secupress-scan-bad-usernames.php:46
 #: free/functions/modules.php:65 free/functions/widgets.php:881
-#: free/modules/users-login/settings/blacklist-logins.php:103
+#: free/modules/users-login/settings/blacklist-logins.php:113
 msgid "Forbid Bad Usernames"
 msgstr "Interdire les identifiants dangereux"
 
@@ -5118,11 +5062,11 @@ msgstr ""
 "https://fr.docs.secupress.me/article/58-scan-de-la-divulgation-des-modules-"
 "php"
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:48
+#: free/classes/scanners/class-secupress-scan-phpversion.php:49
 msgid "Check if your installation is using a supported version of PHP."
 msgstr "Vérifie si votre installation utilise une version supportée de PHP."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:49
+#: free/classes/scanners/class-secupress-scan-phpversion.php:50
 msgid ""
 "Every year, old PHP version are not supported anymore, even for security "
 "patches so it’s important to stay updated."
@@ -5130,31 +5074,45 @@ msgstr ""
 "Tous les ans, les anciennes version de PHP ne sont plus supportées, même "
 "pour la sécurité.Il est donc important de se tenir à jour."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:67
+#: free/classes/scanners/class-secupress-scan-phpversion.php:53
+#, php-format
+msgid ""
+"The build date is also checked, because a supported version can still miss "
+"the %s."
+msgstr ""
+"La date de compilation (build) est également vérifiée, car une version prise "
+"en charge peut tout de même ne pas inclure %s."
+
+#: free/classes/scanners/class-secupress-scan-phpversion.php:54
+#, php-format
+msgid "%s security release"
+msgstr "le correctif de sécurité du %s"
+
+#: free/classes/scanners/class-secupress-scan-phpversion.php:75
 #, php-format
 msgid "You are using <strong>PHP v%s</strong>."
 msgstr "Vous utilisez <strong>PHP v%s</strong>."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:68
+#: free/classes/scanners/class-secupress-scan-phpversion.php:76
 #, php-format
 msgid "You are using <strong>PHP v%s</strong>, do not go lower!"
 msgstr "Vous utilisez <strong>PHP v%s</strong>, n’allez pas plus bas !"
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:69
+#: free/classes/scanners/class-secupress-scan-phpversion.php:77
 #, php-format
 msgid "You are using <strong>PHP v%s</strong>, this is correctly supported."
 msgstr "Vous utilisez <strong>PHP v%s</strong>, c’est correctement supportée."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:70
+#: free/classes/scanners/class-secupress-scan-phpversion.php:78
 #, php-format
 msgid "You are using <strong>PHP v%s</strong>, the last one? Perfect!"
 msgstr "Vous utilisez <strong>PHP v%s</strong>, la dernière ? Parfait !"
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:72
+#: free/classes/scanners/class-secupress-scan-phpversion.php:80
 msgid "Unable to determine version of PHP."
 msgstr "Impossible de déterminer la version de PHP."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:74
+#: free/classes/scanners/class-secupress-scan-phpversion.php:82
 #, php-format
 msgid ""
 "You are using <strong>PHP v%1$s</strong>, but the oldest major supported "
@@ -5165,7 +5123,16 @@ msgstr ""
 "supportée est <strong>PHP v%2$s</strong>, et la dernière en date est "
 "<strong>PHP v%3$s</strong>."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:76
+#: free/classes/scanners/class-secupress-scan-phpversion.php:83
+#, php-format
+msgid ""
+"You are using <strong>PHP v%1$s</strong> built on <strong>%2$s</strong>. "
+"This build is older than <strong>%3$s</strong>."
+msgstr ""
+"Vous utilisez <strong>PHP v%1$s</strong>, compilée le <strong>%2$s</strong>. "
+"Cette compilation (build) date d‘avant le %s."
+
+#: free/classes/scanners/class-secupress-scan-phpversion.php:85
 msgid ""
 "Cannot be fixed automatically. You have to contact your host provider to ask "
 "him to <strong>upgrade your version of PHP</strong>."
@@ -5174,7 +5141,7 @@ msgstr ""
 "hébergeur et lui demander de <strong>mettre à jour la version de PHP</"
 "strong>."
 
-#: free/classes/scanners/class-secupress-scan-phpversion.php:97
+#: free/classes/scanners/class-secupress-scan-phpversion.php:106
 msgid "https://docs.secupress.me/article/114-php-version-scan"
 msgstr "https://fr.docs.secupress.me/article/68-scan-de-la-version-php"
 
@@ -6093,8 +6060,9 @@ msgid "Adding to allowed list&hellip;"
 msgstr "Ajout dans la liste autorisée&hellip;"
 
 #: free/classes/settings/class-secupress-settings-modules.php:686
-#: free/classes/settings/class-secupress-settings-modules.php:1062
-#: free/classes/settings/class-secupress-settings-modules.php:1070
+#: free/classes/settings/class-secupress-settings-modules.php:988
+#: free/classes/settings/class-secupress-settings-modules.php:1147
+#: free/classes/settings/class-secupress-settings-modules.php:1155
 msgid "Allow"
 msgstr "Autoriser"
 
@@ -6110,39 +6078,39 @@ msgstr ""
 "Enregistrez vos modifications. Le mode apprentissage sera disponible au "
 "rechargement de la page."
 
-#: free/classes/settings/class-secupress-settings-modules.php:744
+#: free/classes/settings/class-secupress-settings-modules.php:745
 #, php-format
 msgid "Learning Mode is running until %s."
 msgstr "Le mode apprentissage continue jusqu‘au %s."
 
-#: free/classes/settings/class-secupress-settings-modules.php:754
-#: free/classes/settings/class-secupress-settings-modules.php:861
+#: free/classes/settings/class-secupress-settings-modules.php:755
+#: free/classes/settings/class-secupress-settings-modules.php:862
 #, php-format
 msgid "No calibrable %s signature has matched yet."
 msgstr "Aucune signature %s calibrable n‘a été rencontrée."
 
-#: free/classes/settings/class-secupress-settings-modules.php:764
+#: free/classes/settings/class-secupress-settings-modules.php:765
 msgid "Manage learning mode status"
 msgstr "Gérer le statut du mode apprentissage"
 
-#: free/classes/settings/class-secupress-settings-modules.php:767
+#: free/classes/settings/class-secupress-settings-modules.php:768
 msgid "Extend by"
 msgstr "Étendre de"
 
-#: free/classes/settings/class-secupress-settings-modules.php:775
-#: free/modules/firewall/inc/learning-mode.php:2341
+#: free/classes/settings/class-secupress-settings-modules.php:776
+#: free/modules/firewall/inc/learning-mode.php:2416
 msgid "Extend"
 msgstr "Étendre"
 
-#: free/classes/settings/class-secupress-settings-modules.php:781
+#: free/classes/settings/class-secupress-settings-modules.php:782
 msgid "Finish now"
 msgstr "Arrêter de suite"
 
-#: free/classes/settings/class-secupress-settings-modules.php:785
+#: free/classes/settings/class-secupress-settings-modules.php:786
 msgid "Skip & block everything"
 msgstr "Ignorer et bloquer tout"
 
-#: free/classes/settings/class-secupress-settings-modules.php:792
+#: free/classes/settings/class-secupress-settings-modules.php:793
 msgid ""
 "Learning Mode has ended. Review remaining signatures, then they will be "
 "blocked."
@@ -6150,114 +6118,132 @@ msgstr ""
 "Mode apprentissage terminé. Revoyez les signatures restantes, sinon elle "
 "seront bloquées."
 
-#: free/classes/settings/class-secupress-settings-modules.php:801
+#: free/classes/settings/class-secupress-settings-modules.php:802
 #, php-format
 msgid "Last Learning Mode: %s"
 msgstr "Dernier mode d’apprentissage : %s"
 
-#: free/classes/settings/class-secupress-settings-modules.php:807
-#: free/modules/firewall/inc/learning-mode.php:2358
+#: free/classes/settings/class-secupress-settings-modules.php:808
+#: free/modules/firewall/inc/learning-mode.php:2433
 msgid "Duration"
 msgstr "Durée"
 
-#: free/classes/settings/class-secupress-settings-modules.php:813
-#: free/modules/firewall/inc/learning-mode.php:2345
+#: free/classes/settings/class-secupress-settings-modules.php:814
+#: free/modules/firewall/inc/learning-mode.php:2420
 msgid "Start Learning Mode"
 msgstr "Lancer le mode apprentissage"
 
-#: free/classes/settings/class-secupress-settings-modules.php:829
+#: free/classes/settings/class-secupress-settings-modules.php:830
 #, php-format
 msgid "%s signature to review."
 msgid_plural "%s signatures to review."
 msgstr[0] "%s signature à réviser"
 msgstr[1] "%s signatures à réviser"
 
-#: free/classes/settings/class-secupress-settings-modules.php:832
+#: free/classes/settings/class-secupress-settings-modules.php:833
 msgid "Signatures to review"
 msgstr "Signatures à réviser"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1010
-msgid "String"
-msgstr "Chaine"
+#: free/classes/settings/class-secupress-settings-modules.php:963
+#: free/classes/settings/class-secupress-settings-modules.php:968
+msgid "Review previous decisions"
+msgstr "Revoir les décisions précédentes"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1011
-msgid "Source"
-msgstr "Source"
+#: free/classes/settings/class-secupress-settings-modules.php:972
+msgid "No word has been decided yet."
+msgstr "Aucun mot n’a encore été décidé."
 
-#: free/classes/settings/class-secupress-settings-modules.php:1012
-msgid "Suggested action"
-msgstr "Suggestion"
+#: free/classes/settings/class-secupress-settings-modules.php:985
+msgid "Allowed"
+msgstr "Autorisé"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1012
-msgid "Decision"
-msgstr "Décision"
-
-#: free/classes/settings/class-secupress-settings-modules.php:1014
-msgid "Values"
-msgstr "Valeurs"
-
-#: free/classes/settings/class-secupress-settings-modules.php:1015
-msgid "Hits"
-msgstr "Visites"
-
-#: free/classes/settings/class-secupress-settings-modules.php:1048
-msgid "Keyword:"
-msgstr "Mot-clé :"
-
-#: free/classes/settings/class-secupress-settings-modules.php:1054
-msgid "Rule:"
-msgstr "Règle :"
-
-#: free/classes/settings/class-secupress-settings-modules.php:1063
-msgid "Keep blocking"
-msgstr "Continuer de bloquer"
-
-#: free/classes/settings/class-secupress-settings-modules.php:1070
+#: free/classes/settings/class-secupress-settings-modules.php:986
+#: free/classes/settings/class-secupress-settings-modules.php:1155
 msgid "Block"
 msgstr "Bloquer"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1078
+#: free/classes/settings/class-secupress-settings-modules.php:989
+msgid "Blocked"
+msgstr "Bloqué"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1095
+msgid "String"
+msgstr "Chaine"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1096
+msgid "Source"
+msgstr "Source"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1097
+msgid "Suggested action"
+msgstr "Suggestion"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1097
+msgid "Decision"
+msgstr "Décision"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1099
+msgid "Values"
+msgstr "Valeurs"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1100
+msgid "Hits"
+msgstr "Visites"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1133
+msgid "Keyword:"
+msgstr "Mot-clé :"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1139
+msgid "Rule:"
+msgstr "Règle :"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1148
+msgid "Keep blocking"
+msgstr "Continuer de bloquer"
+
+#: free/classes/settings/class-secupress-settings-modules.php:1163
 msgctxt "learning mode keyword detected"
 msgid "Allowed for this site"
 msgstr "Autorisé pour ce site"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1079
+#: free/classes/settings/class-secupress-settings-modules.php:1164
 msgctxt "learning mode keyword detected"
 msgid "Allowed for a URL"
 msgstr "Autorisé pour cette URL"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1080
+#: free/classes/settings/class-secupress-settings-modules.php:1165
 msgctxt "learning mode keyword detected"
 msgid "Kept blocked"
 msgstr "Garder bloqué"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1081
+#: free/classes/settings/class-secupress-settings-modules.php:1166
 msgctxt "learning mode keyword detected"
 msgid "Auto-allowed for a URL"
 msgstr "Automatiquement autorisé pour cette URL"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1092
+#: free/classes/settings/class-secupress-settings-modules.php:1177
 msgid "Blocked values"
 msgstr "Valeurs bloquées"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1095
+#: free/classes/settings/class-secupress-settings-modules.php:1180
 msgid "10 last blocked values:"
 msgstr "10 derniers blocages :"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1241
+#: free/classes/settings/class-secupress-settings-modules.php:1326
 #, php-format
 msgid "Last hit: %s"
 msgstr "Dernier appel : %s"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1280
+#: free/classes/settings/class-secupress-settings-modules.php:1365
 msgid "No backups found yet."
 msgstr "Aucune sauvegarde trouvée."
 
-#: free/classes/settings/class-secupress-settings-modules.php:1298
+#: free/classes/settings/class-secupress-settings-modules.php:1383
 msgid "Backup my database"
 msgstr "Sauvegarder ma base de données"
 
-#: free/classes/settings/class-secupress-settings-modules.php:1319
+#: free/classes/settings/class-secupress-settings-modules.php:1404
 #: pro/admin/settings.php:1218
 msgid "Backup my files"
 msgstr "Sauvegarder mes fichiers"
@@ -6625,25 +6611,25 @@ msgstr "Raison : %s"
 msgid "Support ID: %s"
 msgstr "Support ID : %s"
 
-#: free/functions/common.php:1873
+#: free/functions/common.php:1902
 msgid "Bad Url Access"
 msgstr "Accès aux mauvaises URLs"
 
-#: free/functions/common.php:1875
+#: free/functions/common.php:1904
 msgid "Rename user names"
 msgstr "Renommer les noms des comptes"
 
-#: free/functions/common.php:2149
+#: free/functions/common.php:2178
 #, php-format
 msgid "Security will resume automatically in %s."
 msgstr "La sécurité reprend automatiquement dans %s."
 
-#: free/functions/common.php:2168
+#: free/functions/common.php:2197
 #, php-format
 msgid "[%s] Security is paused"
 msgstr "[%s] La sécurité est en pause"
 
-#: free/functions/common.php:2170
+#: free/functions/common.php:2199
 #, php-format
 msgid ""
 "Hello,\n"
@@ -6669,16 +6655,16 @@ msgstr ""
 "Si vous n'avez pas suspendu la sécurité, veuillez vous connecter pour la "
 "réactiver."
 
-#: free/functions/common.php:2252
+#: free/functions/common.php:2281
 #, php-format
 msgid "SSL is not supported on HTTP PORT %s"
 msgstr "SSL n‘est pas supporté sur le port HTTP %s"
 
-#: free/functions/common.php:2258
+#: free/functions/common.php:2287
 msgid "SSL is not supported on this website."
 msgstr "SSL n‘est pas supporté sur ce site Web."
 
-#: free/functions/common.php:2372
+#: free/functions/common.php:2401
 #, php-format
 msgid ""
 "%s inactive: suspicious duplicate password signatures were detected among "
@@ -6688,130 +6674,130 @@ msgstr ""
 "détectées parmi vos comptes utilisateur. Un examen de des comptes est "
 "nécessaire."
 
-#: free/functions/common.php:2469
+#: free/functions/common.php:2498
 msgctxt "User role"
 msgid "Administrator"
 msgstr "Administrateur"
 
-#: free/functions/common.php:2470
+#: free/functions/common.php:2499
 msgctxt "User role"
 msgid "Editor"
 msgstr "Éditeur"
 
-#: free/functions/common.php:2471
+#: free/functions/common.php:2500
 msgctxt "User role"
 msgid "Author"
 msgstr "Auteur"
 
-#: free/functions/common.php:2472
+#: free/functions/common.php:2501
 msgctxt "User role"
 msgid "Contributor"
 msgstr "Contributeur"
 
-#: free/functions/common.php:2473
+#: free/functions/common.php:2502
 msgctxt "User role"
 msgid "Subscriber"
 msgstr "Abonné"
 
-#: free/functions/common.php:2517
+#: free/functions/common.php:2546
 msgctxt "scan result"
 msgid "Error"
 msgstr "Erreur"
 
-#: free/functions/common.php:2519
+#: free/functions/common.php:2548
 msgctxt "scanner item"
 msgid "New"
 msgstr "Nouveau"
 
-#: free/functions/common.php:2548
+#: free/functions/common.php:2577
 msgid "Fix done."
 msgstr "Correction effectuée."
 
-#: free/functions/common.php:2677 free/functions/modules.php:206
+#: free/functions/common.php:2706 free/functions/modules.php:206
 msgid "Banned IPs"
 msgstr "IPs bannies"
 
-#: free/functions/common.php:2681
+#: free/functions/common.php:2710
 msgid "Plugin Interactions"
 msgstr "Interactions des extensions"
 
-#: free/functions/common.php:2685
+#: free/functions/common.php:2714
 msgid "Theme Interactions"
 msgstr "Interactions des thèmes"
 
-#: free/functions/common.php:2689
+#: free/functions/common.php:2718
 msgid "GeoIP"
 msgstr "GeoIP"
 
-#: free/functions/common.php:2693
+#: free/functions/common.php:2722
 msgid "Login Protection"
 msgstr "Protection de la connexion"
 
-#: free/functions/common.php:2697
+#: free/functions/common.php:2726
 msgid "ZIP Upload Attempts"
 msgstr "Tentatives de téléversement de ZIP"
 
-#: free/functions/common.php:2701
+#: free/functions/common.php:2730
 msgid "XMLRPC Intrusions"
 msgstr "Intrusions XML-RPC"
 
-#: free/functions/common.php:2705 free/functions/formatting.php:385
+#: free/functions/common.php:2734 free/functions/formatting.php:385
 msgid "Login Page"
 msgstr "Page de connexion"
 
-#: free/functions/common.php:2709
+#: free/functions/common.php:2738
 msgid "Login Attempts"
 msgstr "Tentatives de connexion"
 
-#: free/functions/common.php:2713
+#: free/functions/common.php:2742
 msgid "Password Spraying Attempts"
 msgstr "Tentatives de pulvérisation de mots de passe"
 
-#: free/functions/common.php:2717
+#: free/functions/common.php:2746
 msgid "User Actions"
 msgstr "Actions des comptes"
 
-#: free/functions/common.php:2721
+#: free/functions/common.php:2750
 msgid "Bad Robots"
 msgstr "Mauvais robots"
 
-#: free/functions/common.php:2725
+#: free/functions/common.php:2754
 msgid "Bad Request Content"
 msgstr "Mauvais contenu de requêtes"
 
-#: free/functions/common.php:2729
+#: free/functions/common.php:2758
 #: free/modules/users-login/settings/move-login.php:136
 msgid "Honeypot"
 msgstr "Pot de miel"
 
-#: free/functions/common.php:2733
+#: free/functions/common.php:2762
 msgid "Malicious options"
 msgstr "Options malveillantes"
 
-#: free/functions/common.php:2737
+#: free/functions/common.php:2766
 msgctxt "types of attacks"
 msgid "All"
 msgstr "Toutes"
 
-#: free/functions/common.php:2741
+#: free/functions/common.php:2770
 msgctxt "type of attack"
 msgid "Unknown"
 msgstr "Inconnue"
 
-#: free/functions/common.php:2845
+#: free/functions/common.php:2874
 msgid "64 Bits"
 msgstr "64 bits"
 
-#: free/functions/common.php:2937
+#: free/functions/common.php:2966
 msgid "Plugin not found"
 msgstr "Extension non trouvée"
 
-#: free/functions/common.php:3238
+#: free/functions/common.php:3267
 msgid "You will receive your new login confirmation in your mailbox."
 msgstr ""
 "Vous recevrez la confirmation du nouveau nom dans votre boite de courriel."
 
-#: free/functions/common.php:3242
+#: free/functions/common.php:3271
 msgid "You will receive your new password confirmation in your mailbox."
 msgstr ""
 "Vous recevrez le confirmation du nouveau mot de passe dans votre boite de "
@@ -6862,7 +6848,7 @@ msgstr ""
 "La requête vers le bac à sable a renvoyé le code HTTP %s au lieu d'une "
 "réponse loopback réussie."
 
-#: free/functions/files.php:1704
+#: free/functions/files.php:1705
 msgid "Could not create temporary file."
 msgstr "Impossible de créer le fichier temporaire."
 
@@ -6971,7 +6957,7 @@ msgstr "1 par jour / 1 par 24 heures"
 msgid "0 Calls (blocked)"
 msgstr "0 appel (bloqué)"
 
-#: free/functions/hotfixes.php:149
+#: free/functions/hotfixes.php:144
 #, php-format
 msgid ""
 "Warning: Critical vulnerability detected in %s, very high risk. Let us help "
@@ -6980,27 +6966,27 @@ msgstr ""
 "Attention : Faille critique détectée pour %s, risque très élevé. Laissez "
 "nous vous aidez à régler cela."
 
-#: free/functions/hotfixes.php:150
+#: free/functions/hotfixes.php:145
 msgid "Read the official article"
 msgstr "Voir l’article officiel"
 
-#: free/functions/hotfixes.php:152
+#: free/functions/hotfixes.php:147
 msgid "Patch now"
 msgstr "Patcher maintenant"
 
-#: free/functions/hotfixes.php:153
+#: free/functions/hotfixes.php:148
 msgid "Ignore forever"
 msgstr "Ignorer pour toujours"
 
-#: free/functions/hotfixes.php:181
+#: free/functions/hotfixes.php:176
 msgid "Are you sure you want to ignore this alert forever?"
 msgstr "Êtes-vous sûr de vouloir ignorer cette alerte pour toujours ?"
 
-#: free/functions/hotfixes.php:182
+#: free/functions/hotfixes.php:177
 msgid "The check could not be completed."
 msgstr "Le contrôle n’a pas pu être terminé."
 
-#: free/functions/hotfixes.php:302
+#: free/functions/hotfixes.php:301
 #, php-format
 msgid ""
 "Active UpdraftCentral connection: key %1$s, created on %2$s by user "
@@ -7009,24 +6995,25 @@ msgstr ""
 "Connexion UpdraftCentral active : clé %1$s, créée le %2$s par l’utilisateur "
 "« %3$s ». Supprimez-la maintenant."
 
-#: free/functions/hotfixes.php:310
+#: free/functions/hotfixes.php:309
 msgid "No active UpdraftCentral connection."
 msgstr "Aucune connexion UpdraftCentral active."
 
-#: free/functions/hotfixes.php:326
+#: free/functions/hotfixes.php:325
 #, php-format
 msgid ""
-"%1$s %2$s \"%3$s\" (UA: %4$s). A plugin or theme was pushed to this site."
+"%1$s %2$s \"%3$s\" (UA: %4$s). A plugin or theme was pushed to this site. If "
+"you have already cleaned this up, you can ignore this message."
 msgstr ""
 "%1$s %2$s « %3$s » (UA : %4$s). Une extension ou un thème a été envoyé sur "
-"ce site."
+"ce site. Si vous avez déjà nettoyé, vous pouvez désormais ignorer ce message."
 
-#: free/functions/hotfixes.php:338
+#: free/functions/hotfixes.php:337
 #, php-format
 msgid "%1$s %2$s UpdraftCentral probe (UA: %3$s)."
 msgstr "%1$s %2$s sonde UpdraftCentral (UA : %3$s)."
 
-#: free/functions/hotfixes.php:349
+#: free/functions/hotfixes.php:348
 #, php-format
 msgid ""
 "%1$s %2$s \"%3$s\" from a client that is not UpdraftCentral Cloud (UA: %4$s)."
@@ -7034,56 +7021,74 @@ msgstr ""
 "%1$s %2$s « %3$s » depuis un client qui n’est pas UpdraftCentral Cloud (UA : "
 "%4$s)."
 
-#: free/functions/hotfixes.php:360
+#: free/functions/hotfixes.php:359
 msgid ""
 "The UpdraftCentral log shows no plugin uploads, probes or foreign clients."
 msgstr ""
 "Le journal UpdraftCentral ne montre ni envoi d’extension, ni sonde, ni "
 "client étranger."
 
-#: free/functions/hotfixes.php:389
+#: free/functions/hotfixes.php:388
 #, php-format
 msgid "Backdoor plugin file: %s"
 msgstr "Fichier d’extension porte dérobée : %s"
 
-#: free/functions/hotfixes.php:398
+#: free/functions/hotfixes.php:397
 msgid "No backdoor plugin files found."
 msgstr "Aucun fichier d’extension porte dérobée."
 
-#: free/functions/hotfixes.php:409
+#: free/functions/hotfixes.php:408
 #, php-format
 msgid "Backdoor option in the database: %s"
 msgstr "Option de porte dérobée en base : %s"
 
-#: free/functions/hotfixes.php:415
+#: free/functions/hotfixes.php:414
 msgid "No backdoor options in the database."
 msgstr "Aucune option de porte dérobée en base."
 
-#: free/functions/hotfixes.php:432
+#: free/functions/hotfixes.php:446
+#: pro/modules/users-login/plugins/user-creation-protection.php:789
+msgid "No role"
+msgstr "Aucun rôle"
+
+#: free/functions/hotfixes.php:453
 #, php-format
-msgid "Backdoor-style account: %1$s <%2$s> \"%3$s\""
-msgstr "Compte de type porte dérobée : %1$s <%2$s> « %3$s »"
+msgid ""
+"%1$s (%2$s, %3$s), registered on %4$s, role: %5$s. This administrator was "
+"created in October 2026 and must be reviewed. This account is not "
+"necessarily malicious."
+msgstr ""
+"%1$s (%2$s, %3$s), créé le %4$s, rôle : %5$s. Cet administrateur a été "
+"ajouté en octobre 2026 et doit être vérifié. Ce compte n’est pas forcément "
+"malveillant."
 
-#: free/functions/hotfixes.php:443
+#: free/functions/hotfixes.php:471
 #, php-format
-msgid "Non-administrator %1$s has extra capabilities: %2$s"
+msgid ""
+"%1$s (%2$s, %3$s), registered on %4$s, role: %5$s. This person is not an "
+"administrator but still has administrator rights (%6$s). This account is "
+"considered malicious and must be deleted."
 msgstr ""
-"Le compte non administrateur %1$s possède des droits supplémentaires : %2$s"
+"%1$s (%2$s, %3$s), créé le %4$s, rôle : %5$s. Cette personne n’est pas "
+"administrateur mais a tout de même des droits d’administrateur (%6$s). Ce "
+"compte est considéré comme malveillant et doit être supprimé."
 
-#: free/functions/hotfixes.php:452
-msgid "No backdoor accounts or hidden admin-level users."
+#: free/functions/hotfixes.php:484
+msgid ""
+"No non-administrator account with administrator rights, and no administrator "
+"created in October 2026."
 msgstr ""
-"Aucun compte de porte dérobée, ni utilisateur avec des droits "
-"d’administration cachés."
+"Aucun compte non administrateur avec des droits d’administrateur, et aucun "
+"administrateur créé en octobre 2026."
 
-#: free/functions/hotfixes.php:475
+#: free/functions/hotfixes.php:507
 msgid ""
 "Patched. No traces found. You can continue to use your website as usual."
 msgstr ""
 "Patché. Aucune trace trouvée. Vous pouvez continuer à utiliser votre site "
 "web comme d’habitude."
 
-#: free/functions/hotfixes.php:477
+#: free/functions/hotfixes.php:509
 msgid ""
 "Not patched. Traces of the attack were found. Delete the UpdraftCentral "
 "connection, remove the backdoor and check users and passwords."
@@ -7092,24 +7097,30 @@ msgstr ""
 "UpdraftCentral, retirez la porte dérobée et vérifiez les comptes et les mots "
 "de passe."
 
-#: free/functions/hotfixes.php:479
+#: free/functions/hotfixes.php:511
 msgid ""
-"Not patched. No backdoor found, but there are warnings. If the site is "
-"connected to UpdraftCentral, delete the connection now."
+"Not patched. No backdoor found, but the warnings below must be reviewed."
 msgstr ""
-"Non patché. Aucune porte dérobée trouvée, mais des avertissements sont "
-"présents. Si le site est connecté à UpdraftCentral, supprimez la connexion "
-"maintenant."
+"Non patché. Aucune porte dérobée trouvée, mais les avertissements ci-dessous "
+"sont à vérifier."
 
-#: free/functions/hotfixes.php:492
+#: free/functions/hotfixes.php:524
 msgid "Alert"
 msgstr "Alerte"
 
-#: free/functions/hotfixes.php:492
+#: free/functions/hotfixes.php:524
 msgid "Warning"
 msgstr "Avertissement"
 
-#: free/functions/ip.php:1190
+#: free/functions/hotfixes.php:527
+msgid "Delete this account"
+msgstr "Supprimer ce compte"
+
+#: free/functions/hotfixes.php:527
+msgid "Review this account"
+msgstr "Vérifier ce compte"
+
+#: free/functions/ip.php:1194
 #, php-format
 msgid ""
 "Your IP address %1$s has been banned for %2$s minute, please do not retry "
@@ -7230,7 +7241,7 @@ msgstr "Mots de passe d’application"
 
 #: free/functions/modules.php:61 free/functions/widgets.php:875
 #: free/modules/users-login/settings/blacklist-logins.php:22
-#: pro/modules/users-login/plugins/user-creation-protection.php:281
+#: pro/modules/users-login/plugins/user-creation-protection.php:296
 msgid "Protect User Creation"
 msgstr "Protéger la création de comptes"
 
@@ -7245,24 +7256,24 @@ msgid "Forbid Bad Email Domains"
 msgstr "Interdire les mauvais domaines d'adresses e-mail"
 
 #: free/functions/modules.php:64 free/functions/widgets.php:877
-#: free/modules/users-login/settings/blacklist-logins.php:91
+#: free/modules/users-login/settings/blacklist-logins.php:101
 msgid "Forbid Same Email Domain"
 msgstr "Interdire le même domaine d‘adresse e-mail"
 
 #: free/functions/modules.php:66 free/modules/users-login/callbacks.php:271
 #: free/modules/users-login/callbacks.php:273
-#: free/modules/users-login/settings/blacklist-logins.php:115
+#: free/modules/users-login/settings/blacklist-logins.php:125
 #, php-format
 msgid "Forbid «%s» Usernames"
 msgstr "Interdire les identifiants «%s»"
 
 #: free/functions/modules.php:67 free/modules/users-login/callbacks.php:278
-#: free/modules/users-login/settings/blacklist-logins.php:130
+#: free/modules/users-login/settings/blacklist-logins.php:140
 msgid "Rename public user names"
 msgstr "Renommer les noms des comptes"
 
 #: free/functions/modules.php:68 free/functions/widgets.php:880
-#: free/modules/users-login/settings/blacklist-logins.php:141
+#: free/modules/users-login/settings/blacklist-logins.php:151
 msgid "Forbid User Enumeration"
 msgstr "Interdire l’énumération des comptes"
 
@@ -8034,7 +8045,7 @@ msgstr "Obtenir"
 msgid "System Status"
 msgstr "Statut du système"
 
-#: free/functions/widgets.php:1485 free/functions/widgets.php:1806
+#: free/functions/widgets.php:1485 free/functions/widgets.php:1809
 #, php-format
 msgid "%s — not up to date"
 msgstr "%s — non à jour"
@@ -8224,49 +8235,57 @@ msgstr ""
 #: free/functions/widgets.php:1671
 #, php-format
 msgid ""
+"This PHP build dates from %1$s, before %2$s. Ask your host to upgrade PHP."
+msgstr ""
+"Cette version de PHP date du %1$s, soit avant le %2$s. Demandez à votre "
+"hébergeur de mettre à jour PHP."
+
+#: free/functions/widgets.php:1674
+#, php-format
+msgid ""
 "This PHP version is no longer supported. Ask your host to upgrade to PHP %s "
 "or later."
 msgstr ""
 "Cette version de PHP n’est plus supportée. Demandez à votre hébergeur de la "
 "mettre à jour en version %s ou plus."
 
-#: free/functions/widgets.php:1674
+#: free/functions/widgets.php:1677
 #, php-format
 msgid "This PHP version only receives security updates. PHP %s is recommended."
 msgstr ""
 "Cette version de PHP ne reçoit que des mises à jour de sécurité. La version "
 "%s est recommandée."
 
-#: free/functions/widgets.php:1694
+#: free/functions/widgets.php:1697
 msgctxt "web server"
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: free/functions/widgets.php:1698
+#: free/functions/widgets.php:1701
 msgid "Web server"
 msgstr "Serveur web"
 
-#: free/functions/widgets.php:1707
+#: free/functions/widgets.php:1710
 msgid "Physical robots.txt"
 msgstr "robots.txt physique"
 
-#: free/functions/widgets.php:1708 free/functions/widgets.php:1721
-#: free/functions/widgets.php:1732
+#: free/functions/widgets.php:1711 free/functions/widgets.php:1724
+#: free/functions/widgets.php:1735
 msgctxt "file"
 msgid "Present"
 msgstr "Présent"
 
-#: free/functions/widgets.php:1708
+#: free/functions/widgets.php:1711
 msgctxt "file"
 msgid "None"
 msgstr "Aucun"
 
-#: free/functions/widgets.php:1721 free/functions/widgets.php:1732
+#: free/functions/widgets.php:1724 free/functions/widgets.php:1735
 msgctxt "file"
 msgid "Missing"
 msgstr "Manquant"
 
-#: free/functions/widgets.php:1724
+#: free/functions/widgets.php:1727
 msgid ""
 "The .htaccess file is missing. Permalinks and server rules cannot be "
 "applied. Restore it from Settings → Permalinks."
@@ -8274,7 +8293,7 @@ msgstr ""
 "Le fichier .htaccess est manquant. Les permaliens et les règles du serveur "
 "ne peuvent être appliquées. Restaurez depuis Réglages → Permaliens."
 
-#: free/functions/widgets.php:1735
+#: free/functions/widgets.php:1738
 msgid ""
 "The web.config file is missing. Restore it so IIS rewrite rules can be "
 "applied."
@@ -8282,12 +8301,12 @@ msgstr ""
 "Le fichier web.config est manquant. Restaurez-le afin que les règles de "
 "réécriture IIS puissent être appliquées."
 
-#: free/functions/widgets.php:1799 free/modules/welcome/callbacks.php:70
+#: free/functions/widgets.php:1802 free/modules/welcome/callbacks.php:70
 #: free/modules/welcome/settings/advanced-settings.php:62
 msgid "Expert Mode"
 msgstr "Mode Expert"
 
-#: free/functions/widgets.php:1802
+#: free/functions/widgets.php:1805
 #: free/modules/welcome/settings/security-status.php:76
 #: free/modules/welcome/settings/security-status.php:112
 #, php-format
@@ -8296,85 +8315,85 @@ msgid_plural "%s active modules"
 msgstr[0] "%s module actif"
 msgstr[1] "%s modules actifs"
 
-#: free/functions/widgets.php:1810
+#: free/functions/widgets.php:1813
 #: free/modules/welcome/settings/security-status.php:113
 #, php-format
 msgid "%s is running, but no module is protecting the site."
 msgstr "%s fonctionne, mais aucun module ne protège le site."
 
-#: free/functions/widgets.php:1812 free/functions/widgets.php:1816
+#: free/functions/widgets.php:1815 free/functions/widgets.php:1819
 #, php-format
 msgid "%s is not up to date. Update it from Plugins → Installed Plugins."
 msgstr ""
 "%s n’est pas à jour. Mettez-le à jour depuis Extensions → Extensions "
 "installées."
 
-#: free/functions/widgets.php:1834
+#: free/functions/widgets.php:1837
 #, php-format
 msgid "%s Firewall"
 msgstr "Pare-feu %s"
 
-#: free/functions/widgets.php:1843
+#: free/functions/widgets.php:1846
 msgid "Security"
 msgstr "Sécurité"
 
-#: free/functions/widgets.php:1844
+#: free/functions/widgets.php:1847
 msgid "Paused"
 msgstr "En pause"
 
-#: free/functions/widgets.php:1847
+#: free/functions/widgets.php:1850
 msgid ""
 "Protection it currently paused. Turn it back on to keep your site secured."
 msgstr ""
 "La protection est actuellement en pause. Réactivez-la pour assurer la "
 "sécurité de votre site."
 
-#: free/functions/widgets.php:1860
+#: free/functions/widgets.php:1863
 #, php-format
 msgid "Grade %1$s on %2$s"
 msgstr "Grade %1$s sur %2$s"
 
-#: free/functions/widgets.php:1866
+#: free/functions/widgets.php:1869
 msgid "Last scan"
 msgstr "Dernier scan"
 
-#: free/functions/widgets.php:1882
+#: free/functions/widgets.php:1885
 msgid "Connected users"
 msgstr "Comptes connectés"
 
-#: free/functions/widgets.php:1885
+#: free/functions/widgets.php:1888
 #, php-format
 msgid "%s (live)"
 msgstr "%s (en ligne)"
 
-#: free/functions/widgets.php:1920
+#: free/functions/widgets.php:1923
 msgid "Administrators"
 msgstr "Administrateurs"
 
-#: free/functions/widgets.php:1951
+#: free/functions/widgets.php:1954
 msgid "Get a SecuPress Pro Licence"
 msgstr "Obtenez SecuPress Pro"
 
-#: free/functions/widgets.php:1959
+#: free/functions/widgets.php:1962
 msgid "License valid"
 msgstr "Licence valide"
 
-#: free/functions/widgets.php:1971
+#: free/functions/widgets.php:1974
 msgid "License expired"
 msgstr "Licence expirée"
 
-#: free/functions/widgets.php:1972
+#: free/functions/widgets.php:1975
 msgid ""
 "Your Pro license has expired. Renew it to keep updates and Pro features."
 msgstr ""
 "Votre licence Pro a expiré. Renouvelez-la pour garder les mises à jour et "
 "les fonctionnalités pro."
 
-#: free/functions/widgets.php:1980
+#: free/functions/widgets.php:1983
 msgid "Enter your license"
 msgstr "Entrez votre licence"
 
-#: free/functions/widgets.php:1981
+#: free/functions/widgets.php:1984
 msgid "Pro is installed. Enter your license key to activate Pro features."
 msgstr ""
 "Pro est installée. Entrez votre clé de licence pour activer les "
@@ -9252,293 +9271,293 @@ msgstr ""
 "<strong>Erreur</strong> : Cette adresse e-mail est déjà enregistrée. <a "
 "href=\"%s\">Connectez-vous</a> avec cette adresse ou choisissez-en une autre."
 
-#: free/modules/firewall/inc/learning-mode.php:1201
+#: free/modules/firewall/inc/learning-mode.php:1202
 msgid "Grabbing a coffee…"
 msgstr "J’attrape un café…"
 
-#: free/modules/firewall/inc/learning-mode.php:1202
+#: free/modules/firewall/inc/learning-mode.php:1203
 msgid "Stretching those legs…"
 msgstr "J’étire mes jambes…"
 
-#: free/modules/firewall/inc/learning-mode.php:1203
+#: free/modules/firewall/inc/learning-mode.php:1204
 msgid "Watering a plant…"
 msgstr "J’arrose une plante…"
 
-#: free/modules/firewall/inc/learning-mode.php:1204
+#: free/modules/firewall/inc/learning-mode.php:1205
 msgid "Taking notes…"
 msgstr "Je prends des notes…"
 
-#: free/modules/firewall/inc/learning-mode.php:1205
+#: free/modules/firewall/inc/learning-mode.php:1206
 msgid "Reaching for a biscuit…"
 msgstr "J’attrape un biscuit…"
 
-#: free/modules/firewall/inc/learning-mode.php:1206
+#: free/modules/firewall/inc/learning-mode.php:1207
 msgid "Watching the traffic…"
 msgstr "Je regarde le trafic…"
 
-#: free/modules/firewall/inc/learning-mode.php:1207
+#: free/modules/firewall/inc/learning-mode.php:1208
 msgid "Petting the cat…"
 msgstr "Je caresse le chat…"
 
-#: free/modules/firewall/inc/learning-mode.php:1208
+#: free/modules/firewall/inc/learning-mode.php:1209
 msgid "Counting the minutes…"
 msgstr "Je compte les minutes…"
 
-#: free/modules/firewall/inc/learning-mode.php:1209
+#: free/modules/firewall/inc/learning-mode.php:1210
 msgid "Brewing some tea…"
 msgstr "Je prépare un thé…"
 
-#: free/modules/firewall/inc/learning-mode.php:1210
+#: free/modules/firewall/inc/learning-mode.php:1211
 msgid "Consulting the crystal ball…"
 msgstr "Je consulte la boule de cristal…"
 
-#: free/modules/firewall/inc/learning-mode.php:1211
+#: free/modules/firewall/inc/learning-mode.php:1212
 msgid "Sharpening a pencil…"
 msgstr "Je taille un crayon…"
 
-#: free/modules/firewall/inc/learning-mode.php:1212
+#: free/modules/firewall/inc/learning-mode.php:1213
 msgid "Feeding the goldfish…"
 msgstr "Je nourris le poisson rouge…"
 
-#: free/modules/firewall/inc/learning-mode.php:1213
+#: free/modules/firewall/inc/learning-mode.php:1214
 msgid "Tuning the radio…"
 msgstr "Je règle la radio…"
 
-#: free/modules/firewall/inc/learning-mode.php:1214
+#: free/modules/firewall/inc/learning-mode.php:1215
 msgid "Chasing a squirrel…"
 msgstr "Je chasse un écureuil…"
 
-#: free/modules/firewall/inc/learning-mode.php:1215
+#: free/modules/firewall/inc/learning-mode.php:1216
 msgid "Polishing the shield…"
 msgstr "Je polis le bouclier…"
 
-#: free/modules/firewall/inc/learning-mode.php:1216
+#: free/modules/firewall/inc/learning-mode.php:1217
 msgid "Opening a window…"
 msgstr "J’ouvre une fenêtre…"
 
-#: free/modules/firewall/inc/learning-mode.php:1217
+#: free/modules/firewall/inc/learning-mode.php:1218
 msgid "Humming a little tune…"
 msgstr "Je chantonne un petit truc…"
 
-#: free/modules/firewall/inc/learning-mode.php:1218
+#: free/modules/firewall/inc/learning-mode.php:1219
 msgid "Checking the weather…"
 msgstr "Je vérifie la météo…"
 
-#: free/modules/firewall/inc/learning-mode.php:1219
+#: free/modules/firewall/inc/learning-mode.php:1220
 msgid "Doing a tiny dance…"
 msgstr "Je fais une petite danse…"
 
-#: free/modules/firewall/inc/learning-mode.php:1220
+#: free/modules/firewall/inc/learning-mode.php:1221
 msgid "Waving hello…"
 msgstr "Je fais coucou…"
 
-#: free/modules/firewall/inc/learning-mode.php:1221
+#: free/modules/firewall/inc/learning-mode.php:1222
 msgid "Hanging out with friends…"
 msgstr "Je sors avec des amis…"
 
-#: free/modules/firewall/inc/learning-mode.php:1222
+#: free/modules/firewall/inc/learning-mode.php:1223
 msgid "Celebrating the moment…"
 msgstr "Je célèbre le moment…"
 
-#: free/modules/firewall/inc/learning-mode.php:1223
+#: free/modules/firewall/inc/learning-mode.php:1224
 msgid "Graduating from school…"
 msgstr "Je récupère mon diplôme…"
 
-#: free/modules/firewall/inc/learning-mode.php:1224
+#: free/modules/firewall/inc/learning-mode.php:1225
 msgid "Working on the computer…"
 msgstr "Je travaille sur ordinateur…"
 
-#: free/modules/firewall/inc/learning-mode.php:1225
+#: free/modules/firewall/inc/learning-mode.php:1226
 msgid "Watching a movie…"
 msgstr "Je regarde un film…"
 
-#: free/modules/firewall/inc/learning-mode.php:1226
+#: free/modules/firewall/inc/learning-mode.php:1227
 msgid "Singing a song…"
 msgstr "Je chante une chanson…"
 
-#: free/modules/firewall/inc/learning-mode.php:1227
+#: free/modules/firewall/inc/learning-mode.php:1228
 msgid "Playing a song on the piano…"
 msgstr "Je joue du piano…"
 
-#: free/modules/firewall/inc/learning-mode.php:1228
+#: free/modules/firewall/inc/learning-mode.php:1229
 msgid "Playing a video game…"
 msgstr "Je joue aux jeux vidéo…"
 
-#: free/modules/firewall/inc/learning-mode.php:1229
+#: free/modules/firewall/inc/learning-mode.php:1230
 msgid "Browsing the web…"
 msgstr "Je navigue sur internet…"
 
-#: free/modules/firewall/inc/learning-mode.php:1230
+#: free/modules/firewall/inc/learning-mode.php:1231
 msgid "Searching the web…"
 msgstr "Je cherche sur internet…"
 
-#: free/modules/firewall/inc/learning-mode.php:1231
+#: free/modules/firewall/inc/learning-mode.php:1232
 msgid "Following a link…"
 msgstr "Je suis un lien…"
 
-#: free/modules/firewall/inc/learning-mode.php:1232
+#: free/modules/firewall/inc/learning-mode.php:1233
 msgid "Analyzing the data…"
 msgstr "J’analyse les données…"
 
-#: free/modules/firewall/inc/learning-mode.php:1233
+#: free/modules/firewall/inc/learning-mode.php:1234
 msgid "Making a decision…"
 msgstr "Je prends une décision…"
 
-#: free/modules/firewall/inc/learning-mode.php:1234
+#: free/modules/firewall/inc/learning-mode.php:1235
 msgid "Thinking about the future…"
 msgstr "Je réfléchis au futur…"
 
-#: free/modules/firewall/inc/learning-mode.php:1235
+#: free/modules/firewall/inc/learning-mode.php:1236
 msgid "Planning the next step…"
 msgstr "Je prépare la prochaine étape…"
 
-#: free/modules/firewall/inc/learning-mode.php:1236
+#: free/modules/firewall/inc/learning-mode.php:1237
 msgid "Preparing for the next challenge…"
 msgstr "Je me prépare au prochain défi…"
 
-#: free/modules/firewall/inc/learning-mode.php:1237
+#: free/modules/firewall/inc/learning-mode.php:1238
 msgid "Reflecting on the past…"
 msgstr "Je réfléchis au passé…"
 
-#: free/modules/firewall/inc/learning-mode.php:1238
+#: free/modules/firewall/inc/learning-mode.php:1239
 msgid "Coming up with a solution…"
 msgstr "J’arrive avec une solution…"
 
-#: free/modules/firewall/inc/learning-mode.php:1239
+#: free/modules/firewall/inc/learning-mode.php:1240
 msgid "Waiting for the results…"
 msgstr "J’attends les résultats…"
 
-#: free/modules/firewall/inc/learning-mode.php:1240
+#: free/modules/firewall/inc/learning-mode.php:1241
 msgid "Taking a break…"
 msgstr "Je prends une pause…"
 
-#: free/modules/firewall/inc/learning-mode.php:1241
+#: free/modules/firewall/inc/learning-mode.php:1242
 msgid "Running a test…"
 msgstr "Je lance un test…"
 
-#: free/modules/firewall/inc/learning-mode.php:1242
+#: free/modules/firewall/inc/learning-mode.php:1243
 msgid "Talking to a robot…"
 msgstr "Je parle à un robot…"
 
-#: free/modules/firewall/inc/learning-mode.php:1243
+#: free/modules/firewall/inc/learning-mode.php:1244
 msgid "Procrastinating…"
 msgstr "Je procrastine…"
 
-#: free/modules/firewall/inc/learning-mode.php:1244
+#: free/modules/firewall/inc/learning-mode.php:1245
 msgid "Doing something, I guess…"
 msgstr "Je fais quelque chose, je crois…"
 
-#: free/modules/firewall/inc/learning-mode.php:1245
+#: free/modules/firewall/inc/learning-mode.php:1246
 msgid "Erasing the whole computer…"
 msgstr "J’efface tout l’ordinateur…"
 
-#: free/modules/firewall/inc/learning-mode.php:1246
+#: free/modules/firewall/inc/learning-mode.php:1247
 msgid "Buying something on the internet…"
 msgstr "J’achète quelque chose sur internet…"
 
-#: free/modules/firewall/inc/learning-mode.php:1247
+#: free/modules/firewall/inc/learning-mode.php:1248
 msgid "What am I doing here?…"
 msgstr "Mais qu’est-ce que je fais là?…"
 
-#: free/modules/firewall/inc/learning-mode.php:1255
+#: free/modules/firewall/inc/learning-mode.php:1256
 #, php-format
 msgid "%sing the things…"
 msgstr "%stage les choses…"
 
-#: free/modules/firewall/inc/learning-mode.php:1766
+#: free/modules/firewall/inc/learning-mode.php:1841
 msgid "Most of these admin requests came from an administrator."
 msgstr ""
 "La plupart de ces requêtes `admin` proviennent d’un compte d’administration."
 
-#: free/modules/firewall/inc/learning-mode.php:1772
+#: free/modules/firewall/inc/learning-mode.php:1847
 msgid "Most of these admin requests came from the server."
 msgstr "La plupart de ces requêtes `admin proviennent du serveur."
 
-#: free/modules/firewall/inc/learning-mode.php:1777
+#: free/modules/firewall/inc/learning-mode.php:1852
 msgid "These admin requests did not come from an administrator or the server."
 msgstr ""
 "Ces requêtes `admin` ne proviennent ni du serveur, ni d’un compte "
 "d’administration."
 
-#: free/modules/firewall/inc/learning-mode.php:1788
+#: free/modules/firewall/inc/learning-mode.php:1863
 msgid "This string is a normal part of front traffic."
 msgstr "Cette chaîne fait partie du trafic normal en front office."
 
-#: free/modules/firewall/inc/learning-mode.php:1794
+#: free/modules/firewall/inc/learning-mode.php:1869
 msgid "This string is rare on the front."
 msgstr "Cette chaîne est rare en front office."
 
-#: free/modules/firewall/inc/learning-mode.php:1833
+#: free/modules/firewall/inc/learning-mode.php:1908
 msgid "Most requests came from the server."
 msgstr "La plupart des requêtes proviennent du serveur."
 
-#: free/modules/firewall/inc/learning-mode.php:1835
+#: free/modules/firewall/inc/learning-mode.php:1910
 msgid "Most requests came from an administrator."
 msgstr "La plupart des requêtes proviennent d’un compte d’administration."
 
-#: free/modules/firewall/inc/learning-mode.php:1837
+#: free/modules/firewall/inc/learning-mode.php:1912
 msgid "Seen often enough from an administrator or the server."
 msgstr "Vu assez souvent depuis le serveur ou un compte d’administration."
 
-#: free/modules/firewall/inc/learning-mode.php:1839
+#: free/modules/firewall/inc/learning-mode.php:1914
 msgid "Seen often, but not from an administrator or the server."
 msgstr "Vu souvent, mais pas depuis le serveur ni un compte d’administration."
 
-#: free/modules/firewall/inc/learning-mode.php:1841
+#: free/modules/firewall/inc/learning-mode.php:1916
 msgid "Rare, and not from an administrator or the server."
 msgstr "Rare, ni depuis le serveur, ni depuis un compte d’administration."
 
-#: free/modules/firewall/inc/learning-mode.php:1863
+#: free/modules/firewall/inc/learning-mode.php:1938
 msgid "Query string"
 msgstr "Chaine de la requête"
 
-#: free/modules/firewall/inc/learning-mode.php:1864
+#: free/modules/firewall/inc/learning-mode.php:1939
 msgid "Request URI"
 msgstr "URI de la requête"
 
-#: free/modules/firewall/inc/learning-mode.php:1865
+#: free/modules/firewall/inc/learning-mode.php:1940
 msgid "User-Agent"
 msgstr "User-Agent"
 
-#: free/modules/firewall/inc/learning-mode.php:1866
+#: free/modules/firewall/inc/learning-mode.php:1941
 msgid "Remote host"
 msgstr "Hôte distant."
 
-#: free/modules/firewall/inc/learning-mode.php:1867
+#: free/modules/firewall/inc/learning-mode.php:1942
 msgid "Referer"
 msgstr "Référent"
 
-#: free/modules/firewall/inc/learning-mode.php:1868
+#: free/modules/firewall/inc/learning-mode.php:1943
 msgid "Cookie"
 msgstr "Cookie"
 
-#: free/modules/firewall/inc/learning-mode.php:1905
+#: free/modules/firewall/inc/learning-mode.php:1980
 #, php-format
 msgid "%s signature was auto-allowed for specific URLs."
 msgid_plural "%s signatures were auto-allowed for specific URLs."
 msgstr[0] "%s signature autorisée pour cette URL spécifique."
 msgstr[1] "%s signatures autorisées pour cette URL spécifique."
 
-#: free/modules/firewall/inc/learning-mode.php:1911
+#: free/modules/firewall/inc/learning-mode.php:1986
 #, php-format
 msgid "%s signature still needs your review."
 msgid_plural "%s signatures still need your review."
 msgstr[0] "%s signature ont besoin de votre avis."
 msgstr[1] "%s signatures ont besoin de votre avis."
 
-#: free/modules/firewall/inc/learning-mode.php:1915
+#: free/modules/firewall/inc/learning-mode.php:1990
 msgid "Firewall Learning Mode has ended."
 msgstr "Mode apprentissage du pare-feu terminé."
 
-#: free/modules/firewall/inc/learning-mode.php:1916
+#: free/modules/firewall/inc/learning-mode.php:1991
 msgid "Review signatures"
 msgstr "Réviser les signatures"
 
-#: free/modules/firewall/inc/learning-mode.php:1921
+#: free/modules/firewall/inc/learning-mode.php:1996
 msgid "[###SITENAME###] Firewall Learning Mode has ended"
 msgstr "[###SITENAME###] Mode apprentissage du pare-feu terminé"
 
-#: free/modules/firewall/inc/learning-mode.php:2159
+#: free/modules/firewall/inc/learning-mode.php:2234
 #, php-format
 msgid ""
 "Learning Mode until %1$s — %2$s calibrable rules are not blocking yet. "
@@ -9547,24 +9566,24 @@ msgstr ""
 "Mode apprentissage jusqu‘au %1$s — %2$s règles calibrables ne sont pas "
 "encore bloquantes. Les exploits critiques le restent."
 
-#: free/modules/firewall/inc/learning-mode.php:2160
+#: free/modules/firewall/inc/learning-mode.php:2235
 #, php-format
 msgid "%s signature observed."
 msgid_plural "%s signatures observed."
 msgstr[0] "%s signature observée."
 msgstr[1] "%s signatures observées."
 
-#: free/modules/firewall/inc/learning-mode.php:2161
+#: free/modules/firewall/inc/learning-mode.php:2236
 msgid "Manage Learning Mode"
 msgstr "Gérer le mode apprentissage"
 
-#: free/modules/firewall/inc/learning-mode.php:2183
-#: free/modules/firewall/inc/learning-mode.php:2349
+#: free/modules/firewall/inc/learning-mode.php:2258
+#: free/modules/firewall/inc/learning-mode.php:2424
 #: free/modules/firewall/settings/learning-mode.php:62
 msgid "Firewall Learning Mode"
 msgstr "Mode apprentissage du pare-feu"
 
-#: free/modules/firewall/inc/learning-mode.php:2187
+#: free/modules/firewall/inc/learning-mode.php:2262
 #, php-format
 msgid ""
 "A new %s protection has been activated and has not been calibrated yet. "
@@ -9574,7 +9593,7 @@ msgstr ""
 "Lancez le mode d'apprentissage pour observer le trafic habituel avant de "
 "procéder au blocage."
 
-#: free/modules/firewall/inc/learning-mode.php:2193
+#: free/modules/firewall/inc/learning-mode.php:2268
 #, php-format
 msgid ""
 "%s signatures are active and have never been calibrated on this site. Start "
@@ -9584,11 +9603,11 @@ msgstr ""
 "Lancez le mode d'apprentissage pour observer le trafic habituel avant de "
 "procéder au blocage."
 
-#: free/modules/firewall/inc/learning-mode.php:2197
+#: free/modules/firewall/inc/learning-mode.php:2272
 msgid "Open Learning Mode"
 msgstr "Ouvrir le mode apprentissage"
 
-#: free/modules/firewall/inc/learning-mode.php:2301
+#: free/modules/firewall/inc/learning-mode.php:2376
 #, php-format
 msgid ""
 "WordPress has been updated. Extend Learning Mode by a few days so %s rules "
@@ -9598,7 +9617,7 @@ msgstr ""
 "jours afin que les règles %s ne bloquent pas les requêtes légitimes ayant "
 "été modifiées."
 
-#: free/modules/firewall/inc/learning-mode.php:2307
+#: free/modules/firewall/inc/learning-mode.php:2382
 #, php-format
 msgid ""
 "WordPress was updated while Learning Mode was running. Start it again so %s "
@@ -9608,7 +9627,7 @@ msgstr ""
 "Relancez-le afin que les règles %s ne bloquent pas les requêtes légitimes "
 "ayant été modifiées."
 
-#: free/modules/firewall/inc/learning-mode.php:2313
+#: free/modules/firewall/inc/learning-mode.php:2388
 #, php-format
 msgid ""
 "WordPress has been updated. Start a short Learning Mode so %s rules do not "
@@ -9617,7 +9636,7 @@ msgstr ""
 "WordPress a été mis à jour. Lancez un court mode d'apprentissage afin que "
 "les règles %s ne bloquent pas les requêtes légitimes ayant été modifiées."
 
-#: free/modules/firewall/inc/learning-mode.php:2319
+#: free/modules/firewall/inc/learning-mode.php:2394
 #, php-format
 msgid ""
 "You just added %1$s. Extend Learning Mode by a few days so %2$s rules do not "
@@ -9626,7 +9645,7 @@ msgstr ""
 "Vous venez d‘ajouter %1$s. Prolongez le mode d'apprentissage de quelques "
 "jours afin que les règles %2$s ne bloquent pas ses requêtes légitimes."
 
-#: free/modules/firewall/inc/learning-mode.php:2326
+#: free/modules/firewall/inc/learning-mode.php:2401
 #, php-format
 msgid ""
 "You added %1$s while Learning Mode was running. Start it again so %2$s rules "
@@ -9636,7 +9655,7 @@ msgstr ""
 "Relancez-le afin que les règles de %2$s ne bloquent pas ses requêtes "
 "légitimes."
 
-#: free/modules/firewall/inc/learning-mode.php:2333
+#: free/modules/firewall/inc/learning-mode.php:2408
 #, php-format
 msgid ""
 "You just added %1$s. Start a short Learning Mode so %2$s rules do not block "
@@ -9645,7 +9664,7 @@ msgstr ""
 "Vous venez d'ajouter %1$s. Lancez un court mode d'apprentissage afin que les "
 "règles de %2$s ne bloquent pas ses requêtes légitimes."
 
-#: free/modules/firewall/inc/learning-mode.php:2343
+#: free/modules/firewall/inc/learning-mode.php:2418
 msgid "Relaunch Learning Mode"
 msgstr "Relancer le mode apprentissage"
 
@@ -9895,69 +9914,69 @@ msgstr ""
 "signatures calibrantes sont observées ; les exploits critiques toujours "
 "bloqués."
 
-#: free/modules/firewall/tools.php:436
+#: free/modules/firewall/tools.php:440
 msgid "Antispam, Anti-Usurpation"
 msgstr "Anti-spam, anti-usurpation"
 
-#: free/modules/firewall/tools.php:437
+#: free/modules/firewall/tools.php:441
 msgid "Antispam, Too soon"
 msgstr "Anti-spam, trop tôt"
 
-#: free/modules/firewall/tools.php:439
+#: free/modules/firewall/tools.php:443
 msgid "Bad Referer URL"
 msgstr "Mauvais site référant"
 
-#: free/modules/firewall/tools.php:441
+#: free/modules/firewall/tools.php:445
 msgid "Bad Request Keys"
 msgstr "Mauvais paramètres de requêtes"
 
-#: free/modules/firewall/tools.php:442
+#: free/modules/firewall/tools.php:446
 msgid "Bad URL Contents"
 msgstr "Mauvais contenu dans l’URL"
 
-#: free/modules/firewall/tools.php:443
+#: free/modules/firewall/tools.php:447
 msgid "Bad Host Contents"
 msgstr "Mauvais contenu dans l’hôte"
 
-#: free/modules/firewall/tools.php:444
+#: free/modules/firewall/tools.php:448
 msgid "Bad Referer Contents"
 msgstr "Mauvais contenu dans l’URL"
 
-#: free/modules/firewall/tools.php:446
+#: free/modules/firewall/tools.php:450
 msgid "Bad GeoIP"
 msgstr "Mauvaise Géolocalisation"
 
-#: free/modules/firewall/tools.php:448
+#: free/modules/firewall/tools.php:452
 msgid "User-Agent With HTML Tags"
 msgstr "User-Agent contenant des balises HTML"
 
-#: free/modules/firewall/tools.php:449
+#: free/modules/firewall/tools.php:453
 msgid "User-Agent Disallowed"
 msgstr "User-Agents interdits"
 
-#: free/modules/firewall/tools.php:450
+#: free/modules/firewall/tools.php:454
 msgid "User-Agent is AI Bot"
 msgstr "Ce user-agent est un robot I.A."
 
-#: free/modules/firewall/tools.php:451
+#: free/modules/firewall/tools.php:455
 msgid "Bad Request URI"
 msgstr "Mauvaise URI de requête"
 
-#: free/modules/firewall/tools.php:452
+#: free/modules/firewall/tools.php:456
 msgid "Bad Cookie Contents"
 msgstr "Mauvais contenu dans les cookies"
 
-#: free/modules/firewall/tools.php:454
+#: free/modules/firewall/tools.php:458
 #: free/modules/logs/plugins/inc/php/action-logs/class-secupress-action-log.php:937
 #: pro/modules/alerts/plugins/inc/php/alerts/class-secupress-alerts.php:415
 msgid "Unknown User"
 msgstr "Compte inconnu"
 
-#: free/modules/firewall/tools.php:456
+#: free/modules/firewall/tools.php:460
 msgid "404 on PHP file"
 msgstr "404 sur les fichiers PHP"
 
-#: free/modules/firewall/tools.php:457
+#: free/modules/firewall/tools.php:461
 msgid "Functions in HTTP request"
 msgstr "Fonction dans les requêtes HTTP"
 
@@ -12190,7 +12209,7 @@ msgid "Username: %s"
 msgstr "Identifiant : %s"
 
 #: free/modules/users-login/plugins/blacklist-logins.php:686
-#: pro/modules/users-login/plugins/user-creation-protection.php:928
+#: pro/modules/users-login/plugins/user-creation-protection.php:963
 msgid "Bad Username"
 msgstr "Mauvais identifiant"
 
@@ -12228,7 +12247,7 @@ msgstr ""
 "%2$s.<br>Merci de %3$s désactiver et réactiver%4$s le module pour utiliser "
 "la nouvelle."
 
-#: free/modules/users-login/plugins/limitloginattempts.php:298
+#: free/modules/users-login/plugins/limitloginattempts.php:305
 #, php-format
 msgid "Login failed, <strong>%d</strong> attempt left."
 msgid_plural "Login failed, <strong>%d</strong> attempts left."
@@ -12270,7 +12289,7 @@ msgid ""
 msgstr "Cette page n’existe pas, a été déplacée ou vous n’y avez pas accès."
 
 #: free/modules/users-login/plugins/move-login.php:551
-#: free/modules/users-login/plugins/same-email-domain.php:121
+#: free/modules/users-login/plugins/same-email-domain.php:130
 #: pro/modules/users-login/plugins/bad-email-domains.php:49
 msgid "<strong>Error</strong>: User registration is currently not allowed."
 msgstr ""
@@ -12435,12 +12454,14 @@ msgstr ""
 msgid "Yes, prevent users to be created with a bad email domain"
 msgstr "Oui, empêcher les comptes d‘être créés avec un mauvais domaine"
 
-#: free/modules/users-login/settings/blacklist-logins.php:96
+#: free/modules/users-login/settings/blacklist-logins.php:97
 #, php-format
 msgid "Yes, prevent users from registering with the domain name %s"
-msgstr "Oui, empêcher les comptes d‘être créés avec le domaine %s"
+msgid_plural "Yes, prevent users from registering with the domain names %s"
+msgstr[0] "Oui, empêcher les comptes d‘être créés avec le domaine %s"
+msgstr[1] "Oui, empêcher les comptes d‘être créés avec les domaines %s"
 
-#: free/modules/users-login/settings/blacklist-logins.php:98
+#: free/modules/users-login/settings/blacklist-logins.php:108
 msgid ""
 "Once activated, existing users with your domain name are \"Always allowed\", "
 "while new users are disallowed."
@@ -12448,13 +12469,13 @@ msgstr ""
 "Une fois activé, les comptes existants avec votre nom de domaine seront "
 "encore autorisés, alors que les nouveaux seront refusés."
 
-#: free/modules/users-login/settings/blacklist-logins.php:108
+#: free/modules/users-login/settings/blacklist-logins.php:118
 msgid "Yes, prevent users from using disallowed usernames and display names"
 msgstr ""
 "Oui, utiliser une liste d’identifiants et de noms d’affichage interdits pour "
 "les comptes"
 
-#: free/modules/users-login/settings/blacklist-logins.php:112
+#: free/modules/users-login/settings/blacklist-logins.php:122
 #, php-format
 msgid ""
 "Your username contains the word \"%1$s\": %2$s. You must rename your account "
@@ -12463,18 +12484,18 @@ msgstr ""
 "Votre identifiant contient le mot \"%1$s\" : %2$s. Vous devrez renommer "
 "votre compte après validation."
 
-#: free/modules/users-login/settings/blacklist-logins.php:113
+#: free/modules/users-login/settings/blacklist-logins.php:123
 #, php-format
 msgid "The existing account named «%s» is the only one allowed."
 msgstr "Le compte nommé «%s» existant sera le seul autorisé."
 
-#: free/modules/users-login/settings/blacklist-logins.php:120
+#: free/modules/users-login/settings/blacklist-logins.php:130
 #, php-format
 msgid "Yes, also prevent the word «%s» from being used in any username"
 msgstr ""
 "Oui, empêcher le mot «%s» d'être utilisé dans n‘importe quel identifiant"
 
-#: free/modules/users-login/settings/blacklist-logins.php:131
+#: free/modules/users-login/settings/blacklist-logins.php:141
 msgid ""
 "All users whose nickname, display name, or nicename is identical to their "
 "login may be asked to rename it following our automatic fix attempt."
@@ -12483,21 +12504,21 @@ msgstr ""
 "d‘adresse de profil est identique à leur identifiant de connexion pourront "
 "être invités à le renommer suite à notre tentative de correction automatique."
 
-#: free/modules/users-login/settings/blacklist-logins.php:136
+#: free/modules/users-login/settings/blacklist-logins.php:146
 msgid "Yes, prevent user‘s login to be the same as their public names"
 msgstr ""
 "Oui, empêcher les comptes d‘avoir leur identifiant identique à leurs noms "
 "publics"
 
-#: free/modules/users-login/settings/blacklist-logins.php:139
+#: free/modules/users-login/settings/blacklist-logins.php:149
 msgid "https://woocommerce.com/mobile/"
 msgstr "https://woocommerce.com/fr/mobile/"
 
-#: free/modules/users-login/settings/blacklist-logins.php:146
+#: free/modules/users-login/settings/blacklist-logins.php:156
 msgid "Yes, prevent user and author enumeration"
 msgstr "Oui, interdire l’énumération des comptes"
 
-#: free/modules/users-login/settings/blacklist-logins.php:148
+#: free/modules/users-login/settings/blacklist-logins.php:158
 msgid ""
 "Author pages on the front end will redirect to your homepage to hide "
 "usernames."
@@ -12505,18 +12526,18 @@ msgstr ""
 "Les pages d’auteur sur le site seront redirigées vers la page d’accueil pour "
 "masquer les identifiants."
 
-#: free/modules/users-login/settings/blacklist-logins.php:149
+#: free/modules/users-login/settings/blacklist-logins.php:159
 #, php-format
 msgid ""
 "If you are using the %sWooCommerce Mobile App%s, do not activate this module."
 msgstr ""
 "Si vous utilisez %sl‘App Mobile WooCommerce%s, n‘activez pas le module."
 
-#: free/modules/users-login/settings/blacklist-logins.php:158
+#: free/modules/users-login/settings/blacklist-logins.php:168
 msgid "Lock the Default Role"
 msgstr "Verrouiller le rôle par défaut"
 
-#: free/modules/users-login/settings/blacklist-logins.php:159
+#: free/modules/users-login/settings/blacklist-logins.php:169
 msgid ""
 "Some attacks attempt to set the default role to <em>Administrator</em>. Lock "
 "the default role to prevent any future modifications."
@@ -12525,34 +12546,34 @@ msgstr ""
 "d’<em>Administrateur</em>. Verrouillez le rôle par défaut pour empêcher "
 "toute modification future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:164
+#: free/modules/users-login/settings/blacklist-logins.php:174
 msgid "Yes, prevent changes to the default role"
 msgstr "Oui, interdire la modification du rôle par défaut"
 
-#: free/modules/users-login/settings/blacklist-logins.php:166
+#: free/modules/users-login/settings/blacklist-logins.php:176
 #, php-format
 msgid "For information, the default role on this site is: %s"
 msgstr "Pour information, le rôle par défaut sur ce site est : %s"
 
-#: free/modules/users-login/settings/blacklist-logins.php:171
+#: free/modules/users-login/settings/blacklist-logins.php:181
 msgid "Which role would you like to Lock?"
 msgstr "Quel rôle verrouiller ?"
 
-#: free/modules/users-login/settings/blacklist-logins.php:181
+#: free/modules/users-login/settings/blacklist-logins.php:191
 msgid "To switch the default role, deactivate the module first."
 msgstr "Pour changer de rôle par défaut, désactivez ce module d‘abord."
 
-#: free/modules/users-login/settings/blacklist-logins.php:198
+#: free/modules/users-login/settings/blacklist-logins.php:208
 msgid "You cannot lock the membership while allowing anyone can register."
 msgstr ""
 "Vous ne pouvez pas verrouiller les inscriptions maintenant car elles sont "
 "ouvertes."
 
-#: free/modules/users-login/settings/blacklist-logins.php:202
+#: free/modules/users-login/settings/blacklist-logins.php:212
 msgid "Lock the Membership Setting"
 msgstr "Verrouiller le réglage des inscriptions"
 
-#: free/modules/users-login/settings/blacklist-logins.php:203
+#: free/modules/users-login/settings/blacklist-logins.php:213
 msgid ""
 "Some attacks attempt to set the membership status to «Anyone can register». "
 "Lock the membership setting to «No» to prevent any future modifications."
@@ -12561,15 +12582,15 @@ msgstr ""
 "le monde peut s’inscrire». Verrouillez ce réglage sur «Non» et interdire "
 "toute modification future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:209
+#: free/modules/users-login/settings/blacklist-logins.php:219
 msgid "Yes, prevent changes to the membership status"
 msgstr "Oui, interdire la modification du statut des inscriptions"
 
-#: free/modules/users-login/settings/blacklist-logins.php:217
+#: free/modules/users-login/settings/blacklist-logins.php:227
 msgid "Lock the Admin Email"
 msgstr "Verrouiller l’e-mail de l’administration"
 
-#: free/modules/users-login/settings/blacklist-logins.php:218
+#: free/modules/users-login/settings/blacklist-logins.php:228
 msgid ""
 "Some attacks attempt to change the admin email. Lock the website’s admin "
 "email to prevent any future modifications."
@@ -12578,11 +12599,11 @@ msgstr ""
 "sur la leur. Verrouillez l’adresse e-mail pour interdire toute modification "
 "future."
 
-#: free/modules/users-login/settings/blacklist-logins.php:223
+#: free/modules/users-login/settings/blacklist-logins.php:233
 msgid "Yes, prevent the modification of the admin email"
 msgstr "Oui, interdire la modification de l’e-mail de l’administration"
 
-#: free/modules/users-login/settings/blacklist-logins.php:225
+#: free/modules/users-login/settings/blacklist-logins.php:235
 #, php-format
 msgid "For information, the admin email on this site is: %s"
 msgstr ""
@@ -13165,349 +13186,349 @@ msgid "Yes, <strong>disable</strong> Application Passwords on this site"
 msgstr ""
 "Oui, <strong>désactiver</strong> les mots de passe d’application sur ce site"
 
-#: free/modules/users-login/tools.php:475
+#: free/modules/users-login/tools.php:486
 msgctxt "emoji"
 msgid "One"
 msgstr "le Un"
 
-#: free/modules/users-login/tools.php:475
+#: free/modules/users-login/tools.php:486
 msgctxt "emoji"
 msgid "Two"
 msgstr "le Deux"
 
-#: free/modules/users-login/tools.php:475
+#: free/modules/users-login/tools.php:486
 msgctxt "emoji"
 msgid "Three"
 msgstr "le Trois"
 
-#: free/modules/users-login/tools.php:475
+#: free/modules/users-login/tools.php:486
 msgctxt "emoji"
 msgid "Four"
 msgstr "le Quatre"
 
-#: free/modules/users-login/tools.php:475
+#: free/modules/users-login/tools.php:486
 msgctxt "emoji"
 msgid "Five"
 msgstr "le Cinq"
 
-#: free/modules/users-login/tools.php:476
+#: free/modules/users-login/tools.php:487
 msgctxt "emoji"
 msgid "Plus"
 msgstr "le Plus"
 
-#: free/modules/users-login/tools.php:476
+#: free/modules/users-login/tools.php:487
 msgctxt "emoji"
 msgid "Minus"
 msgstr "le Moins"
 
-#: free/modules/users-login/tools.php:476
+#: free/modules/users-login/tools.php:487
 msgctxt "emoji"
 msgid "Times"
 msgstr "la Croix"
 
-#: free/modules/users-login/tools.php:476
+#: free/modules/users-login/tools.php:487
 msgctxt "emoji"
 msgid "Divided"
 msgstr "le Divisé"
 
-#: free/modules/users-login/tools.php:476
+#: free/modules/users-login/tools.php:487
 msgctxt "emoji"
 msgid "Equal"
 msgstr "l‘Égal"
 
-#: free/modules/users-login/tools.php:477
+#: free/modules/users-login/tools.php:488
 msgctxt "emoji"
 msgid "Spade"
 msgstr "le Pique"
 
-#: free/modules/users-login/tools.php:477
-#: free/modules/users-login/tools.php:479
+#: free/modules/users-login/tools.php:488
+#: free/modules/users-login/tools.php:490
 msgctxt "emoji"
 msgid "Clover"
 msgstr "le Trèfle"
 
-#: free/modules/users-login/tools.php:477
+#: free/modules/users-login/tools.php:488
 msgctxt "emoji"
 msgid "Heart"
 msgstr "le Cœur"
 
-#: free/modules/users-login/tools.php:477
+#: free/modules/users-login/tools.php:488
 msgctxt "emoji"
 msgid "Diamond"
 msgstr "le Carreau"
 
-#: free/modules/users-login/tools.php:477
+#: free/modules/users-login/tools.php:488
 msgctxt "emoji"
 msgid "Square"
 msgstr "le Carré"
 
-#: free/modules/users-login/tools.php:478
+#: free/modules/users-login/tools.php:489
 msgctxt "emoji"
 msgid "Dog"
 msgstr "le Chien"
 
-#: free/modules/users-login/tools.php:478
+#: free/modules/users-login/tools.php:489
 msgctxt "emoji"
 msgid "Cat"
 msgstr "le Chat"
 
-#: free/modules/users-login/tools.php:478
+#: free/modules/users-login/tools.php:489
 msgctxt "emoji"
 msgid "Monkey"
 msgstr "le Singe"
 
-#: free/modules/users-login/tools.php:478
+#: free/modules/users-login/tools.php:489
 msgctxt "emoji"
 msgid "Pig"
 msgstr "le Cochon"
 
-#: free/modules/users-login/tools.php:478
+#: free/modules/users-login/tools.php:489
 msgctxt "emoji"
 msgid "Lion"
 msgstr "le Lion"
 
-#: free/modules/users-login/tools.php:479
+#: free/modules/users-login/tools.php:490
 msgctxt "emoji"
 msgid "Tree"
 msgstr "l‘Arbre"
 
-#: free/modules/users-login/tools.php:479
+#: free/modules/users-login/tools.php:490
 msgctxt "emoji"
 msgid "Logs"
 msgstr "les Buches"
 
-#: free/modules/users-login/tools.php:479
+#: free/modules/users-login/tools.php:490
 msgctxt "emoji"
 msgid "Leaf"
 msgstr "la Feuille"
 
-#: free/modules/users-login/tools.php:479
+#: free/modules/users-login/tools.php:490
 msgctxt "emoji"
 msgid "Flower"
 msgstr "la Fleur"
 
-#: free/modules/users-login/tools.php:480
+#: free/modules/users-login/tools.php:491
 msgctxt "emoji"
 msgid "Apple"
 msgstr "la Pomme"
 
-#: free/modules/users-login/tools.php:480
+#: free/modules/users-login/tools.php:491
 msgctxt "emoji"
 msgid "Banana"
 msgstr "la Banane"
 
-#: free/modules/users-login/tools.php:480
+#: free/modules/users-login/tools.php:491
 msgctxt "emoji"
 msgid "Lemon"
 msgstr "le Citron"
 
-#: free/modules/users-login/tools.php:480
+#: free/modules/users-login/tools.php:491
 msgctxt "emoji"
 msgid "Grapes"
 msgstr "le Raisin"
 
-#: free/modules/users-login/tools.php:480
+#: free/modules/users-login/tools.php:491
 msgctxt "emoji"
 msgid "Kiwi"
 msgstr "le Kiwi"
 
-#: free/modules/users-login/tools.php:481
+#: free/modules/users-login/tools.php:492
 msgctxt "emoji"
 msgid "Chili"
 msgstr "le Piment"
 
-#: free/modules/users-login/tools.php:481
+#: free/modules/users-login/tools.php:492
 msgctxt "emoji"
 msgid "Carrot"
 msgstr "la Carotte"
 
-#: free/modules/users-login/tools.php:481
+#: free/modules/users-login/tools.php:492
 msgctxt "emoji"
 msgid "Corn"
 msgstr "le Maïs"
 
-#: free/modules/users-login/tools.php:481
+#: free/modules/users-login/tools.php:492
 msgctxt "emoji"
 msgid "Avocado"
 msgstr "l‘Avocat"
 
-#: free/modules/users-login/tools.php:481
+#: free/modules/users-login/tools.php:492
 msgctxt "emoji"
 msgid "Tomato"
 msgstr "la Tomate"
 
-#: free/modules/users-login/tools.php:482
+#: free/modules/users-login/tools.php:493
 msgctxt "emoji"
 msgid "Robot"
 msgstr "le Robot"
 
-#: free/modules/users-login/tools.php:482
+#: free/modules/users-login/tools.php:493
 msgctxt "emoji"
 msgid "Clown"
 msgstr "le Clown"
 
-#: free/modules/users-login/tools.php:482
+#: free/modules/users-login/tools.php:493
 msgctxt "emoji"
 msgid "Ghost"
 msgstr "le Fantôme"
 
-#: free/modules/users-login/tools.php:482
+#: free/modules/users-login/tools.php:493
 msgctxt "emoji"
 msgid "Alien"
 msgstr "l‘Alien"
 
-#: free/modules/users-login/tools.php:482
+#: free/modules/users-login/tools.php:493
 msgctxt "emoji"
 msgid "Poo"
 msgstr "le Caca"
 
-#: free/modules/users-login/tools.php:483
+#: free/modules/users-login/tools.php:494
 msgctxt "emoji"
 msgid "Bread"
 msgstr "le Pain"
 
-#: free/modules/users-login/tools.php:483
+#: free/modules/users-login/tools.php:494
 msgctxt "emoji"
 msgid "Cheese"
 msgstr "le Fromage"
 
-#: free/modules/users-login/tools.php:483
+#: free/modules/users-login/tools.php:494
 msgctxt "emoji"
 msgid "Steak"
 msgstr "la Viande"
 
-#: free/modules/users-login/tools.php:483
+#: free/modules/users-login/tools.php:494
 msgctxt "emoji"
 msgid "Butter"
 msgstr "le Beurre"
 
-#: free/modules/users-login/tools.php:483
+#: free/modules/users-login/tools.php:494
 msgctxt "emoji"
 msgid "Salad"
 msgstr "la Salade"
 
-#: free/modules/users-login/tools.php:484
+#: free/modules/users-login/tools.php:495
 msgctxt "emoji"
 msgid "Taco"
 msgstr "le Taco"
 
-#: free/modules/users-login/tools.php:484
+#: free/modules/users-login/tools.php:495
 msgctxt "emoji"
 msgid "Hotdog"
 msgstr "le Hotdog"
 
-#: free/modules/users-login/tools.php:484
+#: free/modules/users-login/tools.php:495
 msgctxt "emoji"
 msgid "Pizza"
 msgstr "la Pizza"
 
-#: free/modules/users-login/tools.php:484
+#: free/modules/users-login/tools.php:495
 msgctxt "emoji"
 msgid "Burger"
 msgstr "le Burger"
 
-#: free/modules/users-login/tools.php:484
+#: free/modules/users-login/tools.php:495
 msgctxt "emoji"
 msgid "Fries"
 msgstr "les Frites"
 
-#: free/modules/users-login/tools.php:485
+#: free/modules/users-login/tools.php:496
 msgctxt "emoji"
 msgid "Earth"
 msgstr "la Terre"
 
-#: free/modules/users-login/tools.php:485
+#: free/modules/users-login/tools.php:496
 msgctxt "emoji"
 msgid "Stars"
 msgstr "les Étoiles"
 
-#: free/modules/users-login/tools.php:485
+#: free/modules/users-login/tools.php:496
 msgctxt "emoji"
 msgid "Moon"
 msgstr "la Lune"
 
-#: free/modules/users-login/tools.php:485
+#: free/modules/users-login/tools.php:496
 msgctxt "emoji"
 msgid "Sun"
 msgstr "le Soleil"
 
-#: free/modules/users-login/tools.php:485
+#: free/modules/users-login/tools.php:496
 msgctxt "emoji"
 msgid "Comet"
 msgstr "la Comète"
 
-#: free/modules/users-login/tools.php:486
+#: free/modules/users-login/tools.php:497
 msgctxt "emoji"
 msgid "Hat"
 msgstr "le Chapeau"
 
-#: free/modules/users-login/tools.php:486
+#: free/modules/users-login/tools.php:497
 msgctxt "emoji"
 msgid "Hand"
 msgstr "la Main"
 
-#: free/modules/users-login/tools.php:486
+#: free/modules/users-login/tools.php:497
 msgctxt "emoji"
 msgid "Eye"
 msgstr "l‘Oeil"
 
-#: free/modules/users-login/tools.php:486
+#: free/modules/users-login/tools.php:497
 msgctxt "emoji"
 msgid "Glasses"
 msgstr "les Lunettes"
 
-#: free/modules/users-login/tools.php:486
+#: free/modules/users-login/tools.php:497
 msgctxt "emoji"
 msgid "Car"
 msgstr "la Voiture"
 
-#: free/modules/users-login/tools.php:487
+#: free/modules/users-login/tools.php:498
 msgctxt "emoji"
 msgid "House"
 msgstr "la Maison"
 
-#: free/modules/users-login/tools.php:487
+#: free/modules/users-login/tools.php:498
 msgctxt "emoji"
 msgid "Piano"
 msgstr "le Piano"
 
-#: free/modules/users-login/tools.php:487
+#: free/modules/users-login/tools.php:498
 msgctxt "emoji"
 msgid "Ball"
 msgstr "le Ballon"
 
-#: free/modules/users-login/tools.php:487
+#: free/modules/users-login/tools.php:498
 msgctxt "emoji"
 msgid "Cookie"
 msgstr "le Cookie"
 
-#: free/modules/users-login/tools.php:487
+#: free/modules/users-login/tools.php:498
 msgctxt "emoji"
 msgid "Star"
 msgstr "l‘Étoile"
 
-#: free/modules/users-login/tools.php:732
+#: free/modules/users-login/tools.php:743
 msgid "Log in"
 msgstr "Connexion"
 
-#: free/modules/users-login/tools.php:733
+#: free/modules/users-login/tools.php:744
 msgid "Log out"
 msgstr "Se déconnecter"
 
-#: free/modules/users-login/tools.php:735
+#: free/modules/users-login/tools.php:746
 msgid "Lost Password"
 msgstr "Mot de passe perdu"
 
-#: free/modules/users-login/tools.php:736
+#: free/modules/users-login/tools.php:747
 #: pro/modules/users-login/plugins/otp-auth.php:95
 msgid "Password Reset"
 msgstr "Réinitialisation du mot de passe"
 
-#: free/modules/users-login/tools.php:737
+#: free/modules/users-login/tools.php:748
 msgid "Confirm Admin Email"
 msgstr "Confirmer l’e-mail admin"
 
-#: free/modules/users-login/tools.php:740
+#: free/modules/users-login/tools.php:751
 msgid "Register"
 msgstr "S’inscrire"
 
@@ -14535,7 +14556,7 @@ msgstr ""
 "votre fichier de configuration manuellement. Merci de supprimer toutes les "
 "règles du fichier %1$s entre les marqueurs suivants :"
 
-#: pro/activation.php:565
+#: pro/activation.php:566
 #, php-format
 msgid ""
 "There is a new version of SecuPress Pro available. <a href=\"%s\" "
@@ -14696,8 +14717,9 @@ msgstr[1] "%d signatures"
 
 #: pro/admin/settings.php:293 pro/admin/settings.php:861
 #: pro/admin/settings.php:940
+msgctxt "noun"
 msgid "Clean"
-msgstr "Nettoyer"
+msgstr "Propre"
 
 #: pro/admin/settings.php:328 pro/admin/settings.php:1029
 msgid "Delete selected files"
@@ -17204,17 +17226,17 @@ msgstr "Cacher"
 msgid "Show password"
 msgstr "Montrer le mot de passe"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:79
-#: pro/modules/users-login/plugins/user-creation-protection.php:839
+#: pro/modules/users-login/plugins/user-creation-protection.php:94
+#: pro/modules/users-login/plugins/user-creation-protection.php:874
 msgid "Role"
 msgstr "Rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:194
+#: pro/modules/users-login/plugins/user-creation-protection.php:209
 #, php-format
 msgid "[%s] Activate an administrator account"
 msgstr "[%s] Activer un compte d‘administration"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:195
+#: pro/modules/users-login/plugins/user-creation-protection.php:210
 msgid ""
 "A user has been designated as `administrator` on your website. Please visit "
 "the users page to approve or delete their account: "
@@ -17222,117 +17244,127 @@ msgstr ""
 "Un compte a été désigné comme `administrateur` sur votre site Web. Merci de "
 "visiter la page des comptes pour approuver ou supprimer ce compte : "
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:227
+#: pro/modules/users-login/plugins/user-creation-protection.php:242
 msgid "Sorry, you are not allowed to grant `Super Admin` to this user."
 msgstr ""
 "Désolé, vous ne pouvez pas accorder le rôle `Super Admin` sur ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:228
+#: pro/modules/users-login/plugins/user-creation-protection.php:243
 msgid "Sorry, you are not allowed to revoke `Super Admin` to this user."
 msgstr ""
 "Désolé, vous ne pouvez pas révoquer le rôle `Super Admin`sur ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:229
+#: pro/modules/users-login/plugins/user-creation-protection.php:244
 msgid "Sorry, you are not allowed to edit this user."
 msgstr "Désolé, vous ne pouvez pas éditer ce compte."
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:503
+#: pro/modules/users-login/plugins/user-creation-protection.php:538
 msgid "Pending User"
 msgid_plural "Pending Users"
 msgstr[0] "Compte en attente"
 msgstr[1] "Comptes en attente"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:513
+#: pro/modules/users-login/plugins/user-creation-protection.php:548
 msgid "Fake User"
 msgid_plural "Fake Users"
 msgstr[0] "Faux compte"
 msgstr[1] "Faux comptes"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:694
+#: pro/modules/users-login/plugins/user-creation-protection.php:729
+#: pro/modules/users-login/plugins/user-creation-protection.php:1391
 msgid "Fake Users"
 msgstr "Faux comptes"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:732
-#: pro/modules/users-login/plugins/user-creation-protection.php:745
+#: pro/modules/users-login/plugins/user-creation-protection.php:767
+#: pro/modules/users-login/plugins/user-creation-protection.php:780
 #, php-format
 msgctxt "user role"
 msgid "Activate as `%s`"
 msgstr "Activer comme `%s`"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:734
+#: pro/modules/users-login/plugins/user-creation-protection.php:769
 msgctxt "verb"
 msgid "Activate without role"
 msgstr "Activer sans rôle"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:743
-#: pro/modules/users-login/plugins/user-creation-protection.php:754
+#: pro/modules/users-login/plugins/user-creation-protection.php:778
+#: pro/modules/users-login/plugins/user-creation-protection.php:789
 #, php-format
 msgctxt "user role"
 msgid "Downgrade as `%s`"
 msgstr "Rétrograder en `%s`"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:754
-msgid "No role"
-msgstr "Aucun rôle"
-
-#: pro/modules/users-login/plugins/user-creation-protection.php:785
-#: pro/modules/users-login/plugins/user-creation-protection.php:815
+#: pro/modules/users-login/plugins/user-creation-protection.php:820
+#: pro/modules/users-login/plugins/user-creation-protection.php:850
 msgid "User updated"
 msgstr "Compte mis à jour"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:840
+#: pro/modules/users-login/plugins/user-creation-protection.php:875
 msgid "Reason"
 msgstr "Raison"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:903
+#: pro/modules/users-login/plugins/user-creation-protection.php:938
 msgctxt "the user"
 msgid "Not Exist"
 msgstr "N‘existe pas"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:908
+#: pro/modules/users-login/plugins/user-creation-protection.php:943
 msgctxt "the user"
 msgid "Not Administrator"
 msgstr "Non administrateur"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:913
+#: pro/modules/users-login/plugins/user-creation-protection.php:948
 msgid "Too Short Pass Hash"
 msgstr "Hash du pass court"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:918
+#: pro/modules/users-login/plugins/user-creation-protection.php:953
 msgid "No Registration Date"
 msgstr "Pas de date d’inscription"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:923
+#: pro/modules/users-login/plugins/user-creation-protection.php:958
 msgid "Missing user_nicename"
 msgstr "`user_nicename` manquant"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:933
+#: pro/modules/users-login/plugins/user-creation-protection.php:968
 msgid "Missing Metadata"
 msgstr "Métadonnée manquante"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:938
+#: pro/modules/users-login/plugins/user-creation-protection.php:973
 msgid "Wrong Metadata Value"
 msgstr "Mauvaise valeur de métadonnée"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:943
+#: pro/modules/users-login/plugins/user-creation-protection.php:978
 msgid "Same Email Domain"
 msgstr "Domaine e-mail identique"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:948
+#: pro/modules/users-login/plugins/user-creation-protection.php:983
 msgid "Wrong Email MX"
 msgstr "Mauvais registre MX"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:953
+#: pro/modules/users-login/plugins/user-creation-protection.php:988
 msgid "Wrong Email Address"
 msgstr "Mauvaise adresse e-mail"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:958
+#: pro/modules/users-login/plugins/user-creation-protection.php:993
 msgid "Bad Email Domain"
 msgstr "Mauvais domaine e-mail"
 
-#: pro/modules/users-login/plugins/user-creation-protection.php:963
+#: pro/modules/users-login/plugins/user-creation-protection.php:998
 msgid "Wrong Password Encryption"
 msgstr "Chiffrement du mot de passe incorrect"
+
+#: pro/modules/users-login/plugins/user-creation-protection.php:1182
+#: pro/modules/users-login/plugins/user-creation-protection.php:1390
+msgid "Content from Fake Accounts"
+msgstr "Contenu provenant des faux comptes"
+
+#: pro/modules/users-login/plugins/user-creation-protection.php:1388
+msgid ""
+"Caution, this content is not available because it probably comes from a fake "
+"account."
+msgstr ""
+"Attention, ce contenu n’est pas disponible, car il provient probablement "
+"d’un faux compte."
 
 #: pro/modules/users-login/tools.php:515
 #, php-format
@@ -17445,6 +17477,73 @@ msgstr "SecuPress Pro — Sécurité WordPress"
 msgid "More than a plugin, the guarantee of a protected website by experts."
 msgstr ""
 "Plus qu’une extension, la garantie d’un site Web protégé par des experts."
+
+#, php-format
+#~ msgid "Backdoor-style account: %1$s <%2$s> \"%3$s\""
+#~ msgstr "Compte de type porte dérobée : %1$s <%2$s> « %3$s »"
+
+#, php-format
+#~ msgid "Non-administrator %1$s has extra capabilities: %2$s"
+#~ msgstr ""
+#~ "Le compte non administrateur %1$s possède des droits supplémentaires : "
+#~ "%2$s"
+
+#~ msgid ""
+#~ "Improvement: Enhance login error handling and disclosures in Login Errors "
+#~ "Disclose feature."
+#~ msgstr ""
+#~ "Amélioration : Meilleure gestion des erreurs de connexion et de leur "
+#~ "divulgation dans la fonctionnalité Erreurs de connexion."
+
+#~ msgid ""
+#~ "Improvement: Learning Mode can review common page slugs instead of "
+#~ "treating them as critical."
+#~ msgstr ""
+#~ "Amélioration : Le mode apprentissage peut examiner les slugs de pages "
+#~ "courants au lieu de les traiter comme critiques."
+
+#~ msgid ""
+#~ "Improvement: Backup folder can be set with the SECUPRESS_BACKUPS_PATH "
+#~ "constant or the secupress.backups.path filter."
+#~ msgstr ""
+#~ "Amélioration : Le dossier des sauvegardes peut être défini avec la "
+#~ "constante SECUPRESS_BACKUPS_PATH ou le filtre secupress.backups.path."
+
+#~ msgid ""
+#~ "Improvement: Activating Bad URL Access now also enables Bad File "
+#~ "Extensions (and the reverse on deactivation)."
+#~ msgstr ""
+#~ "Amélioration : L’activation d’« Accès aux mauvaises URLs » active aussi "
+#~ "« Mauvaises extensions de fichiers » (et l’inverse à la désactivation)."
+
+#~ msgid ""
+#~ "Improvement: Pro update checks also run outside wp-admin, so new versions "
+#~ "are visible everywhere."
+#~ msgstr ""
+#~ "Amélioration : La vérification des mises à jour Pro s’exécute aussi hors "
+#~ "de wp-admin, les nouvelles versions sont donc visibles partout."
+
+#~ msgid ""
+#~ "Removal: Ban Non-Existent Users Feature. Unknown identifiers are no "
+#~ "longer blocked on the first try. Use Limit Login Attempts now."
+#~ msgstr ""
+#~ "Retrait : fonctionnalité « Bannir les identifiants inexistants ». Les "
+#~ "identifiants inconnus ne sont plus bloqués dès la première tentative. "
+#~ "Utilisez désormais « Tentatives de connexion »."
+
+#~ msgid ""
+#~ "Fix: Stop User Enumeration feature was blocking Editors to create or edit "
+#~ "posts and pages."
+#~ msgstr ""
+#~ "Correction : « Interdire l’énumération des comptes » empêchait le rôle "
+#~ "éditeur de créer ou de modifier des articles et des pages."
+
+#~ msgid ""
+#~ "Fix: Fatal error in the dashboard attacks widget (wrong count passed to "
+#~ "_nx, seen with Divi)."
+#~ msgstr ""
+#~ "Correction : Erreur fatale dans le widget des attaques du tableau de bord "
+#~ "(mauvais nombre transmis à _nx, constaté avec Divi)."
 
 #~ msgid "Patched. No traces found."
 #~ msgstr "Patché. Aucune trace trouvée."

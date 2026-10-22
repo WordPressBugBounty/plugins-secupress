@@ -272,17 +272,21 @@ function secupress_hotfix_updraftcentral_run() {
 	$alerts   = 0;
 	$warnings = 0;
 	$lines    = [];
-	$report   = function( $level, $message ) use ( &$alerts, &$warnings, &$lines ) {
+	$report   = function( $level, $message, $url = '' ) use ( &$alerts, &$warnings, &$lines ) {
 		if ( 'ALERT' === $level ) {
 			++$alerts;
 		}
 		if ( 'WARN' === $level ) {
 			++$warnings;
 		}
-		$lines[] = [
+		$line = [
 			'level'   => $level,
 			'message' => $message,
 		];
+		if ( $url ) {
+			$line['url'] = $url;
+		}
+		$lines[] = $line;
 	};
 
 	$keys = get_option( 'updraft_central_localkeys' );
@@ -318,7 +322,7 @@ function secupress_hotfix_updraftcentral_run() {
 			$report(
 				'ALERT',
 				sprintf(
-					__( '%1$s %2$s "%3$s" (UA: %4$s). A plugin or theme was pushed to this site.', 'secupress' ),
+					__( '%1$s %2$s "%3$s" (UA: %4$s). A plugin or theme was pushed to this site. If you have already cleaned this up, you can ignore this message.', 'secupress' ),
 					$when,
 					$ip,
 					$message,
@@ -410,41 +414,74 @@ function secupress_hotfix_updraftcentral_run() {
 		$report( 'OK', __( 'No backdoor options in the database.', 'secupress' ) );
 	}
 
-	$user_hits = 0;
-	$cap_key   = $wpdb->get_blog_prefix() . 'capabilities';
-	$users     = get_users(
+	$user_hits  = 0;
+	$cap_key    = $wpdb->get_blog_prefix() . 'capabilities';
+	$wp_roles   = wp_roles();
+	$admin_caps = [
+		'manage_options',
+		'install_plugins',
+		'activate_plugins',
+		'upload_files',
+		'install_themes',
+		'switch_themes',
+		'edit_files',
+	];
+	$users      = get_users(
 		[
-			'fields' => [ 'ID', 'user_login', 'user_email', 'display_name' ],
+			'fields' => [ 'ID', 'user_login', 'user_email', 'display_name', 'user_registered' ],
 		]
 	);
+	$date_format = get_option( 'date_format' );
 	foreach ( $users as $user ) {
-		$caps  = (array) get_user_meta( $user->ID, $cap_key, true );
-		$extra = array_intersect( [ 'manage_options', 'install_plugins' ], array_keys( array_filter( $caps ) ) );
-		if ( 'Site Tools' === $user->display_name || '@example.org' === substr( (string) $user->user_email, -12 ) ) {
-			$report(
-				'ALERT',
-				sprintf(
-					__( 'Backdoor-style account: %1$s <%2$s> "%3$s"', 'secupress' ),
-					$user->user_login,
-					$user->user_email,
-					$user->display_name
-				)
-			);
-			++$user_hits;
-		} elseif ( $extra && empty( $caps['administrator'] ) ) {
+		$caps             = (array) get_user_meta( $user->ID, $cap_key, true );
+		$is_administrator = ! empty( $caps['administrator'] );
+		$registered_local = ! empty( $user->user_registered ) ? get_date_from_gmt( $user->user_registered ) : '';
+		$registered       = $registered_local ? mysql2date( $date_format, $registered_local ) : '?';
+		$role_names       = [];
+		foreach ( array_keys( array_filter( $caps ) ) as $cap_key_name ) {
+			if ( isset( $wp_roles->roles[ $cap_key_name ]['name'] ) ) {
+				$role_names[] = translate_user_role( $wp_roles->roles[ $cap_key_name ]['name'] );
+			}
+		}
+		$role_label = $role_names ? implode( ', ', $role_names ) : __( 'No role', 'secupress' );
+		$user_url   = add_query_arg( 's', $user->user_email, admin_url( 'users.php' ) );
+		$in_october = $registered_local >= '2026-10-01 00:00:00' && $registered_local < '2026-11-01 00:00:00';
+		if ( $is_administrator && $in_october ) {
 			$report(
 				'WARN',
 				sprintf(
-					__( 'Non-administrator %1$s has extra capabilities: %2$s', 'secupress' ),
+					__( '%1$s (%2$s, %3$s), registered on %4$s, role: %5$s. This administrator was created in October 2026 and must be reviewed. This account is not necessarily malicious.', 'secupress' ),
+					$user->display_name,
 					$user->user_login,
-					implode( ', ', $extra )
-				)
+					$user->user_email,
+					$registered,
+					$role_label
+				),
+				$user_url
 			);
 			++$user_hits;
 		}
+		$granted = array_values( array_intersect( $admin_caps, array_keys( array_filter( $caps ) ) ) );
+		if ( $is_administrator || ! $granted ) {
+			continue;
+		}
+		$report(
+			'ALERT',
+			sprintf(
+				__( '%1$s (%2$s, %3$s), registered on %4$s, role: %5$s. This person is not an administrator but still has administrator rights (%6$s). This account is considered malicious and must be deleted.', 'secupress' ),
+				$user->display_name,
+				$user->user_login,
+				$user->user_email,
+				$registered,
+				$role_label,
+				implode( ', ', $granted )
+			),
+			$user_url
+		);
+		++$user_hits;
 	}
 	if ( ! $user_hits ) {
-		$report( 'OK', __( 'No backdoor accounts or hidden admin-level users.', 'secupress' ) );
+		$report( 'OK', __( 'No non-administrator account with administrator rights, and no administrator created in October 2026.', 'secupress' ) );
 	}
 
 	return [
@@ -471,7 +508,7 @@ function secupress_hotfix_updraftcentral_result_html( $result ) {
 	} elseif ( ! empty( $result['alerts'] ) ) {
 		$summary = __( 'Not patched. Traces of the attack were found. Delete the UpdraftCentral connection, remove the backdoor and check users and passwords.', 'secupress' );
 	} else {
-		$summary = __( 'Not patched. No backdoor found, but there are warnings. If the site is connected to UpdraftCentral, delete the connection now.', 'secupress' );
+		$summary = __( 'Not patched. No backdoor found, but the warnings below must be reviewed.', 'secupress' );
 	}
 
 	$html = '<p><strong>' . esc_html( $summary ) . '</strong></p>';
@@ -485,7 +522,12 @@ function secupress_hotfix_updraftcentral_result_html( $result ) {
 			continue;
 		}
 		$label = 'ALERT' === $line['level'] ? __( 'Alert', 'secupress' ) : __( 'Warning', 'secupress' );
-		$html .= '<li><strong>' . esc_html( $label ) . '</strong> ' . esc_html( $line['message'] ) . '</li>';
+		$html .= '<li><strong>' . esc_html( $label ) . '</strong> ' . esc_html( $line['message'] );
+		if ( ! empty( $line['url'] ) ) {
+			$link_label = 'ALERT' === $line['level'] ? __( 'Delete this account', 'secupress' ) : __( 'Review this account', 'secupress' );
+			$html .= ' <a href="' . esc_url( $line['url'] ) . '">' . esc_html( $link_label ) . '</a>';
+		}
+		$html .= '</li>';
 	}
 	$html .= '</ul>';
 
@@ -523,7 +565,7 @@ function secupress_hotfix_updraftcentral_patch_ajax() {
 
 add_action( 'wp_ajax_secupress_hotfix_updraftcentral_ignore', 'secupress_hotfix_updraftcentral_ignore_ajax' );
 /**
- * Hide the UpdraftCentral notice for good on this site.
+ * Hide the UpdraftCentral notice for the whole site and delete its client log.
  *
  * @author Julio Potier
  * @since 2.7.2
@@ -536,5 +578,6 @@ function secupress_hotfix_updraftcentral_ignore_ajax() {
 	if ( function_exists( 'secupress_dismiss_notice_for_site' ) ) {
 		secupress_dismiss_notice_for_site( 'updraftcentral-backdoor' );
 	}
+	delete_site_option( 'updraftcentral_client_log' );
 	wp_send_json_success();
 }

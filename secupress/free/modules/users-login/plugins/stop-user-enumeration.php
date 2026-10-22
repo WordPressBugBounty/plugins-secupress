@@ -1,10 +1,10 @@
 <?php
 /**
  * Module Name: Forbid User Enumeration
- * Description: Forbid the user listing from front with ?author=X and from REST API with /users/ or ?_embed=
+ * Description: Forbid the user listing from front with ?author=X, from REST API with /users/ or ?_embed=, and from author sitemaps
  * Main Module: users_login
  * Author: SecuPress
- * Version: 2.7.2
+ * Version: 2.7.3
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
@@ -273,5 +273,184 @@ function secupress_stop_user_enumeration_strip_author( $data ) {
 	}
 
 	return $data;
+}
+
+
+add_filter( 'wp_sitemaps_add_provider', 'secupress_stop_user_enumeration_remove_users_sitemap_provider', 10, 2 );
+/**
+ * Remove the core users sitemap provider.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (WP_Sitemaps_Provider|false) $provider Provider instance.
+ * @param (string)                     $name     Provider name.
+ *
+ * @return (WP_Sitemaps_Provider|false)
+ **/
+function secupress_stop_user_enumeration_remove_users_sitemap_provider( $provider, $name ) {
+	if ( 'users' === $name ) {
+		return false;
+	}
+
+	return $provider;
+}
+
+
+add_filter( 'wpseo_sitemap_index_links', 'secupress_stop_user_enumeration_remove_yoast_author_sitemaps' );
+/**
+ * Remove author sitemaps from the Yoast index.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (array) $links Sitemap index links.
+ *
+ * @return (array)
+ **/
+function secupress_stop_user_enumeration_remove_yoast_author_sitemaps( $links ) {
+	return secupress_stop_user_enumeration_without_author_sitemaps( $links, 'sitemap' );
+}
+
+
+add_filter( 'wpseo_build_sitemap_post_type', 'secupress_stop_user_enumeration_exclude_yoast_authors' );
+/**
+ * Drop every author while Yoast builds the author sitemap.
+ *
+ * Yoast loads full user objects only when wpseo_sitemap_exclude_author is already registered, so the filter is added for that build only.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (string) $type Sitemap type.
+ *
+ * @return (string)
+ **/
+function secupress_stop_user_enumeration_exclude_yoast_authors( $type ) {
+	if ( 'author' === $type && ! has_filter( 'wpseo_sitemap_exclude_author', 'secupress_stop_user_enumeration_empty_array' ) ) {
+		add_filter( 'wpseo_sitemap_exclude_author', 'secupress_stop_user_enumeration_empty_array' );
+	}
+
+	return $type;
+}
+
+
+add_filter( 'rank_math/sitemap/index/entry', 'secupress_stop_user_enumeration_remove_rank_math_author_entry', 10, 2 );
+add_filter( 'rank_math/sitemap/entry', 'secupress_stop_user_enumeration_remove_rank_math_author_entry', 10, 2 );
+/**
+ * Remove Rank Math author sitemap entries.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (array|false) $entry Sitemap entry.
+ * @param (string)      $type  Entry type.
+ *
+ * @return (array|false)
+ **/
+function secupress_stop_user_enumeration_remove_rank_math_author_entry( $entry, $type ) {
+	if ( 'author' === $type || 'user' === $type ) {
+		return false;
+	}
+
+	return $entry;
+}
+
+
+add_filter( 'aioseo_sitemap_author_archives', 'secupress_stop_user_enumeration_empty_array' );
+add_filter( 'aioseo_sitemap_indexes', 'secupress_stop_user_enumeration_remove_aioseo_author_sitemaps' );
+/**
+ * Remove author sitemaps from the All in One SEO index.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (array) $indexes Sitemap index entries.
+ *
+ * @return (array)
+ **/
+function secupress_stop_user_enumeration_remove_aioseo_author_sitemaps( $indexes ) {
+	$filename = 'sitemap';
+
+	if ( function_exists( 'aioseo' ) ) {
+		$aioseo = aioseo();
+
+		if ( is_object( $aioseo ) && isset( $aioseo->sitemap->filename ) && is_string( $aioseo->sitemap->filename ) && '' !== $aioseo->sitemap->filename ) {
+			$filename = $aioseo->sitemap->filename;
+		}
+	}
+
+	return secupress_stop_user_enumeration_without_author_sitemaps( $indexes, $filename );
+}
+
+
+/**
+ * Return an empty list of sitemap entries.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @return (array)
+ **/
+function secupress_stop_user_enumeration_empty_array() {
+	return [];
+}
+
+
+/**
+ * Drop index entries that point at an author sitemap.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (array)  $entries  Index entries.
+ * @param (string) $filename Sitemap filename used by the plugin.
+ *
+ * @return (array)
+ **/
+function secupress_stop_user_enumeration_without_author_sitemaps( $entries, $filename ) {
+	if ( ! is_array( $entries ) ) {
+		return $entries;
+	}
+
+	$kept = [];
+
+	foreach ( $entries as $entry ) {
+		if ( is_array( $entry ) && isset( $entry['loc'] ) && secupress_stop_user_enumeration_is_author_sitemap( $entry['loc'], $filename ) ) {
+			continue;
+		}
+
+		$kept[] = $entry;
+	}
+
+	return $kept;
+}
+
+
+/**
+ * Whether a sitemap URL is an author sitemap.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (mixed)  $loc      Sitemap URL.
+ * @param (string) $filename Sitemap filename used by the plugin.
+ *
+ * @return (bool)
+ **/
+function secupress_stop_user_enumeration_is_author_sitemap( $loc, $filename ) {
+	if ( ! is_string( $loc ) || '' === $loc ) {
+		return false;
+	}
+
+	$path = wp_parse_url( $loc, PHP_URL_PATH );
+
+	if ( ! is_string( $path ) ) {
+		return false;
+	}
+
+	$pattern = '#^author-' . preg_quote( $filename, '#' ) . '[0-9]*\.xml$#i';
+
+	return 1 === preg_match( $pattern, wp_basename( $path ) );
 }
 

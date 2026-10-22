@@ -4,7 +4,7 @@
  * Description: The Secupress Anti Spam module
  * Main Module: antispam
  * Author: SecuPress
- * Version: 2.4
+ * Version: 2.7.2
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );

@@ -702,6 +702,7 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 			echo '<p class="description help"><span class="dashicons dashicons-editor-help" aria-hidden="true"></span> ';
 			esc_html_e( 'Save your changes. Learning Mode will be available when the page reloads.', 'secupress' );
 			echo '</p>';
+			$this->learning_mode_decisions_dialog();
 			$this->learning_mode_visibility_script();
 			return;
 		}
@@ -944,7 +945,91 @@ class SecuPress_Settings_Modules extends SecuPress_Settings {
 		})();
 		</script>
 		<?php
+		$this->learning_mode_decisions_dialog();
 		$this->learning_mode_visibility_script();
+	}
+
+	/**
+	 * Popup listing decided words, with the current allow or block state.
+	 *
+	 * @since 2.7.3
+	 * @author Julio Potier
+	 */
+	protected function learning_mode_decisions_dialog() {
+		$rows       = secupress_firewall_learning_decision_rows();
+		$admin_post = admin_url( 'admin-post.php' );
+		?>
+		<p>
+			<button type="button" class="secupress-button secupress-button-mini secupress-ghost" id="secupress-learning-decisions-open"><?php esc_html_e( 'Review previous decisions', 'secupress' ); ?></button>
+		</p>
+		<div id="secupress-learning-decisions" class="secupress-learning-decisions" hidden>
+			<div class="secupress-learning-decisions-panel" role="dialog" aria-modal="true" aria-labelledby="secupress-learning-decisions-title">
+				<div class="secupress-learning-decisions-head">
+					<h4 id="secupress-learning-decisions-title"><?php esc_html_e( 'Review previous decisions', 'secupress' ); ?></h4>
+					<button type="button" class="secupress-learning-decisions-close" aria-label="<?php esc_attr_e( 'Close', 'secupress' ); ?>">&times;</button>
+				</div>
+				<?php if ( ! $rows ) : ?>
+					<p class="description"><?php esc_html_e( 'No word has been decided yet.', 'secupress' ); ?></p>
+				<?php else : ?>
+					<ul class="secupress-learning-decision-list">
+						<?php
+						foreach ( $rows as $hash => $row ) {
+							$allow_url = wp_nonce_url( $admin_post . '?action=secupress-learning-switch&hash=' . rawurlencode( $hash ) . '&decision=allow_site', 'secupress-learning-switch_' . $hash );
+							$block_url = wp_nonce_url( $admin_post . '?action=secupress-learning-switch&hash=' . rawurlencode( $hash ) . '&decision=force_enforce', 'secupress-learning-switch_' . $hash );
+							$match     = '' !== $row['match'] ? $row['match'] : '—';
+							echo '<li class="secupress-learning-decision">';
+							echo '<span class="secupress-learning-decision-word"><code>' . esc_html( $match ) . '</code></span>';
+							echo '<span class="secupress-learning-decision-source">' . esc_html( secupress_firewall_learning_slug_label( $row['slug'] ) ) . '</span>';
+							echo '<span class="secupress-learning-decision-actions">';
+							if ( $row['allowed'] ) {
+								echo '<span class="secupress-learning-decision-btn is-allow is-current" aria-current="true">' . esc_html__( 'Allowed', 'secupress' ) . '</span>';
+								echo '<a class="secupress-learning-decision-btn is-block" href="' . esc_url( $block_url ) . '">' . esc_html__( 'Block', 'secupress' ) . '</a>';
+							} else {
+								echo '<a class="secupress-learning-decision-btn is-allow" href="' . esc_url( $allow_url ) . '">' . esc_html__( 'Allow', 'secupress' ) . '</a>';
+								echo '<span class="secupress-learning-decision-btn is-block is-current" aria-current="true">' . esc_html__( 'Blocked', 'secupress' ) . '</span>';
+							}
+							echo '</span>';
+							echo '</li>';
+						}
+						?>
+					</ul>
+				<?php endif; ?>
+			</div>
+		</div>
+		<script>
+		(function() {
+			var openBtn = document.getElementById('secupress-learning-decisions-open');
+			var box = document.getElementById('secupress-learning-decisions');
+			if ( ! openBtn || ! box ) {
+				return;
+			}
+			var closeBtn = box.querySelector('.secupress-learning-decisions-close');
+			function openBox() {
+				box.hidden = false;
+			}
+			function closeBox() {
+				box.hidden = true;
+			}
+			openBtn.addEventListener('click', openBox);
+			if ( closeBtn ) {
+				closeBtn.addEventListener('click', closeBox);
+			}
+			box.addEventListener('click', function( event ) {
+				if ( event.target === box ) {
+					closeBox();
+				}
+			});
+			document.addEventListener('keydown', function( event ) {
+				if ( 'Escape' === event.key && ! box.hidden ) {
+					closeBox();
+				}
+			});
+			if ( window.location.search.indexOf('learning_decisions=1') !== -1 ) {
+				openBox();
+			}
+		})();
+		</script>
+		<?php
 	}
 
 	/**

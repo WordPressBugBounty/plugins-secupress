@@ -1365,6 +1365,29 @@ function secupress_learning_extend_admin_post_cb() {
 	] );
 }
 
+add_action( 'admin_post_secupress-learning-switch', 'secupress_learning_switch_admin_post_cb' );
+/**
+ * Switch a decided word between allow and block.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ */
+function secupress_learning_switch_admin_post_cb() {
+	$hash     = isset( $_REQUEST['hash'] ) ? sanitize_key( wp_unslash( $_REQUEST['hash'] ) ) : '';
+	$decision = isset( $_REQUEST['decision'] ) ? sanitize_key( wp_unslash( $_REQUEST['decision'] ) ) : '';
+	secupress_check_admin_referer( 'secupress-learning-switch_' . $hash );
+	secupress_check_user_capability();
+
+	$ok = secupress_firewall_learning_switch_decision( $hash, $decision );
+
+	secupress_admin_send_message_die( [
+		'message'     => $ok ? __( 'Decision updated.', 'secupress' ) : __( 'This word could not be updated.', 'secupress' ),
+		'code'        => $ok ? 'learning_switched' : 'learning_switch_failed',
+		'type'        => $ok ? 'success' : 'error',
+		'redirect_to' => secupress_admin_url( 'modules', 'firewall' ) . '&learning_decisions=1#row-learning-mode_learning',
+	] );
+}
+
 add_action( 'admin_post_secupress-learning-allow-site', 'secupress_learning_allow_site_admin_post_cb' );
 /**
  * Allow a NG signature for the whole site.

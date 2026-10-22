@@ -146,6 +146,7 @@ add_action( 'authenticate', 'secupress_limitloginattempts', SECUPRESS_INT_MAX, 2
 /**
  * Count failed logins for a real account, and the same way for an unknown identifier.
  *
+ * @since 2.7.3 XML-RPC logins are counted too. Their body is text/xml, so $_POST stays empty.
  * @since 2.7.2 Unknown identifiers are counted in a transient, with the same limit and the same ban.
  * @since 2.2.6 Refactoring
  * @since 1.0
@@ -164,7 +165,9 @@ function secupress_limitloginattempts( $raw_user, $username ) {
 	}
 	$done = true;
 
-	if ( empty( $_POST ) || secupress_ip_is_whitelisted() ) { // WPCS: CSRF ok.
+	$is_xmlrpc = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
+
+	if ( ( empty( $_POST ) && ! $is_xmlrpc ) || secupress_ip_is_whitelisted() ) { // WPCS: CSRF ok.
 		return $raw_user;
 	}
 
@@ -224,6 +227,7 @@ function secupress_limitloginattempts_get_user( $username ) {
  * Ban or warn once the shared attempt limit is reached.
  *
  * @author Julio Potier
+ * @since 2.7.3 XML-RPC keeps its fault response. The IP is already banned for the next call.
  * @since 2.7.2
  *
  * @param (int) $user_attempts Attempts already stored.
@@ -235,6 +239,9 @@ function secupress_limitloginattempts_after_increment( $user_attempts ) {
 
 	if ( $user_attempts >= $max_attempts ) {
 		secupress_ban_ip( (int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' ) );
+		if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
+			return;
+		}
 		wp_safe_redirect( secupress_get_current_url() );
 		die();
 	}

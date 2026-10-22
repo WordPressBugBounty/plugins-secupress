@@ -87,13 +87,23 @@ $this->add_field( array(
 	'label'             => __( 'Yes, prevent users to be created with a bad email domain', 'secupress' ),
 ) );
 
+$same_email_domains = secupress_get_current_url( 'domain', 'same_email_domain' );
+$same_email_domains = array_values( array_filter( array_map( 'strval', (array) $same_email_domains ) ) );
+$same_email_codes   = [];
+foreach ( $same_email_domains as $same_email_domain ) {
+	$same_email_codes[] = secupress_code_me( '&hellip;@' . $same_email_domain );
+}
+$same_email_label = sprintf(
+	_n( 'Yes, prevent users from registering with the domain name %s', 'Yes, prevent users from registering with the domain names %s', count( $same_email_codes ), 'secupress' ),
+	wp_sprintf( '%l', $same_email_codes )
+);
 $this->add_field( array(
 	'title'             => __( 'Forbid Same Email Domain', 'secupress' ),
 	'label_for'         => $this->get_field_name( 'same-email-domain' ),
 	'plugin_activation' => true,
 	'type'              => 'checkbox',
 	'value'             => (int) secupress_is_submodule_active( 'users-login', 'same-email-domain' ),
-	'label'             => sprintf( __( 'Yes, prevent users from registering with the domain name %s', 'secupress' ), secupress_code_me( '&hellip;@' . secupress_get_current_url( 'domain' ) ) ),
+	'label'             => $same_email_label,
 	'helpers'           => [
 							[ 'type' => 'description', 'description' => __( 'Once activated, existing users with your domain name are "Always allowed", while new users are disallowed.', 'secupress' ), ],
 						]

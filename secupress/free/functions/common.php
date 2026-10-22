@@ -170,7 +170,7 @@ function secupress_require_class( $prefix, $class_name_part = '' ) {
  * @author Grégory Viguier
  */
 function secupress_require_class_async() {
-	/* https://github.com/A5hleyRich/wp-background-processing v1.0 */
+	/* https://github.com/deliciousbrains/wp-background-processing — Ashley Rich, Delicious Brains. */
 	secupress_require_class( 'Admin', 'wp-async-request' );
 	secupress_require_class( 'Admin', 'wp-background-process' );
 }
@@ -1143,6 +1143,7 @@ function secupress_get_blogname() {
 /**
  * Return the current URL.
  *
+ * @since 2.7.3 $context parameter and secupress.current_url filter. An empty context is the calling function. The filtered value may be an array.
  * @since 2.7 Use the host (and port) from home_url(), keep subdirectory installs intact
  * @since 2.2.6 'domain' param
  * @since 2.0 Remove usage of HTTP_HOST and $port
@@ -1151,10 +1152,12 @@ function secupress_get_blogname() {
  * @since 1.0
  * @author Grégory Viguier
  *
- * @param (string) $mode What to return: raw (all), base (before '?'), uri (before '?', without the domain), 'domain' (only the domain 'example.com').
- * @return (string)
+ * @param (string) $mode    What to return: raw (all), base (before '?'), uri (before '?', without the domain), 'domain' (only the domain 'example.com').
+ * @param (string) $context Caller context, passed to the filter. Empty uses the calling function name.
+ *
+ * @return (string|array)
  */
-function secupress_get_current_url( $mode = 'base' ) {
+function secupress_get_current_url( $mode = 'base', $context = '' ) {
 	$parsed = wp_parse_url( home_url() );
 	$host   = isset( $parsed['host'] ) ? $parsed['host'] : '';
 	if ( ! empty( $parsed['port'] ) ) {
@@ -1164,23 +1167,49 @@ function secupress_get_current_url( $mode = 'base' ) {
 	$url = 'http' . ( secupress_server_is_ssl() ? 's' : '' ) . '://' . $host . str_replace( '//', '/', $url );
 
 	switch ( $mode ) {
-		case 'uri' :
+		case 'uri':
 			$home = set_url_scheme( home_url() );
 			$url  = explode( '?', $url, 2 );
 			$url  = reset( $url );
 			$url  = str_replace( $home, '', $url );
-			return trim( $url, '/' );
-		case 'base' :
-			$url  = explode( '?', $url, 2 );
-			return reset( $url );
-		case 'domain' :
+			$url  = trim( $url, '/' );
+			break;
+		case 'base':
+			$url = explode( '?', $url, 2 );
+			$url = reset( $url );
+			break;
+		case 'domain':
 			$url = parse_url( get_site_url(), PHP_URL_HOST );
-			$url = preg_replace( '/^www\./', '', $url ); // Remove "www." if present
-			return $url;
-		default :
-		case 'raw' :
-			return $url;
+			$url = preg_replace( '/^www\./', '', $url );
+			break;
+		default:
+		case 'raw':
+			break;
 	}
+	// Since we cannot use the magic __FUNCTION__, we get the context from the caller with debug_backtrace.
+	if ( ! $context ) {
+		$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+		if ( isset( $backtrace[1]['function'] ) ) {
+			$context = $backtrace[1]['function'];
+			if ( isset( $backtrace[1]['class'] ) ) {
+				$context = $backtrace[1]['class'] . '::' . $context;
+			}
+		}
+	}
+
+	/**
+	 * Filter the current URL.
+	 *
+	 * Return an array when the caller passes a context that expects several values, for example SameEmailDomain with the domain mode.
+	 *
+	 * @since 2.7.3
+	 * @author Julio Potier
+	 *
+	 * @param (string) $url     Current URL fragment.
+	 * @param (string) $mode    Requested mode.
+	 * @param (string) $context Caller context.
+	 */
+	return apply_filters( 'secupress.current_url', $url, $mode, $context );
 }
 
 

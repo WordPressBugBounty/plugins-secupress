@@ -210,17 +210,30 @@ add_action( 'admin_footer', 'secupress_pre_check_php_version' );
  * Runs a pre check to see if we need to launch a PHPVersion Scanner silently
  *
  * @since 2.0
+ * @since 2.7.3 Rerun when a known build date is older than October 21, 2026.
  * @author Julio Potier
  *
  * @see SecuPress_Scan_PhpVersion
  **/
 function secupress_pre_check_php_version() {
-	$info     = get_option( 'secupress_scan_phpversion' );
-	if ( ! isset( $info['status'] ) || 'bad' !== $info['status'] ) {
+	$info = get_option( 'secupress_scan_phpversion' );
+	if ( ! isset( $info['status'] ) ) {
 		return;
 	}
-	$versions = secupress_get_php_versions();
-	if ( version_compare( $versions['current'], $versions['mini'] ) >= 0 ) {
-		secupress_scanit_async( 'PhpVersion' );
+
+	$versions       = secupress_get_php_versions();
+	$build_outdated = ! empty( $versions['build_outdated'] );
+
+	if ( 'bad' !== $info['status'] ) {
+		if ( $build_outdated ) {
+			secupress_scanit_async( 'PhpVersion' );
+		}
+		return;
 	}
+
+	if ( version_compare( $versions['current'], $versions['mini'] ) < 0 || $build_outdated ) {
+		return;
+	}
+
+	secupress_scanit_async( 'PhpVersion' );
 }

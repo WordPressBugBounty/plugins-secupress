@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  * @package SecuPress
  * @since 1.0
  */
-class SecuPress_Background_Process_Fightspam_Retest extends WP_Background_Process {
+class SecuPress_Background_Process_Fightspam_Retest extends SecuPress_Background_Process {
 
 	const VERSION = '1.0';
 

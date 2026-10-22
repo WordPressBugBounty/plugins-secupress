@@ -2,16 +2,22 @@
 /**
  * WP Async Request
  *
+ * Forked for SecuPress as SecuPress_Async_Request.
+ * Original library by Ashley Rich, maintained by Delicious Brains.
+ *
  * @package WP-Background-Processing
+ * @author Ashley Rich
+ * @author Delicious Brains
+ * @link https://github.com/deliciousbrains/wp-background-processing
+ * @license GPL-2.0-or-later
  */
-if ( ! class_exists( 'WP_Async_Request' ) ) :
 
 /**
- * Abstract WP_Async_Request class.
+ * Abstract SecuPress_Async_Request class.
  *
  * @abstract
  */
-abstract class WP_Async_Request {
+abstract class SecuPress_Async_Request {
 
 	/**
 	 * Prefix
@@ -201,5 +207,3 @@ abstract class WP_Async_Request {
 	 */
 	abstract protected function handle();
 }
-
-endif;

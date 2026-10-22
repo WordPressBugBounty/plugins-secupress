@@ -2,17 +2,23 @@
 /**
  * WP Background Process
  *
+ * Forked for SecuPress as SecuPress_Background_Process.
+ * Original library by Ashley Rich, maintained by Delicious Brains.
+ *
  * @package WP-Background-Processing
+ * @author Ashley Rich
+ * @author Delicious Brains
+ * @link https://github.com/deliciousbrains/wp-background-processing
+ * @license GPL-2.0-or-later
  */
-if ( ! class_exists( 'WP_Background_Process' ) ) :
 
 /**
- * Abstract WP_Background_Process class.
+ * Abstract SecuPress_Background_Process class.
  *
  * @abstract
- * @extends WP_Async_Request
+ * @extends SecuPress_Async_Request
  */
-abstract class WP_Background_Process extends WP_Async_Request {
+abstract class SecuPress_Background_Process extends SecuPress_Async_Request {
 	/**
 	 * The default query arg name used for passing the chain ID to new processes.
 	 */
@@ -997,5 +1003,3 @@ abstract class WP_Background_Process extends WP_Async_Request {
 		return $chain_id_arg_name;
 	}
 }
-
-endif;

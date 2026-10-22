@@ -683,9 +683,69 @@ function secupress_mail_html_headers( $headers ) {
 }
 
 /**
+ * PHP build date, read from phpinfo().
+ *
+ * @author Julio Potier
+ * @since 2.7.3
+ *
+ * @return (string) Ex. "Oct 21 2026 11:46:39", or an empty string.
+ **/
+function secupress_get_php_build_date() {
+	static $build_date = null;
+
+	if ( null !== $build_date ) {
+		return $build_date;
+	}
+
+	$build_date = '';
+
+	if ( ! function_exists( 'phpinfo' ) ) {
+		return $build_date;
+	}
+
+	ob_start();
+	phpinfo( INFO_GENERAL );
+	$raw = strip_tags( ob_get_clean() );
+
+	if ( preg_match( '/Build Date\s*(?:=>)?\s*([A-Za-z]{3}\s+\d{1,2}\s+\d{4}\s+\d{2}:\d{2}:\d{2})/', $raw, $matches ) ) {
+		$build_date = $matches[1];
+	}
+
+	return $build_date;
+}
+
+/**
+ * Tell if the PHP build date is known and older than October 21, 2026.
+ *
+ * @author Julio Potier
+ * @since 2.7.3
+ *
+ * @param $build_date (string|null) Date already read, or null to read it.
+ *
+ * @return (bool)
+ **/
+function secupress_is_php_build_outdated( $build_date = null ) {
+	if ( null === $build_date ) {
+		$build_date = secupress_get_php_build_date();
+	}
+
+	if ( '' === $build_date ) {
+		return false;
+	}
+
+	$build_timestamp = strtotime( $build_date );
+	if ( ! $build_timestamp ) {
+		return false;
+	}
+
+	return $build_timestamp < strtotime( '2026-10-21 00:00:00' );
+}
+
+/**
  * Return php versions needed for security
  *
  * @since 2.0
+ * @since 2.7.3 Includes build_date and build_outdated.
  * @author Julio Potier
  *
  * @see SecuPress_Scan_PhpVersion
@@ -744,11 +804,14 @@ function secupress_get_php_versions() {
 		$best = $get_version( $years_offset - 1 );
 	}
 
-	$versions = array(
-		'current' => $ver,
-		'mini'    => $mini,
-		'last'    => $last,
-		'best'    => $best,
+	$build_date = secupress_get_php_build_date();
+	$versions   = array(
+		'current'        => $ver,
+		'mini'           => $mini,
+		'last'           => $last,
+		'best'           => $best,
+		'build_date'     => $build_date,
+		'build_outdated' => secupress_is_php_build_outdated( $build_date ),
 	);
 
 	return $versions;

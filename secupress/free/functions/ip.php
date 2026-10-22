@@ -1041,6 +1041,7 @@ function secupress_ip_is_blacklisted( $ip = null ) {
  * • fedc:6482:cafe::/32 = from fedc:6482:cafe:0:0:0:0:0 to fedc:cafe:FFFF:ffff:ffff:ffff:ffff:ffff
  * • fedc:6482:cafe:* = from fedc:6482:cafe:0:0:0:0:0    to fedc:6482:FFFF:ffff:ffff:ffff:ffff:ffff
  *
+ * @since 2.7.2 Compare the full 128-bit IPv6 prefix.
  * @since 2.2.3 Use "continue" instad of "return" too soon.
  * @since 1.4.9
  * @author Julio Potier
@@ -1112,24 +1113,27 @@ function secupress_is_ip_in_range( $ip, $ips ) {
 			}
 			if ( strpos( $_ips, '/' ) ) {
 				list( $first_ip, $mask ) = explode( '/', $_ips, 2 );
-				if ($mask < 1 || $mask > 128) {
+				$mask = (int) $mask;
+				if ( $mask < 1 || $mask > 128 ) {
 					continue;
 				}
-				$bytesAddr = unpack( 'n*', @inet_pton( $first_ip ) );
-				$bytesTest = unpack( 'n*', @inet_pton( $ip ) );
-				if ( ! $bytesAddr || ! $bytesTest ) {
+				$range_bin = inet_pton( $first_ip );
+				$ip_bin    = inet_pton( $ip );
+				if ( false === $range_bin || false === $ip_bin ) {
 					continue;
 				}
-				for ( $i = 1, $ceil = ceil( $mask / 16 ); $i <= $ceil; ++$i ) {
-					$left = $mask - 16 * ( $i - 1 );
-					$left = ( $left <= 16 ) ? $left : 16;
-					$mask = ~ ( 0xffff >> $left ) & 0xffff;
-					if ( ( $bytesAddr[$i] & $mask ) != ( $bytesTest[$i] & $mask ) ) {
+				$full_bytes     = intdiv( $mask, 8 );
+				$remaining_bits = $mask % 8;
+				if ( $full_bytes > 0 && substr( $range_bin, 0, $full_bytes ) !== substr( $ip_bin, 0, $full_bytes ) ) {
+					continue;
+				}
+				if ( $remaining_bits > 0 ) {
+					$bitmask = ( 0xff << ( 8 - $remaining_bits ) ) & 0xff;
+					if ( ( ord( $range_bin[ $full_bytes ] ) & $bitmask ) !== ( ord( $ip_bin[ $full_bytes ] ) & $bitmask ) ) {
 						continue;
 					}
-					return true;
 				}
-				continue;
+				return true;
 			}
 			if ( strpos( $_ips, '*' ) ) {
 				$_ips     = str_replace( '*', '', $_ips );

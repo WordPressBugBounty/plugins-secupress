@@ -1663,10 +1663,13 @@ function secupress_system_widget_server_items() {
 		'hint'    => $https_hint,
 	];
 
-	$versions = secupress_get_php_versions();
+	$versions   = secupress_get_php_versions();
 	$php_status = '';
 	$php_hint   = '';
-	if ( version_compare( $versions['current'], $versions['mini'], '<' ) ) {
+	if ( ! empty( $versions['build_outdated'] ) ) {
+		$php_status = 'danger';
+		$php_hint   = sprintf( __( 'This PHP build dates from %1$s, before %2$s. Ask your host to upgrade PHP.', 'secupress' ), $versions['build_date'], date_i18n( 'F d, Y', strtotime( '2026-10-21' ) ) );
+	} elseif ( version_compare( $versions['current'], $versions['mini'], '<' ) ) {
 		$php_status = 'danger';
 		$php_hint   = sprintf( __( 'This PHP version is no longer supported. Ask your host to upgrade to PHP %s or later.', 'secupress' ), $versions['mini'] );
 	} elseif ( version_compare( $versions['current'], $versions['last'], '<' ) ) {

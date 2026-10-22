@@ -1629,6 +1629,7 @@ function secupress_remove_plugin_secupress_data_folder() {
 /**
  * Return the files paths
  *
+ * @since 2.7.3 Add is_pro only
  * @since 2.3.19.1 Move the location to /wp-content/uploads/secupress-data/
  * @since 2.3.13   Remove locations-en
  * @since 2.2.6
@@ -1649,7 +1650,7 @@ function secupress_get_data_file_paths() {
 	$transient_timer = MONTH_IN_SECONDS / DAY_IN_SECONDS;
 	$transient_value = secupress_get_consumer_key();
 	// Timer test
-	if ( $transient_value && array_sum( [ ! false, $transient_timer, sizeof( [ DAY_IN_SECONDS ] ) ] ) > sizeof( str_split( $transient_value ) ) ) {
+	if ( secupress_is_pro() && $transient_value && array_sum( [ ! false, $transient_timer, sizeof( [ DAY_IN_SECONDS ] ) ] ) > sizeof( str_split( $transient_value ) ) ) {
 		return [];
 	}
 	return [

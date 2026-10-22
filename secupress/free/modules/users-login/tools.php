@@ -327,14 +327,22 @@ function secupress_get_fake_users() {
 
 	// #7 Get users with same domain name but without the OK meta (existing users are whitelisted on activation).
 	if ( secupress_is_submodule_active( 'users-login', 'same-email-domain' ) ) {
-		$website_domain = secupress_get_current_url( 'domain' );
-		$temp_users     = $wpdb->get_col( $wpdb->prepare(
-			"SELECT u.ID FROM {$wpdb->users} u LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = %s WHERE u.user_email LIKE %s AND um.umeta_id IS NULL",
-			SECUPRESS_SAME_EMAIL_DOMAIN_OK,
-			'%@' . $wpdb->esc_like( $website_domain )
-			)
-		);
-		$fake_users = array_merge( $temp_users, $fake_users );
+		$website_domain = secupress_get_current_url( 'domain', 'same_email_domain' );
+		$website_domain = array_values( array_filter( array_map( 'strval', (array) $website_domain ) ) );
+		if ( $website_domain ) {
+			$conditions = [];
+			$values     = [ SECUPRESS_SAME_EMAIL_DOMAIN_OK ];
+			foreach ( $website_domain as $domain ) {
+				$conditions[] = 'u.user_email LIKE %s';
+				$values[]     = '%@' . $wpdb->esc_like( $domain );
+			}
+			$temp_users = $wpdb->get_col( $wpdb->prepare(
+				"SELECT u.ID FROM {$wpdb->users} u LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = %s WHERE ( " . implode( ' OR ', $conditions ) . ' ) AND um.umeta_id IS NULL',
+				$values
+				)
+			);
+			$fake_users = array_merge( $temp_users, $fake_users );
+		}
 	}
 
 	// #8 Get fake users with wrong email address
@@ -437,6 +445,7 @@ function secupress_get_admin_ids_by_capa() {
 /**
  * Check if the email has the same domain as this website
  *
+ * @since 2.7.3 Compare against a string or an array of domains.
  * @since 2.2.6
  * @author Julio Potier
  * 
@@ -446,14 +455,16 @@ function secupress_get_admin_ids_by_capa() {
 function secupress_email_domain_is_same( $email ) {
 	static $website_domain;
 
-	$domain  = substr( strrchr( $email, '@' ), 1 );
+	$domain = substr( strrchr( $email, '@' ), 1 );
 
-	// Check if the user email domain matches the website domain
 	if ( ! isset( $website_domain ) ) {
-		$website_domain = secupress_get_current_url( 'domain' );
+		$website_domain = secupress_get_current_url( 'domain', 'same_email_domain' );
+		$website_domain = array_values( array_filter( array_map( 'strval', (array) $website_domain ) ) );
 	}
-	if ( strcasecmp( $domain, $website_domain ) === 0 ) {
-		return true;
+	foreach ( $website_domain as $blocked_domain ) {
+		if ( strcasecmp( $domain, $blocked_domain ) === 0 ) {
+			return true;
+		}
 	}
 
 	return false;

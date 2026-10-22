@@ -17,40 +17,20 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 function secupress_firewall_settings_callback( $settings ) {
 	$modulenow = 'firewall';
 	$activate  = secupress_get_submodule_activations( $modulenow );
-	$settings  = $settings && is_array( $settings ) ? $settings : array();
-	$ng_off    = false;
-
-	if ( false !== $activate && secupress_is_pro() ) {
-		$posted_settings = array();
-		if ( isset( $_POST['secupress_firewall_settings'] ) && is_array( $_POST['secupress_firewall_settings'] ) ) { // WPCS: CSRF ok.
-			$posted_settings = wp_unslash( $_POST['secupress_firewall_settings'] );
-		}
-		if ( empty( $posted_settings['learning-mode_8g'] ) ) {
-			$ng_off = true;
-			$settings['learning-mode_8g'] = 0;
-			unset( $settings['learning-mode_last'] );
-			if ( function_exists( 'secupress_firewall_learning_deactivate' ) ) {
-				secupress_firewall_learning_deactivate();
-			}
-		}
-	}
+	$settings = $settings && is_array( $settings ) ? $settings : array();
 
 	if ( isset( $settings['sanitized'] ) ) {
 		return $settings;
 	}
 	$settings['sanitized'] = 1;
 
-	if ( $ng_off ) {
-		unset( $settings['learning-mode_last'] );
+	$old_last = (int) secupress_get_module_option( 'learning-mode_last', 0, $modulenow );
+	$new_last = isset( $settings['learning-mode_last'] ) ? (int) $settings['learning-mode_last'] : 0;
+	$keep     = max( $old_last, $new_last );
+	if ( $keep > 0 ) {
+		$settings['learning-mode_last'] = $keep;
 	} else {
-		$old_last = (int) secupress_get_module_option( 'learning-mode_last', 0, $modulenow );
-		$new_last = isset( $settings['learning-mode_last'] ) ? (int) $settings['learning-mode_last'] : 0;
-		$keep     = max( $old_last, $new_last );
-		if ( $keep > 0 ) {
-			$settings['learning-mode_last'] = $keep;
-		} else {
-			unset( $settings['learning-mode_last'] );
-		}
+		unset( $settings['learning-mode_last'] );
 	}
 
 	/*
@@ -100,10 +80,6 @@ function secupress_waf_settings_callback( $modulenow, &$settings, $activate ) {
 
 		if ( secupress_is_pro() ) {
 			$settings['learning-mode_8g'] = ! empty( $settings['learning-mode_8g'] ) ? 1 : 0;
-			if ( ! $settings['learning-mode_8g'] ) {
-				unset( $settings['learning-mode_last'] );
-				secupress_firewall_learning_deactivate();
-			}
 		} else {
 			$previous = get_site_option( 'secupress_firewall_settings', array() );
 			if ( is_array( $previous ) && array_key_exists( 'learning-mode_8g', $previous ) ) {

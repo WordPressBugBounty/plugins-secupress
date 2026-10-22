@@ -723,6 +723,109 @@ input[type="text"]:required:invalid {
 	border-left-color: #d63638;
 	color: #8a2424;
 }
+#secupress-learning-decisions-open.secupress-ghost.secupress-button {
+	background: transparent;
+	color: #26b3a9;
+	border: 1px solid #26b3a9;
+	box-shadow: none;
+}
+#secupress-learning-decisions-open.secupress-ghost.secupress-button:hover,
+#secupress-learning-decisions-open.secupress-ghost.secupress-button:focus {
+	background: transparent;
+	color: #1d2327;
+	border-color: #1d2327;
+}
+.secupress-learning-decisions[hidden] {
+	display: none !important;
+}
+.secupress-learning-decisions {
+	position: fixed;
+	z-index: 100000;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.45);
+}
+.secupress-learning-decisions-panel {
+	width: 560px;
+	max-width: calc(100% - 32px);
+	max-height: 70vh;
+	overflow: auto;
+	padding: 20px;
+	border-radius: 8px;
+	background: #fff;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+.secupress-learning-decisions-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+.secupress-learning-decisions-head h4 {
+	margin: 0;
+}
+.secupress-learning-decisions-close {
+	border: 0;
+	background: transparent;
+	color: #1d2327;
+	font-size: 24px;
+	line-height: 1;
+	cursor: pointer;
+}
+.secupress-learning-decision-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.secupress-learning-decision {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 0;
+	border-top: 1px solid #f0f0f1;
+}
+.secupress-learning-decision-word {
+	flex: 1;
+	min-width: 0;
+}
+.secupress-learning-decision-word code {
+	word-break: break-word;
+}
+.secupress-learning-decision-source {
+	color: #646970;
+	font-size: 12px;
+}
+.secupress-learning-decision-actions {
+	display: inline-flex;
+	gap: 6px;
+}
+.secupress-learning-decision-btn {
+	display: inline-block;
+	padding: 4px 10px;
+	border: 1px solid #c3c4c7;
+	border-radius: 999px;
+	background: #fff;
+	color: #1d2327;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-decoration: none;
+}
+.secupress-learning-decision-btn.is-allow.is-current {
+	border-color: #26b3a9;
+	background: #b3efe9;
+	color: #0d7a72;
+}
+.secupress-learning-decision-btn.is-block.is-current {
+	border-color: #cb234f;
+	background: #f2295e;
+	color: #fff;
+}
 .secupress-module-options-block .secupress-button-primary,
 .secupress-module-options-block .secupress-button-secondary,
 .secupress-module-options-block .secupress-button-tertiary,

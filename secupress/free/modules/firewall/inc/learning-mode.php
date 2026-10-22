@@ -858,6 +858,7 @@ function secupress_firewall_learning_exception_from_hit( $hash, $hit, $type, $ur
 		'slug'         => isset( $hit['slug'] ) ? $hit['slug'] : '',
 		'pattern_hash' => $pattern_hash,
 		'match_key'    => $match_key,
+		'match'        => isset( $hit['match'] ) ? secupress_firewall_learning_match_sample( $hit['match'] ) : '',
 	];
 }
 
@@ -1503,30 +1504,104 @@ function secupress_firewall_learning_clear_schedule() {
 }
 
 /**
- * Stop Learning Mode because the 8G pack was turned off.
- * Pending signatures are discarded. Nothing is blocked.
+ * Unchecking 8G or a firewall filter keeps Learning Mode data.
  *
  * @since 2.7.1
  * @author Julio Potier
  */
-function secupress_firewall_learning_deactivate() {
-	secupress_cache_data( 'firewall_learning_stopped', 1 );
-	secupress_firewall_learning_clear_schedule();
-	delete_site_transient( 'secupress_firewall_learning_ended_notice' );
-	secupress_firewall_learning_set_hits( [] );
-	$state = get_site_option( SECUPRESS_FIREWALL_LEARNING, [] );
-	if ( ! is_array( $state ) ) {
-		$state = [];
+function secupress_firewall_learning_deactivate() {}
+
+/**
+ * Decisions already stored, with the word kept on the exception.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @return (array)
+ */
+function secupress_firewall_learning_decision_rows() {
+	$exceptions = secupress_firewall_learning_get_exceptions();
+	$hits       = secupress_firewall_learning_get_hits();
+	$rows       = [];
+	$dirty      = false;
+
+	foreach ( $exceptions as $hash => $exception ) {
+		if ( ! is_array( $exception ) ) {
+			continue;
+		}
+		$type = isset( $exception['type'] ) ? $exception['type'] : '';
+		if ( ! in_array( $type, [ 'allow_site', 'allow_uri', 'auto_allowed', 'force_enforce' ], true ) ) {
+			continue;
+		}
+		$match = isset( $exception['match'] ) ? (string) $exception['match'] : '';
+		if ( '' === $match && ! empty( $hits[ $hash ]['match'] ) ) {
+			$match = secupress_firewall_learning_match_sample( $hits[ $hash ]['match'] );
+			$exceptions[ $hash ]['match'] = $match;
+			$dirty = true;
+		}
+		$slug = isset( $exception['slug'] ) ? (string) $exception['slug'] : '';
+		if ( '' === $slug && ! empty( $hits[ $hash ]['slug'] ) ) {
+			$slug = (string) $hits[ $hash ]['slug'];
+			$exceptions[ $hash ]['slug'] = $slug;
+			$dirty = true;
+		}
+		$rows[ $hash ] = [
+			'match'   => $match,
+			'slug'    => $slug,
+			'allowed' => 'force_enforce' !== $type,
+		];
 	}
-	$state['status']         = 'off';
-	$state['started']        = 0;
-	$state['ends']           = 0;
-	$state['requests_front'] = 0;
-	$state['requests_admin'] = 0;
-	secupress_firewall_learning_set_state( $state );
-	if ( function_exists( 'secupress_reinit_notice' ) ) {
-		secupress_reinit_notice( 'firewall-learning-mode-intro' );
+
+	if ( $dirty ) {
+		secupress_firewall_learning_set_exceptions( $exceptions );
 	}
+
+	uasort( $rows, function( $first, $second ) {
+		return strcasecmp( $first['match'], $second['match'] );
+	} );
+
+	return $rows;
+}
+
+/**
+ * Switch a stored decision between allow and block.
+ *
+ * @since 2.7.3
+ * @author Julio Potier
+ *
+ * @param (string) $hash
+ * @param (string) $decision `allow_site` or `force_enforce`.
+ *
+ * @return (bool)
+ */
+function secupress_firewall_learning_switch_decision( $hash, $decision ) {
+	$hash = sanitize_key( $hash );
+	if ( 32 !== strlen( $hash ) ) {
+		return false;
+	}
+	if ( ! in_array( $decision, [ 'allow_site', 'force_enforce' ], true ) ) {
+		return false;
+	}
+
+	$exceptions = secupress_firewall_learning_get_exceptions();
+	if ( empty( $exceptions[ $hash ] ) || ! is_array( $exceptions[ $hash ] ) ) {
+		return false;
+	}
+
+	$exceptions[ $hash ]['type'] = $decision;
+	if ( 'force_enforce' === $decision ) {
+		$exceptions[ $hash ]['uris'] = [];
+	}
+	secupress_firewall_learning_set_exceptions( $exceptions );
+
+	$hits = secupress_firewall_learning_get_hits();
+	if ( isset( $hits[ $hash ] ) && is_array( $hits[ $hash ] ) ) {
+		$hits[ $hash ]['decision'] = $decision;
+		secupress_firewall_learning_set_hits( $hits );
+		secupress_firewall_learning_get_state();
+	}
+
+	return true;
 }
 
 /**

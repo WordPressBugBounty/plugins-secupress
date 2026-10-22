@@ -264,12 +264,16 @@ function secupress_block_bad_content_but_what( $function, $server, $block_id ) {
 		if ( is_array( $bad_contents ) ) {
 			$bad_contents = implode( ',', $bad_contents );
 		}
-		$bad_contents = preg_replace( '/\s*,\s*/', '|', preg_quote( $bad_contents, '/' ) );
-		$bad_contents = trim( $bad_contents, '| ' );
-
-		while ( false !== strpos( $bad_contents, '||' ) ) {
-			$bad_contents = str_replace( '||', '|', $bad_contents );
+		$parts  = explode( ',', $bad_contents );
+		$quoted = [];
+		foreach ( $parts as $part ) {
+			$part = trim( $part, " \t" );
+			if ( '' === $part ) {
+				continue;
+			}
+			$quoted[] = preg_quote( $part, '/' );
 		}
+		$bad_contents = implode( '|', $quoted );
 
 		preg_match( '/' . $bad_contents . '/i', $check_value, $matches );
 		if ( ! empty( $check_value ) && $bad_contents && ! empty( $matches ) ) {
