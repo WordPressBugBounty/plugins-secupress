@@ -135,6 +135,18 @@ function secupress_bad_contents_settings_callback( $modulenow, &$settings, $acti
 	if ( false !== $activate ) {
 		secupress_manage_submodule( $modulenow, 'ban-404-php', ! empty( $activate['bbq-url-content_ban-404-php'] ) );
 	}
+
+	if ( secupress_is_expert_mode() ) {
+		$settings['bbq-url-content_404-max-visitors'] = ! empty( $settings['bbq-url-content_404-max-visitors'] ) ? (int) secupress_validate_range( $settings['bbq-url-content_404-max-visitors'], 5, 300, 60 ) : 60;
+		$settings['bbq-url-content_404-max-robots']   = ! empty( $settings['bbq-url-content_404-max-robots'] ) ? (int) secupress_validate_range( $settings['bbq-url-content_404-max-robots'], 5, 300, 120 ) : 120;
+		$settings['bbq-url-content_404-ban-time']     = ! empty( $settings['bbq-url-content_404-ban-time'] ) ? (int) secupress_validate_range( $settings['bbq-url-content_404-ban-time'], 1, 60, 5 ) : 5;
+	} else {
+		$settings['bbq-url-content_404-max-visitors'] = (int) secupress_get_module_option( 'bbq-url-content_404-max-visitors', 60, 'firewall' );
+		$settings['bbq-url-content_404-max-robots']   = (int) secupress_get_module_option( 'bbq-url-content_404-max-robots', 120, 'firewall' );
+		$settings['bbq-url-content_404-ban-time']     = (int) secupress_get_module_option( 'bbq-url-content_404-ban-time', 5, 'firewall' );
+	}
+
+	$settings['bbq-url-content_404-skip-google'] = ! empty( $settings['bbq-url-content_404-skip-google'] ) ? 1 : 0;
 	// Settings.
 	// if ( ! empty( $settings['bbq-url-content_bad-contents-list'] ) ) {
 		// // Do not sanitize the value or the sky will fall.
@@ -165,8 +177,12 @@ function secupress_install_firewall_module( $module ) {
 	if ( 'all' === $module || 'firewall' === $module ) {
 		$previous = get_site_option( 'secupress_firewall_settings', array() );
 		$settings = array(
-			'bbq-headers_user-agents-list'      => secupress_firewall_bbq_headers_user_agents_list_default(),
-			'bbq-url-content_bad-contents-list' => secupress_firewall_bbq_url_content_bad_contents_list_default(),
+			'bbq-headers_user-agents-list'        => secupress_firewall_bbq_headers_user_agents_list_default(),
+			'bbq-url-content_bad-contents-list'   => secupress_firewall_bbq_url_content_bad_contents_list_default(),
+			'bbq-url-content_404-max-visitors'    => 60,
+			'bbq-url-content_404-max-robots'      => 120,
+			'bbq-url-content_404-ban-time'        => 5,
+			'bbq-url-content_404-skip-google'     => 1,
 		);
 		if ( ! empty( $previous['learning-mode_last'] ) ) {
 			$settings['learning-mode_last'] = (int) $previous['learning-mode_last'];

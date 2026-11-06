@@ -22,6 +22,7 @@ function secupress_admin_bar_css() {
 
 	$css  = '#wpadminbar .secupress-new-notice a,#wpadminbar .secupress-new-notice .ab-item,#wpadminbar .secupress-new-item{color:#F1C40F!important;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-weight:600}';
 	$css .= '#wpadminbar .secupress-tour-count,#adminmenu .secupress-tour-count{display:inline-block;min-width:18px;height:18px;margin:0 0 0 6px;padding:0 6px;border-radius:9px;background:#F7AB13;color:#fff!important;font-size:11px;line-height:18px;font-weight:600;text-align:center;vertical-align:middle;text-shadow:none}';
+	$css .= '#wpadminbar #wp-admin-bar-secupress .ab-sub-wrapper .ab-icon.svg-icon,#wpadminbar #wp-admin-bar-secupress .ab-sub-wrapper .ab-icon.svg-icon svg{width:17px;height:17px}';
 
 	if ( secupress_is_security_paused() ) {
 		$css .= '#wpadminbar #wp-admin-bar-secupress.secupress-security-paused>.ab-item{background:#F2295E;color:#fff}#wpadminbar #wp-admin-bar-secupress-resume-security .ab-item{color:#F2295E!important;font-weight:600}';
@@ -127,7 +128,7 @@ function secupress_admin_bar( $wp_admin_bar ) {
 	$modules   = secupress_get_modules();
 	$dismissed = array_filter( explode( ',', (string) get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ) ) );
 	foreach ( $modules as $module_slug => $module ) {
-		$wp_admin_bar->add_menu( array(
+		$module_node = array(
 			'parent' => 'secupress-modules',
 			'id' 	 => 'secupress-modules-' . $module_slug,
 			'title'  => '<span class="ab-icon dashicons dashicons-' . $module['dashicon'] . '" style="font-size: 17px"></span>' . $module['title'],
@@ -136,7 +137,12 @@ function secupress_admin_bar( $wp_admin_bar ) {
 						esc_url( $module['href'] ),
 			'meta'   => [ 'class'  => ! isset( $module['mark_as_pro'] ) || ! $module['mark_as_pro'] || secupress_is_pro() ? '' : 'secupress-pro-notice',
 						'target' => ! isset( $module['href'] ) ? '' : '_blank', ]
-		) );
+		);
+		$module_icon = secupress_get_icon_name( 'dashicons-' . $module['dashicon'] );
+		if ( $module_icon ) {
+			$module_node['icon'] = $module_icon;
+		}
+		$wp_admin_bar->add_menu( $module_node );
 
 		if ( empty( $module['submodules'] ) ) {
 			continue;
@@ -207,13 +213,18 @@ function secupress_admin_bar( $wp_admin_bar ) {
 	}
 
 	if ( ! secupress_is_pro() ) {
-		$wp_admin_bar->add_menu( array(
+		$pro_node = array(
 			'parent' => 'secupress',
 			'id'     => 'secupress-modules-get-pro',
 			'title'  => '<span class="ab-icon dashicons dashicons-star-filled" style="font-size: 17px"></span>' . $title,
 			'href'   => $href,
 			'meta'   => [ 'class'  => 'secupress-pro-notice',
 						'target' => $target, ],
-		) );
+		);
+		$pro_icon = secupress_get_icon_name( 'dashicons-star-filled' );
+		if ( $pro_icon ) {
+			$pro_node['icon'] = $pro_icon;
+		}
+		$wp_admin_bar->add_menu( $pro_node );
 	}
 }

@@ -211,10 +211,9 @@ class SecuPress_Scan_Bad_File_Extensions extends SecuPress_Scan implements SecuP
 	 */
 	public function manual_fix() {
 		if ( $this->has_fix_action_part( 'fix' ) ) {
-			$this->fix();
+			return $this->fix();
 		}
-		// "good"
-		$this->add_fix_message( 1 );
+
 		return parent::manual_fix();
 	}
 

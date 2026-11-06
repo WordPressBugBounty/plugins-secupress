@@ -9,11 +9,6 @@
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
 
-// EMERGENCY BYPASS!
-if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS ) {
-	return;
-}
-
 $req_wp_ver  = '6.8'; // 6.8 because of encapsulated wp dev
 $is_wp_ok    = secupress_wp_version_is( $req_wp_ver );
 if ( ! $is_wp_ok ) {
@@ -22,6 +17,11 @@ if ( ! $is_wp_ok ) {
 
 if ( secupress_is_pro() ) {
 	require( SECUPRESS_PRO_MODULES_PATH . 'users-login/plugins/force-strong-encryption-pro.php' );
+}
+
+// EMERGENCY BYPASS!
+if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS ) {
+	return;
 }
 
 /** --------------------------------------------------------------------------------------------- */
@@ -77,7 +77,7 @@ function secupress_force_strong_encryption_get_best_encryption_system_notice() {
 			'<a href="' . secupress_admin_url( 'modules', 'users-login#row-double-auth_force-strong-encryption' ) . '">',
 			'</a>'
 		);
-		secupress_add_notice( $message, 'error', false );
+		secupress_add_notice( $message, 'error', false, null, 'password encryption method' );
 	}
 }
 
@@ -109,7 +109,7 @@ function secupress_force_strong_encryption_algo() {
 			'<a href="' . secupress_admin_url( 'modules', 'users-login#row-double-auth_force-strong-encryption' ) . '">',
 			'</a>'
 		);
-		secupress_add_notice( $message, 'error', false );
+		secupress_add_notice( $message, 'error', false, null, 'password encryption method' );
 	}
 	return $algo;
 }

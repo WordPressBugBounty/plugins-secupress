@@ -4,7 +4,7 @@ Tags: security, malware, scanner, ssl, scan
 Requires at least: 5.5
 Tested up to: 7.1.3
 Requires PHP: 7.3
-Stable tag: 2.7.3
+Stable tag: 2.7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -185,17 +185,28 @@ The answer is no. SecuPress is not compatible with another security plugin. Just
 
 == Changelog ==
 
-= 2.7.3 =
-* 22 Oct 2026
-* Critical: PHP Version scanner treats a known PHP build older than October 21, 2026 as critical and can re-run silently when that date is detected.
-* Critical: UpdraftCentral backdoor check better detects compromised administrator accounts and links to affected users when possible.
-* New: Firewall Learning Mode can list decided words and switch them between allow and block.
-* New: Stop User Enumeration also blocks the core users REST route and author sitemaps (WordPress, Yoast SEO, Rank Math, All in One SEO).
-* New: User Creation Protection (Pro) adds a "Content from Fake Accounts" admin view, highlights related rows, and shows a front banner to editors when fake-account content would be hidden.
-* Improvement: Limit Login Attempts also counts failed XML-RPC logins.
-* Improvement: Background async processes are forked correctly between Free and Pro builds, to fix (again) a possible fatal error “Call to undefined method ::is_queued()” if WooCommerce loads an older async lib (file monitoring, bad plugins, bad themes).
-* Fix: IPv6 validation was too permissive.
-* Fix: Firewall rules were not always read correctly from the rules data.
+= 2.7.4 =
+* 6 Nov 2026
+* New: The `secupress.notices.display` filter can hide an admin notice. Its context is two or three words taken from the message.
+* New: Block scans for hidden content counts every 404 for one minute, then refuses further missing pages (HTTP 429). Missing PHP files stay blocked.
+* Improvement: PasswordLess always affects the Administrator role. The checkbox stays checked and cannot be unchecked. 
+* Improvement: You can now fix legitimate "fake accounts" if needed.
+* Improvement: Anti-spam checks a disallowed-terms file (more than 20,000 words) in addition to the WordPress comment list, and obfuscates only visible email addresses and mailto links.
+* Improvement: The anti-spam disallowed-terms check is about 100 times faster: a few milliseconds per comment instead of about 200 ms.
+* Improvement: Forbid Same Email Domain also blocks a profile email change and a users REST update. Accounts that already use the site domain stay allowed.
+* Improvement: A disallowed username that contains a wildcard now blocks a new account, including registration and the REST API. An existing account can still be updated.
+* Improvement: Limit Login Attempts counts an unknown identifier even when user enumeration protection is off, and counts each failed XML-RPC authentication in the same request.
+* Improvement: Limit Login Attempts stores each unknown identifier on its own, for one month after its last failure. The shared list no longer grows forever and parallel attempts are no longer lost.
+* Improvement: A single banned IP is stored on its own, with an expiry that does not follow a later change of the ban length. IP ranges stay in the shared list. An IPv4 address written as IPv6 is treated as IPv4.
+* Improvement: SECUPRESS_ALLOW_LOGIN_ACCESS also skips Limit Login Attempts, Password Spraying, and Protect User Creation, so a fake user can log in while the constant is set. An admin notice stays visible until it is removed.
+* Fix: A verified-bot hostname is remembered, so a visit does not repeat the DNS lookup.
+* Fix: A request that claims to come from a SecuPress scan now carries a signature made with the master key.
+* Fix: A line break in a log or a 404 address can no longer forge an extra log line.
+* Fix: Firewall checks on the referer, the host, and the request method use the whole value. A list of request keys is read correctly on PHP 8.
+* Fix: A ban that must stop the request now really stops it (HTTP 403) and logs the attack, for example during an XML-RPC multicall or a password spraying attempt.
+* Fix: Move Login keeps the password-reset confirmation (checkemail=confirm) and the registration confirmation (checkemail=registered) on the custom login URL.
+* Fix: Block Bad User Agents, without the 8G signatures, refuses a user agent that contains HTML (HTTP 403). The bad user agent scan sees that block and no longer stays on a bad status. 
+* Fix: The system status widget uses less memory.
 
 == Upgrade Notice ==
 * SecuPress 2.7+ now requires WP 5.5 minimum.
@@ -214,3 +225,9 @@ give possibility to rename logins
 target="_blank" on doc links
 AI Scanner
 Improve malware scanner, again, always!
+OLD 2.8 RDM
+New: HTTP Logs, reads the docs!
+New: Session Hijacking Protection under GeoIP Login
+Improvement: New page and menu entry dedicated for Malware Scanner
+Improvement: Add the possibility to refuse distant calls (but features link to those calls won't be available)
+Improvement: Malware Database Scanner performances has been improved to reduce time and memory consumption

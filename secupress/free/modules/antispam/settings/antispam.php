@@ -81,6 +81,8 @@ $this->add_field( array(
 ) );
 
 
+$disallowed_terms_file = secupress_get_disallowed_terms_file();
+
 $this->add_field( array(
 	'title'        => __( 'Improve the WordPress comments disallowed terms', 'secupress' ),
 	'description'  => __( 'You can improve the list of bad words that will flag comments as spam.', 'secupress' ),
@@ -88,7 +90,7 @@ $this->add_field( array(
 	'label_for'    => $this->get_field_name( 'better-blacklist-comment' ),
 	'type'         => 'checkbox',
 	'label'        => __( 'Yes, implement enhanced comment filtering with disallowed terms to detect spam', 'secupress' ),
-	'disabled'     => ! secupress_get_data_path( 'spam-disallowed-terms' ),
+	'disabled'     => ! $disallowed_terms_file,
 	'helpers' => array(
 		array(
 			'type'        => 'description',
@@ -96,7 +98,7 @@ $this->add_field( array(
 		),
 		array(
 			'type'        => 'warning',
-			'description' => ! secupress_get_data_path( 'spam-disallowed-terms' ) ? sprintf( __( 'As long as the %s file is not readable, this feature can’t be used.', 'secupress' ), '<code>' . SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data</code>' ) : null,
+			'description' => ! $disallowed_terms_file ? sprintf( __( 'As long as the %s file is not readable, this feature can’t be used.', 'secupress' ), '<code>' . SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data</code>' ) : null,
 		),
 	),
 ) );

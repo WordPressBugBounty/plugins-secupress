@@ -1105,7 +1105,7 @@ abstract class SecuPress_Scan extends SecuPress_Singleton implements SecuPress_S
 			'user-agent'  => SECUPRESS_PLUGIN_NAME . '/' . SECUPRESS_VERSION,
 			'cookies'     => $_COOKIE,
 			'headers'     => array(
-				'X-SecuPress-Origin' => $class_name,
+				'X-SecuPress-Origin' => secupress_get_scan_origin_header( $class_name ),
 			),
 		);
 		/**

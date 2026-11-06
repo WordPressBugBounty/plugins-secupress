@@ -187,7 +187,8 @@ function secupress_get_attacks_daily_totals( $type = 'all' ) {
 		if ( 'all' === $attack_type || ! is_array( $data ) ) {
 			continue;
 		}
-		if ( 'all' !== $type && $attack_type !== $type ) {
+		// A numeric type such as "404" is stored as an int key. Compare the strings.
+		if ( 'all' !== $type && (string) $attack_type !== (string) $type ) {
 			continue;
 		}
 		foreach ( $data as $date_key => $value ) {
@@ -1182,6 +1183,8 @@ function secupress_attacks_widget_type_icon( $type ) {
 		'passwordspraying'    => 'dashicons-privacy',
 		'users'               => 'dashicons-groups',
 		'bad_robots'          => 'dashicons-admin-generic',
+		'404'                 => 'dashicons-dismiss',
+		'php404'              => 'dashicons-media-code',
 		'bad_request_content' => 'dashicons-warning',
 		'honeypot'            => 'dashicons-visibility',
 		'option'              => 'dashicons-admin-settings',
@@ -1214,6 +1217,8 @@ function secupress_attacks_widget_type_description( $type ) {
 		'passwordspraying'    => __( 'The same password tried against too many accounts.', 'secupress' ),
 		'users'               => __( 'Attempts to list, create, or change user accounts outside the allowed rules.', 'secupress' ),
 		'bad_robots'          => __( 'Bots that opened a hidden trap link.', 'secupress' ),
+		'404'                 => __( 'Too many pages not found, from the same IP, in one minute.', 'secupress' ),
+		'php404'              => __( 'Requests for a PHP file that does not exist.', 'secupress' ),
 		'bad_request_content' => __( 'Requests that contain malicious data, such as an injection attempt.', 'secupress' ),
 		'honeypot'            => __( 'Forms submitted to a trap that only an attacker would fill in.', 'secupress' ),
 		'option'              => __( 'Attempts to read a WordPress option known as malware.', 'secupress' ),
@@ -1253,6 +1258,8 @@ function secupress_attacks_widget_type_rows( $range ) {
 		'passwordspraying',
 		'users',
 		'bad_robots',
+		'404',
+		'php404',
 		'bad_request_content',
 		'honeypot',
 		'option',
@@ -1404,7 +1411,7 @@ function secupress_attacks_render_dashboard_widget( $attacks = null ) {
 			}
 			echo '<div class="' . esc_attr( $classes ) . '" data-type="' . esc_attr( $row['type'] ) . '">';
 			echo '<span class="secupress-attack-row-label" tabindex="0" aria-describedby="secupress-attack-tip-' . esc_attr( $row['type'] ) . '">';
-			echo '<span class="secupress-attack-row-icon dashicons ' . esc_attr( $row['icon'] ) . '" aria-hidden="true"></span>';
+			echo '<span class="secupress-attack-row-icon">' . secupress_get_icon( $row['icon'], [ 'size' => 16 ] ) . '</span>';
 			echo '<span class="secupress-attack-row-title">' . esc_html( $row['title'] ) . '</span>';
 			if ( $row['description'] ) {
 				echo '<span class="secupress-attack-row-tip" id="secupress-attack-tip-' . esc_attr( $row['type'] ) . '" role="tooltip">' . esc_html( $row['description'] ) . '</span>';
@@ -1479,8 +1486,9 @@ function secupress_system_widget_wordpress_items() {
 		$outdated = true;
 	}
 	$items[] = [
-		'icon'    => 'dashicons-wordpress', //// "core/wordpress" in WP 7.2
-		'label'   => 'WordPress',
+		'icon'     => 'core/wordpress',
+		'dashicon' => 'dashicons-wordpress',
+		'label'    => 'WordPress',
 		'value'   => $outdated
 			? sprintf( __( '%s — not up to date', 'secupress' ), $wp_version )
 			: sprintf( __( '%s — up to date', 'secupress' ), $wp_version ),
@@ -1517,8 +1525,9 @@ function secupress_system_widget_wordpress_items() {
 		) . ')';
 	}
 	$items[] = [
-		'icon'    => 'dashicons-admin-appearance', //// "core/appearance" in WP 7.2
-		'label'   => __( 'Theme', 'secupress' ),
+		'icon'     => 'core/brush',
+		'dashicon' => 'dashicons-admin-appearance',
+		'label'    => __( 'Theme', 'secupress' ),
 		'value'   => $theme_value,
 		'status'  => $theme_outdated ? 'warning' : '',
 		'tooltip' => [],
@@ -1546,8 +1555,9 @@ function secupress_system_widget_wordpress_items() {
 		) . ')';
 	}
 	$items[] = [
-		'icon'    => 'dashicons-admin-plugins', //// "core/plugins" in WP 7.2
-		'label'   => __( 'Plugins', 'secupress' ),
+		'icon'     => 'core/plugins',
+		'dashicon' => 'dashicons-admin-plugins',
+		'label'    => __( 'Plugins', 'secupress' ),
 		'value'   => $plugins_value,
 		'status'  => $plugins_update ? 'warning' : '',
 		'tooltip' => [],
@@ -1562,8 +1572,9 @@ function secupress_system_widget_wordpress_items() {
 		'production'  => __( 'Production', 'secupress' ),
 	];
 	$items[] = [
-		'icon'    => 'core/map-marker',
-		'label'   => __( 'Environment', 'secupress' ),
+		'icon'     => 'core/map-marker',
+		'dashicon' => 'dashicons-location',
+		'label'    => __( 'Environment', 'secupress' ),
 		'value'   => isset( $env_labels[ $env ] ) ? $env_labels[ $env ] : $env,
 		'status'  => '',
 		'tooltip' => [],
@@ -1593,8 +1604,9 @@ function secupress_system_widget_wordpress_items() {
 		$debug_hint   = __( 'debug.log is enabled in production and may be publicly downloadable. Disable WP_DEBUG_LOG in wp-config.php.', 'secupress' );
 	}
 	$items[] = [
-		'icon'    => 'core/tip',
-		'label'   => __( 'Debug', 'secupress' ),
+		'icon'     => 'core/tip',
+		'dashicon' => 'dashicons-lightbulb',
+		'label'    => __( 'Debug', 'secupress' ),
 		'value'   => $debug_value,
 		'status'  => $debug_status,
 		'tooltip' => [],
@@ -1612,8 +1624,9 @@ function secupress_system_widget_wordpress_items() {
 		$index_hint   = __( 'Search engines can index this non-production site. Discourage indexing in Settings → Reading.', 'secupress' );
 	}
 	$items[] = [
-		'icon'    => 'core/search',
-		'label'   => __( 'Search engines', 'secupress' ),
+		'icon'     => 'core/search',
+		'dashicon' => 'dashicons-search',
+		'label'    => __( 'Search engines', 'secupress' ),
 		'value'   => $blog_public ? _x( 'Indexed', 'website', 'secupress' ) : __( 'Indexing discouraged', 'secupress' ),
 		'status'  => $index_status,
 		'tooltip' => [],
@@ -1622,8 +1635,9 @@ function secupress_system_widget_wordpress_items() {
 
 	$can_register = secupress_users_can_register();
 	$items[] = [
-		'icon'    => 'dashicons-id',
-		'label'   => __( 'Registrations', 'secupress' ),
+		'icon'     => 'dashicons-id',
+		'dashicon' => 'dashicons-id',
+		'label'    => __( 'Registrations', 'secupress' ),
 		'value'   => $can_register ? _x( 'Open', 'registrations', 'secupress' ) : _x( 'Closed', 'registrations', 'secupress' ),
 		'status'  => '',
 		'tooltip' => [],
@@ -1655,8 +1669,9 @@ function secupress_system_widget_server_items() {
 			: __( 'HTTPS is off. Use HTTPS even on local or staging when possible.', 'secupress' );
 	}
 	$items[] = [
-		'icon'    => 'core/key',
-		'label'   => 'HTTPS',
+		'icon'     => 'core/key',
+		'dashicon' => 'dashicons-lock',
+		'label'    => 'HTTPS',
 		'value'   => $is_https ? __( 'On', 'secupress' ) : __( 'Off', 'secupress' ),
 		'status'  => $https_status,
 		'tooltip' => [],
@@ -1677,8 +1692,9 @@ function secupress_system_widget_server_items() {
 		$php_hint   = sprintf( __( 'This PHP version only receives security updates. PHP %s is recommended.', 'secupress' ), $versions['best'] );
 	}
 	$items[] = [
-		'icon'    => 'core/symbol',
-		'label'   => 'PHP',
+		'icon'     => 'core/symbol',
+		'dashicon' => 'dashicons-editor-code',
+		'label'    => 'PHP',
 		'value'   => phpversion(),
 		'status'  => $php_status,
 		'tooltip' => [],
@@ -1697,8 +1713,9 @@ function secupress_system_widget_server_items() {
 		$server = _x( 'Unknown', 'web server', 'secupress' );
 	}
 	$items[] = [
-		'icon'    => 'core/desktop',
-		'label'   => __( 'Web server', 'secupress' ),
+		'icon'     => 'core/desktop',
+		'dashicon' => 'dashicons-desktop',
+		'label'    => __( 'Web server', 'secupress' ),
 		'value'   => $server,
 		'status'  => '',
 		'tooltip' => [],
@@ -1706,8 +1723,9 @@ function secupress_system_widget_server_items() {
 
 	$has_robots = file_exists( ABSPATH . 'robots.txt' );
 	$items[] = [
-		'icon'    => 'dashicons-media-text',
-		'label'   => __( 'Physical robots.txt', 'secupress' ),
+		'icon'     => 'core/file',
+		'dashicon' => 'dashicons-media-text',
+		'label'    => __( 'Physical robots.txt', 'secupress' ),
 		'value'   => $has_robots ? _x( 'Present', 'file', 'secupress' ) : _x( 'None', 'file', 'secupress' ),
 		'status'  => '',
 		'tooltip' => [],
@@ -1719,8 +1737,9 @@ function secupress_system_widget_server_items() {
 		$ht_file = $home_path . '.htaccess';
 		$exists  = $filesystem ? $filesystem->exists( $ht_file ) : file_exists( $ht_file );
 		$items[] = [
-			'icon'    => 'core/file',
-			'label'   => '.htaccess',
+			'icon'     => 'core/file',
+			'dashicon' => 'dashicons-media-code',
+			'label'    => '.htaccess',
 			'value'   => $exists ? _x( 'Present', 'file', 'secupress' ) : _x( 'Missing', 'file', 'secupress' ),
 			'status'  => $exists ? '' : 'danger',
 			'tooltip' => [],
@@ -1730,8 +1749,9 @@ function secupress_system_widget_server_items() {
 		$ht_file = $home_path . 'web.config';
 		$exists  = $filesystem ? $filesystem->exists( $ht_file ) : file_exists( $ht_file );
 		$items[] = [
-			'icon'    => 'core/file',
-			'label'   => 'web.config',
+			'icon'     => 'core/file',
+			'dashicon' => 'dashicons-media-code',
+			'label'    => 'web.config',
 			'value'   => $exists ? _x( 'Present', 'file', 'secupress' ) : _x( 'Missing', 'file', 'secupress' ),
 			'status'  => $exists ? '' : 'danger',
 			'tooltip' => [],
@@ -1792,7 +1812,7 @@ function secupress_system_widget_firewall_row_status( $state ) {
  *
  * @return (array)
  **/
-function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.2/7.3
+function secupress_system_widget_secupress_items() {
 	$items = [];
 
 	$modules_count = secupress_count_active_submodules();
@@ -1822,8 +1842,9 @@ function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.
 		$secupress_hint   = '';
 	}
 	$items[] = [
-		'icon'    => 'core/settings',
-		'label'   => SECUPRESS_PLUGIN_NAME,
+		'icon'     => 'core/settings',
+		'dashicon' => 'dashicons-admin-settings',
+		'label'    => SECUPRESS_PLUGIN_NAME,
 		'value'   => $modules_text,
 		'status'  => $secupress_status,
 		'tooltip' => secupress_get_active_submodule_labels(),
@@ -1833,8 +1854,9 @@ function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.
 	$firewall        = secupress_attacks_widget_firewall_status();
 	$firewall_status = secupress_system_widget_firewall_row_status( $firewall['state'] );
 	$items[] = [
-		'icon'    => 'core/shield',
-		'label'   => sprintf( __( '%s Firewall', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
+		'icon'     => 'core/shield',
+		'dashicon' => 'dashicons-shield-alt',
+		'label'    => sprintf( __( '%s Firewall', 'secupress' ), SECUPRESS_PLUGIN_NAME ),
 		'value'   => $firewall['label'],
 		'status'  => $firewall_status,
 		'tooltip' => [],
@@ -1842,8 +1864,9 @@ function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.
 
 	if ( secupress_is_security_paused() ) {
 		$items[] = [
-			'icon'    => 'core/caution',
-			'label'   => __( 'Security', 'secupress' ),
+			'icon'     => 'core/caution',
+			'dashicon' => 'dashicons-warning',
+			'label'    => __( 'Security', 'secupress' ),
 			'value'   => __( 'Paused', 'secupress' ),
 			'status'  => 'danger',
 			'tooltip' => [],
@@ -1865,24 +1888,19 @@ function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.
 		$scan_value = $last_report;
 	}
 	$items[] = [
-		'icon'    => 'secupress-icon-radar',
-		'label'   => __( 'Last scan', 'secupress' ),
+		'icon'     => 'secupress-icon-radar',
+		'dashicon' => 'dashicons-search',
+		'label'    => __( 'Last scan', 'secupress' ),
 		'value'   => $scan_value,
 		'status'  => '',
 		'tooltip' => [],
 	];
 
-	$connected = 0;
-	$cached    = get_site_transient( 'secupress_system_connected_users' );
-	if ( false !== $cached ) {
-		$connected = (int) $cached;
-	} elseif ( function_exists( 'secupress_get_connected_user_ids' ) ) {
-		$connected = count( secupress_get_connected_user_ids() );
-		set_site_transient( 'secupress_system_connected_users', $connected, MINUTE_IN_SECONDS );
-	}
+	$connected = function_exists( 'secupress_count_connected_users' ) ? secupress_count_connected_users() : 0;
 	$items[] = [
-		'icon'    => 'core/people',
-		'label'   => __( 'Connected users', 'secupress' ),
+		'icon'     => 'core/people',
+		'dashicon' => 'dashicons-groups',
+		'label'    => __( 'Connected users', 'secupress' ),
 		'value'   => sprintf(
 			/* translators: %s: number of currently connected users. */
 			__( '%s (live)', 'secupress' ),
@@ -1919,8 +1937,9 @@ function secupress_system_widget_secupress_items() { //// recheck icons in WP 7.
 		$admin_logins = array_values( $admin_users );
 	}
 	$items[] = [
-		'icon'    => 'core/star-empty',
-		'label'   => __( 'Administrators', 'secupress' ),
+		'icon'     => 'core/star-empty',
+		'dashicon' => 'dashicons-star-empty',
+		'label'    => __( 'Administrators', 'secupress' ),
 		'value'   => number_format_i18n( $admin_count ),
 		'status'  => '',
 		'tooltip' => $admin_logins,
@@ -1986,33 +2005,31 @@ function secupress_system_widget_get_footer() {
 }
 
 /**
- * Get an SVG icon from WordPress
+ * Get an icon for a system status row.
  *
  * @author Julio Potier
  * @since 2.7
+ * @since 2.7.4 Uses secupress_get_icon().
  *
- * @param (string) $name Icon name.
+ * @param (string) $name     Icon name.
+ * @param (string) $dashicon Dashicon class used when the SVG is unavailable.
  *
  * @return (string)
  **/
-function secupress_system_widget_wp_icon( $name ) {
-	if ( ! $name ) {
+function secupress_system_widget_wp_icon( $name, $dashicon = '' ) {
+	if ( ! $name && ! $dashicon ) {
 		return '&raquo;';
 	}
-	if ( function_exists( 'wp_get_icon' ) ) {
-		$html = wp_get_icon( $name, [
-			'size'  => 20,
-			'class' => 'secupress-system-wp-icon',
-		] );
-		if ( is_string( $html ) && $html ) {
-			return $html;
-		}
-	}
-	if ( 0 === strpos( $name, 'dashicons-' ) ) {
-		return '<span class="dashicons ' . esc_attr( $name ) . '" aria-hidden="true"></span>';
-	}
-	if ( 0 === strpos( $name, 'secupress-icon-' ) ) {
-		return '<span class="' . esc_attr( $name ) . '" aria-hidden="true"></span>';
+	$html = secupress_get_icon(
+		$name ? $name : $dashicon,
+		[
+			'size'     => 20,
+			'class'    => 'secupress-system-wp-icon',
+			'dashicon' => $dashicon,
+		]
+	);
+	if ( $html ) {
+		return $html;
 	}
 	return function_exists( 'wp_get_icon' ) ? '' : '&raquo;';
 }
@@ -2028,23 +2045,17 @@ function secupress_system_widget_wp_icon( $name ) {
  * @return (string)
  **/
 function secupress_system_widget_get_icon( $item ) {
-	$status = isset( $item['status'] ) ? $item['status'] : '';
+	$status   = isset( $item['status'] ) ? $item['status'] : '';
+	$dashicon = isset( $item['dashicon'] ) ? $item['dashicon'] : '';
 	if ( 'danger' === $status ) {
-		$html = secupress_system_widget_wp_icon( 'core/cancel-circle-filled' );
-		if ( $html ) {
-			return $html;
-		}
-		return '<span class="secupress-system-cross secupress-system-cross-danger" aria-hidden="true">×</span>';
+		return secupress_system_widget_wp_icon( 'core/cancel-circle-filled', 'dashicons-no' );
 	}
 	if ( 'warning' === $status ) {
-		$html = secupress_system_widget_wp_icon( 'core/error' );
-		if ( $html ) {
-			return $html;
-		}
-		return '<span class="secupress-system-cross secupress-system-cross-warning" aria-hidden="true">×</span>';
+		return secupress_system_widget_wp_icon( 'core/error', 'dashicons-warning' );
 	}
-	if ( ! empty( $item['icon'] ) ) {
-		return secupress_system_widget_wp_icon( $item['icon'] );
+	if ( ! empty( $item['icon'] ) || $dashicon ) {
+		$icon = isset( $item['icon'] ) ? $item['icon'] : '';
+		return secupress_system_widget_wp_icon( $icon, $dashicon );
 	}
 	return '';
 }
@@ -2064,7 +2075,10 @@ function secupress_system_widget_tooltip( $entries ) {
 		return '';
 	}
 	$html  = ' <span class="secupress-system-info" tabindex="0">';
-	$html .= '<span class="dashicons dashicons-info" aria-hidden="true"></span>';
+	$html .= secupress_get_icon( 'core/info', [
+		'size'     => 16,
+		'dashicon' => 'dashicons-info',
+	] );
 	$html .= '<span class="screen-reader-text">' . esc_html( implode( ', ', $entries ) ) . '</span>';
 	$html .= '<span class="secupress-system-tooltip"><span class="secupress-system-tooltip-inner">';
 	foreach ( $entries as $entry ) {

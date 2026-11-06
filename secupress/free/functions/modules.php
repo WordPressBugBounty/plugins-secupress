@@ -25,7 +25,7 @@ function secupress_get_modules() {
 			'with_form'      => false,
 			'with_reset_box' => false,
 			'submodules'     => [
-							'module-secupress_security_status'        => '+sp27_pause_security+' . __( 'Security Status', 'secupress' ),
+							'module-secupress_security_status'        => __( 'Security Status', 'secupress' ), // '+sp27_pause_security+' .
 							'module-secupress_display_apikey_options' => ! defined( 'SECUPRESS_HIDE_API_KEY' ) || SECUPRESS_HIDE_API_KEY ? __( 'License Information', 'secupress' ) : '',
 							'module-secupress_display_white_label'    => secupress_is_pro() && ( defined( 'WP_SWL' ) && constant( 'WP_SWL' ) ) ? __( 'White Label', 'secupress' ) : '',
 							'module-secupress_advanced_settings'      => __( 'Advanced Settings', 'secupress' ),
@@ -57,7 +57,7 @@ function secupress_get_modules() {
 							'row-password-policy_password_expiration'         => secupress_is_submodule_active( 'users-login', 'strong-passwords' ) ? '*' . __( 'Password Lifespan', 'secupress' ) : '',
 							'row-password-policy_send-emails'                 => '*' . __( 'Force Reset Passwords', 'secupress' ),
 							'row-password-policy_force-logout'                => '*' . __( 'Force Logout Everyone', 'secupress' ),
-							'row-password-policy_application-passwords'       => '+sp27_app_passwords+' . __( 'Application Passwords', 'secupress' ),
+							'row-password-policy_application-passwords'       => __( 'Application Passwords', 'secupress' ), // '+sp27_app_passwords+' .
 							'row-blacklist-logins_user-creation-protection'   => '*' . __( 'Protect User Creation', 'secupress' ),
 							'row-blacklist-logins_prevent-user-creation'      => secupress_is_submodule_active( 'users-login', 'user-creation-protection' ) ? '>*' . __( 'Forbid User Creation', 'secupress' ) : '',
 							'row-blacklist-logins_bad-email-domains'          => '*' . __( 'Forbid Bad Email Domains', 'secupress' ),
@@ -151,7 +151,7 @@ function secupress_get_modules() {
 							'row-learning-mode_learning'               => function_exists( 'secupress_firewall_ng_is_enabled' ) && secupress_firewall_ng_is_enabled() ? '>*' . __( 'Learning Mode', 'secupress' ) : '',
 							'row-bbq-headers_fake-google-bots'       => __( 'Block Fake SEO Bots', 'secupress' ),
 							'row-bbq-headers_block-ai'               => '*' . __( 'Block AI Bots', 'secupress' ),
-							'row-bbq-url-content_ban-404-php'        => __( 'Block 404 requests on PHP files', 'secupress' ),
+							'row-bbq-url-content_ban-404-php'        => __( 'Block scans for hidden content', 'secupress' ),
 							'module-geoip-system'                    => '*' . __( 'GeoIP Management', 'secupress' ),
 						]
 		],

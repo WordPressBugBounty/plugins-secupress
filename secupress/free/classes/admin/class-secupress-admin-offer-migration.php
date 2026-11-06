@@ -534,6 +534,7 @@ abstract class SecuPress_Admin_Offer_Migration extends SecuPress_Singleton {
 	/**
 	 * Add an admin notice.
 	 *
+	 * @since 2.7.4 Added the $context parameter.
 	 * @since 1.3
 	 * @author Grégory Viguier
 	 *
@@ -543,15 +544,17 @@ abstract class SecuPress_Admin_Offer_Migration extends SecuPress_Singleton {
 	 *                                  false: the notice is not dismissible.
 	 *                                  string: the notice is dismissible and send an ajax call to store the "dismissed" state into a user meta to prevent it to popup again.
 	 *                                  enpty string: meant for a one-shot use. The notice is dismissible but the "dismissed" state is not stored, it will popup again. This is the exact same behavior than the WordPress dismissible notices.
+	 * @param (string)      $context    Two or three words describing the notice message.
 	 */
-	protected static function add_notice( $message, $error_code = 'updated', $notice_id = '' ) {
-		secupress_add_notice( $message, $error_code, $notice_id );
+	protected static function add_notice( $message, $error_code = 'updated', $notice_id = '', $context = '' ) {
+		secupress_add_notice( $message, $error_code, $notice_id, null, $context );
 	}
 
 
 	/**
 	 * Add a "transient" admin notice.
 	 *
+	 * @since 2.7.4 Added the $context parameter.
 	 * @since 1.3
 	 * @author Grégory Viguier
 	 *
@@ -561,8 +564,9 @@ abstract class SecuPress_Admin_Offer_Migration extends SecuPress_Singleton {
 	 *                                  false: the notice is not dismissible.
 	 *                                  string: the notice is dismissible and send an ajax call to store the "dismissed" state into a user meta to prevent it to popup again.
 	 *                                  enpty string: meant for a one-shot use. The notice is dismissible but the "dismissed" state is not stored, it will popup again. This is the exact same behavior than the WordPress dismissible notices.
+	 * @param (string)      $context    Two or three words describing the notice message.
 	 */
-	protected static function add_transient_notice( $message, $error_code = 'updated', $notice_id = '' ) {
-		secupress_add_transient_notice( $message, $error_code, $notice_id );
+	protected static function add_transient_notice( $message, $error_code = 'updated', $notice_id = '', $context = '' ) {
+		secupress_add_transient_notice( $message, $error_code, $notice_id, null, $context );
 	}
 }

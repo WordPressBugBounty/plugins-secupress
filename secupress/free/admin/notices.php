@@ -40,7 +40,38 @@ function secupress_http_block_external_notice() {
 		$message .= '<p><textarea readonly="readonly" class="large-text readonly" rows="1">define( \'WP_ACCESSIBLE_HOSTS\', \'*.secupress.me\' );</textarea></p>';
 	$message .= '</div>';
 
-	secupress_add_notice( $message, 'error', 'http-block-external' );
+	secupress_add_notice( $message, 'error', 'http-block-external', null, 'external http blocked' );
+}
+
+
+add_action( 'admin_init', 'secupress_allow_login_access_constant_notice' );
+/**
+ * Permanent notice when the emergency login bypass constant is enabled.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ */
+function secupress_allow_login_access_constant_notice() {
+	if ( ! defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) || ! SECUPRESS_ALLOW_LOGIN_ACCESS ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$message  = '<div>';
+	$message .= '<p><strong>' . esc_html__( 'Emergency login access is enabled.', 'secupress' ) . '</strong></p>';
+	$message .= '<p>' . sprintf(
+		__( 'The %1$s constant is defined in your %2$s file. Several %3$s login protection modules are bypassed until you remove this constant.', 'secupress' ),
+		secupress_code_me( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ),
+		secupress_code_me( secupress_get_wpconfig_filename() ),
+		SECUPRESS_PLUGIN_NAME
+	) . '</p>';
+	$message .= '<p>' . esc_html__( 'Remove this constant as soon as you have regained access. Leaving it enabled significantly weakens your site security.', 'secupress' ) . '</p>';
+	$message .= '</div>';
+
+	secupress_add_notice( $message, 'error', false, 'manage_options', 'emergency login access' );
 }
 
 
@@ -81,7 +112,7 @@ function secupress_plugins_to_deactivate() {
 		}
 		$message .= '</ul>';
 
-		secupress_add_notice( $message, 'error', 'deactivate-plugin' );
+		secupress_add_notice( $message, 'error', 'deactivate-plugin', null, 'included plugins deactivated' );
 	}
 
 	$plugins_to_warn = [ // deactivation not mandatory, dismissable
@@ -131,7 +162,7 @@ function secupress_plugins_to_deactivate() {
 		}
 		$message .= '</ul>';
 
-		secupress_add_transient_notice( $message, 'warning', SECUPRESS_VERSION . '-warn-plugins' );
+		secupress_add_transient_notice( $message, 'warning', SECUPRESS_VERSION . '-warn-plugins', null, 'security plugins conflict' );
 	}
 
 }
@@ -176,7 +207,7 @@ function secupress_add_packed_plugins_notice() {
 	}
 	$message .= '</ul>';
 
-	secupress_add_notice( $message, 'error', 'deactivate-packed-plugins' );
+	secupress_add_notice( $message, 'error', 'deactivate-packed-plugins', null, 'packed plugins active' );
 }
 
 
@@ -252,7 +283,7 @@ function secupress_warning_module_activity() {
 		$message  = _n( 'This module has been activated:', 'These modules have been activated:', count( $activated_modules ), 'secupress' );
 		$message .= sprintf( '</p><ul><li>%s</li></ul>', implode( '</li><li>', $activated_modules ) );
 
-		secupress_add_notice( $message );
+		secupress_add_notice( $message, 'updated', '', null, 'module activated' );
 		secupress_delete_site_transient( 'secupress_module_activation_' . $current_user_id );
 	}
 
@@ -260,7 +291,7 @@ function secupress_warning_module_activity() {
 		$message  = _n( 'This module has been deactivated:', 'These modules have been deactivated:', count( $deactivated_modules ), 'secupress' );
 		$message .= sprintf( '</p><ul><li>%s</li></ul>', implode( '</li><li>', $deactivated_modules ) );
 
-		secupress_add_notice( $message );
+		secupress_add_notice( $message, 'updated', '', null, 'module deactivated' );
 		secupress_delete_site_transient( 'secupress_module_deactivation_' . $current_user_id );
 	}
 }
@@ -375,7 +406,7 @@ function secupress_no_active_modules_notice() {
 	$message  = '<p>' . $message;
 	$message .= ' <a href="' . esc_url( $fix_url ) . '" class="secupress-button secupress-button-tertiary secupress-button-mini secupress-ghost"><span class="icon"><i class="secupress-icon-wrench" aria-hidden="true"></i></span><span class="text">' . __( 'Open Auto-Fix', 'secupress' ) . '</span></a></p>';
 
-	secupress_add_notice( $message, 'notice-warning', 'no-active-modules' );
+	secupress_add_notice( $message, 'notice-warning', 'no-active-modules', null, 'no active modules' );
 }
 
 
@@ -489,7 +520,7 @@ function secupress_active_plugins_error() {
 				), 
 				'</a>',
 				);
-	secupress_add_notice( $message, 'error', 'active-plugins-error' );
+	secupress_add_notice( $message, 'error', 'active-plugins-error', null, 'plugin actions issue' );
 }
 
 add_action( 'admin_init', 'secupress_active_plugins_network_error' );
@@ -527,7 +558,7 @@ function secupress_active_plugins_network_error() {
 				), 
 				'</a>',
 				);
-	secupress_add_notice( $message, 'error', 'active-plugins-error' );
+	secupress_add_notice( $message, 'error', 'active-plugins-error', null, 'plugin actions issue' );
 }
 
 
@@ -554,7 +585,7 @@ function secupress_check_default_login_slug_notice() {
 			sprintf( '<a href="%s">', esc_url( $settings_url ) ),
 			'</a>'
 		);
-		secupress_add_notice( $message, 'warning', 'default-login-slug' );
+		secupress_add_notice( $message, 'warning', 'default-login-slug', null, 'default login slug' );
 	}
 }
 
@@ -587,5 +618,5 @@ function secupress_security_paused_notice() {
 	}
 	$message   .= ' <a href="' . esc_url( $resume_url ) . '" class="button button-primary">' . __( 'Activate Security', 'secupress' ) . '</a></p>';
 
-	secupress_add_notice( $message, 'warning', false );
+	secupress_add_notice( $message, 'warning', false, null, 'security paused' );
 }

@@ -15,84 +15,52 @@ add_action('secupress.plugins.loaded','secupress_check_ban_ips', 0);
 /**
  * Will remove expired banned IPs, then block the remaining ones. A form will be displayed to allow clumsy Administrators to unlock themselves.
  *
+ * @since 2.7.4 Single IPs are read from their transient. The option only keeps ranges.
  * @since 1.0
  * @author Grégory Viguier
  */
 function secupress_check_ban_ips() {
-	$ban_ips = get_site_option( SECUPRESS_BAN_IP );
-	$ip      = secupress_get_ip();
+	$ip = secupress_get_ip();
 
 	if ( secupress_ip_is_whitelisted( $ip ) ) {
 		return;
 	}
 
-	$time_ban = (int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' );
-	$update   = false;
-	$redirect = false;
+	// The link to be unlocked?
+	if ( ! empty( $_GET['action'] ) && 'secupress_self-unban-ip' === $_GET['action'] ) {
+		$result = ! empty( $_GET['_wpnonce'] ) ? wp_verify_nonce( $_GET['_wpnonce'], 'secupress_self-unban-ip-' . $ip ) : false;
 
-	// If we got banned ips.
-	if ( $ban_ips && is_array( $ban_ips ) ) {
-		// The link to be unlocked?
-		if ( ! empty( $_GET['action'] ) && 'secupress_self-unban-ip' === $_GET['action'] ) {
-			$result = ! empty( $_GET['_wpnonce'] ) ? wp_verify_nonce( $_GET['_wpnonce'], 'secupress_self-unban-ip-' . $ip ) : false;
+		if ( ! $result ) {
+			$title   = '403 ' . get_status_header_desc( 403 );
+			$content = __( 'Unlock link expired.', 'secupress' );
 
-			if ( $result ) {
-				// You're good to go.
-				unset( $ban_ips[ $ip ] );
-				$update   = true;
-				$redirect = true;
-			} else {
-				// Cheating?
-				$title   = '403 ' . get_status_header_desc( 403 );
-				$content = __( 'Unlock link expired.', 'secupress' );
-
-				secupress_die( $content, $title, array( 'response' => 403, 'force_die' => true ) );
-			}
+			secupress_die( $content, $title, array( 'response' => 403, 'force_die' => true ) );
 		}
 
-		// Purge the expired banned IPs.
-		foreach ( $ban_ips as $timed_ip => $time ) {
-			if ( ( $time + ( $time_ban * 60 ) ) < time() ) {
-				unset( $ban_ips[ $timed_ip ] );
-				$update = true;
-			}
-		}
-
-		// Save the changes.
-		if ( $update ) {
-			if ( $ban_ips ) {
-				update_site_option( SECUPRESS_BAN_IP, $ban_ips );
-			} else {
-				delete_site_option( SECUPRESS_BAN_IP );
-			}
-		}
-
-		// The user just got unlocked. Redirect to homepage.
-		if ( $redirect ) {
-			wp_redirect( esc_url_raw( home_url() ) );
-			die();
-		}
-
-		// Block the user if the IP is still in the array.
-		if ( secupress_is_ip_in_range( $ip, array_keys( $ban_ips ) ) ) {
-			// Display a form in case of accidental ban.
-			$unban_atts = secupress_check_ban_ips_maybe_send_unban_email( $ip );
-
-			$title = ! empty( $unban_atts['title'] ) ? $unban_atts['title'] : ( '403 ' . get_status_header_desc( 403 ) );
-
-			if ( $unban_atts['display_form'] ) {
-				$time_ban     = 0;
-				$error        = $unban_atts['message'];
-				$content      = secupress_check_ban_ips_form( compact( 'ip', 'time_ban', 'error' ) );
-			} else {
-				$content = $unban_atts['message'];
-			}
-
-			secupress_die( $content, $title, [ 'response' => 403, 'force_die' => true, 'attack_type' => 'ban_ip' ] );
-		}
-	} elseif ( false !== $ban_ips ) {
-		delete_site_option( SECUPRESS_BAN_IP );
+		secupress_unban_ip( $ip );
+		wp_redirect( esc_url_raw( home_url() ) );
+		die();
 	}
+
+	secupress_purge_expired_banned_ranges();
+
+	if ( ! secupress_is_ip_banned( $ip ) ) {
+		return;
+	}
+
+	// Display a form in case of accidental ban.
+	$unban_atts = secupress_check_ban_ips_maybe_send_unban_email( $ip );
+	$title      = ! empty( $unban_atts['title'] ) ? $unban_atts['title'] : ( '403 ' . get_status_header_desc( 403 ) );
+
+	if ( $unban_atts['display_form'] ) {
+		$time_ban = 0;
+		$error    = $unban_atts['message'];
+		$content  = secupress_check_ban_ips_form( compact( 'ip', 'time_ban', 'error' ) );
+	} else {
+		$content = $unban_atts['message'];
+	}
+
+	secupress_die( $content, $title, array( 'response' => 403, 'force_die' => true, 'attack_type' => 'ban_ip' ) );
 }
 
 
@@ -644,7 +612,8 @@ function secupress_auto_username_login() {
 		$redirect = esc_url( secupress_admin_url( 'modules' ) );
 	}
 	if ( $message_str ) {
-		secupress_add_transient_notice( $message_str, 'updated', '', 'exist' );
+		$notice_context = isset( $payload['notice_context'] ) ? $payload['notice_context'] : '';
+		secupress_add_transient_notice( $message_str, 'updated', '', 'exist', $notice_context );
 	}
 	wp_safe_redirect( $redirect );
 	die();
@@ -836,11 +805,12 @@ if ( is_admin() ) {
  * @since 2.7 Cryptographically random token, 30s TTL, associative payload with user_id.
  * @author Julio Potier
  *
- * @param (string)      $module      The SecuPress module to be redirected
- * @param (WP_User|int) $user        The user to be logged in
- * @param (string)      $message_str Optional notice displayed after login.
+ * @param (string)      $module         The SecuPress module to be redirected
+ * @param (WP_User|int) $user           The user to be logged in
+ * @param (string)      $message_str    Optional notice displayed after login.
+ * @param (string)      $notice_context Two or three words describing that notice.
  **/
-function secupress_auto_login( $module, $user = null, $message_str = '' ) {
+function secupress_auto_login( $module, $user = null, $message_str = '', $notice_context = '' ) {
 	if ( is_int( $user ) ) {
 		$user = new WP_User( $user );
 	}
@@ -856,10 +826,11 @@ function secupress_auto_login( $module, $user = null, $message_str = '' ) {
 	secupress_set_site_transient(
 		'secupress_auto_login_' . $token,
 		[
-			'user_login' => $current_user->user_login,
-			'user_id'    => (int) $current_user->ID,
-			'module'     => $module,
-			'message'    => $message_str,
+			'user_login'     => $current_user->user_login,
+			'user_id'        => (int) $current_user->ID,
+			'module'         => $module,
+			'message'        => $message_str,
+			'notice_context' => $notice_context,
 		],
 		30
 	);

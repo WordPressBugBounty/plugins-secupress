@@ -153,7 +153,7 @@ function secupress_create_subsite_menu() {
 	if ( 'admin.php' !== $pagenow || empty( $_GET['page'] ) || SECUPRESS_PLUGIN_SLUG . '_scanners' !== $_GET['page'] ) {
 		/** Translators: 1 is an URL, 2 is the plugin name. */
 		$message = sprintf( __( 'Some security issues must be fixed, please visit <a href="%1$s">%2$s’s page</a>.', 'secupress' ), esc_url( admin_url( 'admin.php?page=' . SECUPRESS_PLUGIN_SLUG . '_scanners' ) ), '<strong>' . SECUPRESS_PLUGIN_NAME . '</strong>' );
-		secupress_add_notice( $message, null, 'subsite-security-issues' );
+		secupress_add_notice( $message, null, 'subsite-security-issues', null, 'subsite security issues' );
 	} else {
 		// The user is on the plugin page: make sure to not display the notice.
 		secupress_dismiss_notice( 'subsite-security-issues' );

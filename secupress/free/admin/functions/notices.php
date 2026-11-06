@@ -4,6 +4,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * Add a notice with the SecuPress_Admin_Notices class.
  *
+ * @since 2.7.4 Added the $context parameter.
  * @since 1.0
  *
  * @param (string)      $message    The message to display in the notice.
@@ -13,15 +14,17 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  *                                  string: the notice is dismissible and send an ajax call to store the "dismissed" state into a user meta to prevent it to popup again.
  *                                  empty string: meant for a one-shot use. The notice is dismissible but the "dismissed" state is not stored, it will popup again. This is the exact same behavior than the WordPress dismissible notices.
  * @param (null|string) $capa       A WordPress capability or role. "null" = secupress_get_capability()
+ * @param (string)      $context    Two or three words describing the notice message.
  */
-function secupress_add_notice( $message, $error_code = 'updated', $notice_id = '', $capa = null ) {
-	SecuPress_Admin_Notices::get_instance()->add( $message, $error_code, $notice_id, $capa );
+function secupress_add_notice( $message, $error_code = 'updated', $notice_id = '', $capa = null, $context = '' ) {
+	SecuPress_Admin_Notices::get_instance()->add( $message, $error_code, $notice_id, $capa, $context );
 }
 
 
 /**
  * Add a temporary notice with the SecuPress_Admin_Notices class.
  *
+ * @since 2.7.4 Added the $context parameter.
  * @since 1.0
  * @since 1.3 Added $notice_id parameter.
  *
@@ -32,9 +35,10 @@ function secupress_add_notice( $message, $error_code = 'updated', $notice_id = '
  *                                  string: the notice is dismissible and send an ajax call to store the "dismissed" state into a user meta to prevent it to popup again.
  *                                  empty string: meant for a one-shot use. The notice is dismissible but the "dismissed" state is not stored, it will popup again. This is the exact same behavior than the WordPress dismissible notices.
  * @param (null|string) $capa       A WordPress capability or role. "null" = secupress_get_capability()
+ * @param (string)      $context    Two or three words describing the notice message.
  */
-function secupress_add_transient_notice( $message, $error_code = 'updated', $notice_id = '', $capa = null ) {
-	SecuPress_Admin_Notices::get_instance()->add_temporary( $message, $error_code, $notice_id, $capa );
+function secupress_add_transient_notice( $message, $error_code = 'updated', $notice_id = '', $capa = null, $context = '' ) {
+	SecuPress_Admin_Notices::get_instance()->add_temporary( $message, $error_code, $notice_id, $capa, $context );
 }
 
 

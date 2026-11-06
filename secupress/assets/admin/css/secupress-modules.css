@@ -2473,6 +2473,20 @@ li.secupress-status-success{
 .state-dev .secupress-scanner-status-text {
     color: #888;
 }
+.secupress-scanner-feature-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+.secupress-scanner-feature .secupress-scanit {
+    display: none;
+    line-height: 1em;
+}
+.secupress-scanner-feature:hover .secupress-scanit,
+.secupress-scanner-feature:focus-within .secupress-scanit {
+    display: inline-block;
+}
 .secupress-scanner-toggle-btn {
     display: inline-flex;
     align-items: center;
@@ -3128,4 +3142,98 @@ details .secupress-learning-table {
 	to {
 		transform: rotate(360deg);
 	}
+}
+.secupress-seo-poisoning-table tr.secupress-urlvoid-risky,
+.secupress-seo-poisoning-table tr.secupress-urlvoid-risky:hover {
+	background-color: #fff;
+	background-image: linear-gradient(130deg, rgba(243, 156, 18, 0.125) 25%, transparent 25%, transparent 50%, rgba(243, 156, 18, 0.125) 50%, rgba(243, 156, 18, 0.125) 75%, transparent 75%, transparent 100%);
+	background-size: 12px 15px;
+}
+.secupress-seo-poisoning-table.striped > tbody > tr.secupress-urlvoid-risky > td,
+.secupress-seo-poisoning-table.striped > tbody > tr.secupress-urlvoid-risky > th,
+.secupress-seo-poisoning-table.striped > tbody > tr.secupress-urlvoid-risky:hover > td,
+.secupress-seo-poisoning-table.striped > tbody > tr.secupress-urlvoid-risky:hover > th {
+	background-color: transparent;
+}
+.secupress-seo-poisoning-table .secupress-row-check-confirm {
+	box-shadow: 0 0 0 2px #F39C12;
+}
+.secupress-seo-poisoning-table .column-link code {
+	display: block;
+	margin-top: 4px;
+	white-space: normal;
+	word-break: break-all;
+}
+.secupress-seo-poisoning-table .column-status {
+	width: 9em;
+	overflow: visible;
+}
+.secupress-seo-poisoning-table .secupress-urlvoid-wrap {
+	position: relative;
+	display: inline-block;
+}
+.secupress-seo-poisoning-table .secupress-urlvoid-wrap:has( .secupress-urlvoid-categories ) {
+	cursor: help;
+}
+.secupress-seo-poisoning-table .secupress-urlvoid-status {
+	display: inline-block;
+	vertical-align: middle;
+}
+.secupress-urlvoid-categories {
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 100%;
+	z-index: 1000;
+	min-width: 160px;
+	max-width: 280px;
+	width: max-content;
+	padding-top: 8px;
+	color: #FFF;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-align: left;
+	cursor: auto;
+}
+.secupress-urlvoid-categories:before {
+	content: "";
+	position: absolute;
+	left: 16px;
+	top: 2px;
+	border: 6px solid transparent;
+	border-top: 0;
+	border-bottom-color: #393E46;
+}
+.secupress-urlvoid-categories-inner {
+	display: block;
+	padding: 8px 12px;
+	background: #393E46;
+	border-radius: 3px;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.secupress-urlvoid-wrap:hover > .secupress-urlvoid-categories,
+.secupress-urlvoid-wrap:focus-within > .secupress-urlvoid-categories {
+	display: block;
+}
+.secupress-urlvoid-spinner {
+	display: inline-block;
+	vertical-align: middle;
+}
+.secupress-urlvoid-safe {
+	color: #1a7f37;
+	font-weight: 600;
+}
+.secupress-urlvoid-bad,
+.secupress-urlvoid-caution,
+.secupress-urlvoid-suspicious {
+	color: #F39C12;
+	font-weight: 600;
+}
+.secupress-urlvoid-untested {
+	color: #646970;
+	font-weight: 600;
+}
+.secupress-urlvoid-allow-anyway {
+	margin-left: 6px;
 }

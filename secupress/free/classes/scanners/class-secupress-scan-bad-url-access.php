@@ -212,10 +212,9 @@ class SecuPress_Scan_Bad_URL_Access extends SecuPress_Scan implements SecuPress_
 	 */
 	public function manual_fix() {
 		if ( $this->has_fix_action_part( 'fix' ) ) {
-			$this->fix();
+			return $this->fix();
 		}
-		// "good"
-		$this->add_fix_message( 1 );
+
 		return parent::manual_fix();
 	}
 

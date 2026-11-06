@@ -143,7 +143,7 @@ function secupress_add_centralized_blog_options() {
 		__( 'Your network is quite big. Before doing anything, some data must be set. Please %s.', 'secupress' ),
 		'<a href="' . esc_url( $href ) . '" class="secupress-centralize-blog-options">' . __( 'click here', 'secupress' ) . '</a>'
 	);
-	secupress_add_notice( $message, 'error', false );
+	secupress_add_notice( $message, 'error', false, null, 'multisite data setup' );
 }
 
 

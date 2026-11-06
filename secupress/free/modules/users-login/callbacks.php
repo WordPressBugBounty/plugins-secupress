@@ -185,7 +185,7 @@ function secupress_password_policy_settings_callback( $modulenow, &$settings, $a
 					secupress_add_module_notice( '', $hash_reuse_label, 'activation' );
 				} else {
 					$settings['double-auth_prevent-hash-reuse'] = 0;
-					secupress_add_transient_notice( secupress_get_unique_user_pass_index_error_message( $hash_reuse_label ), 'error', 'secupress-unique-user-pass-index' );
+					secupress_add_transient_notice( secupress_get_unique_user_pass_index_error_message( $hash_reuse_label ), 'error', 'secupress-unique-user-pass-index', null, 'duplicate password signatures' );
 				}
 			} else {
 				secupress_add_module_notice( '', $hash_reuse_label, 'deactivation' );

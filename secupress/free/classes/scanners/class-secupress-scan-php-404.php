@@ -38,11 +38,11 @@ class SecuPress_Scan_Php_404 extends SecuPress_Scan implements SecuPress_Scan_In
 	 * @since 1.0
 	 */
 	protected function init() {
-		$this->title = __( 'Check if your site is allowing 404 on PHP files.', 'secupress' );
-		$this->more  = __( 'Do not let attackers find hidden PHP files by guessing it, ban them!', 'secupress' );
+		$this->title = __( 'Check if requests for missing PHP files are blocked.', 'secupress' );
+		$this->more  = __( 'Attackers guess the addresses of forgotten PHP files. Blocking those requests stops that search.', 'secupress' );
 		$this->more_fix = sprintf(
 			__( 'Activate the option %1$s in the %2$s module.', 'secupress' ),
-			'<em>' . __( 'Block 404 on .php', 'secupress' ) . '</em>',
+			'<em>' . __( 'Block scans for hidden content', 'secupress' ) . '</em>',
 			'<a href="' . esc_url( secupress_admin_url( 'modules', 'firewall' ) ) . '#row-bbq-url-content_ban-404-php">' . __( 'Firewall', 'secupress' ) . '</a>'
 		);
 	}
@@ -60,18 +60,18 @@ class SecuPress_Scan_Php_404 extends SecuPress_Scan implements SecuPress_Scan_In
 	public static function get_messages( $message_id = null ) {
 		/** Translators: 1 is the name of a protection, 2 is the name of a module. */
 		$activate_protection_message = sprintf( __( 'But you can activate the %1$s protection from the module %2$s.', 'secupress' ),
-			'<strong>' . __( 'Block 404 on .php', 'secupress' ) . '</strong>',
+			'<strong>' . __( 'Block scans for hidden content', 'secupress' ) . '</strong>',
 			'<a target="_blank" href="' . esc_url( secupress_admin_url( 'modules', 'firewall' ) ) . '#row-bbq-url-content_ban-404-php">' . __( 'Firewall', 'secupress' ) . '</a>'
 		);
 
 		$messages = array(
 			// "good"
-			0   => __( 'You are currently blocking 404 requests on .php files.', 'secupress' ),
+			0   => __( 'Requests for missing PHP files are blocked.', 'secupress' ),
 			1   => __( 'Protection activated', 'secupress' ),
 			// "warning"
-			100 => __( 'Unable to determine if your homepage is blocking 404 on .php files.', 'secupress' ) . ' ' . $activate_protection_message,
+			100 => __( 'Unable to determine if requests for missing PHP files are blocked.', 'secupress' ) . ' ' . $activate_protection_message,
 			// "bad"
-			200 => __( 'Your website should block <strong>404 on .php files</strong>.', 'secupress' ),
+			200 => __( 'Your site should block requests for missing PHP files.', 'secupress' ),
 		);
 
 		if ( isset( $message_id ) ) {

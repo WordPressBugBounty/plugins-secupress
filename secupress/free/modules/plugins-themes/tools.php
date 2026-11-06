@@ -681,7 +681,7 @@ function secupress_reinstall_plugins( $plugins = [] ) {
 	}
 	$count = count( $reinstalled );
 	$list  = sprintf( '<ul>%s</ul>', implode( '', $reinstalled ) );
-	secupress_add_transient_notice( sprintf( __( 'Plugin reinstallation results: %s', 'secupress' ), $list ), 'info' );
+	secupress_add_transient_notice( sprintf( __( 'Plugin reinstallation results: %s', 'secupress' ), $list ), 'info', '', null, 'plugin reinstall results' );
 }
 
 add_action( 'wp_ajax_secupress_reinstall_plugins', 'secupress_reinstall_plugins_admin_ajax_cb' );

@@ -179,16 +179,18 @@ if ( secupress_is_pro() && defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRES
 		) );
 	}
 	$this->add_field( array(
-		'title'        => '<span class="dashicons dashicons-groups"></span> ' . __( 'Affected Roles', 'secupress' ),
-		'description'  => __( 'Which roles does this module affect?', 'secupress' ),
-		'depends'      => $field_name,
-		// 'depends'      => $field_name . '_passwordless ' . $field_name . '_otp-auth',
-		'row_class'    => 'affected-role-row',
-		'name'         => $this->get_field_name( 'affected_role' ),
-		'type'         => 'roles',
-		'label_screen' => __( 'Affected Roles', 'secupress' ),
-		'move_item'    => '.secupress-field-double-auth_type_passwordless',
-		'helpers'      => array(
+		'title'               => '<span class="dashicons dashicons-groups"></span> ' . __( 'Affected Roles', 'secupress' ),
+		'description'         => __( 'Which roles does this module affect?', 'secupress' ),
+		'depends'             => $field_name,
+		// 'depends'          => $field_name . '_passwordless ' . $field_name . '_otp-auth',
+		'row_class'           => 'affected-role-row',
+		'name'                => $this->get_field_name( 'affected_role' ),
+		'type'                => 'roles',
+		'disabled_roles'      => [ 'administrator' ],
+		'disabled_role_title' => __( 'The Administrator role is always affected for security reasons.', 'secupress' ),
+		'label_screen'        => __( 'Affected Roles', 'secupress' ),
+		'move_item'           => '.secupress-field-double-auth_type_passwordless',
+		'helpers'             => array(
 			array(
 				'type'        => 'description',
 				'description' => __( 'Future roles will be automatically selected', 'secupress' ),

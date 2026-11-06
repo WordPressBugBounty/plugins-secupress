@@ -920,6 +920,7 @@ class SecuPress_Logs extends SecuPress_Singleton {
 	/**
 	 * Admin post callback that allows to download the Logs of a certain type as a .txt file.
 	 *
+	 * @since 2.7.4 Line breaks in a log cannot forge the file separator.
 	 * @since 1.0
 	 */
 	public function post_download_logs_ajax_post_cb() {
@@ -951,14 +952,13 @@ class SecuPress_Logs extends SecuPress_Singleton {
 
 		if ( $logs && is_array( $logs ) ) {
 			$classname  = static::maybe_include_log_class();
-			$log_header = str_pad( '==%SECUPRESS-LOG%', 100, '=', STR_PAD_RIGHT ) . "\n";
+			$log_header = $this->get_log_file_separator() . "\n";
 
 			foreach ( $logs as $log ) {
 				$log = new $classname( $log );
 
 				echo $log_header;
-				echo $this->get_log_header_for_file( $log ) . "\n";
-				echo html_entity_decode( strip_tags( str_replace( '<br/>', "\n", $log->get_message() ) ) );
+				echo $this->format_log_for_file( $log );
 				echo "\n\n";
 			}
 		}
@@ -1352,6 +1352,87 @@ class SecuPress_Logs extends SecuPress_Singleton {
 		$user_ids = array_intersect( $user_ids, $administrators );
 
 		return $user_ids ? (int) reset( $user_ids ) : 0;
+	}
+
+
+	/**
+	 * Separator written between entries of a downloaded `.txt` log file.
+	 *
+	 * @since 2.7.4
+	 *
+	 * @return (string)
+	 */
+	public function get_log_file_separator() {
+		return str_pad( '==%SECUPRESS-LOG%', 100, '=', STR_PAD_RIGHT );
+	}
+
+
+	/**
+	 * One log entry, ready for the `.txt` download.
+	 *
+	 * User content is flattened to a single line. Only the plugin's own `<br/>` becomes a new line, and the file separator is neutralized if it appears in that content.
+	 *
+	 * @since 2.7.4
+	 *
+	 * @param (object) $log `SecuPress_Log` object.
+	 *
+	 * @return (string)
+	 */
+	public function format_log_for_file( $log ) {
+		$break = 'SECUPRESSBR' . wp_generate_password( 16, false );
+
+		$header = $this->remove_log_line_breaks( $this->get_log_header_for_file( $log ) );
+		$header = $this->neutralize_log_file_markup( $header );
+
+		$message = str_replace( '<br/>', $break, $log->get_message() );
+		$message = $this->remove_log_line_breaks( $message );
+		$message = html_entity_decode( strip_tags( $message ) );
+		$message = $this->remove_log_line_breaks( $message );
+		$message = $this->neutralize_log_file_markup( $message );
+		$message = str_replace( $break, "\n", $message );
+
+		return $header . "\n" . $message;
+	}
+
+
+	/**
+	 * Drop characters that start a new line in a text log, including Unicode line separators.
+	 *
+	 * @since 2.7.4
+	 *
+	 * @param (string) $text Raw text.
+	 *
+	 * @return (string)
+	 */
+	public function remove_log_line_breaks( $text ) {
+		$text  = (string) $text;
+		$clean = wp_check_invalid_utf8( $text, true );
+
+		if ( is_string( $clean ) ) {
+			$text = $clean;
+		}
+
+		$stripped = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]|\R/u', '', $text );
+
+		if ( ! is_string( $stripped ) ) {
+			$stripped = preg_replace( '/[\x00-\x1F\x7F]/', '', $text );
+		}
+
+		return is_string( $stripped ) ? $stripped : '';
+	}
+
+
+	/**
+	 * Prevent log content from containing the `.txt` entry separator.
+	 *
+	 * @since 2.7.4
+	 *
+	 * @param (string) $text Exported line.
+	 *
+	 * @return (string)
+	 */
+	protected function neutralize_log_file_markup( $text ) {
+		return str_replace( '==%SECUPRESS-LOG%', '== %SECUPRESS-LOG%', (string) $text );
 	}
 
 

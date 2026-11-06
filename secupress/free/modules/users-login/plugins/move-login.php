@@ -197,6 +197,7 @@ add_filter( 'wp_redirect', 'secupress_move_login_redirect', 10 );
 /**
  * Filter the redirect location: some redirections are hard-coded.
  *
+ * @since 2.7.4 Also rewrite wp-login.php?checkemail=confirm|registered, including when wp_safe_redirect() prefixes the current directory or the URL is absolute.
  * @since 1.0
  * @author Grégory Viguier
  *
@@ -208,11 +209,41 @@ function secupress_move_login_redirect( $location ) {
 	if ( ! secupress_is_submodule_active( 'users-login', 'move-login' ) ) {
 		return $location;
 	}
+	$parsed_location = wp_parse_url( $location );
+	$location_path   = isset( $parsed_location['path'] ) ? $parsed_location['path'] : '';
+	$location_query  = array();
+
+	if ( ! empty( $parsed_location['query'] ) ) {
+		wp_parse_str( $parsed_location['query'], $location_query );
+	}
+
+	$targets_login = (bool) preg_match( '#(?:^|/)wp-login\.php$#', $location_path );
+	$checkemail    = isset( $location_query['checkemail'] ) && is_string( $location_query['checkemail'] ) ? $location_query['checkemail'] : '';
+	$is_checkemail = in_array( $checkemail, array( 'confirm', 'registered' ), true );
+
+	if ( $targets_login ) {
+		$referer          = wp_get_referer();
+		$referer_is_login = is_string( $referer ) && false !== strpos( $referer, 'wp-login.php' );
+
+		if ( $is_checkemail || ! $referer_is_login ) {
+			if ( ! empty( $parsed_location['host'] ) ) {
+				$home_host = wp_parse_url( home_url(), PHP_URL_HOST );
+				if ( ! $home_host || strtolower( $home_host ) !== strtolower( $parsed_location['host'] ) ) {
+					return $location;
+				}
+			}
+
+			$login_path = 'wp-login.php';
+			if ( ! empty( $parsed_location['query'] ) ) {
+				$login_path .= '?' . $parsed_location['query'];
+			}
+
+			return secupress_move_login_site_url( $login_path, $login_path, 'login', get_current_blog_id() );
+		}
+	}
+
 	$location_base = explode( '?', $location, 2 );
 	$location_base = reset( $location_base );
-	if ( site_url( $location_base ) === site_url( 'wp-login.php' ) && strpos( wp_get_referer(), 'wp-login.php' ) === false ) {
-		return secupress_move_login_site_url( $location, $location, 'login', get_current_blog_id() );
-	}
 
 	if ( trailingslashit( $location_base ) === trailingslashit( wp_login_url() ) ) {
 		$location_query = wp_parse_url( $location );
@@ -271,6 +302,7 @@ function secupress_move_login_update_welcome_email( $welcome_email, $blog_id ) {
 /**
  * Set the relative path: `wp-login.php?action=register -> /register`.
  *
+ * @since 2.7.4 Keep checkemail=confirm and checkemail=registered on the custom login URL.
  * @since 1.0
  * @author Grégory Viguier
  *
@@ -292,6 +324,10 @@ function secupress_move_login_set_path( $path ) {
 
 		if ( isset( $params['key'] ) ) {
 			$action = 'resetpass';
+		}
+
+		if ( empty( $params['key'] ) && isset( $params['checkemail'] ) && is_string( $params['checkemail'] ) && in_array( $params['checkemail'], array( 'confirm', 'registered' ), true ) ) {
+			$action = 'login';
 		}
 
 		if ( ! isset( $slugs[ $action ] ) && ! isset( $other[ $action ] ) && false === has_filter( 'login_form_' . $action ) ) {

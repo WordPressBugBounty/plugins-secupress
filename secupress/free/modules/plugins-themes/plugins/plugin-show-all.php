@@ -40,7 +40,7 @@ function secupress_plugin_show_all_force_all_plugins_view_pre_current_active_plu
 				background-color: $backgroundColor !important;
 			}</style>";
 			secupress_cache_data( 'plugins_show-all-notice', 'pre_current_active_plugins' );
-			secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'pre_current_active_plugins' ) ) . $legend . $css, 'error', 'pre_current_active_plugins-tab-' . md5( $css ) );
+			secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'pre_current_active_plugins' ) ) . $legend . $css, 'error', 'pre_current_active_plugins-tab-' . md5( $css ), null, 'hidden plugin current' );
 		}
 	}
 
@@ -58,7 +58,7 @@ function secupress_plugin_show_all_force_all_plugins_view_pre_current_active_plu
 		}</style>";
 		// We add the CSS in the notice so if the notice is dismissed, the CSS rules will be too.
 		secupress_cache_data( 'plugins_show-all-notice', 'plugins_list' );
-		secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'plugins_list' ) ) . $legend . $css, 'error', 'plugins_list-tab-' . md5( $css ) );
+		secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'plugins_list' ) ) . $legend . $css, 'error', 'plugins_list-tab-' . md5( $css ), null, 'hidden plugin list' );
 	}
 	$wp_list_table->items = get_plugins();
 }
@@ -93,7 +93,7 @@ function secupress_plugin_show_all_force_all_plugins_view() {
                 color: " . esc_js( secupress_darken_color( $backgroundColor, 40 ) ) . " !important;
             }</style>";
         secupress_cache_data( 'plugins_show-all-notice', 'show_advanced_plugins' );
-		secupress_add_notice( sprintf( __( 'The <strong>Must-Use</strong> tab has been hidden! (using the WP Filter %s)', 'secupress' ), secupress_code_me( 'show_advanced_plugins' ) ) . $legend . $css, 'error', 'mustuse-tab' );
+		secupress_add_notice( sprintf( __( 'The <strong>Must-Use</strong> tab has been hidden! (using the WP Filter %s)', 'secupress' ), secupress_code_me( 'show_advanced_plugins' ) ) . $legend . $css, 'error', 'mustuse-tab', null, 'hidden mustuse tab' );
 	}
 
 	if ( $dins_visible_filtered !== $dins_visible_non_filtered ) {
@@ -107,7 +107,7 @@ function secupress_plugin_show_all_force_all_plugins_view() {
                 color: " . esc_js( secupress_darken_color( $backgroundColor, 40 ) ) . " !important;
             }</style>";
         secupress_cache_data( 'plugins_show-all-notice', 'show_advanced_plugins' );
-		secupress_add_notice( sprintf( __( 'The <strong>Drop-in</strong> tab has been hidden! (using the WP Filter %s)', 'secupress' ), secupress_code_me( 'show_advanced_plugins' ) ) . $legend . $css, 'error', 'dropin-tab' );
+		secupress_add_notice( sprintf( __( 'The <strong>Drop-in</strong> tab has been hidden! (using the WP Filter %s)', 'secupress' ), secupress_code_me( 'show_advanced_plugins' ) ) . $legend . $css, 'error', 'dropin-tab', null, 'hidden dropin tab' );
 	}
 
 	// Handle the "all_plugins" filter
@@ -121,7 +121,7 @@ function secupress_plugin_show_all_force_all_plugins_view() {
 			background-color: $backgroundColor !important;
 		}</style>";
 		secupress_cache_data( 'plugins_show-all-notice', 'all_plugins' );
-		secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'all_plugins' ) ) . $legend . $css, 'error', 'all_plugins-tab-' . md5( $css ) );
+		secupress_add_notice( sprintf( __( 'The plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'all_plugins' ) ) . $legend . $css, 'error', 'all_plugins-tab-' . md5( $css ), null, 'hidden plugin all' );
 	}
 
 	// Handle the "plugins_list" filter
@@ -140,7 +140,7 @@ function secupress_plugin_show_all_force_all_plugins_view() {
 		}</style>";
 		// We add the CSS in the notice so if the notice is dismissed, the CSS rules will be too.
 		secupress_cache_data( 'plugins_show-all-notice', 'plugins_list' );
-		secupress_add_notice( sprintf( __( 'The must-use plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'plugins_list' ) ) . $legend . $css, 'error', 'plugins_list-tab-' . md5( $css ) );
+		secupress_add_notice( sprintf( __( 'The must-use plugin %s has been hidden ! (using the WP Filter %s)', 'secupress' ), secupress_code_me( $slug ), secupress_code_me( 'plugins_list' ) ) . $legend . $css, 'error', 'plugins_list-tab-' . md5( $css ), null, 'hidden mustuse plugin' );
 	}
 
 	add_filter( 'get_user_metadata', 'secupress_dfp_force_all_plugins_view_meta', 10, 3 );
@@ -213,7 +213,7 @@ function secupress_plugin_show_all_maybe_add_notice() {
 	}
 	// $type = secupress_cache_data( 'plugins_show-all-notice' );
 	// if ( ! $type ) {
-		secupress_add_notice( ' ', 'error hidden', 'plugins_all_js_css' );
+		secupress_add_notice( ' ', 'error hidden', 'plugins_all_js_css', null, 'hidden plugins style' );
 	// }
 }
 

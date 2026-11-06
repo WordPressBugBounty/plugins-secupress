@@ -136,3 +136,11 @@ function secupress_blackhole_is_whitelisted() {
 	_deprecated_function( __FUNCTION__, '2.3.19', '__return_true' );
 	return true;
 }
+
+/**
+ * @since 2.7.4 Deprecated
+ */
+function secupress_fightspam_better_blacklist_comment( $value ) {
+	_deprecated_function( __FUNCTION__, '2.7.4', 'secupress_fightspam_has_disallowed_term()' );
+	return $value;
+}

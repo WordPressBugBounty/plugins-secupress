@@ -9,6 +9,11 @@
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
 
+// EMERGENCY BYPASS!
+if ( defined( 'SECUPRESS_ALLOW_LOGIN_ACCESS' ) && SECUPRESS_ALLOW_LOGIN_ACCESS ) {
+	return;
+}
+
 /**
  * Check if we have to ban the IP and redirect
  *
@@ -146,6 +151,10 @@ add_action( 'authenticate', 'secupress_limitloginattempts', SECUPRESS_INT_MAX, 2
 /**
  * Count failed logins for a real account, and the same way for an unknown identifier.
  *
+ * Unknown identifiers are always counted. Gating that count on user-enumeration
+ * protection lets a ban reveal that the account exists.
+ *
+ * @since 2.7.4 Unknown identifiers are counted even when user enumeration protection is off.
  * @since 2.7.3 XML-RPC logins are counted too. Their body is text/xml, so $_POST stays empty.
  * @since 2.7.2 Unknown identifiers are counted in a transient, with the same limit and the same ban.
  * @since 2.2.6 Refactoring
@@ -160,12 +169,12 @@ add_action( 'authenticate', 'secupress_limitloginattempts', SECUPRESS_INT_MAX, 2
 function secupress_limitloginattempts( $raw_user, $username ) {
 	static $done = false;
 
-	if ( $done ) {
+	$is_xmlrpc = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
+
+	if ( $done && ! $is_xmlrpc ) {
 		return $raw_user;
 	}
 	$done = true;
-
-	$is_xmlrpc = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
 
 	if ( ( empty( $_POST ) && ! $is_xmlrpc ) || secupress_ip_is_whitelisted() ) { // WPCS: CSRF ok.
 		return $raw_user;
@@ -190,13 +199,50 @@ function secupress_limitloginattempts( $raw_user, $username ) {
 		return $raw_user;
 	}
 
-	if ( '' === trim( $username ) || ! secupress_is_submodule_active( 'users-login', 'stop-user-enumeration' ) ) {
+	if ( '' === trim( $username ) ) {
 		return $raw_user;
 	}
 
 	secupress_limitloginattempts_add_unknown_try( $username );
 
 	return $raw_user;
+}
+
+add_filter( 'xmlrpc_login_error', 'secupress_limitloginattempts_xmlrpc_login_error', SECUPRESS_INT_MAX, 2 );
+/**
+ * Count each failed authentication subcall in the current XML-RPC request.
+ *
+ * WordPress checks only the first bad password in a request, then returns a
+ * `login_prevented` error for the following subcalls. These errors must still
+ * count toward the request limit so a multicall can be stopped immediately.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (IXR_Error) $error XML-RPC login error.
+ * @param (WP_Error)  $user  WordPress authentication error.
+ *
+ * @return (IXR_Error)
+ */
+function secupress_limitloginattempts_xmlrpc_login_error( $error, $user ) {
+	static $request_attempts = 0;
+
+	if ( ! is_wp_error( $user ) || secupress_ip_is_whitelisted() ) {
+		return $error;
+	}
+
+	++$request_attempts;
+
+	$max_attempts = (int) secupress_get_module_option( 'login-protection_number_attempts', 10, 'users-login' );
+	if ( $request_attempts >= $max_attempts ) {
+		secupress_ban_ip(
+			(int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' ),
+			null,
+			[ 'die' => true, 'attack_type' => 'loginattempts' ]
+		);
+	}
+
+	return $error;
 }
 
 /**
@@ -238,10 +284,15 @@ function secupress_limitloginattempts_after_increment( $user_attempts ) {
 	$user_attempts_left = $max_attempts - $user_attempts;
 
 	if ( $user_attempts >= $max_attempts ) {
-		secupress_ban_ip( (int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' ) );
 		if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
+			secupress_ban_ip(
+				(int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' ),
+				null,
+				[ 'die' => true, 'attack_type' => 'loginattempts' ]
+			);
 			return;
 		}
+		secupress_ban_ip( (int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' ) );
 		wp_safe_redirect( secupress_get_current_url() );
 		die();
 	}
@@ -270,17 +321,17 @@ function secupress_limitloginattempts_unknown_hash( $username ) {
  * Count one failed login on an identifier that has no account.
  *
  * @author Julio Potier
+ * @since 2.7.4 One transient per identifier, kept one month after its last failure.
  * @since 2.7.2
  *
  * @param (string) $username Login or email as typed.
  */
 function secupress_limitloginattempts_add_unknown_try( $username ) {
-	$bag          = secupress_get_site_transient( 'secupress_lla_unknown' );
-	$bag          = is_array( $bag ) ? $bag : [];
-	$hash         = secupress_limitloginattempts_unknown_hash( $username );
-	$bag[ $hash ] = isset( $bag[ $hash ] ) ? (int) $bag[ $hash ] + 1 : 1;
-	secupress_set_site_transient( 'secupress_lla_unknown', $bag );
-	secupress_limitloginattempts_after_increment( $bag[ $hash ] );
+	$transient = 'secupress_lla_u_' . secupress_limitloginattempts_unknown_hash( $username );
+	$attempts  = (int) get_site_transient( $transient ) + 1;
+
+	set_site_transient( $transient, $attempts, MONTH_IN_SECONDS );
+	secupress_limitloginattempts_after_increment( $attempts );
 }
 
 

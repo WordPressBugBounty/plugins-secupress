@@ -790,7 +790,9 @@ function secupress_notify_unclosed_marker( $file ) {
 		return;
 	}
 
-	secupress_add_notice( secupress_get_unclosed_marker_message( $file ), 'error', '' );
+	$marker_file = strtolower( ltrim( basename( $file ), '.' ) );
+	$marker_file = preg_replace( '/[^a-z0-9]+/', '', $marker_file );
+	secupress_add_notice( secupress_get_unclosed_marker_message( $file ), 'error', '', null, 'unclosed marker ' . $marker_file );
 }
 
 
@@ -1000,7 +1002,7 @@ function secupress_wpconfig_success_in_sandbox( $content ) {
 		'user-agent'  => SECUPRESS_PLUGIN_NAME . '/' . SECUPRESS_VERSION,
 		'cookies'     => $_COOKIE,
 		'headers'     => array(
-			'X-SecuPress-Origin' => $origin,
+			'X-SecuPress-Origin' => secupress_get_scan_origin_header( $origin ),
 		),
 	);
 
@@ -1465,6 +1467,7 @@ function secupress_get_siteurl_subdir() {
  * Get infos for the rewrite rules.
  * The main concern is about directories.
  *
+ * @since 2.7.4 Always define site_from, site_to, home_from and home_to.
  * @since 1.0
  * @author Grégory Viguier
  *
@@ -1494,10 +1497,14 @@ function secupress_get_rewrite_bases() {
 	$site_dir = $base . ltrim( $wp_dir, '/' );
 
 	$bases = array(
-		'base'     => $base,     // '/' or '/sub-dir/'.
-		'wp_dir'   => $wp_dir,   // '' or '/wp-dir/'.
-		'site_dir' => $site_dir, // '/', '/wp-dir/', '/sub-dir/', or '/sub-dir/wp-dir/'.
-		'is_sub'   => $is_sub,   // True or false.
+		'base'      => $base,     // '/' or '/sub-dir/'.
+		'wp_dir'    => $wp_dir,   // '' or '/wp-dir/'.
+		'site_dir'  => $site_dir, // '/', '/wp-dir/', '/sub-dir/', or '/sub-dir/wp-dir/'.
+		'is_sub'    => $is_sub,   // True or false.
+		'site_from' => '',
+		'site_to'   => '',
+		'home_from' => '',
+		'home_to'   => '',
 	);
 
 	// Apache.
@@ -1673,10 +1680,36 @@ function secupress_get_data_file_path( $slug ) {
 	$paths     = secupress_get_data_file_paths();
 	$slug      = str_replace( '.data', '', sanitize_key( $slug ) );
 	$data_path = secupress_get_data_path();
-	if ( isset( $paths[ $data_path ] ) && in_array( $slug, $paths[ $data_path ] ) && file_exists( $data_path . $slug . '.data' ) ) {
+	if ( isset( $paths[ $data_path ] ) && in_array( $slug, $paths[ $data_path ] ) && is_file( $data_path . $slug . '.data' ) ) {
 		return $data_path . $slug . '.data';
 	}
 	return false;
+}
+
+/**
+ * Path to the comment disallowed-terms list.
+ *
+ * Uses the updated Pro data file when it is readable, otherwise the list shipped with the plugin.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @return (string) Absolute path, or an empty string when no readable file exists.
+ **/
+function secupress_get_disallowed_terms_file() {
+	$file = secupress_get_data_file_path( 'spam_disallowed_terms' );
+
+	if ( $file && is_readable( $file ) ) {
+		return $file;
+	}
+
+	$bundled = SECUPRESS_INC_PATH . 'data/spam-disallowed-terms.data';
+
+	if ( is_file( $bundled ) && is_readable( $bundled ) ) {
+		return $bundled;
+	}
+
+	return '';
 }
 
 /**

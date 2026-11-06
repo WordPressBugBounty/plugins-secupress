@@ -1228,7 +1228,6 @@ function secupress_firewall_learning_wait_message() {
 		[ 'emoji' => '🎹', 'text' => __( 'Playing a song on the piano…', 'secupress' ) ],
 		[ 'emoji' => '🎮', 'text' => __( 'Playing a video game…', 'secupress' ) ],
 		[ 'emoji' => '🌐', 'text' => __( 'Browsing the web…', 'secupress' ) ],
-		[ 'emoji' => '🔍', 'text' => __( 'Searching the web…', 'secupress' ) ],
 		[ 'emoji' => '🔗', 'text' => __( 'Following a link…', 'secupress' ) ],
 		[ 'emoji' => '📊', 'text' => __( 'Analyzing the data…', 'secupress' ) ],
 		[ 'emoji' => '🤔', 'text' => __( 'Making a decision…', 'secupress' ) ],
@@ -1246,6 +1245,13 @@ function secupress_firewall_learning_wait_message() {
 		[ 'emoji' => '🌊', 'text' => __( 'Erasing the whole computer…', 'secupress' ) ],
 		[ 'emoji' => '💸', 'text' => __( 'Buying something on the internet…', 'secupress' ) ],
 		[ 'emoji' => '💩', 'text' => __( 'What am I doing here?…', 'secupress' ) ],
+		[ 'emoji' => '🔧', 'text' => __( 'Reticulating splines…', 'secupress' ) ],
+		[ 'emoji' => '🔍', 'text' => __( 'Checking Staging…', 'secupress' ) ],
+		[ 'emoji' => '🔴', 'text' => __( 'Pressing Red Button…', 'secupress' ) ],
+		[ 'emoji' => '🛞', 'text' => __( 'Reinventing Wheel…', 'secupress' ) ],
+		[ 'emoji' => '✂️', 'text' => __( 'Snipping Red Wire…', 'secupress' ) ],
+		[ 'emoji' => '🐙', 'text' => __( 'Waking Kraken…', 'secupress' ) ],
+		[ 'emoji' => '🔒', 'text' => __( 'Stealing your passwords…', 'secupress' ) ],
 	];
 	$user = wp_get_current_user();
 	if ( $user->exists() && '' !== $user->display_name ) {
@@ -2234,7 +2240,7 @@ function secupress_firewall_learning_admin_notices() {
 		$message    = sprintf( __( 'Learning Mode until %1$s — %2$s calibrable rules are not blocking yet. Critical exploits still are.', 'secupress' ), $until, secupress_firewall_ng_name() );
 		$message   .= ' ' . sprintf( _n( '%s signature observed.', '%s signatures observed.', $hits_count, 'secupress' ), number_format_i18n( $hits_count ) );
 		$message .= ' <a href="' . esc_url( $module_url ) . '">' . __( 'Manage Learning Mode', 'secupress' ) . '</a>';
-		secupress_add_notice( $message, 'updated', false );
+		secupress_add_notice( $message, 'updated', false, null, 'learning mode running' );
 	}
 
 	if ( ! secupress_firewall_learning_is_running() ) {
@@ -2242,7 +2248,7 @@ function secupress_firewall_learning_admin_notices() {
 		if ( $ended ) {
 			delete_site_transient( 'secupress_firewall_learning_ended_notice' );
 			if ( secupress_firewall_learning_end_notice_has_work() ) {
-				secupress_add_notice( $ended, 'updated', '' );
+				secupress_add_notice( $ended, 'updated', '', null, 'learning mode ended' );
 			}
 		}
 	}
@@ -2250,7 +2256,7 @@ function secupress_firewall_learning_admin_notices() {
 	if ( secupress_firewall_ng_is_active() ) {
 		$proposal = secupress_firewall_learning_current_proposal();
 		if ( $proposal && ! secupress_notice_is_dismissed( $proposal['id'] ) ) {
-			secupress_add_notice( secupress_firewall_learning_proposal_notice_html( $proposal ), 'updated', $proposal['id'] );
+			secupress_add_notice( secupress_firewall_learning_proposal_notice_html( $proposal ), 'updated', $proposal['id'], null, 'learning mode proposal' );
 		}
 	}
 
@@ -2270,7 +2276,7 @@ function secupress_firewall_learning_admin_notices() {
 			);
 		}
 		$message .= ' <a href="' . esc_url( $module_url ) . '" class="secupress-button secupress-button-tertiary secupress-ghost secupress-button-mini">' . __( 'Open Learning Mode', 'secupress' ) . '</a>';
-		secupress_add_notice( $message, 'updated', 'firewall-learning-mode-intro' );
+		secupress_add_notice( $message, 'updated', 'firewall-learning-mode-intro', null, 'learning mode calibration' );
 	}
 }
 

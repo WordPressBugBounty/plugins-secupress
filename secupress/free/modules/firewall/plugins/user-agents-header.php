@@ -4,7 +4,7 @@
  * Description: Block requests received with bad user-agents.
  * Main Module: firewall
  * Author: SecuPress
- * Version: 2.7
+ * Version: 2.7.4
  */
 
 defined( 'SECUPRESS_VERSION' ) or die( 'Something went wrong.' );
@@ -16,6 +16,7 @@ add_action( 'secupress.plugins.loaded', 'secupress_block_bad_user_agents', 5 );
  * 8G FIREWALL
  * https://perishablepress.com/8g-firewall/
  *
+ * @since 2.7.4 Block user agents that contain HTML when the 8G pack is disabled, and always during the bad user agent scan.
  * @since 2.7 Add 8G regex data file
  * @since 2.0 Empty user agent is fine
  * @since 1.4.6 Strip URLs from User-Agents to prevent false positive when the website contain a bad word (which is not bad)
@@ -25,7 +26,7 @@ add_action( 'secupress.plugins.loaded', 'secupress_block_bad_user_agents', 5 );
  */
 function secupress_block_bad_user_agents() {
 	// If this is from our scanner and the host remove or empty the UA, return a good result
-	if ( isset( $_SERVER['HTTP_X_SECUPRESS_ORIGIN'] ) && 'SecuPress_Scan_Bad_User_Agent' === $_SERVER['HTTP_X_SECUPRESS_ORIGIN'] && ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) || empty( $_SERVER['HTTP_USER_AGENT'] ) ) ) {
+	if ( 'SecuPress_Scan_Bad_User_Agent' === secupress_get_scan_request_origin() && ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) || empty( $_SERVER['HTTP_USER_AGENT'] ) ) ) {
 		status_header( 200, 'OK' );
 		echo 'SecuPress_Scan_Bad_User_Agent OK';
 		die();
@@ -43,9 +44,10 @@ function secupress_block_bad_user_agents() {
 
 	$user_agent = preg_replace( '/\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i', '', $user_agent );
 
-	// if ( trim( wp_strip_all_tags( $user_agent ) ) !== trim( $user_agent ) ) {
-	// 	secupress_block( 'UAHT', [ 'code' => 403, 'b64' => [ 'data' => $user_agent ] ] );
-	// }
+	$block_html_user_agent = ! secupress_firewall_ng_is_enabled() || 'SecuPress_Scan_Bad_User_Agent' === secupress_get_scan_request_origin();
+	if ( $block_html_user_agent && trim( wp_strip_all_tags( $user_agent ) ) !== trim( $user_agent ) ) {
+		secupress_block( 'UAHT', [ 'code' => 403, 'b64' => [ 'data' => $user_agent ] ] );
+	}
 
 	$bad_user_agents = secupress_firewall_bbq_headers_user_agents_list_default();
 

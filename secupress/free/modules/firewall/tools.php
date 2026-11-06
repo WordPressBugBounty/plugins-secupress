@@ -152,7 +152,10 @@ function secupress_firewall_bbq_request_content_bad_contents_list_default() {
 	}
 	$filename = secupress_get_data_file_path( 'bad_request_keys' );
 	if ( empty( $list ) && $filename ) {
-		$list = explode( ',', file_get_contents( $filename ) );
+		$contents = file_get_contents( $filename );
+		if ( is_string( $contents ) && '' !== $contents ) {
+			$list = explode( ',', $contents );
+		}
 	}
 	/**
 	 * Filters the bad request keys
@@ -209,13 +212,24 @@ function secupress_firewall_bbq_referer_content_ai_bots_list_default() {
 /**
  * Detect if a group of word is present in $_REQUEST
  *
+ * @since 2.7.4 Accept an array of groups. PHP 8 rejects an array in explode().
  * @since 2.2.6
  * @author Julio Potier
- * 
+ *
+ * @param (array|string) $keys
+ *
  * @return (string|bool)
  **/
 function secupress_check_request_keys( $keys ) {
-	$groups = explode( ',', $keys );
+	if ( is_array( $keys ) ) {
+		$groups = $keys;
+	} else {
+		$keys = (string) $keys;
+		if ( '' === $keys ) {
+			return false;
+		}
+		$groups = explode( ',', $keys );
+	}
 	foreach ( $groups as $group ) {
 		$words = explode( ' ', $group );
 		$all_present = true;
@@ -235,6 +249,7 @@ function secupress_check_request_keys( $keys ) {
 /**
  * See secupress_block_bad_url_contents
  *
+ * @since 2.7.4 Referer, host, and request method are matched on the whole value.
  * @since 1.4.9
  * @author Julio Potier
  * @param (string) $function Short string to be concat to form the callback
@@ -242,18 +257,17 @@ function secupress_check_request_keys( $keys ) {
  * @param (string) $block_id Which code use if we block
  **/
 function secupress_block_bad_content_but_what( $function, $server, $block_id ) {
-	if ( ! isset( $_SERVER[ $server ] ) ) {
+	if ( ! isset( $_SERVER[ $server ] ) || ! is_string( $_SERVER[ $server ] ) ) {
 		return;
 	}
 
 	// don't block if our own domain name contains a bad word and is present in the URL (with redirect for example).
 	$check_value = isset( $_SERVER['HTTP_HOST'] ) ? str_replace( $_SERVER['HTTP_HOST'], '', $_SERVER[ $server ] ) : $_SERVER[ $server ];
-	$check_value = explode( '?', $check_value, 2 );
-	// Nothing like a request uri? It's ok, don't look into the URLs paths
-	if ( 'QUERY_STRING' !== $server && ! isset( $check_value[1] ) ) {
-		return;
+	if ( 'QUERY_STRING' === $server ) {
+		$query_parts = explode( '?', $check_value, 2 );
+		$check_value = end( $query_parts );
 	}
-	$check_value  = urldecode( end( $check_value ) );
+	$check_value = urldecode( $check_value );
 	$bad_contents = "secupress_firewall_bbq_{$function}_content_bad_contents_list_default";
 	if ( ! function_exists( $bad_contents ) ) {
 		wp_die( esc_html( __FUNCTION__ ) ); // Should not happen in live.
@@ -457,8 +471,8 @@ function secupress_firewall_block_id( $module ) {
 		// Users
 		'NOUSER' => __( 'Unknown User', 'secupress' ),
 		// Files & functions
-		'PHP404' => __( '404 on PHP file', 'secupress' ),
-		'FUNCTS' => __( 'Functions in HTTP request', 'secupress' ),
+		'PHP404' => __( '404 on PHP files', 'secupress' ),
+		'404'    => __( 'Too many 404s', 'secupress' ),
 	);
 
 	return isset( $block_ids[ $module ] ) ? $block_ids[ $module ] : $module;

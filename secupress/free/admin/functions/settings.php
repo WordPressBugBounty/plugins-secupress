@@ -74,11 +74,12 @@ function secupress_print_scanner_ui( $scanner_results = [] ) {
 	$signature_scanners           = 0;
 	$signature_scanners_with_file = 0;
 	foreach ( $scanners as $scanner ) {
-		$scanner_file  = isset( $scanner['file'] ) ? $scanner['file'] : null;
-		$scanner_class = isset( $scanner['class'] ) ? $scanner['class'] : '';
-		$is_under_dev  = false !== stripos( $scanner_class, 'unavailable' );
+		$scanner_file    = isset( $scanner['file'] ) ? $scanner['file'] : null;
+		$scanner_class   = isset( $scanner['class'] ) ? $scanner['class'] : '';
+		$is_under_dev    = false !== stripos( $scanner_class, 'unavailable' );
+		$is_core_scanner = isset( $scanner['icon'] ) && 'core' === $scanner['icon'];
 
-		if ( $scanner_file && is_string( $scanner_file ) && ! $is_under_dev ) {
+		if ( $scanner_file && is_string( $scanner_file ) && ! $is_under_dev && ! $is_core_scanner ) {
 			$signature_scanners++;
 			$filename = secupress_get_data_file_path( $scanner_file );
 			if ( $filename && file_exists( $filename ) ) {
@@ -126,7 +127,7 @@ function secupress_print_scanner_ui( $scanner_results = [] ) {
 			$is_core_scanner = isset( $scanner['icon'] ) && 'core' === $scanner['icon'];
 
 			$file_available = true;
-			if ( ! $is_under_dev && $scanner_file && is_string( $scanner_file ) ) {
+			if ( ! $is_under_dev && ! $is_core_scanner && $scanner_file && is_string( $scanner_file ) ) {
 				$filename       = secupress_get_data_file_path( $scanner_file );
 				$file_available = $filename && file_exists( $filename );
 			}
@@ -219,8 +220,10 @@ function secupress_print_scanner_ui( $scanner_results = [] ) {
 				$state_class = 'state-available';
 			}
 
-			$scanner_id  = $results_key ? sanitize_html_class( $results_key ) : sanitize_title( $scanner['name'] );
-			$show_toggle = secupress_is_pro() && ! $running && 'dev' !== $state;
+			$scanner_id      = $results_key ? sanitize_html_class( $results_key ) : sanitize_title( $scanner['name'] );
+			$show_toggle     = secupress_is_pro() && ! $running && 'dev' !== $state;
+			$can_single_scan = secupress_is_pro() && secupress_is_expert_mode() && ! $running && 'dev' !== $state && 'file-missing' !== $state && $results_key;
+			$single_scan_url = $can_single_scan ? wp_nonce_url( admin_url( 'admin-post.php?action=secupress_toggle_file_scan&turn=on&type=' . $results_key ), 'secupress_toggle_file_scan' ) : '';
 		?>
 		<div class="secupress-scanner-feature <?php echo esc_attr( $state_class ); ?>">
 			<?php if ( $running && 'dev' !== $state && 'file-missing' !== $state ) { ?>
@@ -235,10 +238,24 @@ function secupress_print_scanner_ui( $scanner_results = [] ) {
 				</div>
 				<div class="secupress-scanner-feature-status">
 					<span class="secupress-scanner-status-text"><?php echo esc_html( $status_text ); ?></span>
-					<?php if ( $show_toggle ) { ?>
-						<button type="button" class="secupress-scanner-toggle-btn" data-target="secupress-results-<?php echo $scanner_id; ?>" aria-expanded="false" title="<?php esc_attr_e( 'View details', 'secupress' ); ?>">
-							<span class="dashicons dashicons-arrow-down-alt2"></span>
-						</button>
+					<?php if ( $can_single_scan || $show_toggle ) { ?>
+						<div class="secupress-scanner-feature-actions">
+							<?php if ( $can_single_scan ) { ?>
+								<a class="secupress-button secupress-button-mini secupress-scanit light" href="<?php echo esc_url( $single_scan_url ); ?>" data-loading-i18n="<?php esc_attr_e( 'Loading&hellip;', 'secupress' ); ?>">
+									<span class="icon" aria-hidden="true">
+										<i class="secupress-icon-refresh"></i>
+									</span>
+									<span class="text">
+										<?php _ex( 'Scan', 'verb', 'secupress' ); ?>
+									</span>
+								</a>
+							<?php } ?>
+							<?php if ( $show_toggle ) { ?>
+								<button type="button" class="secupress-scanner-toggle-btn" data-target="secupress-results-<?php echo $scanner_id; ?>" aria-expanded="false" title="<?php esc_attr_e( 'View details', 'secupress' ); ?>">
+									<span class="dashicons dashicons-arrow-down-alt2"></span>
+								</button>
+							<?php } ?>
+						</div>
 					<?php } ?>
 				</div>
 			</div>

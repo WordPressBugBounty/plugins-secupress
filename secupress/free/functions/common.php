@@ -29,6 +29,7 @@ function secupress_get_malware_scanners() {
 		],
 		[
 			'icon'  => 'core',
+			'file'  => 'core-integrity',
 			'name'  => __( 'WordPress Core Files Integrity', 'secupress' ),
 			'cback' => 'secupress_file_scanner_get_full_filetree',
 			'desc'  => __( 'Verifies that WordPress core files have not been modified or compromised.', 'secupress' ),
@@ -764,16 +765,74 @@ function secupress_block( $module, $args = array( 'code' => 403 ) ) {
 
 
 /**
- * Tell if the request comes from one of our scans by detecting a specific header.
- * Careful, this header can be forged, the result is not trustful.
+ * Build the signed value of the X-SecuPress-Origin header.
  *
- * @since 1.0
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (string) $origin Scan identifier, usually the scan class name.
+ *
+ * @return (string)
+ **/
+function secupress_get_scan_origin_header( $origin ) {
+	$origin = (string) $origin;
+	$time   = time();
+	$sign   = hash_hmac( 'sha256', $origin . '|' . $time, secupress_create_master_key() );
+
+	return $origin . '|' . $time . '|' . $sign;
+}
+
+/**
+ * Return the scan identifier when the request header carries a valid signature.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @return (string) Empty when the header is missing or not authentic.
+ **/
+function secupress_get_scan_request_origin() {
+	static $origin = null;
+
+	if ( null !== $origin ) {
+		return $origin;
+	}
+
+	$origin = '';
+	$header = isset( $_SERVER['HTTP_X_SECUPRESS_ORIGIN'] ) ? (string) wp_unslash( $_SERVER['HTTP_X_SECUPRESS_ORIGIN'] ) : '';
+
+	if ( ! preg_match( '/^(.+)\|(\d+)\|([a-f0-9]{64})$/', $header, $matches ) ) {
+		return $origin;
+	}
+
+	$name = $matches[1];
+	$time = (int) $matches[2];
+	$sign = $matches[3];
+	$key  = secupress_get_option( 'master_key' );
+
+	if ( ! $key || abs( time() - $time ) > 2 * MINUTE_IN_SECONDS ) {
+		return $origin;
+	}
+
+	$expected = hash_hmac( 'sha256', $name . '|' . $time, $key );
+
+	if ( hash_equals( $expected, $sign ) ) {
+		$origin = $name;
+	}
+
+	return $origin;
+}
+
+/**
+ * Tell if the request comes from one of our scans.
+ *
  * @author Grégory Viguier
+ * @since 2.7.4 The header must carry a signature made with the SecuPress master key.
+ * @since 1.0
  *
- * @return (bool) True if the request comes from a scan. False otherwize.
- */
+ * @return (bool) True if the request comes from a scan. False otherwise.
+ **/
 function secupress_is_scan_request() {
-	return ! empty( $_SERVER['HTTP_X_SECUPRESS_ORIGIN'] );
+	return '' !== secupress_get_scan_request_origin();
 }
 
 
@@ -858,6 +917,36 @@ function secupress_user_agent( $user_agent ) {
 }
 
 /**
+ * A visitor is a robot when the user agent is empty or matches a known crawler.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @return (bool)
+ **/
+function secupress_current_visitor_is_robot() {
+	$ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? trim( (string) wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+
+	if ( '' === $ua ) {
+		$is_robot = true;
+	} else {
+		$pattern  = '/bot|crawl|spider|slurp|archiver|http.?client|wget|curl|python|scrapy|headless|facebookexternalhit|embedly|pinterest|whatsapp|telegram|slackbot|discord|linkedin|semrush|ahrefs|mj12|dotbot|petal|bytespider|gptbot|claudebot|amazonbot|applebot|baidu|yandex|sogou|exabot|duckduck|bing|google|qwant|mojeek/i';
+		$is_robot = (bool) preg_match( $pattern, $ua );
+	}
+
+	/**
+	 * Filter the robot classification of the current visitor.
+	 *
+	 * @author Julio Potier
+	 * @since 2.7.4
+	 *
+	 * @param (bool)   $is_robot True when the visitor is counted as a robot.
+	 * @param (string) $ua       Raw user agent. Empty when missing.
+	 */
+	return (bool) apply_filters( 'secupress.visitor.is_robot', $is_robot, $ua );
+}
+
+/**
  * Get the site main URL. Will be the same for any site of a network, and for any lang of a multilang site.
  *
  * @since 1.2.2
@@ -915,6 +1004,196 @@ function secupress_is_white_label() {
 	return false;
 }
 
+/**
+ * Dashicon used when a core icon slug has no SVG to render.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (string) $slug Icon slug, without a collection prefix.
+ *
+ * @return (string) Dashicon class, or an empty string.
+ */
+function secupress_get_icon_slug_dashicon( $slug ) {
+	$dashicons = [
+		'wordpress'  => 'dashicons-wordpress',
+		'brush'      => 'dashicons-admin-appearance',
+		'plugins'    => 'dashicons-admin-plugins',
+		'map-marker' => 'dashicons-location',
+		'tip'        => 'dashicons-lightbulb',
+		'search'     => 'dashicons-search',
+		'key'        => 'dashicons-admin-network',
+		'symbol'     => 'dashicons-editor-code',
+		'desktop'    => 'dashicons-desktop',
+		'file'       => 'dashicons-media-default',
+		'settings'   => 'dashicons-admin-settings',
+		'shield'     => 'dashicons-shield',
+		'caution'    => 'dashicons-warning',
+		'people'     => 'dashicons-admin-users',
+		'star-empty'           => 'dashicons-star-empty',
+		'error'                => 'dashicons-dismiss',
+		'info'                 => 'dashicons-info',
+		'cancel-circle-filled' => 'dashicons-no',
+	];
+
+	return isset( $dashicons[ $slug ] ) ? $dashicons[ $slug ] : '';
+}
+
+/**
+ * Split an icon name into a Dashicon class and a core icon slug.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (string) $name Dashicon class, core/slug, core-admin/slug, or secupress-icon-* class.
+ *
+ * @return (array)
+ */
+function secupress_parse_icon_name( $name ) {
+	$parsed = [
+		'dashicon' => '',
+		'slug'     => '',
+		'custom'   => '',
+	];
+	$name   = trim( (string) $name );
+
+	if ( 0 === strpos( $name, 'secupress-icon-' ) ) {
+		$parsed['custom'] = $name;
+		return $parsed;
+	}
+
+	if ( 0 === strpos( $name, 'dashicons-' ) ) {
+		$parsed['dashicon'] = $name;
+		return $parsed;
+	}
+
+	if ( preg_match( '#^(?:core-admin|core)/([a-z0-9-]+)$#', $name, $matches ) ) {
+		$parsed['slug']     = $matches[1];
+		$parsed['dashicon'] = secupress_get_icon_slug_dashicon( $matches[1] );
+	}
+
+	return $parsed;
+}
+
+/**
+ * Tell if a namespaced icon is registered.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (string) $name Namespaced icon name.
+ *
+ * @return (bool)
+ */
+function secupress_is_icon_registered( $name ) {
+	if ( ! $name || ! class_exists( 'WP_Icons_Registry' ) ) {
+		return false;
+	}
+
+	return WP_Icons_Registry::get_instance()->is_registered( $name );
+}
+
+/**
+ * core-admin icon name for a Dashicon or a core icon slug.
+ *
+ * Empty before WordPress 7.2, and empty when the icon has no admin replacement.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (string) $name Dashicon class, core/slug, or core-admin/slug.
+ *
+ * @return (string)
+ */
+function secupress_get_icon_name( $name ) {
+	if ( ! function_exists( 'wp_is_valid_icon_name' ) ) {
+		return '';
+	}
+
+	$parsed = secupress_parse_icon_name( $name );
+
+	if ( $parsed['dashicon'] && class_exists( 'WP_Icons_Registry' ) ) {
+		$registry = WP_Icons_Registry::get_instance();
+		if ( method_exists( $registry, 'get_admin_icon_name_for_dashicon' ) ) {
+			$icon_name = $registry->get_admin_icon_name_for_dashicon( $parsed['dashicon'] );
+			if ( is_string( $icon_name ) && $icon_name ) {
+				return $icon_name;
+			}
+		}
+	}
+
+	if ( $parsed['slug'] && secupress_is_icon_registered( 'core-admin/' . $parsed['slug'] ) ) {
+		return 'core-admin/' . $parsed['slug'];
+	}
+
+	return '';
+}
+
+/**
+ * Icon markup.
+ *
+ * WordPress 7.2 and later renders a registered core-admin SVG. WordPress 7.1 renders a registered core/ icon when the name is a core slug, which keeps core/map-marker on 7.1. Every other case is a Dashicon.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (string) $name Dashicon class, core/slug, core-admin/slug, or secupress-icon-* class.
+ * @param (array)  $args {
+ *     Optional. Icon arguments.
+ *
+ *     @type (int)    $size     SVG width and height. Default 20.
+ *     @type (string) $class    Extra class names.
+ *     @type (string) $dashicon Dashicon class used when no SVG is rendered.
+ * }
+ *
+ * @return (string)
+ */
+function secupress_get_icon( $name, $args = [] ) {
+	$args = wp_parse_args(
+		$args,
+		[
+			'size'     => 20,
+			'class'    => '',
+			'dashicon' => '',
+		]
+	);
+	$parsed = secupress_parse_icon_name( $name );
+	if ( $args['dashicon'] ) {
+		$parsed['dashicon'] = 0 === strpos( $args['dashicon'], 'dashicons-' ) ? $args['dashicon'] : 'dashicons-' . $args['dashicon'];
+	}
+
+	if ( $parsed['custom'] ) {
+		$class = trim( $parsed['custom'] . ' ' . $args['class'] );
+		return '<span class="' . esc_attr( $class ) . '" aria-hidden="true"></span>';
+	}
+
+	$icon_name = '';
+	if ( function_exists( 'wp_is_valid_icon_name' ) ) {
+		$icon_name = secupress_get_icon_name( $name );
+	} elseif ( $parsed['slug'] && function_exists( 'wp_get_icon' ) && secupress_is_icon_registered( 'core/' . $parsed['slug'] ) ) {
+		$icon_name = 'core/' . $parsed['slug'];
+	}
+
+	if ( $icon_name && function_exists( 'wp_get_icon' ) ) {
+		$html = wp_get_icon(
+			$icon_name,
+			[
+				'size'  => (int) $args['size'],
+				'class' => $args['class'],
+			]
+		);
+		if ( is_string( $html ) && $html ) {
+			return $html;
+		}
+	}
+
+	if ( ! $parsed['dashicon'] ) {
+		return '';
+	}
+
+	$class = trim( 'dashicons ' . $parsed['dashicon'] . ' ' . $args['class'] );
+	return '<span class="' . esc_attr( $class ) . '" aria-hidden="true"></span>';
+}
 
 /**
  * Get SecuPress logo.
@@ -1492,6 +1771,9 @@ function secupress_feature_is_expert( $feature ) {
 		'login-protection_geoip_login_device'       => 1,
 		'login-protection_number_attempts'          => 1,
 		'login-protection_time_ban'                 => 1,
+		'bbq-url-content_404-max-visitors'          => 1,
+		'bbq-url-content_404-max-robots'            => 1,
+		'bbq-url-content_404-ban-time'              => 1,
 		'content-protect_hotlink_redirection'       => 1,
 		'content-protect_hotlink_allow'             => 1,
 	];
@@ -1577,6 +1859,7 @@ function secupress_feature_is_pro( $feature ) {
 /**
  * Tell if a user is affected by its role for the asked module.
  *
+ * @since 2.7.4 The administrator role is always affected by the double authentication.
  * @since 1.0
  * @author Julio Potier
  *
@@ -1600,6 +1883,10 @@ function secupress_is_affected_role( $module, $submodule, $user ) {
 	$user = secupress_is_user( $user, true );
 	if ( ! $user ) {
 		return false;
+	}
+
+	if ( 'users-login' === $module && 'double-auth' === $submodule && in_array( 'administrator', (array) $user->roles, true ) ) {
+		return true;
 	}
 
 	return secupress_is_user( $user) && ! array_intersect( $roles, $user->roles );
@@ -2748,6 +3035,14 @@ function secupress_attacks_get_type_title( $type ) {
 		
 		case 'bad_robots':
 			return __( 'Bad Robots', 'secupress' );
+		break;
+
+		case '404':
+			return __( 'Too many 404s', 'secupress' );
+		break;
+
+		case 'php404':
+			return __( '404 on PHP files', 'secupress' );
 		break;
 		
 		case 'bad_request_content':

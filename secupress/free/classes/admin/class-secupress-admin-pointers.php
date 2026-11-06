@@ -93,6 +93,8 @@ final class SecuPress_Admin_Pointers {
 	 * @return (array)
 	 */
 	public static function get_tours() {
+		return [];
+		/*
 		$app_passwords  = '<h3><span class="dashicons dashicons-star-filled"></span> ' . __( 'New: Application Passwords', 'secupress' ) . '</h3>';
 		$app_passwords .= '<h4>' . __( 'Get notified when an application password is created on your account', 'secupress' ) . '</h4>';
 		$app_passwords .= '<p>' . __( 'WordPress application passwords can grant REST API access to an account. Enable this setting to email the user (and the site admin if needed) whenever one is added.', 'secupress' ) . '</p>';
@@ -190,6 +192,7 @@ final class SecuPress_Admin_Pointers {
 		}
 
 		return $pointers;
+		*/
 	}
 
 	/**

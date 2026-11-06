@@ -38,18 +38,89 @@ $this->add_field( array(
 	'helpers'      => array(
 		array(
 			'type'        => 'warning',
-			'description' => __( 'Blocking AI bots may impact your SEO, as their results now appear in search engines.', 'secupress' ),
+			'description' => __( 'Blocking AI bots may impact your GEO (SEO for AI), as their results now appear in search engines.', 'secupress' ),
 		),
 	),
 ) );
 
+$main_field_name = 'bbq-url-content_ban-404-php';
+
 $this->add_field( array(
-	'title'             => __( 'Block 404 requests on PHP files', 'secupress' ),
-	'description'       => __( 'Allows you to redirect people who attempt to access hidden or malicious PHP files on a 404 page not found error.', 'secupress' ),
-	'label_for'         => 'bbq-url-content_ban-404-php',
-	'name'              => 'bbq-url-content_ban-404-php',
+	'title'             => __( 'Block scans for hidden content', 'secupress' ),
+	'description'       => __( 'Attackers try many addresses to find forgotten files and hidden pages they could abuse. This stops that search and protects your site.', 'secupress' ),
+	'label_for'         => $main_field_name,
+	'name'              => $main_field_name,
 	'plugin_activation' => true,
 	'type'              => 'checkbox',
 	'value'             => (int) secupress_is_submodule_active( 'firewall', 'ban-404-php' ),
-	'label'             => __( 'Yes, protect my site from 404 on .php files', 'secupress' ),
+	'label'             => __( 'Yes, protect my site from these scans', 'secupress' ),
 ) );
+
+$this->add_field( array(
+	'title'        => __( 'Verified bots', 'secupress' ),
+	'description'  => __( 'Bots we can identify for real, such as Google and Bing, are left alone so your site stays visible to them.', 'secupress' ),
+	'label_for'    => 'bbq-url-content_404-skip-google',
+	'name'         => 'bbq-url-content_404-skip-google',
+	'type'         => 'checkbox',
+	'depends'      => $main_field_name,
+	'value'        => (int) secupress_get_module_option( 'bbq-url-content_404-skip-google', 1, 'firewall' ),
+	'default'      => 1,
+	'label'        => __( 'Yes, do not count verified bots', 'secupress' ),
+) );
+
+$field_name = 'bbq-url-content_404-max-visitors';
+if ( secupress_feature_is_expert( $field_name ) && secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'        => __( 'How many tries before a block for visitors?', 'secupress' ),
+		'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '60' ),
+		'label_for'    => $field_name,
+		'name'         => $field_name,
+		'type'         => 'number',
+		'depends'      => $main_field_name,
+		'default'      => 60,
+		'value'        => (int) secupress_get_module_option( $field_name, 60, 'firewall' ),
+		'label_after'  => __( 'per minute', 'secupress' ),
+		'attributes'   => array(
+			'min' => 5,
+			'max' => 300,
+		),
+	) );
+}
+
+$field_name = 'bbq-url-content_404-max-robots';
+if ( secupress_feature_is_expert( $field_name ) && secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'        => __( 'How many tries before a block for robots?', 'secupress' ),
+		'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '120' ),
+		'label_for'    => $field_name,
+		'name'         => $field_name,
+		'type'         => 'number',
+		'depends'      => $main_field_name,
+		'default'      => 120,
+		'value'        => (int) secupress_get_module_option( $field_name, 120, 'firewall' ),
+		'label_after'  => __( 'per minute', 'secupress' ),
+		'attributes'   => array(
+			'min' => 5,
+			'max' => 300,
+		),
+	) );
+}
+
+$field_name = 'bbq-url-content_404-ban-time';
+if ( secupress_feature_is_expert( $field_name ) && secupress_is_expert_mode() ) {
+	$this->add_field( array(
+		'title'        => __( 'How long should the block last?', 'secupress' ),
+		'description'  => sprintf( __( 'Recommended: %s', 'secupress' ), '5 - 15' ),
+		'label_for'    => $field_name,
+		'name'         => $field_name,
+		'type'         => 'number',
+		'depends'      => $main_field_name,
+		'default'      => 5,
+		'value'        => (int) secupress_get_module_option( $field_name, 5, 'firewall' ),
+		'label_after'  => _x( 'min', 'minute', 'secupress' ),
+		'attributes'   => array(
+			'min' => 1,
+			'max' => 60,
+		),
+	) );
+}

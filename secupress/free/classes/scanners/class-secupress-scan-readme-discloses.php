@@ -188,10 +188,9 @@ class SecuPress_Scan_Readme_Discloses extends SecuPress_Scan implements SecuPres
 	 */
 	public function manual_fix() {
 		if ( $this->has_fix_action_part( 'fix' ) ) {
-			$this->fix();
+			return $this->fix();
 		}
-		// "good"
-		$this->add_fix_message( 1 );
+
 		return parent::manual_fix();
 	}
 

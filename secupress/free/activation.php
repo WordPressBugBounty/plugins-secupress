@@ -39,7 +39,9 @@ function secupress_db_error_delete_file() {
 		secupress_add_transient_notice(
 			__( 'Please be informed that your website experienced downtime due to a database error. We are pleased to report that the issue has been resolved and your website is now fully operational.', 'secupress' ),
 			'info',
-			''
+			'',
+			null,
+			'activation database downtime'
 		);
 
 	}
@@ -190,7 +192,7 @@ function secupress_write_rules_on_activation( $rules ) {
 		if ( ! secupress_root_file_is_writable( '.htaccess' ) ) {
 			/** Translators: 1 is a file name, 2 is some code. */
 			$message = sprintf( __( 'Your %1$s file is not writable. Please add the following lines at the beginning of the file: %2$s', 'secupress' ), '<code>.htaccess</code>', '<pre>' . esc_html( $new_content ) . '</pre>' );
-			secupress_add_notice( $message, 'error', 'secupress-activation-file-not-writable' );
+			secupress_add_notice( $message, 'error', 'secupress-activation-file-not-writable', null, 'activation file htaccess' );
 			return;
 		}
 
@@ -295,7 +297,7 @@ function secupress_write_rules_on_activation( $rules ) {
 
 		if ( ! $loaded ) {
 			$message = sprintf( __( 'Your %1$s file is not writable. Please edit this file, following these instructions: %2$s', 'secupress' ), '<code>web.config</code>', implode( '<br/>', $data ) );
-			secupress_add_notice( $message, 'error', 'secupress-activation-file-not-writable' );
+			secupress_add_notice( $message, 'error', 'secupress-activation-file-not-writable', null, 'activation file webconfig' );
 			return;
 		}
 
@@ -311,7 +313,7 @@ function secupress_write_rules_on_activation( $rules ) {
 	// Nginx.
 	if ( apply_filters( 'secupress.nginx.notice', true ) ) {
 		$message = sprintf( __( 'Since your %1$s file cannot be edited directly, please add the following in your file: %2$s', 'secupress' ), '<code>nginx.conf</code>', '<pre>' . implode( "\n", $rules ) . '</pre>' );
-		secupress_add_notice( $message, 'error', 'secupress-activation-file-not-writable' );
+		secupress_add_notice( $message, 'error', 'secupress-activation-file-not-writable', null, 'activation file nginx' );
 	}
 }
 

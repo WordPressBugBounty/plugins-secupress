@@ -494,6 +494,44 @@ input:hover + .secupress_disabled{
 	border-color: #888;
 	background: #ddd;
 }
+.secupress-checkbox-roles-line .secupress-checkbox:disabled {
+	pointer-events: none;
+}
+.secupress-checkbox-roles-line .secupress-role-locked {
+	cursor: help;
+}
+.secupress-checkbox-roles-line .secupress-role-lock-tip {
+	display: none;
+	position: absolute;
+	z-index: 1000;
+	left: 0;
+	top: calc(100% + 8px);
+	width: max-content;
+	max-width: 240px;
+	padding: 8px 12px;
+	background: #393E46;
+	color: #FFF;
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0;
+	white-space: normal;
+	border-radius: 3px;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.secupress-checkbox-roles-line .secupress-role-lock-tip:before {
+	content: "";
+	position: absolute;
+	left: 8px;
+	top: -6px;
+	border: 6px solid transparent;
+	border-top: 0;
+	border-bottom-color: #393E46;
+}
+.secupress-checkbox-roles-line .secupress-role-locked:hover .secupress-role-lock-tip {
+	display: block;
+}
 .secupress-section-dark .secupress-checkbox:disabled:not(:checked) + label:after,
 .secupress-section-dark .secupress-checkbox:disabled:checked + label:after,
 .secupress-section-dark .secupress-checkbox:disabled:not(:checked) + .label-text:after,

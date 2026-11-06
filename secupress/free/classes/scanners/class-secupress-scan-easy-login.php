@@ -173,10 +173,9 @@ class SecuPress_Scan_Easy_Login extends SecuPress_Scan implements SecuPress_Scan
 	 */
 	public function manual_fix() {
 		if ( $this->has_fix_action_part( 'fix' ) ) {
-			$this->fix();
+			return $this->fix();
 		}
-		// "good"
-		$this->add_fix_message( 1 );
+
 		return parent::manual_fix();
 	}
 
@@ -190,8 +189,10 @@ class SecuPress_Scan_Easy_Login extends SecuPress_Scan implements SecuPress_Scan
 	public function fix() {
 		secupress_activate_submodule( 'users-login', 'passwordless' );
 
-		// "good"
-		$this->add_fix_message( 1 );
+		if ( secupress_is_submodule_active( 'users-login', 'passwordless' ) || secupress_is_submodule_active( 'users-login', 'otp-auth' ) ) {
+			// "good"
+			$this->add_fix_message( 1 );
+		}
 
 		return parent::fix();
 	}

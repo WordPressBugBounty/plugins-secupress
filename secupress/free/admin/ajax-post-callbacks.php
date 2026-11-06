@@ -449,35 +449,50 @@ function secupress_ban_ip_ajax_post_cb() {
 		) );
 	}
 
-	// Already banned
-	$ban_ips = get_site_option( SECUPRESS_BAN_IP );
-	$ban_ips = is_array( $ban_ips ) ? $ban_ips : [];
-	if ( ! $is_list && isset( $ban_ips[ $ip ] ) ) {
+	// Already banned.
+	if ( ! $is_list && secupress_is_ip_banned( $ip ) ) {
 		secupress_admin_send_message_die( array(
 			'message' => __( 'This IP is already banned.', 'secupress' ),
 			'code'    => 'already_banned',
 			'type'    => 'error',
 		) );
 	}
-	// Transform the non list as a list now
+	// Transform the non list as a list now.
 	if ( ! is_array( $ip ) ) {
-		$ip  = [ $ip ];
+		$ip = array( $ip );
 	}
-	$ip      = array_flip( $ip );
-	array_walk( $ip, function( &$_ip, $time ) {
-		$_ip = strtotime('+10 years');
-	});
-	$ban_ips = array_merge( $ban_ips, $ip );
 
-	// Update the ips now
-	update_site_option( SECUPRESS_BAN_IP, $ban_ips );
+	$expires = strtotime( '+1 year' );
+	$added   = array();
+	$ranges  = get_site_option( SECUPRESS_BAN_IP );
+	$ranges  = is_array( $ranges ) ? $ranges : array();
+
+	foreach ( $ip as $one ) {
+		$one = trim( (string) $one );
+
+		if ( '' === $one || secupress_get_ip() === $one ) {
+			continue;
+		}
+
+		if ( secupress_ip_is_valid( $one, false ) ) {
+			secupress_set_banned_ip( $one, $expires );
+		} else {
+			$ranges[ $one ] = $expires;
+		}
+
+		$added[ $one ] = $expires;
+	}
+
+	if ( $ranges ) {
+		update_site_option( SECUPRESS_BAN_IP, $ranges );
+	}
 
 	/* This hook is documented in /inc/functions/admin.php */
-	do_action( 'secupress.ban.ip_banned', $ip, $ban_ips );
+	do_action( 'secupress.ban.ip_banned', $added, $ranges );
 
 	$referer_arg  = '&_wp_http_referer=' . urlencode( esc_url_raw( secupress_admin_url( 'modules', 'logs' ) ) );
 	$format       = _x( 'M jS Y', 'date', 'secupress' ) . ' ' . _x( 'G:i', 'date', 'secupress' );
-	$_time        = date_i18n( $format, strtotime('+10 years'));
+	$_time        = date_i18n( $format, $expires + ( (float) get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
 	// Send a response.
 	if ( ! $is_list ) {
 		secupress_admin_send_message_die( [
@@ -493,7 +508,7 @@ function secupress_ban_ip_ajax_post_cb() {
 		);
 	} else {
 		$tmplValues = [];
-		foreach ( $ban_ips as $_ip => $time ) {
+		foreach ( $added as $_ip => $time ) {
 			$tmplValues[] = [   'ip'        => $_ip,
 								'time'      => $_time,
 								'unban_url' => esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=secupress-unban-ip&ip=' . esc_attr( $_ip ) . $referer_arg ), 'secupress-unban-ip_' . $_ip ) ),
@@ -538,24 +553,15 @@ function secupress_unban_ip_ajax_post_cb() {
 
 	$ip = urldecode( $_REQUEST['ip'] );
 
-	// Remove the IP from the option.
-	$ban_ips = get_site_option( SECUPRESS_BAN_IP );
-	$ban_ips = is_array( $ban_ips ) ? $ban_ips : array();
-
-	if ( empty( $ban_ips[ $ip ] ) ) {
+	if ( ! secupress_unban_ip( $ip ) ) {
 		secupress_admin_send_message_die( array(
 			'message' => sprintf( __( 'The IP address %s is not banned.', 'secupress' ), '<code>' . esc_html( $ip ) . '</code>' ),
 			'code'    => 'ip_not_banned',
 		) );
 	}
 
-	unset( $ban_ips[ $ip ] );
-
-	if ( $ban_ips ) {
-		update_site_option( SECUPRESS_BAN_IP, $ban_ips );
-	} else {
-		delete_site_option( SECUPRESS_BAN_IP );
-	}
+	$ban_ips = get_site_option( SECUPRESS_BAN_IP );
+	$ban_ips = is_array( $ban_ips ) ? $ban_ips : array();
 
 	/**
 	 * Fires once a IP is unbanned.
@@ -587,8 +593,9 @@ function secupress_clear_ips_ajax_post_cb() {
 	secupress_check_admin_referer( 'secupress-clear-ips' );
 	secupress_check_user_capability();
 
-	// Remove all IPs from the option.
+	// Remove ranges and every single-IP transient.
 	delete_site_option( SECUPRESS_BAN_IP );
+	secupress_delete_all_banned_ip_transients();
 
 	/**
 	 * Fires once all IPs are unbanned.
@@ -618,7 +625,7 @@ function secupress_admin_post_toggle_security_pause_cb() {
 
 	if ( secupress_is_security_paused() ) {
 		secupress_resume_security();
-		secupress_add_transient_notice( __( 'Security is active again.', 'secupress' ), 'updated', 'security-resumed' );
+		secupress_add_transient_notice( __( 'Security is active again.', 'secupress' ), 'updated', 'security-resumed', null, 'security resumed' );
 	} elseif ( secupress_count_active_submodules() ) {
 		secupress_pause_security();
 		secupress_add_transient_notice(
@@ -628,7 +635,9 @@ function secupress_admin_post_toggle_security_pause_cb() {
 				human_time_diff( time(), time() + secupress_get_security_pause_duration() )
 			),
 			'warning',
-			'security-paused'
+			'security-paused',
+			null,
+			'security paused'
 		);
 	}
 
@@ -666,7 +675,7 @@ function secupress_admin_post_reset_settings_post_cb( $module = '', $bypass = fa
 	do_action( 'secupress.first_install', $module );
 
 	if ( ! $bypass ) {
-		secupress_add_transient_notice( __( 'Module settings reset.', 'secupress' ), 'updated', 'module-reset' );
+		secupress_add_transient_notice( __( 'Module settings reset.', 'secupress' ), 'updated', 'module-reset', null, 'module settings reset' );
 
 		wp_safe_redirect( esc_url_raw( secupress_admin_url( 'modules', $module ) ) );
 		die();
@@ -779,9 +788,12 @@ All at ###SITENAME###
 }
 
 add_action( 'admin_post_nopriv_secupress_deactivate_module', 'secupress_deactivate_module_admin_post_cb' );
+add_action( 'admin_post_secupress_deactivate_module', 'secupress_deactivate_module_admin_post_cb' );
 /**
- * Can deactivate a module from a link sent by secupress_unlock_admin_ajax_post_cb()
+ * Can deactivate a module from a link sent by secupress_unlock_admin_ajax_post_cb().
+ * PasswordLess can be deactivated the same way, including while logged in.
  *
+ * @since 2.7.4 PasswordLess deactivation link. Also available to a logged-in account.
  * @since 1.3.2
  * @author Julio Potier
  **/
@@ -796,7 +808,15 @@ function secupress_deactivate_module_admin_post_cb() {
 		wp_die( 'Something went wrong.' );
 	}
 	delete_transient( $tr_key_name );
-	secupress_deactivate_submodule( 'users-login', array( 'move-login' ) );
+	$module = isset( $_GET['module'] ) ? sanitize_key( wp_unslash( $_GET['module'] ) ) : 'move-login';
+	if ( 'passwordless' === $module ) {
+		secupress_deactivate_submodule( 'users-login', [ 'passwordless' ] );
+		if ( function_exists( 'secupress_passwordless_activation_validation_remove_option' ) ) {
+			secupress_passwordless_activation_validation_remove_option();
+		}
+	} else {
+		secupress_deactivate_submodule( 'users-login', [ 'move-login' ] );
+	}
 	wp_redirect( wp_login_url( secupress_admin_url( 'modules', 'users-login' ) ) );
 	die();
 }
@@ -825,7 +845,7 @@ function secupress_reset_all_settings_admin_post_cb() {
 		secupress_admin_post_reset_settings_post_cb( $key, true );
 	}
 
-	secupress_add_transient_notice( __( 'All modules settings reset', 'secupress' ), 'updated', 'module-reset' );
+	secupress_add_transient_notice( __( 'All modules settings reset', 'secupress' ), 'updated', 'module-reset', null, 'modules settings reset' );
 
 	wp_safe_redirect( wp_get_referer() );
 	die();
@@ -941,7 +961,7 @@ function secupress_regen_hash_key_admin_post_cb() {
 		secupress_create_mu_plugin( 'salt_keys', $alicia_keys, uniqid() );
 	}
 
-	secupress_auto_login( 'Salt_Keys', null, __( 'Security keys have been successfully regenerated.', 'secupress' ) );
+	secupress_auto_login( 'Salt_Keys', null, __( 'Security keys have been successfully regenerated.', 'secupress' ), 'security keys regenerated' );
 }
 
 add_action( 'admin_post_secupress_accept_notification', 'secupress_accept_notification_admin_post_cb' );

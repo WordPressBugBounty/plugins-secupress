@@ -200,7 +200,7 @@ function secupress_wp_endpoints_settings_callback( $modulenow, &$settings, $acti
 			if ( $error ) {
 				$settings['wp-endpoints_author_base'] = $old_author_base;
 				$error = sprintf( __( 'This author page base is already used for %s. Please choose another one.', 'secupress' ), $message );
-				secupress_add_transient_notice( $error, 'error', '', 'exist' );
+				secupress_add_transient_notice( $error, 'error', '', 'exist', 'author base used' );
 				return $settings;
 			}
 

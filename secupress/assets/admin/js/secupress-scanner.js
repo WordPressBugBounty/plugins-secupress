@@ -802,9 +802,18 @@ jQuery( document ).ready( function( $ ) {
 			// Ajax call
 			setTimeout( function() {
 				$.getJSON( href.replace( 'admin-post.php', 'admin-ajax.php' ) )
-				.done( function( r ) {
-					$( '.secupress-scanned-current' ).html( test.replace(/_/g, ' ') + '<br>' + $('.secupress-item-all').index($row) );
-				} )
+			.done( function( r ) {
+				$( '.secupress-scanned-current' ).html( test.replace(/_/g, ' ') + '<br>' + $('.secupress-item-all').index($row) );
+
+				if ( secupressResponseHasRequiredData( r ) ) {
+					$( 'body' ).trigger( 'scanDone.secupress', [ {
+						test:   test,
+						href:   href,
+						isBulk: isBulk,
+						data:   r.data
+					} ] );
+				}
+			} )
 				.fail( function() {
 					// Error
 					secupressDisplayScanError( $row );
@@ -1044,6 +1053,27 @@ jQuery( document ).ready( function( $ ) {
 		// !End of scan. ---------------------------------------------------------------------------
 
 		// What to do when a scan ends.
+		function secupressAdvanceStep3Item( $row ) {
+			var $parent = $row.closest( '.secupress-manual-fix' ),
+				$next   = $parent.next( '.secupress-manual-fix' ),
+				$ignore = $parent.find( '.secupress-button-ignoreit' ).first(),
+				item;
+
+			if ( ! $next.length ) {
+				if ( $ignore.length ) {
+					w.location = $ignore.attr( 'href' );
+				}
+				return;
+			}
+
+			$parent.addClass( 'hide-if-js' );
+			$next.removeClass( 'hide-if-js' );
+			item = $( '.step3-advanced-text' ).first().text();
+			item = Number( item ) + 1;
+			$( '.step3-advanced-text' ).text( item );
+		}
+
+
 		$( 'body' ).on( 'scanDone.secupress', function( e, extra ) {
 			/*
 			* Available extras:
@@ -1053,7 +1083,23 @@ jQuery( document ).ready( function( $ ) {
 			* extra.data:   data returned by the ajax call.
 			*/
 			var $row = $( '#' + extra.test ),
-				$fixitWrap, $refixitWrap;
+				$fixitWrap, $refixitWrap,
+				$manual;
+
+			if ( extra.data && 'good' === extra.data.class ) {
+				if ( 2 === SecuPressi18nScanner.step ) {
+					$row.slideUp( 200 );
+				}
+				if ( 3 === SecuPressi18nScanner.step ) {
+					secupressAdvanceStep3Item( $( '#secupress-mf-content-' + extra.test ) );
+				}
+			} else if ( 3 === SecuPressi18nScanner.step && extra.data && extra.data.message ) {
+				$manual = $( '#secupress-mf-content-' + extra.test );
+				$manual.find( '.secupress-ic-desc' ).html( extra.data.message );
+				$manual.find( '.secupress-button-manual-scanit .secupress-icon-shield' ).addClass( 'secupress-icon-check' ).removeClass( 'secupress-icon-shield' );
+				secupressResetManualFix();
+				secupressEnableButtons( $manual.find( '.secupress-button-manual-scanit' ) );
+			}
 
 			// If we have delayed fixes (only in bulk), launch the first in queue now.
 			if ( secupressScans.delayedFixes.length ) {

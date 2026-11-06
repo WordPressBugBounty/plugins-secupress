@@ -91,7 +91,10 @@
 .secupress-notice a.notice-dismiss {
 	text-decoration: none;
 	justify-content: end;
-	font-weight: 500;
+	font-weight: 600;
+}
+.secupress-notice p {
+	max-width: 94%;
 }
 .secupress-compat-notice .notice-dismiss {
 	border: none;

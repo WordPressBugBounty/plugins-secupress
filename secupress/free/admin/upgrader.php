@@ -261,7 +261,7 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 		if ( secupress_is_submodule_active( 'plugins-themes', 'theme-installation' ) ) {
 			secupress_deactivate_submodule( 'plugins-themes', 'theme-installation' );
 			secupress_activate_submodule( 'plugins-themes', 'theme-installation' );
-			secupress_add_transient_notice( __( 'The modules for `No Theme Activation`, `No Theme Deletion` have been consolidated into the `No Theme Actions` module.', 'secupress' ) );
+			secupress_add_transient_notice( __( 'The modules for `No Theme Activation`, `No Theme Deletion` have been consolidated into the `No Theme Actions` module.', 'secupress' ), 'updated', '', null, 'theme actions consolidated' );
 		}
 
 		secupress_deactivate_submodule( 'sensitive-data', 'bad-file-extensions' ); // Not silently because we need to remove the htaccess rules.
@@ -288,7 +288,7 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 		if ( secupress_is_submodule_active( 'plugins-themes', 'plugin-installation' ) ) {
 			secupress_deactivate_submodule( 'plugins-themes', 'plugin-installation' );
 			secupress_activate_submodule( 'plugins-themes', 'plugin-installation' );
-			secupress_add_transient_notice( __( 'The modules for `No Plugin Activation`, `No Plugin Deactivation`, and `No Plugin Deletion` have been consolidated into the `No Plugin Actions` module.', 'secupress' ) );
+			secupress_add_transient_notice( __( 'The modules for `No Plugin Activation`, `No Plugin Deactivation`, and `No Plugin Deletion` have been consolidated into the `No Plugin Actions` module.', 'secupress' ), 'updated', '', null, 'plugin actions consolidated' );
 		}
 
 		delete_transient( 'secupress_unlock_admin_key' ); // name changed, now contains user_email.
@@ -392,7 +392,7 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 			if ( secupress_get_module_option( 'password-policy_password_expiration', 0, 'users-login' ) > 0 
 				&& ! secupress_is_submodule_active( 'users-login', 'strong-passwords' )
 			) {
-				secupress_add_notice( sprintf( __( 'For information, the module "Password Lifespan" has been deactivated. We cannot reactivated it unless you activate the <a href="%s">module "Force Strong Passwords"</a>.', 'secupress' ), secupress_admin_url( 'modules', 'users-login#row-password-policy_strong_passwords' ) ), 'info', '' );
+				secupress_add_notice( sprintf( __( 'For information, the module "Password Lifespan" has been deactivated. We cannot reactivated it unless you activate the <a href="%s">module "Force Strong Passwords"</a>.', 'secupress' ), secupress_admin_url( 'modules', 'users-login#row-password-policy_strong_passwords' ) ), 'info', '', null, 'password lifespan deactivated' );
 			}
 		}
 	}
@@ -498,6 +498,17 @@ function secupress_new_upgrade( $secupress_version, $actual_version ) {
 		secupress_migrate_attacks_md_to_ymd();
 		secupress_deactivate_submodule( 'users-login', 'bannonexistsuser' );
 		secupress_remove_old_plugin_file( SECUPRESS_MODULES_PATH . 'users-login/plugins/bannonexistsuser.php' );
+	}
+	// < 2.7.4
+	if ( version_compare( $actual_version, '2.7.4', '<' ) ) {
+		if ( function_exists( 'secupress_migrate_content_allowed_urls_to_hosts' ) ) {
+			secupress_migrate_content_allowed_urls_to_hosts();
+		}
+		secupress_migrate_banned_ips();
+		secupress_delete_site_transient( 'secupress_lla_unknown' );
+		if ( function_exists( 'secupress_migrate_double_auth_force_administrator' ) ) {
+			secupress_migrate_double_auth_force_administrator();
+		}
 	}
 	// DEV: DO NOT REDIRECT / DO NOT AUTOLOGIN / DO NOT USE $modulenow //
 }
@@ -782,6 +793,7 @@ if ( ! secupress_is_white_label() ) {
 			$title     = sprintf( '<strong>' . __( 'What’s new in SecuPress %s%s', 'secupress' ) . '</strong>', defined( 'SECUPRESS_PRO_VERSION' ) ? 'Pro ' : '', SECUPRESS_VERSION );
 			$readmore  = '<a href="https://secupress.me/changelog" target="_blank"><em>' . __( 'Or read full changelog on secupress.me', 'secupress' ) . '</em></a>';
 			$newitems  = [
+							__( 'Improvement: PasswordLess always affects the Administrator role. If it was excluded, each administrator receives an email with a link to deactivate it.', 'secupress' ),
 							__( 'Critical: Warn admins so they can check the backdoor and patch it.', 'secupress' ),
 							__( 'New: Passwordless login now uses a 6-digit code instead of a magic link.', 'secupress' ),
 							__( 'New: Disable Application Passwords: refuse and log any Application Password authentication attempt.', 'secupress' ),
@@ -792,7 +804,7 @@ if ( ! secupress_is_white_label() ) {
 						];
 			if ( ! empty( $newitems ) ) {
 				$newitems = '<ul><li>• ' . implode( '</li><li>• ', $newitems ) . '</li></ul>';
-				secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2 );
+				secupress_add_transient_notice( $title . $newitems . $readmore, 'updated', $notice_id2, null, 'plugin changelog' );
 			}
 		}
 	}

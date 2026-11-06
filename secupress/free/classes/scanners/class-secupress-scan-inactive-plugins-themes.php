@@ -132,6 +132,9 @@ class SecuPress_Scan_Inactive_Plugins_Themes extends SecuPress_Scan implements S
 		if ( $count = count( $lists['plugins'] ) ) {
 			// "bad"
 			$lists['plugins'] = wp_list_pluck( $lists['plugins'], 'Name' ); // Do not translate 'Name'.
+			foreach ( $lists['plugins'] as $plugin_file => $plugin_name ) {
+				$lists['plugins'][ $plugin_file ] = esc_html( strip_tags( $plugin_name ) );
+			}
 			$lists['plugins'] = self::wrap_in_tag( $lists['plugins'], 'code' );
 			$this->slice_and_dice( $lists['plugins'], 8 );
 			$this->add_message( 200, array( $count, $count, $lists['plugins'] ) );
@@ -342,6 +345,9 @@ class SecuPress_Scan_Inactive_Plugins_Themes extends SecuPress_Scan implements S
 			// "cantfix"
 			$not_removed = array_diff_key( $selected_plugins, $deleted_plugins );
 			$not_removed = wp_list_pluck( $not_removed, 'Name' );
+			foreach ( $not_removed as $plugin_file => $plugin_name ) {
+				$not_removed[ $plugin_file ] = esc_html( strip_tags( $plugin_name ) );
+			}
 			$this->add_fix_message( 102, array( count( $not_removed ), $not_removed ) );
 		}
 
@@ -465,9 +471,9 @@ class SecuPress_Scan_Inactive_Plugins_Themes extends SecuPress_Scan implements S
 				$form .= '<input type="checkbox" id="secupress-fix-delete-inactive-plugins-' . sanitize_html_class( $plugin_file ) . '" name="secupress-fix-delete-inactive-plugins[]" value="' . esc_attr( $plugin_file ) . '" ' . ( $is_symlinked ? 'disabled="disabled"' : 'checked="checked"' ) . '/> ';
 				$form .= '<label for="secupress-fix-delete-inactive-plugins-' . sanitize_html_class( $plugin_file ) . '">';
 				if ( $is_symlinked ) {
-					$form .= '<del>' . $plugin_data['Name'] . '</del> <span class="description">(' . __( 'symlinked', 'secupress' ) . ')</span>';
+					$form .= '<del>' . $plugin_name . '</del> <span class="description">(' . __( 'symlinked', 'secupress' ) . ')</span>';
 				} else {
-					$form .= $plugin_data['Name'];
+					$form .= $plugin_name;
 				}
 				$form .= "</label><br/>\n";
 			}

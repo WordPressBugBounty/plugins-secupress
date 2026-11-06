@@ -84,13 +84,17 @@ class SecuPress_404_Logs extends SecuPress_Logs {
 	/**
 	 * Log a 404.
 	 *
+	 * @since 2.7.4 Strip line breaks from the URI before it is stored.
 	 * @since 1.0
 	 */
 	public function log_404() {
+		// Line breaks in the requested URI must not be stored: the .txt export is line-oriented.
+		$uri = $this->remove_log_line_breaks( secupress_get_current_url( 'uri' ) );
+
 		// Build the Log array.
 		$log = static::set_log_time_and_user( array(
 			'type'   => 'error-404',
-			'target' => esc_html( secupress_get_current_url( 'uri' ) ),
+			'target' => esc_html( $uri ),
 			'data'   => array(
 				'get'  => $_GET, // WPCS: CSRF ok.
 				'post' => $_POST, // WPCS: CSRF ok.

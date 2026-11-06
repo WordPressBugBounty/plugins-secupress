@@ -172,6 +172,15 @@ function secupress_db_access_granted() {
 	if ( ! isset( $results[0]['Grants for ' . DB_USER . '@' . $host] ) ) {
 		return false;
 	}
+	if ( '127.0.0.1' === $host ) {
+		$host = 'localhost';
+	}
+	$results = $wpdb->get_results( 'SHOW GRANTS FOR ' . DB_USER . '@' . $host, ARRAY_A ); // WPCS: unprepared SQL ok.
+
+	// We got something.
+	if ( ! isset( $results[0]['Grants for ' . DB_USER . '@' . $host] ) ) {
+		return false;
+	}
 
 	$access_granted = false;
 	$quoted_db_name = str_replace( '_', '\\\*_', preg_quote( DB_NAME, '/' ) );

@@ -110,8 +110,9 @@ add_action( 'check_comment_flood', 'secupress_fightspam_force_check_comment' );
  * Force deactivation of "manual comment moderation" option.
  * Force deactivation of "approve comments by previously-approved authors" option.
  * This will allow `check_comment()` to run its tests properly in `wp_allow_comment()`, and let us do our job.
- * Force deactivation of the blacklist from WordPress, because it does not return the right spam status. We will use it later in `secupress_fightspam_blacklist_as_spam_check()`.
+ * Force deactivation of the disallowed terms list from WordPress, because it does not return the right spam status. We will use it later in `secupress_fightspam_blacklist_as_spam_check()`.
  *
+ * @since 2.7.4 `blacklist_keys` was renamed to `disallowed_keys` in WordPress 5.5.
  * @since 2.0 Remove pre_option_comment_moderation
  * @since 1.0
  */
@@ -120,7 +121,7 @@ function secupress_fightspam_force_check_comment() {
 		// Do not use `__return_false`, it won't work.
 		// add_filter( 'pre_option_comment_moderation', '__return_zero', 1 );
 		add_filter( 'pre_option_comment_whitelist',  '__return_empty_string', 1 );
-		add_filter( 'pre_option_blacklist_keys',     '__return_empty_string', 1 );
+		add_filter( 'pre_option_disallowed_keys',    '__return_empty_string', 1 );
 	}
 }
 
@@ -173,7 +174,7 @@ function secupress_fightspam_remove_comment_moderation_filter( $approved ) {
 	// Remove our filters.
 	remove_filter( 'pre_option_comment_moderation', '__return_zero', 1 );
 	remove_filter( 'pre_option_comment_whitelist',  '__return_empty_string', 1 );
-	remove_filter( 'pre_option_blacklist_keys',     '__return_empty_string', 1 );
+	remove_filter( 'pre_option_disallowed_keys',    '__return_empty_string', 1 );
 
 	if ( is_user_logged_in() ) {
 		return $approved;
@@ -290,8 +291,9 @@ function secupress_fightspam_shortcode_as_spam_check( $approved, $commentdata ) 
 add_filter( 'pre_comment_approved', 'secupress_fightspam_blacklist_as_spam_check', 9, 2 );
 /**
  * Mark comments as spam, depending on a blacklist.
- * The blacklist from WordPress is disabled in `secupress_fightspam_force_check_comment()`. We run the test here (with maybe our improved list).
+ * The disallowed terms list from WordPress is disabled in `secupress_fightspam_force_check_comment()`. We run the test here, then our own terms file.
  *
+ * @since 2.7.4 Our terms file is tested apart with `secupress_fightspam_has_disallowed_term()`.
  * @since 1.0
  *
  * @param (int|string) $approved    The approval status. Accepts 1, 0, 'spam', or 'trash'.
@@ -308,12 +310,6 @@ function secupress_fightspam_blacklist_as_spam_check( $approved, $commentdata ) 
 		return $approved;
 	}
 
-	if ( secupress_get_module_option( 'antispam_better-blacklist-comment', false, 'antispam' ) ) {
-		// Add our blacklist.
-		add_filter( 'pre_option_blacklist_keys', 'secupress_fightspam_better_blacklist_comment' );
-	}
-
-	// Test.
 	if ( wp_check_comment_disallowed_list(
 		$commentdata['comment_author'],
 		$commentdata['comment_author_email'],
@@ -325,29 +321,96 @@ function secupress_fightspam_blacklist_as_spam_check( $approved, $commentdata ) 
 		return secupress_fightspam_return_spam_status_setting( 'blacklist' );
 	}
 
-	remove_filter( 'pre_option_blacklist_keys', 'secupress_fightspam_better_blacklist_comment' );
+	if ( secupress_get_module_option( 'antispam_better-blacklist-comment', false, 'antispam' ) && secupress_fightspam_has_disallowed_term( $commentdata ) ) {
+		return secupress_fightspam_return_spam_status_setting( 'blacklist' );
+	}
 
 	return $approved;
 }
 
 
 /**
- * Add our blacklist to the WordPress's one.
+ * Get the terms from our disallowed terms file, lowercased.
  *
- * @since 1.0
+ * @author Julio Potier
+ * @since 2.7.4
  *
- * @param (bool|string) $value The value of the WordPress's blacklist.
- *
- * @return (string) The blacklist.
- */
-function secupress_fightspam_better_blacklist_comment( $value ) {
-	$file = secupress_get_data_path( 'spam-disallowed-terms' );
+ * @return (array)
+ **/
+function secupress_fightspam_get_disallowed_terms() {
+	static $terms = null;
 
-	if ( file_exists( $file ) ) {
-		$spam_words = file( $file );
-		$value     .= "\n" . implode( "\n", $spam_words );
+	if ( null !== $terms ) {
+		return $terms;
 	}
-	return trim( $value );
+
+	$terms = [];
+	$file  = secupress_get_disallowed_terms_file();
+
+	if ( ! $file ) {
+		return $terms;
+	}
+
+	$lines = file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+
+	if ( ! is_array( $lines ) ) {
+		return $terms;
+	}
+
+	foreach ( $lines as $line ) {
+		$line = mb_strtolower( trim( $line ) );
+
+		if ( '' !== $line ) {
+			$terms[ $line ] = true;
+		}
+	}
+
+	$terms = array_keys( $terms );
+
+	return $terms;
+}
+
+
+/**
+ * Tell if a comment contains one of the terms from our disallowed terms file.
+ * Same fields and same case-insensitive substring test as `wp_check_comment_disallowed_list()`, without regular expressions.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (array) $commentdata Comment data.
+ *
+ * @return (bool)
+ **/
+function secupress_fightspam_has_disallowed_term( $commentdata ) {
+	$terms = secupress_fightspam_get_disallowed_terms();
+
+	if ( ! $terms ) {
+		return false;
+	}
+
+	$fields = [];
+	$keys   = [ 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_author_IP', 'comment_agent' ];
+
+	foreach ( $keys as $key ) {
+		if ( isset( $commentdata[ $key ] ) && is_string( $commentdata[ $key ] ) && '' !== $commentdata[ $key ] ) {
+			$fields[] = $commentdata[ $key ];
+		}
+	}
+
+	if ( isset( $commentdata['comment_content'] ) && is_string( $commentdata['comment_content'] ) ) {
+		$fields[] = wp_strip_all_tags( $commentdata['comment_content'] );
+	}
+
+	$haystack = mb_strtolower( implode( "\n", $fields ) );
+
+	foreach ( $terms as $term ) {
+		if ( false !== strpos( $haystack, $term ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -696,28 +759,11 @@ function secupress_fightspam_get_spam_status( $value ) {
 
 	// URL.
 	if ( false !== $value && $is_url ) {
-		$service_base_url = 'http://www.urlvoid.com/';
-
-		// First scan to initialize the entry if new.
-		$url = $service_base_url . 'scan/' . $value;
-		wp_remote_get( $url, array( 'timeout' => 2, 'blocking' => false ) );
-
-		// Force update the entry.
-		$url = $service_base_url . 'update-report/' . $value;
-		wp_remote_get( $url, array( 'timeout' => 10 ) );
-
-		// Scan the entry, updated.
-		$url      = $service_base_url . 'scan/' . $value;
-		$response = wp_remote_get( $url, array( 'timeout' => 10 ) );
-
-		// Manage to get the status doing a parsing job.
-		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-
-			if ( strpos( $response['body'], '<span class="label label-success">' ) > 0 ) {
-				$status = 'safe';
-			} else {
-				$status = 'blacklisted';
-			}
+		$reputation = secupress_get_url_reputation( $value );
+		if ( in_array( $reputation['status'], array( 'safe', 'untested' ), true ) ) {
+			$status = 'safe';
+		} elseif ( in_array( $reputation['status'], array( 'warning', 'caution', 'suspicious' ), true ) ) {
+			$status = 'blacklisted';
 		}
 	}
 	// IP, Email, Username.
@@ -729,16 +775,7 @@ function secupress_fightspam_get_spam_status( $value ) {
 			$is_what = 'email';
 		}
 		if ( 'username' !== $is_what ) {
-			$service_base_url = 'https://api.stopforumspam.org/api?f=serial&' . $is_what . '=' . $value;
-			$response         = wp_remote_get( $service_base_url, array( 'timeout' => 5 ) );
-
-			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-				$results = maybe_unserialize( $response['body'] );
-
-				if ( isset( $results['success'], $results[ $is_what ] ) && $results['success'] ) {
-					$status = 0 === (int) $results[ $is_what ]['frequency'] && ( ! isset( $results[ $is_what ]['confidence'] ) || 1 < $results[ $is_what ]['confidence'] ) ? 'safe' : 'blacklisted';
-				}
-			}
+			$status = secupress_stopforumspam_get_status( $value, $is_what );
 		} else {
 			// We can't say "John" is a spammer just by it's name. SO, all username are "good" since they can't be a URL, already done earlier.
 			$status = 'safe';
@@ -875,6 +912,7 @@ add_filter( 'widget_text_content', 'secupress_fightspam_obfuscate_emails', 20 );
  * Obfuscate email addresses in front-end content to limit harvest by spam bots.
  *
  * @since 2.7.2
+ * @since 2.7.4 Process only visible text and mailto links.
  * @author Julio Potier
  *
  * @param (string) $content The content.
@@ -886,16 +924,118 @@ function secupress_fightspam_obfuscate_emails( $content ) {
 		return $content;
 	}
 
-	$pattern = '/<(script|style|textarea|pre|code)\b[^>]*>.*?<\/\1>(*SKIP)(*FAIL)|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/is';
-	$fixed   = preg_replace_callback( $pattern, 'secupress_fightspam_obfuscate_email', $content );
+	$pattern       = '/[a-z0-9._%+-]{1,320}@[a-z0-9.-]{1,320}\.[a-z]{2,63}/i';
+	$excluded_tags = [];
+	$content_parts = wp_html_split( $content );
 
-	return is_string( $fixed ) ? $fixed : $content;
+	if ( ! is_array( $content_parts ) ) {
+		return $content;
+	}
+
+	foreach ( $content_parts as $index => $content_part ) {
+		// Odd parts are HTML tags and comments, even parts are text nodes.
+		if ( $index % 2 ) {
+			if ( preg_match( '/^<\s*(\/?)\s*(script|style|textarea|pre|code)\b/i', $content_part, $matches ) ) {
+				$tag = strtolower( $matches[2] );
+
+				if ( $matches[1] ) {
+					$tag_index = array_search( $tag, array_reverse( $excluded_tags, true ), true );
+					if ( false !== $tag_index ) {
+						unset( $excluded_tags[ $tag_index ] );
+					}
+				} elseif ( ! preg_match( '/\/\s*>$/', $content_part ) ) {
+					$excluded_tags[] = $tag;
+				}
+			}
+
+			if ( empty( $excluded_tags ) ) {
+				$content_parts[ $index ] = secupress_fightspam_obfuscate_mailto( $content_part );
+			}
+
+			continue;
+		}
+
+		if ( ! empty( $excluded_tags ) || false === strpos( $content_part, '@' ) ) {
+			continue;
+		}
+
+		$fixed = preg_replace_callback( $pattern, 'secupress_fightspam_obfuscate_email', $content_part );
+		if ( is_string( $fixed ) ) {
+			$content_parts[ $index ] = $fixed;
+		}
+	}
+
+	return implode( $content_parts );
 }
 
 /**
- * Obfuscate one email address with WordPress' antispambot().
+ * Obfuscate email addresses in a mailto link.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $tag An HTML tag.
+ *
+ * @return (string) The tag with obfuscated mailto email addresses.
+ */
+function secupress_fightspam_obfuscate_mailto( $tag ) {
+	if ( ! preg_match( '/^<\s*a\b/i', $tag ) || false === stripos( $tag, 'mailto:' ) ) {
+		return $tag;
+	}
+
+	$original_tag   = $tag;
+	$quoted_pattern = '/(\s+href\s*=\s*)(["\'])(mailto:)(.*?)\2/is';
+	$tag            = preg_replace_callback(
+		$quoted_pattern,
+		function ( $matches ) {
+			return $matches[1] . $matches[2] . $matches[3] . secupress_fightspam_obfuscate_mailto_recipients( $matches[4] ) . $matches[2];
+		},
+		$tag
+	);
+
+	if ( ! is_string( $tag ) ) {
+		return $original_tag;
+	}
+
+	$unquoted_pattern = '/(\s+href\s*=\s*)(mailto:)([^\s>]+)/i';
+	$fixed            = preg_replace_callback(
+		$unquoted_pattern,
+		function ( $matches ) {
+			return $matches[1] . $matches[2] . secupress_fightspam_obfuscate_mailto_recipients( $matches[3] );
+		},
+		$tag
+	);
+
+	return is_string( $fixed ) ? $fixed : $tag;
+}
+
+/**
+ * Obfuscate the recipient part of a mailto link.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $mailto The mailto value without its scheme.
+ *
+ * @return (string) The mailto value with obfuscated recipients.
+ */
+function secupress_fightspam_obfuscate_mailto_recipients( $mailto ) {
+	$mailto_parts = explode( '?', $mailto, 2 );
+	$pattern      = '/[a-z0-9._%+-]{1,320}@[a-z0-9.-]{1,320}\.[a-z]{2,63}/i';
+	$fixed        = preg_replace_callback( $pattern, 'secupress_fightspam_obfuscate_mailto_email', $mailto_parts[0] );
+
+	if ( is_string( $fixed ) ) {
+		$mailto_parts[0] = $fixed;
+	}
+
+	return implode( '?', $mailto_parts );
+}
+
+/**
+ * Obfuscate one visible email address with WordPress' antispambot().
  *
  * @since 2.7.2
+ * @since 2.7.4 Limit email addresses to 320 characters.
  * @author Julio Potier
  *
  * @param (array) $matches The regex matches.
@@ -910,9 +1050,29 @@ function secupress_fightspam_obfuscate_email( $matches ) {
 		return $email;
 	}
 
-	if ( ! is_email( $email ) ) {
+	if ( 320 < strlen( $email ) || ! is_email( $email ) ) {
 		return $email;
 	}
 
-	return antispambot( $email, 1 ); // 1 = enable hex encoding, WP 7.1+
+	return antispambot( $email );
+}
+
+/**
+ * Obfuscate one mailto email address with WordPress' antispambot().
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (array) $matches The regex matches.
+ *
+ * @return (string) The obfuscated email, or the original match if it is not an email.
+ */
+function secupress_fightspam_obfuscate_mailto_email( $matches ) {
+	$email = $matches[0];
+
+	if ( 320 < strlen( $email ) || ! is_email( $email ) ) {
+		return $email;
+	}
+
+	return antispambot( $email, 1 );
 }

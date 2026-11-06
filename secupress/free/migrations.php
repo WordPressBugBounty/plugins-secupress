@@ -26,5 +26,5 @@ if ( secupress_is_plugin_active( 'sf-move-login/sf-move-login.php' ) ) {
 		}
 	}
 	deactivate_plugins( 'sf-move-login/sf-move-login.php' );
-	secupress_add_notice( sprintf( __( 'The plugin "Move Login" has been deactivated because it is no longer needed. This feature is now included in %s. You can <a href="%s">delete</a> it now.', 'secupress' ), SECUPRESS_PLUGIN_NAME, wp_nonce_url( admin_url( 'plugins.php?action=delete&plugin=sf-move-login/sf-move-login.php' ), 'delete-plugin_sf-move-login/sf-move-login.php' ) ), 'success' );
+	secupress_add_notice( sprintf( __( 'The plugin "Move Login" has been deactivated because it is no longer needed. This feature is now included in %s. You can <a href="%s">delete</a> it now.', 'secupress' ), SECUPRESS_PLUGIN_NAME, wp_nonce_url( admin_url( 'plugins.php?action=delete&plugin=sf-move-login/sf-move-login.php' ), 'delete-plugin_sf-move-login/sf-move-login.php' ) ), 'success', '', null, 'move login deactivated' );
 }

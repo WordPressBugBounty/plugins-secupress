@@ -5,6 +5,7 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  * Get the Disallowed usernames.
  *
  * @author Julio Potier
+ * @since 2.7.4 Trim each username.
  * @since 2.2.6
  * @author Grégory Viguier
  * @since 1.0
@@ -31,6 +32,7 @@ function secupress_get_blacklisted_usernames() {
    		_deprecated_hook( 'secupress.plugin.disallowed_logins_list', '2.2.6', 'secupress.plugins.disallowed_logins_list' );
 	}
 	$list = apply_filters( 'secupress.plugins.disallowed_logins_list', $list );
+	$list = array_values( array_filter( array_map( 'trim', (array) $list ), 'strlen' ) );
 
 	// Temporarily allow some Disallowed usernames.
 	$allowed = (array) secupress_cache_data( 'allowed_usernames' );
@@ -119,6 +121,91 @@ function secupress_get_user_roles( $user_id ) {
 }
 
 /**
+ * Walk users who still have a non-expired session, one database batch at a time.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @param (callable) $callback Receives a user ID.
+ */
+function secupress_foreach_connected_user_id( $callback ) {
+	global $wpdb;
+
+	$now      = time();
+	$last_id  = 0;
+	$batch    = 500;
+
+	do {
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT user_id, meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s AND user_id > %d ORDER BY user_id ASC LIMIT %d",
+				'session_tokens',
+				$last_id,
+				$batch
+			),
+			ARRAY_A
+		);
+		if ( ! is_array( $rows ) || ! $rows ) {
+			break;
+		}
+
+		foreach ( $rows as $row ) {
+			$last_id  = (int) $row['user_id'];
+			$sessions = maybe_unserialize( $row['meta_value'] );
+			if ( ! is_array( $sessions ) ) {
+				continue;
+			}
+			foreach ( $sessions as $session ) {
+				if ( is_array( $session ) && ! empty( $session['expiration'] ) && (int) $session['expiration'] > $now ) {
+					$callback( $last_id );
+					break;
+				}
+			}
+		}
+
+		$fetched = count( $rows );
+		unset( $rows );
+	} while ( $fetched === $batch );
+}
+
+/**
+ * Count users with a non-expired session.
+ *
+ * Only the total is kept. Large sites keep that total for 10 minutes, others for 3.
+ *
+ * @author Julio Potier
+ * @since 2.7.4
+ *
+ * @return (int)
+ */
+function secupress_count_connected_users() {
+	static $count = null;
+
+	if ( null !== $count ) {
+		return $count;
+	}
+
+	$cached = get_site_transient( 'secupress_system_connected_users' );
+	if ( false !== $cached && is_numeric( $cached ) ) {
+		$count = (int) $cached;
+		return $count;
+	}
+
+	$count = 0;
+	secupress_foreach_connected_user_id( function () use ( &$count ) {
+		$count++;
+	} );
+
+	$ttl = 3 * MINUTE_IN_SECONDS;
+	if ( function_exists( 'wp_is_large_user_count' ) && wp_is_large_user_count() ) {
+		$ttl = 10 * MINUTE_IN_SECONDS;
+	}
+	set_site_transient( 'secupress_system_connected_users', $count, $ttl );
+
+	return $count;
+}
+
+/**
  * Get user IDs with active sessions.
  *
  * @since 2.2.6
@@ -127,29 +214,16 @@ function secupress_get_user_roles( $user_id ) {
  * @return (array) User IDs with active sessions.
  */
 function secupress_get_connected_user_ids() {
-	static $user_ids = [];
-	$user_ids = $user_ids ?? [];
+	static $user_ids = null;
 
-	if ( ! empty( $user_ids ) ) {
+	if ( null !== $user_ids ) {
 		return $user_ids;
 	}
 
-	// Get all user IDs
-	$users = get_users( [
-		'meta_key'     => 'session_tokens',
-		'meta_compare' => 'EXISTS'
-	] );
-
-	foreach ($users as $user) {
-		$instance = WP_Session_Tokens::get_instance( $user->ID );
-		$sessions = $instance->get_all();
-		foreach ( $sessions as $session ) {
-			if ( $session['expiration'] > time() ) {
-				$user_ids[] = $user->ID;
-				break; // No need to check further tokens for this user
-			}
-		}
-	}
+	$user_ids = [];
+	secupress_foreach_connected_user_id( function ( $user_id ) use ( &$user_ids ) {
+		$user_ids[] = $user_id;
+	} );
 
 	return $user_ids;
 }
@@ -357,7 +431,23 @@ function secupress_get_fake_users() {
 	$fake_users = array_merge( $temp_users, $fake_users );
 
 	$fake_users = array_unique( $fake_users );
-	
+	if ( $fake_users ) {
+		$rehash_ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND user_id IN (" . implode( ',', array_map( 'intval', $fake_users ) ) . ')',
+			'secupress-password-needs-rehash'
+		) );
+		if ( $rehash_ids ) {
+			$rehash_ids = array_map( 'intval', $rehash_ids );
+			$fake_users = array_filter( $fake_users, function( $user_id ) use ( $rehash_ids ) {
+				$user_id = (int) $user_id;
+				if ( ! in_array( $user_id, $rehash_ids, true ) ) {
+					return true;
+				}
+				return false !== secupress_is_fake_user( $user_id );
+			} );
+		}
+	}
+
 	// Convert IDs to user objects using our custom function that handles empty user_nicename
 	$fake_users = array_map( function( $user_id ) {
 		if ( ! $user_id ) {

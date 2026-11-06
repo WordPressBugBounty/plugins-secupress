@@ -1611,12 +1611,32 @@ function secupressDisplayAjaxSuccess( $button, text, ajaxID ) {
 				$btn.attr( 'aria-expanded', 'false' );
 			} );
 			$toggles.remove();
+			$wrapper.find( '.secupress-scanner-feature .secupress-scanit' ).remove();
 
 			$wrapper.find( '.secupress-scanner-feature:not(.state-dev):not(.state-file-missing) .secupress-scanner-feature > .secupress-icon, .secupress-scanner-feature:not(.state-dev):not(.state-file-missing) > .secupress-icon' ).each( function() {
 				$( this ).replaceWith( '<span class="spinner secupress-inline-spinner secupress-inline-spinner-active"></span>' );
 			} );
 		}
 
+	} );
+
+	$( d ).on( 'click', '.secupress-scanner-feature .secupress-scanit', function() {
+		var $button  = $( this );
+		var $feature = $button.closest( '.secupress-scanner-feature' );
+		var $wrapper = $button.closest( '.secupress-scanner-promo' );
+
+		$button.find( '.text' ).text( $button.data( 'loading-i18n' ) );
+
+		if ( $wrapper.length ) {
+			var $results = $wrapper.find( '.secupress-scanner-results-content:visible' );
+			$results.slideUp( 200 );
+
+			var $toggles = $wrapper.find( '.secupress-scanner-toggle-btn' );
+			$toggles.remove();
+			$wrapper.find( '.secupress-scanner-feature .secupress-scanit' ).not( $button ).remove();
+		}
+
+		$feature.children( '.secupress-icon' ).replaceWith( '<span class="spinner secupress-inline-spinner secupress-inline-spinner-active"></span>' );
 	} );
 	
 	$( document ).on( 'click', '.secupress-scanner-toggle-btn', function(e) {

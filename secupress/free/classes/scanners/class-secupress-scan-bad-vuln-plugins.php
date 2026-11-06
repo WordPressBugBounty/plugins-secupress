@@ -175,19 +175,84 @@ class SecuPress_Scan_Bad_Vuln_Plugins extends SecuPress_Scan implements SecuPres
 	 *
 	 * @return (array) The fix results.
 	 */
+	/**
+	 * A listed plugin needs a manual choice. Otherwise the Pro one-click fix can activate the detector.
+	 *
+	 * @since 2.7.4
+	 *
+	 * @return (bool|string)
+	 */
+	public function is_fixable() {
+		if ( false === $this->fixable || ( 'pro' === $this->fixable && ! secupress_is_pro() ) ) {
+			return $this->fixable;
+		}
+
+		$bad_plugins = $this->get_installed_plugins_vulnerables();
+
+		if ( is_array( $bad_plugins ) && $bad_plugins ) {
+			return false;
+		}
+
+		return $this->fixable;
+	}
+
+	/**
+	 * Try to fix the flaw(s).
+	 *
+	 * @since 2.7.4 A real deletion form when vulnerable plugins are installed.
+	 * @since 1.4.5
+	 *
+	 * @return (array) The fix results.
+	 */
 	public function need_manual_fix() {
+		$bad_plugins = $this->get_installed_plugins_vulnerables();
+
+		if ( is_array( $bad_plugins ) && $bad_plugins ) {
+			return [ 'delete-vuln-plugins' => 'delete-vuln-plugins' ];
+		}
+
 		return [ 'fix' => 'fix' ];
 	}
 
 	/**
 	 * Get an array containing ALL the forms that would fix the scan if it requires user action.
 	 *
+	 * @since 2.7.4 A checkbox list of vulnerable plugins.
 	 * @since 1.4.5
 	 *
 	 * @return (array) An array of HTML templates (form contents most of the time).
 	 */
 	protected function get_fix_action_template_parts() {
-		return [ 'fix' => '&nbsp;' ];
+		$plugins = $this->get_installed_plugins_vulnerables();
+
+		if ( ! is_array( $plugins ) || ! $plugins ) {
+			return [ 'fix' => '&nbsp;' ];
+		}
+
+		$installed = get_plugins();
+		$form      = '<h4 id="secupress-fix-vuln-plugins">' . __( 'Checked plugins will be deleted:', 'secupress' ) . '</h4>';
+		$form     .= '<fieldset aria-labelledby="secupress-fix-vuln-plugins" class="secupress-boxed-group">';
+
+		foreach ( $plugins as $plugin_file ) {
+			$is_symlinked = secupress_is_plugin_symlinked( $plugin_file );
+			$plugin_data  = isset( $installed[ $plugin_file ] ) ? $installed[ $plugin_file ] : [];
+			$plugin_name  = ! empty( $plugin_data['Name'] ) ? $plugin_data['Name'] : $plugin_file;
+			$plugin_name  = esc_html( wp_strip_all_tags( $plugin_name ) );
+			$input_id     = 'secupress-fix-delete-vuln-plugins-' . sanitize_html_class( $plugin_file );
+
+			$form .= '<input type="checkbox" id="' . $input_id . '" name="secupress-fix-delete-vuln-plugins[]" value="' . esc_attr( $plugin_file ) . '" ' . ( $is_symlinked ? 'disabled="disabled"' : 'checked="checked"' ) . '/> ';
+			$form .= '<label for="' . $input_id . '">';
+			if ( $is_symlinked ) {
+				$form .= '<del>' . $plugin_name . '</del> <span class="description">(' . __( 'symlinked', 'secupress' ) . ')</span>';
+			} else {
+				$form .= $plugin_name;
+			}
+			$form .= '</label><br/>';
+		}
+
+		$form .= '</fieldset>';
+
+		return [ 'delete-vuln-plugins' => $form ];
 	}
 
 	/**
@@ -198,17 +263,19 @@ class SecuPress_Scan_Bad_Vuln_Plugins extends SecuPress_Scan implements SecuPres
 	 * @return (array) The fix results.
 	 */
 	public function manual_fix() {
-		if ( $this->has_fix_action_part( 'fix' ) ) {
-			$this->fix();
+		if ( $this->has_fix_action_part( 'delete-vuln-plugins' ) ) {
+			$this->manual_delete_vuln_plugins();
+		} elseif ( $this->has_fix_action_part( 'fix' ) ) {
+			return $this->fix();
 		}
-		// "good"
-		$this->add_fix_message( 1 );
+
 		return parent::manual_fix();
 	}
 
 	/**
 	 * Try to fix the flaw(s).
 	 *
+	 * @since 2.7.4 Do not report success while vulnerable plugins are still installed.
 	 * @since 1.0
 	 *
 	 * @return (array) The fix results.
@@ -216,10 +283,58 @@ class SecuPress_Scan_Bad_Vuln_Plugins extends SecuPress_Scan implements SecuPres
 	public function fix() {
 		secupress_activate_submodule( 'plugins-themes', 'detect-bad-plugins' );
 
-		// "good"
-		$this->add_fix_message( 1 );
+		$bad_plugins = $this->get_installed_plugins_vulnerables();
+
+		if ( ! is_array( $bad_plugins ) || ! $bad_plugins ) {
+			// "good"
+			$this->add_fix_message( 1 );
+		}
 
 		return parent::fix();
+	}
+
+	/**
+	 * Delete the vulnerable plugins selected in the manual fix form.
+	 *
+	 * @since 2.7.4
+	 */
+	protected function manual_delete_vuln_plugins() {
+		$bad_plugins = $this->get_installed_plugins_vulnerables();
+
+		if ( ! is_array( $bad_plugins ) || ! $bad_plugins ) {
+			$this->add_fix_message( 1 );
+			return;
+		}
+
+		$allowed          = array_fill_keys( array_values( $bad_plugins ), 1 );
+		$selected_plugins = ! empty( $_POST['secupress-fix-delete-vuln-plugins'] ) && is_array( $_POST['secupress-fix-delete-vuln-plugins'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['secupress-fix-delete-vuln-plugins'] ) ) : []; // WPCS: CSRF ok.
+		$selected_plugins = array_fill_keys( $selected_plugins, 1 );
+		$selected_plugins = array_intersect_key( $allowed, $selected_plugins );
+
+		if ( ! $selected_plugins ) {
+			$this->add_fix_message( 101 );
+			return;
+		}
+
+		if ( ! function_exists( 'delete_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$result = delete_plugins( array_keys( $selected_plugins ) );
+
+		if ( is_wp_error( $result ) || null === $result ) {
+			$this->add_fix_message( 103, [ count( $selected_plugins ), implode( ', ', array_keys( $selected_plugins ) ) ] );
+			return;
+		}
+
+		$still_there = $this->get_installed_plugins_vulnerables();
+
+		if ( is_array( $still_there ) && $still_there ) {
+			$this->add_fix_message( 102, [ count( $selected_plugins ) ] );
+			return;
+		}
+
+		$this->add_fix_message( 2 );
 	}
 
 
@@ -247,6 +362,10 @@ class SecuPress_Scan_Bad_Vuln_Plugins extends SecuPress_Scan implements SecuPres
 
 		if ( ! $bad_plugins ) {
 			return array();
+		}
+
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
 		$all_plugins = get_plugins();

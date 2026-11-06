@@ -458,6 +458,8 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 	 *                - (string) $label_before      A label to display before the field.
 	 *                - (string) $label_after       A label to display after the field.
 	 *                - (bool)   $disabled          True to disable the field. Pro fields are automatically disabled on the free version.
+	 *                - (array)  $disabled_roles      Role slugs always checked and not uncheckable for the 'roles' type.
+	 *                - (string) $disabled_role_title Text shown when hovering the name of a locked role.
 	 *                - (array)  $attributes        An array of html attributes to add to the field (like min and max for a 'number' type).
 	 *                - (array)  $helpers           An array containing the helpers. See `self::helpers()`.
 	 */
@@ -837,19 +839,32 @@ abstract class SecuPress_Settings extends SecuPress_Singleton {
 				}
 				break;
 			case 'roles' :
-				$value = array_flip( (array) $value );
-				$roles = new WP_Roles();
-				$roles = $roles->get_names();
-				$roles = array_map( 'secupress_translate_user_role', $roles );
+				$value          = array_flip( (array) $value );
+				$roles          = new WP_Roles();
+				$roles          = $roles->get_names();
+				$roles          = array_map( 'secupress_translate_user_role', $roles );
+				$disabled_roles = isset( $args['disabled_roles'] ) ? (array) $args['disabled_roles'] : [];
 				foreach ( $roles as $val => $title ) {
+					$role_locked = in_array( $val, $disabled_roles, true );
+					$role_attr   = $attributes;
+					$lock_tip    = '';
+					if ( $role_locked && ! $disabled ) {
+						$role_attr .= ' disabled="disabled"';
+					}
+					if ( $role_locked && ! empty( $args['disabled_role_title'] ) ) {
+						$lock_tip = '<span class="secupress-role-lock-tip">' . esc_html( $args['disabled_role_title'] ) . '</span>';
+					}
 					?>
 					<p class="secupress-checkbox-roles-line">
-						<label<?php echo $disabled ? ' class="disabled"' : ''; ?>>
-							<input type="checkbox" name="<?php echo $name_attribute; ?>[]" value="<?php echo $val; ?>"<?php checked( ! isset( $value[ $val ] ) ); ?><?php echo $attributes; ?>>
-							<?php echo '<span class="label-text">' . $title . '</span>'; ?>
+						<label<?php echo ( $disabled || $role_locked ) ? ' class="disabled"' : ''; ?>>
+							<input type="checkbox" name="<?php echo $name_attribute; ?>[]" value="<?php echo $val; ?>"<?php checked( $role_locked || ! isset( $value[ $val ] ) ); ?><?php echo $role_attr; ?>>
+							<?php echo '<span class="label-text' . ( $lock_tip ? ' secupress-role-locked' : '' ) . '">' . $title . $lock_tip . '</span>'; ?>
 						</label>
 					</p>
 					<?php
+					if ( $role_locked ) {
+						echo '<input type="hidden" name="' . $name_attribute . '[]" value="' . esc_attr( $val ) . '" />';
+					}
 				}
 				?>
 				<input type="hidden" name="<?php echo $name_attribute; ?>[witness]" value="1" />

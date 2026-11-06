@@ -47,21 +47,20 @@ foreach ( $secupress_tests as $module_name => $class_name_parts ) {
 		$current_test     = $class_name::get_instance();
 		$is_fixable       = $current_test->is_fixable();
 		$this_fix_actions = $current_test->need_manual_fix();
+		$auto_fixable     = true === $is_fixable || ( 'pro' === $is_fixable && secupress_is_pro() );
+		$one_click        = is_array( $this_fix_actions ) && array( 'fix' ) === array_keys( $this_fix_actions );
 
-		// Those that need a manual fix.
-		if ( is_array( $this_fix_actions ) && ( ( secupress_is_pro() && 'pro' !== $is_fixable ) || 'pro' !== $is_fixable ) ) {
-			// Store the "fix actions".
-			if ( $this_fix_actions ) {
-				$fix_actions[ $class_name_part_lower ] = $this_fix_actions;
-				if ( isset( $lasts[ $class_name_part ] ) ) {
-					$tests_6[ $class_name_part ] = $module_name; // last
-				} else {
-					$tests_1[ $class_name_part ]           = $module_name; // 1: fix action.
-				}
+		if ( is_array( $this_fix_actions ) && $this_fix_actions && ( ! $one_click || $auto_fixable ) && ( $auto_fixable || 'pro' !== $is_fixable ) ) {
+			$fix_actions[ $class_name_part_lower ] = $this_fix_actions;
+			if ( isset( $lasts[ $class_name_part ] ) ) {
+				$tests_6[ $class_name_part ] = $module_name; // last
 			} else {
-				// Doesn't need to be fixed, the scan is simply not up to date. Excluded.
-				unset( $bad_scan_results[ $class_name_part_lower ] );
+				$tests_1[ $class_name_part ] = $module_name; // 1: fix action.
 			}
+			continue;
+		}
+		if ( is_array( $this_fix_actions ) && ! $this_fix_actions ) {
+			unset( $bad_scan_results[ $class_name_part_lower ] );
 			continue;
 		}
 		// Pro.
@@ -224,8 +223,12 @@ if ( ! $secupress_tests ) {
 
 					<p class="secupress-ic-desc">
 						<?php
+						// A previous fix could not be applied: show that result, not the generic activation sentence.
+						if ( 'cantfix' === $fix_status && ! empty( $fix_result['msgs'] ) ) {
+							echo wp_kses( secupress_format_message( $fix_result['msgs'], $class_name_part ), $allowed_tags );
+						}
 						// Case 1: needs Pro, or not fixable by SecuPress (example: DB password).
-						if ( ! $is_fixable ) {
+						elseif ( ! $is_fixable ) {
 							if ( ! empty( $scanner['msgs'] ) ) {
 								$message = secupress_format_message( $scanner['msgs'], $class_name_part );
 							} else {
@@ -292,7 +295,7 @@ if ( ! $secupress_tests ) {
 								</span>
 								<span class="text"><?php _e( 'Ignore it', 'secupress' ); ?></span>
 							</a>
-							<?php 
+							<?php
 							if ( ( $not_fixable_by_sp && ! $has_actions ) || 'cantfix' === $fix_status ) { ?>
 								<a href="<?php echo esc_url( $scan_nonce_url ); ?>" class="secupress-button secupress-button-primary secupress-button-manual-scanit shadow">
 									<span class="icon">

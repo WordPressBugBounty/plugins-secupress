@@ -171,10 +171,9 @@ class SecuPress_Scan_Bad_User_Agent extends SecuPress_Scan implements SecuPress_
 	 */
 	public function manual_fix() {
 		if ( $this->has_fix_action_part( 'fix' ) ) {
-			$this->fix();
+			return $this->fix();
 		}
-		// "good"
-		$this->add_fix_message( 1 );
+
 		return parent::manual_fix();
 	}
 
@@ -186,11 +185,12 @@ class SecuPress_Scan_Bad_User_Agent extends SecuPress_Scan implements SecuPress_
 	 * @return (array) The fix results.
 	 */
 	public function fix() {
-		// Activate.
 		secupress_activate_submodule( 'firewall', 'user-agents-header' );
 
-		// "good"
-		$this->add_fix_message( 1 );
+		if ( secupress_is_submodule_active( 'firewall', 'user-agents-header' ) ) {
+			// "good"
+			$this->add_fix_message( 1 );
+		}
 
 		return parent::fix();
 	}

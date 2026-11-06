@@ -96,7 +96,7 @@ function secupress_auth_redirect_blacklist_logins( $user_id ) {
 			$raw_user->user_login = $user_login;
 			// Send the new login by email.
 			secupress_blocklist_logins_new_user_notification( $raw_user );
-			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), __( 'username', 'secupress' ), secupress_tag_me( esc_html( $user_login ), 'strong' ) ), 'updated', 'username-updated', 'exist' );
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), __( 'username', 'secupress' ), secupress_tag_me( esc_html( $user_login ), 'strong' ) ), 'updated', 'username-updated', 'exist', 'username updated' );
 			// Kill session.
 			wp_clear_auth_cookie();
 			wp_destroy_current_session();
@@ -202,7 +202,7 @@ function secupress_auth_redirect_blacklist_display_name( $user_id ) {
 		}
 
 		if ( ! $error ) {
-			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), _x( 'Display Name', 'bad logins', 'secupress' ), secupress_tag_me( esc_html( $display_name ), 'strong' ) ), 'updated', 'display-name-updated', 'exist' );
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), _x( 'Display Name', 'bad logins', 'secupress' ), secupress_tag_me( esc_html( $display_name ), 'strong' ) ), 'updated', 'display-name-updated', 'exist', 'display name updated' );
 			return;
 		}
 	}
@@ -281,12 +281,12 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 				if ( isset( $which['nicename'] ) ) {
 					$raw_user->user_nicename = sanitize_title( $new_name );
 				}
-				secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ), 'updated', 'nickname-updated', 'exist' );
+				secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ), 'updated', 'nickname-updated', 'exist', 'nickname updated' );
 				wp_update_user( $raw_user );
 			}
 		} elseif ( isset( $which['nicename'] ) && $raw_user->user_nicename !== sanitize_title( $raw_user->display_name ) ) {
 			$raw_user->user_nicename = sanitize_title( $raw_user->display_name );
-			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( sanitize_title( $raw_user->display_name ), 'strong' ) ), 'updated', 'nickname-updated', 'exist' );
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', 1, 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( sanitize_title( $raw_user->display_name ), 'strong' ) ), 'updated', 'nickname-updated', 'exist', 'nickname updated' );
 			wp_update_user( $raw_user );
 		}
 		$which = secupress_pro_same_usernames_get_which( $raw_user );
@@ -347,7 +347,7 @@ function secupress_pro_same_usernames_on_login( $user_id ) {
 				unset( $which['nicename'] );
 				$last = ' ' . sprintf( __( 'Your author profil URL slug has to be updated as %s.', 'secupress' ), secupress_tag_me( esc_html( $raw_user->user_nicename ), 'strong' ) );
 			}
-			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ) . $last, 'updated', 'nickname-updated', 'exist' );
+			secupress_add_transient_notice( sprintf( _nx( 'Your %1$s has been updated as %2$s.', 'Your %1$s have been updated as %2$s.', count( $which ), 'a nickname', 'secupress' ), wp_sprintf_l( '%l', $which ), secupress_tag_me( esc_html( $new_name ), 'strong' ) ) . $last, 'updated', 'nickname-updated', 'exist', 'nickname updated' );
 
 			wp_update_user( $raw_user );
 			return;
@@ -541,6 +541,7 @@ add_filter( 'illegal_user_logins', 'secupress_blacklist_logins_illegal_user_logi
 /**
  * Filter the blacklisted user names.
  * This filter is used in `wp_insert_user()`, `edit_user()` and `wpmu_validate_user_signup()`.
+ * Core compares the list with an exact match, so wildcard entries are not effective there.
  *
  * @since 2.2.6 usage of 'illegal_user_logins' filter (compat 4.4), finally!
  * @since 1.0
@@ -551,7 +552,84 @@ add_filter( 'illegal_user_logins', 'secupress_blacklist_logins_illegal_user_logi
  * @return (array) The forbidden user names.
  */
 function secupress_blacklist_logins_illegal_user_logins( $usernames ) {
-	return array_merge( $usernames, secupress_get_blacklisted_usernames() );
+	$usernames = array_merge( $usernames, secupress_get_blacklisted_usernames() );
+	$pending   = secupress_blacklist_logins_wildcard_pending_login();
+
+	// A concrete login that matched a wildcard, so core's exact comparison can reject it.
+	if ( '' !== $pending ) {
+		$usernames[] = $pending;
+	}
+
+	return $usernames;
+}
+
+
+/**
+ * Remember a not-yet-created login that matched a disallowed wildcard.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string|null) $user_login Login to store. Null only reads the current value.
+ *
+ * @return (string)
+ */
+function secupress_blacklist_logins_wildcard_pending_login( $user_login = null ) {
+	static $pending = '';
+
+	if ( is_string( $user_login ) ) {
+		$pending = $user_login;
+	}
+
+	return $pending;
+}
+
+
+add_filter( 'pre_user_login', 'secupress_blacklist_logins_pre_user_login' );
+/**
+ * Feed core's exact disallowed-login check with a new login that matches a wildcard.
+ * Existing accounts are left untouched so an update can still be saved.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $user_login Sanitized user login.
+ *
+ * @return (string)
+ */
+function secupress_blacklist_logins_pre_user_login( $user_login ) {
+	if ( ! is_string( $user_login ) || '' === $user_login || username_exists( $user_login ) ) {
+		return $user_login;
+	}
+
+	if ( secupress_is_username_blacklisted( $user_login ) ) {
+		secupress_blacklist_logins_wildcard_pending_login( $user_login );
+	}
+
+	return $user_login;
+}
+
+
+add_filter( 'registration_errors', 'secupress_blacklist_logins_registration_errors', 10, 2 );
+/**
+ * Block a wildcard disallowed username on the front-end registration form.
+ * `register_new_user()` only exact-matches `illegal_user_logins`, then replaces any
+ * later `wp_insert_user()` failure with a generic registration error.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (WP_Error) $errors               Registration errors.
+ * @param (string)   $sanitized_user_login User login after sanitization.
+ *
+ * @return (WP_Error)
+ */
+function secupress_blacklist_logins_registration_errors( $errors, $sanitized_user_login ) {
+	if ( ! $errors->get_error_message( 'invalid_username' ) && secupress_is_username_blacklisted( $sanitized_user_login ) ) {
+		$errors->add( 'invalid_username', __( 'Sorry, that username is not allowed.', 'secupress' ) );
+	}
+
+	return $errors;
 }
 
 
@@ -581,10 +659,12 @@ function secupress_blacklist_logins_user_profile_update_errors( $errors, $update
 
 add_filter( 'rest_pre_insert_user', 'secupress_blacklist_logins_rest_display_name', 10, 2 );
 /**
- * Refuse a disallowed display name sent through the REST API.
+ * Refuse a disallowed login or display name sent through the REST API.
+ * Core's username check is an exact match, so wildcard entries are enforced here.
  *
  * @author Julio Potier
  * @since 2.7.2
+ * @since 2.7.4 Also rejects a wildcard user login.
  *
  * @param (object)          $prepared_user User object prepared for insert.
  * @param (WP_REST_Request) $request       Request used to generate the user.
@@ -594,6 +674,10 @@ add_filter( 'rest_pre_insert_user', 'secupress_blacklist_logins_rest_display_nam
 function secupress_blacklist_logins_rest_display_name( $prepared_user, $request ) {
 	if ( is_wp_error( $prepared_user ) ) {
 		return $prepared_user;
+	}
+
+	if ( empty( $prepared_user->ID ) && ! empty( $prepared_user->user_login ) && secupress_is_username_blacklisted( $prepared_user->user_login ) ) {
+		return new WP_Error( 'invalid_username', __( 'Sorry, that username is not allowed.', 'secupress' ) );
 	}
 
 	if ( ! empty( $prepared_user->display_name ) && secupress_is_username_blacklisted( $prepared_user->display_name ) ) {

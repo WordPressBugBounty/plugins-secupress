@@ -4,9 +4,9 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
 /**
  * Get the IP address of the current user.
  *
+ * @since 2.7.4 Normalize IPv4-mapped IPv6 addresses to their IPv4 form.
  * @since 2.7.2 Trust CF-Connecting-IP only when REMOTE_ADDR is a Cloudflare proxy.
  * @since 2.2.3 Security Fix: Only get IP from REMOTE_ADDR
- * @since 1.4.3 Add $priority param
  * @since 1.0
  *
  * @param (string) $priority Contains a key from $keys to be read first.
@@ -14,12 +14,13 @@ defined( 'ABSPATH' ) or die( 'Something went wrong.' );
  */
 function secupress_get_ip() {
 	$remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) && is_string( $_SERVER['REMOTE_ADDR'] ) ? trim( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '0.0.0.0';
+	$remote_addr = secupress_unmap_ipv4_address( $remote_addr );
 	$ip          = $remote_addr;
 
 	if ( secupress_ip_is_cloudflare_proxy( $remote_addr ) && isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) && is_string( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
 		$cloudflare_ip = trim( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
 		if ( secupress_ip_is_valid( $cloudflare_ip ) ) {
-			$ip = $cloudflare_ip;
+			$ip = secupress_unmap_ipv4_address( $cloudflare_ip );
 		}
 	}
 
@@ -30,7 +31,35 @@ function secupress_get_ip() {
 	 *
 	 * @param (string) $ip The IP address.
 	 */
-	return apply_filters( 'secupress.ip.get_ip', $ip );
+	$ip = apply_filters( 'secupress.ip.get_ip', $ip );
+
+	return is_string( $ip ) ? secupress_unmap_ipv4_address( $ip ) : $ip;
+}
+
+/**
+ * Convert an IPv4-mapped IPv6 address to its dotted IPv4 form.
+ *
+ * @since 2.7.4
+ *
+ * @param (string) $ip An IP address.
+ *
+ * @return (string)
+ */
+function secupress_unmap_ipv4_address( $ip ) {
+	if ( ! is_string( $ip ) || ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+		return $ip;
+	}
+
+	$packed_ip = inet_pton( $ip );
+	$prefix    = str_repeat( "\0", 10 ) . "\xff\xff";
+
+	if ( false === $packed_ip || 16 !== strlen( $packed_ip ) || 0 !== strncmp( $packed_ip, $prefix, 12 ) ) {
+		return $ip;
+	}
+
+	$ipv4 = inet_ntop( substr( $packed_ip, 12 ) );
+
+	return false !== $ipv4 ? $ipv4 : $ip;
 }
 
 /**
@@ -147,7 +176,16 @@ function secupress_ip_is_valid( $ip, $range_format = false , $flag = 0 ) {
 
 	if ( strpos( $ip, '-' ) > 0 ) {
 		$ip = explode( '-', $ip, 2 );
-		return (bool) filter_var( $ip[0], FILTER_VALIDATE_IP, $flag ) && is_numeric( $ip[1] )  && $ip[1] <= 255 && $ip[1] > 0;
+		if ( FILTER_FLAG_IPV6 === $flag ) {
+			return (bool) filter_var( $ip[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) && (bool) filter_var( $ip[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 );
+		} elseif ( FILTER_FLAG_IPV4 === $flag ) {
+			return (bool) filter_var( $ip[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) && is_numeric( $ip[1] ) && $ip[1] <= 255 && $ip[1] > 0;
+		} elseif ( 0 === $flag ) {
+			$is_ipv4_range = filter_var( $ip[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) && is_numeric( $ip[1] ) && $ip[1] <= 255 && $ip[1] > 0;
+			$is_ipv6_range = filter_var( $ip[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) && filter_var( $ip[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 );
+
+			return (bool) ( $is_ipv4_range || $is_ipv6_range );
+		}
 	}
 
 	return false;
@@ -177,6 +215,7 @@ function secupress_get_full_ipv6( $ipv6, $mask ) {
 /**
  * Tell if an IP address is whitelisted.
  *
+ * @since 2.7.4 Normalize IPv4-mapped IPv6 addresses.
  * @since 2.2.3 0.0.0.0 is not whitelisted anymore
  * @since 1.4.9 $in_range param
  * @since 1.0
@@ -187,7 +226,7 @@ function secupress_get_full_ipv6( $ipv6, $mask ) {
  * @return (bool).
  */
 function secupress_ip_is_whitelisted( $ip = null, $in_range = true ) {
-	$ip = $ip ? $ip : secupress_get_ip();
+	$ip = $ip ? secupress_unmap_ipv4_address( $ip ) : secupress_get_ip();
 
 	/**
 	 * Filter the possibility for an IP to bypass the function
@@ -953,6 +992,76 @@ function secupress_ip_is_whitelisted( $ip = null, $in_range = true ) {
 		'2401:fa00:2a::/48' => 1,
 		'2401:fa00:2b::/48' => 1,
 		'2401:fa00:2d::/48' => 1,
+		// BlogVault IPs
+		'46.101.79.34' => 1,
+		'139.180.180.168' => 1,
+		'136.244.79.211' => 1,
+		'217.69.12.130' => 1,
+		'66.42.61.105' => 1,
+		'95.179.211.0' => 1,
+		'49.13.85.158' => 1,
+		'78.46.201.135' => 1,
+		'188.245.49.234' => 1,
+		'188.245.80.240' => 1,
+		'116.202.106.0' => 1,
+		'5.161.106.94' => 1,
+		'5.161.201.188' => 1,
+		'5.161.52.234' => 1,
+		'5.161.177.123' => 1,
+		'5.161.250.15' => 1,
+		'157.230.220.204' => 1,
+		'82.196.2.12' => 1,
+		'188.245.58.208' => 1,
+		'49.12.219.178' => 1,
+		'138.201.158.24' => 1,
+		'91.107.202.135' => 1,
+		'167.235.254.214' => 1,
+		'5.161.44.164' => 1,
+		'178.156.128.204' => 1,
+		'5.161.69.178' => 1,
+		'5.161.216.238' => 1,
+		'5.161.226.151' => 1,
+		'5.161.53.170' => 1,
+		'178.156.134.136' => 1,
+		'5.161.217.158' => 1,
+		'5.161.202.241' => 1,
+		'5.161.250.122' => 1,
+		'188.245.87.173' => 1,
+		'116.202.110.255' => 1,
+		'49.13.10.198' => 1,
+		'5.75.228.162' => 1,
+		'88.99.13.2' => 1,
+		'137.184.135.216' => 1,
+		'143.198.117.131' => 1,
+		'146.185.155.135' => 1,
+		'5.161.252.168' => 1,
+		'178.156.146.200' => 1,
+		'5.161.114.127' => 1,
+		'5.161.96.135' => 1,
+		'178.156.136.36' => 1,
+		'188.245.90.252' => 1,
+		'188.245.48.218' => 1,
+		'188.245.61.191' => 1,
+		'49.12.66.195' => 1,
+		'49.13.22.245' => 1,
+		'188.226.179.196' => 1,
+		'188.226.158.111' => 1,
+		'161.35.15.229' => 1,
+		'68.183.107.157' => 1,
+		'49.13.61.43' => 1,
+		'49.13.217.108' => 1,
+		'138.199.152.110' => 1,
+		'188.245.53.189' => 1,
+		'104.248.114.9' => 1,
+		'192.81.221.63' => 1,
+		'45.63.10.187' => 1,
+		'45.76.137.73' => 1,
+		'159.223.99.132' => 1,
+		'198.211.127.63' => 1,
+		'37.139.10.11' => 1,
+		'82.196.10.5' => 1,
+		'139.59.75.155' => 1,
+		'165.227.156.122' => 1,
 	];
 
 	if ( isset( $_SERVER['SERVER_ADDR'] ) ) {
@@ -978,13 +1087,7 @@ function secupress_ip_is_whitelisted( $ip = null, $in_range = true ) {
 	}
 
 	if ( $in_range ) {
-		// Handle IP ranges lately
-		$whitelist = array_keys( $whitelist );
-		$whitelist = array_filter( $whitelist, function( $item ) {
-			return strpos( $item, '*' ) > 0 || strpos( $item, '/' ) > 0 || strpos( $item, '-' ) > 0;
-		} );
-
-		return secupress_is_ip_in_range( $ip, $whitelist );
+		return secupress_is_ip_in_range( $ip, array_keys( $whitelist ) );
 	}
 
 	return false;
@@ -993,6 +1096,7 @@ function secupress_ip_is_whitelisted( $ip = null, $in_range = true ) {
 /**
  * Tell if an IP address is blacklisted.
  *
+ * @since 2.7.4 Normalize IPv4-mapped IPv6 addresses.
  * @since 2.2.3 0.0.0.0 is now blacklisted
  * @since 1.4.9
  *
@@ -1001,16 +1105,19 @@ function secupress_ip_is_whitelisted( $ip = null, $in_range = true ) {
  * @return (bool).
  */
 function secupress_ip_is_blacklisted( $ip = null ) {
-	$ip = $ip ? $ip : secupress_get_ip();
+	$ip = $ip ? secupress_unmap_ipv4_address( $ip ) : secupress_get_ip();
 
 	if ( ! secupress_ip_is_valid( $ip ) ) {
 		return false;
 	}
 
-	// The IPs from the settings page.
+	// Ranges stay in the option. Single addresses are one transient each.
 	$blacklist            = get_site_option( SECUPRESS_BAN_IP );
-	$blacklist            = array_flip( array_keys( $blacklist ) );
+	$blacklist            = is_array( $blacklist ) ? array_flip( array_keys( $blacklist ) ) : array();
 	$blacklist['0.0.0.0'] = 1;
+	if ( secupress_get_banned_ip_expiration( $ip ) ) {
+		$blacklist[ $ip ] = 1;
+	}
 	/**
 	 * Filter the IPs blacklist.
 	 *
@@ -1023,12 +1130,7 @@ function secupress_ip_is_blacklisted( $ip = null ) {
 	if ( isset( $blacklist[ $ip ] ) ) {
 		return true;
 	}
-	// Handle IP ranges lately
-	$blacklist = array_keys( $blacklist );
-	$blacklist = array_filter( $blacklist, function( $item ) {
-		return strpos( $item, '*' ) > 0 || strpos( $item, '/' ) > 0 || strpos( $item, '-' ) > 0;
-	} );
-	return secupress_is_ip_in_range( $ip, $blacklist );
+	return secupress_is_ip_in_range( $ip, array_keys( $blacklist ) );
 }
 
 /**
@@ -1041,6 +1143,7 @@ function secupress_ip_is_blacklisted( $ip = null ) {
  * • fedc:6482:cafe::/32 = from fedc:6482:cafe:0:0:0:0:0 to fedc:cafe:FFFF:ffff:ffff:ffff:ffff:ffff
  * • fedc:6482:cafe:* = from fedc:6482:cafe:0:0:0:0:0    to fedc:6482:FFFF:ffff:ffff:ffff:ffff:ffff
  *
+ * @since 2.7.4 Normalize IPv4-mapped IPv6 addresses.
  * @since 2.7.2 Compare the full 128-bit IPv6 prefix.
  * @since 2.2.3 Use "continue" instad of "return" too soon.
  * @since 1.4.9
@@ -1054,7 +1157,11 @@ function secupress_is_ip_in_range( $ip, $ips ) {
 	if ( empty( $ips ) || ! is_array( $ips ) ) {
 		return false;
 	}
+	$ip = is_string( $ip ) ? secupress_unmap_ipv4_address( $ip ) : $ip;
+
 	foreach ( $ips as $_ips ) {
+		$_ips = is_string( $_ips ) ? secupress_unmap_ipv4_address( $_ips ) : $_ips;
+
 		if ( secupress_ip_is_valid( $ip, true, FILTER_FLAG_IPV4 ) && secupress_ip_is_valid( $_ips, true, FILTER_FLAG_IPV4 ) ) {
 			if ( 0 === strcmp( $ip, $_ips ) ) {
 				return true;
@@ -1086,7 +1193,7 @@ function secupress_is_ip_in_range( $ip, $ips ) {
 			if ( strpos( $_ips, '*' ) ) {
 				$mask     = str_replace( '*', '', $_ips );
 				$mask     = explode( '.', $mask );
-				$mask     = array_filter( $mask );
+				$mask     = array_filter( $mask, 'strlen' );
 				$mask     = $mask + array_fill( count( $mask ), 4 - count( $mask ), '0/255' );
 				$mask     = implode( '.', $mask );
 				$first_ip = str_replace( '0/255', '0', $mask );
@@ -1101,12 +1208,9 @@ function secupress_is_ip_in_range( $ip, $ips ) {
 			if ( 0 === strcmp( $ip, $_ips ) ) {
 				return true;
 			}
-			if ( strpos( $_ips, '::-' ) ) {
-				$temp     = explode( '::-', $_ips );
-				$first_ip = $temp[0] . str_repeat( ':0', 7 - substr_count( $temp[0], ':' ) );
-				$last_ip  = $temp[1];
-
-				if ( secupress_ipv6_numeric( $ip ) >= secupress_ipv6_numeric( $first_ip ) && secupress_ipv6_numeric( $ip ) <= secupress_ipv6_numeric( $last_ip ) ) {
+			if ( strpos( $_ips, '-' ) ) {
+				list( $first_ip, $last_ip ) = explode( '-', $_ips, 2 );
+				if ( secupress_is_ipv6_in_range( $ip, $first_ip, $last_ip ) ) {
 					return true;
 				}
 				continue;
@@ -1139,7 +1243,7 @@ function secupress_is_ip_in_range( $ip, $ips ) {
 				$_ips     = str_replace( '*', '', $_ips );
 				$first_ip = secupress_get_full_ipv6( $_ips, '0' );
 				$last_ip  = secupress_get_full_ipv6( $_ips, 'ffff' );
-				if ( secupress_ipv6_numeric( $ip ) >= secupress_ipv6_numeric( $first_ip ) && secupress_ipv6_numeric( $ip ) <= secupress_ipv6_numeric( $last_ip ) ) {
+				if ( secupress_is_ipv6_in_range( $ip, $first_ip, $last_ip ) ) {
 					return true;
 				}
 				continue;
@@ -1150,34 +1254,483 @@ function secupress_is_ip_in_range( $ip, $ips ) {
 }
 
 /**
+ * Tell if an IPv6 address is between two IPv6 addresses.
+ *
+ * @since 2.7.4
+ *
+ * @param (string) $ip       The IPv6 address to check.
+ * @param (string) $first_ip The first IPv6 address in the range.
+ * @param (string) $last_ip  The last IPv6 address in the range.
+ *
+ * @return (bool)
+ */
+function secupress_is_ipv6_in_range( $ip, $first_ip, $last_ip ) {
+	$ip_bin       = inet_pton( $ip );
+	$first_ip_bin = inet_pton( $first_ip );
+	$last_ip_bin  = inet_pton( $last_ip );
+
+	if ( false === $ip_bin || false === $first_ip_bin || false === $last_ip_bin ) {
+		return false;
+	}
+
+	return strcmp( $ip_bin, $first_ip_bin ) >= 0 && strcmp( $ip_bin, $last_ip_bin ) <= 0;
+}
+
+/**
+ * Normalize an IP used as a ban key.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip IP address.
+ *
+ * @return (string)
+ */
+function secupress_normalize_ban_ip( $ip ) {
+	$ip = secupress_unmap_ipv4_address( trim( (string) $ip ) );
+
+	if ( secupress_ip_is_valid( $ip, false, FILTER_FLAG_IPV6 ) ) {
+		$ip = strtolower( $ip );
+	}
+
+	return $ip;
+}
+
+/**
+ * Absolute expiry for a stored ban time.
+ *
+ * A timestamp still in the future is already the end. An older one is the moment
+ * the ban started, completed with the login-protection duration.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (int) $time Stored timestamp.
+ *
+ * @return (int) Unix expiry.
+ */
+function secupress_ban_time_to_expiration( $time ) {
+	$time = (int) $time;
+	$now  = time();
+
+	if ( $time > $now ) {
+		return $time;
+	}
+
+	$time_ban = (int) secupress_get_module_option( 'login-protection_time_ban', 5, 'users-login' );
+	$time_ban = $time_ban > 0 ? $time_ban : 5;
+
+	return $time + ( $time_ban * MINUTE_IN_SECONDS );
+}
+
+/**
+ * Move single banned IPs out of the shared option and into one transient each.
+ *
+ * Ranges stay in the option. An expired single IP is dropped. A past timestamp
+ * still means "banned at", and the login-protection duration completes it.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ */
+function secupress_migrate_banned_ips() {
+	static $done = false;
+
+	if ( $done ) {
+		return;
+	}
+
+	$done    = true;
+	$ban_ips = get_site_option( SECUPRESS_BAN_IP );
+
+	if ( ! is_array( $ban_ips ) || ! $ban_ips ) {
+		return;
+	}
+
+	$ranges  = array();
+	$changed = false;
+	$now     = time();
+
+	foreach ( $ban_ips as $ip => $time ) {
+		if ( ! is_string( $ip ) ) {
+			$changed = true;
+			continue;
+		}
+
+		$ip      = secupress_normalize_ban_ip( $ip );
+		$expires = secupress_ban_time_to_expiration( $time );
+
+		if ( ! secupress_ip_is_valid( $ip, false ) ) {
+			if ( secupress_ip_is_valid( $ip, true ) && $expires > $now ) {
+				$ranges[ $ip ] = $expires;
+			}
+			if ( $expires !== (int) $time || ! isset( $ranges[ $ip ] ) ) {
+				$changed = true;
+			}
+			continue;
+		}
+
+		if ( $expires > $now ) {
+			secupress_set_banned_ip( $ip, $expires );
+		}
+
+		$changed = true;
+	}
+
+	if ( ! $changed ) {
+		return;
+	}
+
+	if ( $ranges ) {
+		update_site_option( SECUPRESS_BAN_IP, $ranges );
+	} else {
+		delete_site_option( SECUPRESS_BAN_IP );
+	}
+}
+
+/**
+ * Store one banned IP until an absolute expiry.
+ *
+ * The rows use the site-transient names, so WordPress deletes them once the
+ * timeout is in the past. They are written as options even when an external
+ * object cache is active, otherwise a cache flush would lift the ban.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip      Single IP address.
+ * @param (int)    $expires Unix expiry.
+ */
+function secupress_set_banned_ip( $ip, $expires ) {
+	$ip      = secupress_normalize_ban_ip( $ip );
+	$expires = (int) $expires;
+	$name    = SECUPRESS_BAN_IP_TRANSIENT . $ip;
+
+	if ( $expires <= time() ) {
+		secupress_delete_banned_ip_transient( $ip );
+		return;
+	}
+
+	update_site_option( '_site_transient_timeout_' . $name, $expires );
+	update_site_option( '_site_transient_' . $name, $expires );
+}
+
+/**
+ * Expiry of a single banned IP, or false when it is not banned.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip Single IP address.
+ *
+ * @return (int|false)
+ */
+function secupress_get_banned_ip_expiration( $ip ) {
+	$ip      = secupress_normalize_ban_ip( $ip );
+	$name    = SECUPRESS_BAN_IP_TRANSIENT . $ip;
+	$expires = get_site_option( '_site_transient_timeout_' . $name );
+
+	if ( false === $expires ) {
+		return false;
+	}
+
+	$expires = (int) $expires;
+
+	if ( $expires <= time() ) {
+		secupress_delete_banned_ip_transient( $ip );
+		return false;
+	}
+
+	return $expires;
+}
+
+/**
+ * Delete the transient of one banned IP.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip Single IP address.
+ */
+function secupress_delete_banned_ip_transient( $ip ) {
+	$name = SECUPRESS_BAN_IP_TRANSIENT . secupress_normalize_ban_ip( $ip );
+
+	delete_site_option( '_site_transient_' . $name );
+	delete_site_option( '_site_transient_timeout_' . $name );
+}
+
+/**
+ * Tell if an IP is banned, either by its transient or by a range still stored in the option.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip IP address.
+ *
+ * @return (bool)
+ */
+function secupress_is_ip_banned( $ip ) {
+	$ip = secupress_normalize_ban_ip( $ip );
+
+	if ( secupress_get_banned_ip_expiration( $ip ) ) {
+		return true;
+	}
+
+	$ranges = get_site_option( SECUPRESS_BAN_IP );
+
+	if ( ! is_array( $ranges ) || ! $ranges ) {
+		return false;
+	}
+
+	return secupress_is_ip_in_range( $ip, array_keys( $ranges ) );
+}
+
+/**
+ * Remove one IP from the ban transient and from the range option.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip IP address or range.
+ *
+ * @return (bool) True when a ban was removed.
+ */
+function secupress_unban_ip( $ip ) {
+	$ip    = is_string( $ip ) ? trim( $ip ) : '';
+	$found = false;
+
+	if ( secupress_ip_is_valid( $ip, false ) && secupress_get_banned_ip_expiration( $ip ) ) {
+		secupress_delete_banned_ip_transient( $ip );
+		$found = true;
+	}
+
+	$ranges = get_site_option( SECUPRESS_BAN_IP );
+
+	if ( is_array( $ranges ) && isset( $ranges[ $ip ] ) ) {
+		unset( $ranges[ $ip ] );
+
+		if ( $ranges ) {
+			update_site_option( SECUPRESS_BAN_IP, $ranges );
+		} else {
+			delete_site_option( SECUPRESS_BAN_IP );
+		}
+
+		$found = true;
+	}
+
+	return $found;
+}
+
+/**
+ * Drop ranges whose expiry is in the past.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ */
+function secupress_purge_expired_banned_ranges() {
+	$ranges = get_site_option( SECUPRESS_BAN_IP );
+
+	if ( false === $ranges ) {
+		return;
+	}
+
+	if ( ! is_array( $ranges ) ) {
+		delete_site_option( SECUPRESS_BAN_IP );
+		return;
+	}
+
+	$now    = time();
+	$update = false;
+
+	foreach ( $ranges as $range => $time ) {
+		$expires = secupress_ban_time_to_expiration( $time );
+
+		if ( $expires < $now ) {
+			unset( $ranges[ $range ] );
+			$update = true;
+			continue;
+		}
+
+		if ( $expires !== (int) $time ) {
+			$ranges[ $range ] = $expires;
+			$update           = true;
+		}
+	}
+
+	if ( ! $update ) {
+		return;
+	}
+
+	if ( $ranges ) {
+		update_site_option( SECUPRESS_BAN_IP, $ranges );
+	} else {
+		delete_site_option( SECUPRESS_BAN_IP );
+	}
+}
+
+/**
+ * Banned IPs for the administration list.
+ *
+ * Ranges come from the option. Single IPs come from their transients.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $search Substring matched against the IP or the range.
+ * @param (int)    $limit  Maximum single IPs to return. 0 returns them all.
+ *
+ * @return (array) Keys `ips` (IP => expiry) and `count`.
+ */
+function secupress_get_banned_ip_list( $search = '', $limit = 50 ) {
+	global $wpdb;
+
+	$ranges = get_site_option( SECUPRESS_BAN_IP );
+	$ranges = is_array( $ranges ) ? $ranges : array();
+	$search = is_string( $search ) ? trim( $search ) : '';
+
+	if ( '' !== $search ) {
+		$matched = preg_grep( '~' . preg_quote( $search, '~' ) . '~', array_keys( $ranges ) );
+		$ranges  = is_array( $matched ) ? array_intersect_key( $ranges, array_flip( $matched ) ) : array();
+	}
+
+	$storage = secupress_banned_ip_transient_storage();
+	$where   = $storage['where'] . $storage['name'] . ' LIKE %s';
+	$args    = array( $wpdb->esc_like( '_site_transient_' . SECUPRESS_BAN_IP_TRANSIENT ) . '%' );
+
+	if ( '' !== $search ) {
+		$where .= ' AND SUBSTRING( ' . $storage['name'] . ', %d ) LIKE %s';
+		$args[] = strlen( '_site_transient_' . SECUPRESS_BAN_IP_TRANSIENT ) + 1;
+		$args[] = '%' . $wpdb->esc_like( $search ) . '%';
+	}
+
+	$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$storage['table']} WHERE {$where}", $args ) );
+	$sql   = "SELECT {$storage['name']} AS ban_name, {$storage['value']} AS ban_value FROM {$storage['table']} WHERE {$where} ORDER BY {$storage['id']} DESC";
+
+	if ( $limit > 0 ) {
+		$sql   .= ' LIMIT %d';
+		$args[] = (int) $limit;
+	}
+
+	$rows   = $wpdb->get_results( $wpdb->prepare( $sql, $args ) );
+	$rows   = is_array( $rows ) ? array_reverse( $rows ) : array();
+	$prefix = '_site_transient_' . SECUPRESS_BAN_IP_TRANSIENT;
+	$ips    = array();
+
+	foreach ( $rows as $row ) {
+		$ip = substr( (string) $row->ban_name, strlen( $prefix ) );
+
+		if ( '' === $ip ) {
+			continue;
+		}
+
+		$expires = (int) $row->ban_value;
+
+		if ( $expires <= time() ) {
+			secupress_delete_banned_ip_transient( $ip );
+			--$count;
+			continue;
+		}
+
+		$ips[ $ip ] = $expires;
+	}
+
+	return array(
+		'ips'   => $ips + $ranges,
+		'count' => count( $ranges ) + max( 0, $count ),
+	);
+}
+
+/**
+ * Table and columns where single-IP ban transients are stored.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @return (array) Keys `table`, `id`, `name`, `value`, `where`.
+ */
+function secupress_banned_ip_transient_storage() {
+	global $wpdb;
+
+	if ( is_multisite() ) {
+		return array(
+			'table' => $wpdb->sitemeta,
+			'id'    => 'meta_id',
+			'name'  => 'meta_key',
+			'value' => 'meta_value',
+			'where' => $wpdb->prepare( 'site_id = %d AND ', get_current_network_id() ),
+		);
+	}
+
+	return array(
+		'table' => $wpdb->options,
+		'id'    => 'option_id',
+		'name'  => 'option_name',
+		'value' => 'option_value',
+		'where' => '',
+	);
+}
+
+/**
+ * Delete every single-IP ban transient.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ */
+function secupress_delete_all_banned_ip_transients() {
+	global $wpdb;
+
+	$value_like   = $wpdb->esc_like( '_site_transient_' . SECUPRESS_BAN_IP_TRANSIENT ) . '%';
+	$timeout_like = $wpdb->esc_like( '_site_transient_timeout_' . SECUPRESS_BAN_IP_TRANSIENT ) . '%';
+
+	if ( is_multisite() ) {
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->sitemeta} WHERE site_id = %d AND ( meta_key LIKE %s OR meta_key LIKE %s )", get_current_network_id(), $value_like, $timeout_like ) );
+	} else {
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", $value_like, $timeout_like ) );
+	}
+
+	if ( function_exists( 'wp_cache_flush_group' ) ) {
+		wp_cache_flush_group( is_multisite() ? 'site-options' : 'options' );
+	}
+}
+
+/**
  * Ban an IP address if not whitelisted.
  * Will add the IP to the list of banned IPs. Will maybe write the IPs in the `.htaccess` file. Will maybe forbid access to the user by displaying a message.
  *
+ * @since 2.7.4 A single IP is stored in its own transient. The option only keeps ranges.
+ * @since 2.7.4 `absolute` stores an expiry timestamp so the ban can outlive the login-protection duration.
+ * @since 2.7.4 Normalize IPv4-mapped IPv6 addresses.
+ * @since 2.7.4 `die` really stops the request with a 403 and logs the attack.
  * @since 1.0
  *
- * @param (int)    $time_ban Ban duration in minutes. Only used in the message.
+ * @param (int)    $time_ban Ban duration in minutes. Used in the message and as the transient lifetime.
  * @param (string) $ip       The IP to ban.
- * @param (array)   $die      True to forbid access to the user by displaying a message.
+ * @param (array)  $args     `die` to display the message. `attack_type` for the log.
  */
 function secupress_ban_ip( $time_ban = 5, $ip = null, $args = [] ) {
-	$ip = $ip ? $ip : secupress_get_ip();
+	$ip = $ip ? secupress_normalize_ban_ip( $ip ) : secupress_get_ip();
 
 	if ( secupress_ip_is_whitelisted( $ip ) ) {
 		return;
 	}
 
 	$time_ban = (int) $time_ban > 0 ? (int) $time_ban : 5;
-	$ban_ips  = get_site_option( SECUPRESS_BAN_IP );
-	$ban_ips  = is_array( $ban_ips ) ? $ban_ips : array();
 	if ( is_bool( $args ) ) {
-		$args['die'] = true;
+		$args = array( 'die' => true );
 	}
-	$die             = isset( $args['die'] ) && $args['die'];
-	$attack_type     = isset( $args['attack_type'] ) ? $args['attack_type'] : 'ban_ip';
+	$die         = isset( $args['die'] ) && $args['die'];
+	$attack_type = isset( $args['attack_type'] ) ? $args['attack_type'] : 'ban_ip';
+	$expires     = time() + ( $time_ban * MINUTE_IN_SECONDS );
 
-	$ban_ips[ $ip ]  = time();
+	if ( secupress_ip_is_valid( $ip, false ) ) {
+		secupress_set_banned_ip( $ip, $expires );
+	} else {
+		$ban_ips         = get_site_option( SECUPRESS_BAN_IP );
+		$ban_ips         = is_array( $ban_ips ) ? $ban_ips : array();
+		$ban_ips[ $ip ]  = $expires;
+		update_site_option( SECUPRESS_BAN_IP, $ban_ips );
+	}
 
-	update_site_option( SECUPRESS_BAN_IP, $ban_ips );
+	$ban_ips = array( $ip => $expires );
 
 	/**
 	 * Fires once a IP is banned.
@@ -1194,7 +1747,7 @@ function secupress_ban_ip( $time_ban = 5, $ip = null, $args = [] ) {
 			_n( 'Your IP address %1$s has been banned for %2$s minute, please do not retry until then.', 'Your IP address %1$s has been banned for %2$s minutes, please do not retry until then.', $time_ban, 'secupress' ),
 			'<code>' . esc_html( $ip ) . '</code>',
 			'<strong>' . number_format_i18n( $time_ban ) . '</strong>'
-		), [ 'force_die' => true, 'context' => 'ban_ip', 'attack_type' => $attack_type ] );
+		), '', [ 'force_die' => true, 'context' => 'ban_ip', 'attack_type' => $attack_type, 'response' => 403 ] );
 	}
 }
 
@@ -1202,6 +1755,7 @@ function secupress_ban_ip( $time_ban = 5, $ip = null, $args = [] ) {
 /**
  * Returns if the user-agent is a real bot (true) or not, a fake one (false).
  *
+ * @since 2.7.4 Cache the confirmed hostname per IP and stop trusting generic AWS hostnames for `ia_archiver`.
  * @since 2.6.2 Use secupress.me instead of google for testing, use PTR records for IP to hostname lookup
  * @since 1.4.2 Add $test param + revamp
  * @since 1.4
@@ -1244,29 +1798,85 @@ function secupress_check_bot_ip( $test = false ) {
 			$bot_regex = '/\.yandex\.(com|ru|net)$/i';
 		} elseif ( preg_match( '/duckduckbot/i', $user_agent ) ) {
 			$bot_regex = '/\.duckduckgo\.com$/i';
-		} elseif ( preg_match( '/ia_archiver/i', $user_agent ) ) {
-			$bot_regex = '/\.(alexa|amazonaws)\.com$/i';
 		} else {
 			return false;
 		}
-		$ip = secupress_get_ip();
-	} else {
-		$ip = '109.234.167.151'; // SecuPress.me
+		$hostname = secupress_get_cached_confirmed_hostname( secupress_get_ip() );
+
+		return (bool) ( $hostname && preg_match( $bot_regex, $hostname ) );
 	}
 
+	$hostname    = secupress_get_confirmed_hostname( '109.234.167.151' ); // SecuPress.me
+	$test_result = (int) (bool) preg_match( '/109-234-167-151\.reverse\.odns\.fr$/i', $hostname );
+	set_site_transient( 'secupress-test-hostname', $test_result, WEEK_IN_SECONDS );
+
+	return (bool) $test_result;
+}
+
+/**
+ * Confirmed hostname for an IP, kept so the next requests skip the DNS lookups.
+ *
+ * A confirmed name is kept for 12 hours. A failed check is kept for 1 hour.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip Visitor IP.
+ *
+ * @return (string) Hostname, or an empty string when the forward check failed.
+ */
+function secupress_get_cached_confirmed_hostname( $ip ) {
+	static $hostnames = array();
+
+	if ( isset( $hostnames[ $ip ] ) ) {
+		return $hostnames[ $ip ];
+	}
+
+	$key    = 'secupress_bot_host_' . md5( $ip );
+	$cached = get_site_transient( $key );
+
+	if ( is_string( $cached ) ) {
+		$hostnames[ $ip ] = ( '0' === $cached ) ? '' : $cached;
+
+		return $hostnames[ $ip ];
+	}
+
+	$hostname         = secupress_get_confirmed_hostname( $ip );
+	$hostnames[ $ip ] = $hostname;
+	set_site_transient( $key, $hostname ? $hostname : '0', $hostname ? 12 * HOUR_IN_SECONDS : HOUR_IN_SECONDS );
+
+	return $hostname;
+}
+
+/**
+ * Resolve an IP and confirm the name points back to it.
+ *
+ * @since 2.7.4
+ * @author Julio Potier
+ *
+ * @param (string) $ip Visitor IP.
+ *
+ * @return (string) Hostname, or an empty string when the forward check failed.
+ */
+function secupress_get_confirmed_hostname( $ip ) {
 	$hostname_addr = gethostbyaddr( $ip );
 	$hostname      = is_string( $hostname_addr ) && ! secupress_ip_is_valid( $hostname_addr ) ? strtolower( trim( $hostname_addr ) ) : '';
-	$real_ip       = $hostname ? gethostbyname( $hostname ) : '';
+
+	if ( ! $hostname ) {
+		return '';
+	}
+
+	$real_ip       = gethostbyname( $hostname );
 	$real_ip_match = ( $real_ip && $real_ip !== $hostname && $real_ip === $ip );
 
-	if ( ! $real_ip_match && $hostname ) {
+	if ( ! $real_ip_match ) {
 		$real_ips = gethostbynamel( $hostname );
 		if ( is_array( $real_ips ) && in_array( $ip, $real_ips, true ) ) {
 			$real_ip_match = true;
 		}
 	}
 
-	if ( ! $real_ip_match && $hostname && function_exists( 'dns_get_record' ) && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+	if ( ! $real_ip_match && function_exists( 'dns_get_record' ) && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
 		$real_ips = dns_get_record( $hostname, DNS_AAAA );
 		if ( is_array( $real_ips ) ) {
 			foreach ( $real_ips as $record ) {
@@ -1277,18 +1887,8 @@ function secupress_check_bot_ip( $test = false ) {
 			}
 		}
 	}
-	
-	if ( true === $test ) {
-		$test_result = (int) ( preg_match( '/109-234-167-151\.reverse\.odns\.fr$/i', $hostname ) && $real_ip_match );
-		set_site_transient( 'secupress-test-hostname', $test_result, WEEK_IN_SECONDS );
-		return (bool) $test_result;
-	}
 
-	if ( $real_ip_match && preg_match( $bot_regex, $hostname ) ) {
-		return true;
-	}
-
-	return false;
+	return $real_ip_match ? $hostname : '';
 }
 
 /**

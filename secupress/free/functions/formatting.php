@@ -97,6 +97,54 @@ function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 
 		secupress_die( __( 'Something went wrong.', 'secupress' ), '', [ 'force_die' => true, 'context' => 'missing-sp_action', 'attack_type' => 'login' ] );
 	}
 
+	nocache_headers();
+	
+	header( 'Content-Type: ' . get_bloginfo( 'html_type' ) . '; charset=' . get_bloginfo( 'charset' ) );
+	
+	// Set a cookie now to see if they are supported by the browser.
+	$secure = ( 'https' === parse_url( wp_login_url(), PHP_URL_SCHEME ) );
+	setcookie( TEST_COOKIE, 'WP Cookie check', 0, COOKIEPATH, COOKIE_DOMAIN, $secure, true );
+	
+	if ( SITECOOKIEPATH !== COOKIEPATH ) {
+		setcookie( TEST_COOKIE, 'WP Cookie check', 0, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true );
+	}
+	
+	if ( isset( $_REQUEST['wp_lang'] ) ) {
+		setcookie( 'wp_lang', sanitize_text_field( $_REQUEST['wp_lang'] ), 0, COOKIEPATH, COOKIE_DOMAIN, $secure, true );
+	}
+
+	/**
+	 * Fires when the login form is initialized.
+	 *
+	 * @since WP 3.2.0
+	 */
+	do_action( 'login_init' );
+	/**
+	 * Fires when the login form is initialized.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( 'secupress_login_page.login_init' );
+
+	/**
+	 * Fires before a specified login form action.
+	 *
+	 * The dynamic portion of the hook name, `$action`, refers to the action
+	 * that brought the visitor to the login form.
+	 *
+	 * @since WP 2.8.0
+	 */
+	do_action( "login_form_{$sp_action}" );
+	/**
+	 * Fires before a specified login form action.
+	 *
+	 * The dynamic portion of the hook name, `$action`, refers to the action
+	 * that brought the visitor to the login form.
+	 *
+	 * @since 2.3.19
+	 */
+	do_action( "secupress_login_page.login_form_{$sp_action}" );
+
 	$user_id = $user_id ? $user_id : get_current_user_id();
 	if ( $user_id ) {
 		switch_to_locale( get_user_locale( $user_id ) );
@@ -311,53 +359,6 @@ function secupress_login_page( $title, $content, $wp_error = null, $user_id = 0 
 		}
 
 	}
-	nocache_headers();
-	
-	header( 'Content-Type: ' . get_bloginfo( 'html_type' ) . '; charset=' . get_bloginfo( 'charset' ) );
-	
-	// Set a cookie now to see if they are supported by the browser.
-	$secure = ( 'https' === parse_url( wp_login_url(), PHP_URL_SCHEME ) );
-	setcookie( TEST_COOKIE, 'WP Cookie check', 0, COOKIEPATH, COOKIE_DOMAIN, $secure, true );
-	
-	if ( SITECOOKIEPATH !== COOKIEPATH ) {
-		setcookie( TEST_COOKIE, 'WP Cookie check', 0, SITECOOKIEPATH, COOKIE_DOMAIN, $secure, true );
-	}
-	
-	if ( isset( $_REQUEST['wp_lang'] ) ) {
-		setcookie( 'wp_lang', sanitize_text_field( $_REQUEST['wp_lang'] ), 0, COOKIEPATH, COOKIE_DOMAIN, $secure, true );
-	}
-	
-	/**
-	 * Fires when the login form is initialized.
-	 *
-	 * @since WP 3.2.0
-	 */
-	do_action( 'login_init' );
-	/**
-	 * Fires when the login form is initialized.
-	 *
-	 * @since 2.3.19
-	 */
-	do_action( 'secupress_login_page.login_init' );
-
-	/**
-	 * Fires before a specified login form action.
-	 *
-	 * The dynamic portion of the hook name, `$action`, refers to the action
-	 * that brought the visitor to the login form.
-	 *
-	 * @since WP 2.8.0
-	 */
-	do_action( "login_form_{$sp_action}" );
-	/**
-	 * Fires before a specified login form action.
-	 *
-	 * The dynamic portion of the hook name, `$action`, refers to the action
-	 * that brought the visitor to the login form.
-	 *
-	 * @since 2.3.19
-	 */
-	do_action( "secupress_login_page.login_form_{$sp_action}" );
 
 	/**
 	 * Filters the content of the form

@@ -5,7 +5,7 @@
  * Description: More than a plugin, the guarantee of a protected website by experts.
  * Author: SecuPress
  * Author URI: https://secupress.me
- * Version: 2.7.3
+ * Version: 2.7.4
  * Code Name: Makeshift
  * Network: true
  * Contributors: SecuPress, juliobox, GregLone
@@ -73,6 +73,9 @@ define( 'SECUPRESS_FULL_FILETREE'         , 'secupress_full_filetree' );
 define( 'SECUPRESS_DATABASE_MALWARES'     , 'secupress_database_malwares' );
 define( 'SECUPRESS_FIX_DISTS'             , 'secupress_fix_dists' );
 define( 'SECUPRESS_BAN_IP'                , 'secupress_ban_ip' );
+define( 'SECUPRESS_BAN_IP_TRANSIENT'      , 'secupress_ban_ip_' );
+define( 'SECUPRESS_404_'                  , 'secupress_404_' );
+define( 'SECUPRESS_404_PENALTY_'          , 'secupress_404_penalty_' );
 define( 'SECUPRESS_BLOCKED_IP'            , 'secupress_blocked_ip' );
 define( 'SECUPRESS_USER_PROTECTION'       , 'secupress_user_protection' );
 define( 'SECUPRESS_SAME_EMAIL_DOMAIN_OK'  , 'secupress_same_email_domain_ok' );
@@ -119,7 +122,8 @@ if ( defined( 'SECUPRESS_API_EMAIL' ) && defined( 'SECUPRESS_API_KEY' ) && ! def
 /**
  * Requires hotfixes first because it's hot.
  */ 
-require_once( SECUPRESS_INC_PATH . 'functions/hotfixes.php' );
+require_once( SECUPRESS_INC_PATH . 'functions/hotfixes/hotfixes-wp.php' );
+require_once( SECUPRESS_INC_PATH . 'functions/hotfixes/hotfixes-updraft.php' );
 
 /**
  * All the stuff for the plugin activation and deactivation.
@@ -443,12 +447,13 @@ function secupress_load_functions() {
 	require_once( SECUPRESS_INC_PATH . 'functions/common.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/compat.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/deprecated.php' );
-	require_once( SECUPRESS_INC_PATH . 'functions/3rdparty.php' );
+	require_once( SECUPRESS_INC_PATH . 'functions/hotfixes/3rdparty.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/formatting.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/options.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/modules.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/db.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/ip.php' );
+	require_once( SECUPRESS_INC_PATH . 'functions/services.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/files.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/htaccess.php' );
 	require_once( SECUPRESS_INC_PATH . 'functions/widgets.php' );

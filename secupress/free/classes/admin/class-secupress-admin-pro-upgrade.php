@@ -111,7 +111,7 @@ class SecuPress_Admin_Pro_Upgrade extends SecuPress_Admin_Offer_Migration {
 			'<a href="' . esc_url( static::get_post_install_url() ) . '">' . _x( 'upgrade', 'verb', 'secupress' ) . '</a>'
 		);
 
-		static::add_notice( $message, 'updated', false );
+		static::add_notice( $message, 'updated', false, 'pro upgrade available' );
 	}
 
 
@@ -160,7 +160,7 @@ class SecuPress_Admin_Pro_Upgrade extends SecuPress_Admin_Offer_Migration {
 					'<a target="_blank" title="' . esc_attr__( 'Open in a new window.', 'secupress' ) . '" href="' . esc_url( static::get_account_url() ) . '">' . __( 'SecuPress account', 'secupress' ) . '</a>'
 				);
 
-				static::add_transient_notice( $message, 'error' );
+				static::add_transient_notice( $message, 'error', '', 'pro upgrade download' );
 
 				wp_safe_redirect( esc_url_raw( wp_get_referer() ) );
 				die();
@@ -181,7 +181,7 @@ class SecuPress_Admin_Pro_Upgrade extends SecuPress_Admin_Offer_Migration {
 				'<a target="_blank" title="' . esc_attr__( 'Open in a new window.', 'secupress' ) . '" href="' . esc_url( static::get_account_url() ) . '">' . __( 'SecuPress account', 'secupress' ) . '</a>'
 			);
 
-			static::add_transient_notice( $message, 'error' );
+			static::add_transient_notice( $message, 'error', '', 'pro upgrade replace' );
 
 			wp_safe_redirect( esc_url_raw( wp_get_referer() ) );
 			die();
@@ -234,7 +234,7 @@ class SecuPress_Admin_Pro_Upgrade extends SecuPress_Admin_Offer_Migration {
 		delete_user_meta( $user_id, 'secupress_migration_congrats' );
 
 		$message = __( 'Congratulations, your Pro version has been installed 🎉.', 'secupress' );
-		static::add_notice( $message );
+		static::add_notice( $message, 'updated', '', 'pro upgrade installed' );
 	}
 
 

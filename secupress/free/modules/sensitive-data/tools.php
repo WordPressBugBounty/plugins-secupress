@@ -380,7 +380,7 @@ function secupress_author_base_save_user_options() {
 		if ( secupress_wp_version_is( '6.4' ) ) {
 			add_action( 'user_profile_update_errors', 'secupress_author_base_user_add_fake_error' );
 		}
-		secupress_add_transient_notice( sprintf( __( 'Sorry, the slug %s is already in use!', 'secupress' ), secupress_tag_me( esc_html( $new_nicename ), 'strong' ) ), 'error', '', 'exist' );
+		secupress_add_transient_notice( sprintf( __( 'Sorry, the slug %s is already in use!', 'secupress' ), secupress_tag_me( esc_html( $new_nicename ), 'strong' ) ), 'error', '', 'exist', 'author slug used' );
 	} else {
 		$updated = wp_update_user( array(
 			'ID'            => $user_id,
@@ -391,7 +391,7 @@ function secupress_author_base_save_user_options() {
 			if ( secupress_wp_version_is( '6.4' ) ) {
 				add_action( 'user_profile_update_errors', 'secupress_author_base_user_add_fake_error' );
 			}
-			secupress_add_transient_notice( __( 'Unexpected issue updating the author profile URL slug. Please try again.', 'secupress' ), 'error', '', 'exist' );
+			secupress_add_transient_notice( __( 'Unexpected issue updating the author profile URL slug. Please try again.', 'secupress' ), 'error', '', 'exist', 'author slug failed' );
 		}
 	}
 
@@ -443,19 +443,9 @@ function secupress_blackhole_please_click_me( $template ) {
 	$dirname = secupress_get_hashed_folder_name( basename( __FILE__, '.php' ) );
 
 	if ( isset( $_REQUEST['token'] ) && wp_verify_nonce( $_REQUEST['token'], 'ban_me_please-' . date( 'ymdhi' ) ) ) {
-		$ip      = secupress_get_ip();
-		$ban_ips = get_site_option( SECUPRESS_BAN_IP );
+		$ip = secupress_get_ip();
 
-		if ( ! is_array( $ban_ips ) ) {
-			$ban_ips = array();
-		}
-
-		$ban_ips[ $ip ] = time() + MONTH_IN_SECONDS;
-
-		update_site_option( SECUPRESS_BAN_IP, $ban_ips );
-
-		/* This hook is documented in /inc/functions/admin.php */
-		do_action( 'secupress.ban.ip_banned', $ip, $ban_ips );
+		secupress_ban_ip( (int) ( MONTH_IN_SECONDS / MINUTE_IN_SECONDS ), $ip );
 
 		switch ( $_SERVER['REQUEST_METHOD'] ) {
 			case 'GET':

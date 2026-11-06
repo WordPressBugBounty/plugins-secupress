@@ -61,6 +61,7 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	/**
 	 * Add an admin notice.
 	 *
+	 * @since 2.7.4 Added the $context parameter and the secupress.notices.display filter.
 	 * @since 1.0
 	 *
 	 * @param (string)      $message    The message to display in the notice.
@@ -70,15 +71,31 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	 *                                  string: the notice is dismissible and send an ajax call to store the "dismissed" state into a user meta to prevent it to popup again.
 	 *                                  empty string: meant for a one-shot use. The notice is dismissible but the "dismissed" state is not stored, it will popup again. This is the exact same behavior than the WordPress dismissible notices.
 	 * @param (null|string) $capa       A WordPress capability or role. "null" = secupress_get_capability()
+	 * @param (string)      $context    Two or three words describing the notice message.
  	 */
-	public function add( $message, $error_code = 'updated', $notice_id = false, $capa = null ) {
+	public function add( $message, $error_code = 'updated', $notice_id = false, $capa = null, $context = '' ) {
 		if ( is_null( $capa ) ) {
 			$capa = secupress_get_capability( false, 'notice' );
 		}
+		if ( false !== $notice_id && $notice_id && self::is_dismissed( $notice_id ) ) {
+			return;
+		}
+
+		/**
+		 * Filter whether to display an admin notice.
+		 *
+		 * @since 2.7.4
+		 *
+		 * @param (bool)        $display    True to display the notice.
+		 * @param (string)      $context    Two or three words describing the notice message.
+		 * @param (string|bool) $notice_id  Dismiss identifier.
+		 * @param (string|null) $error_code CSS class.
+		 */
+		if ( ! apply_filters( 'secupress.notices.display', true, $context, $notice_id, $error_code ) ) {
+			return;
+		}
+
 		if ( false !== $notice_id ) {
-			if ( $notice_id && self::is_dismissed( $notice_id ) ) {
-				return;
-			}
 			// Add notices script.
 			self::enqueue_script();
 		}
@@ -112,6 +129,7 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	/**
 	 * Add a temporary admin notice.
 	 *
+	 * @since 2.7.4 Added the $context parameter. It is stored with the notice and replayed by add().
 	 * @since 2.4 Fix duplicate notices (based on ID, not content)
 	 * @since 1.3 Added $notice_id parameter.
 	 * @since 1.0
@@ -123,11 +141,12 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 	 *                                  string: the notice is dismissible and send an ajax call to store the "dismissed" state into a user meta to prevent it to popup again.
 	 *                                  enpty string: meant for a one-shot use. The notice is dismissible but the "dismissed" state is not stored, it will popup again. This is the exact same behavior than the WordPress dismissible notices.
 	 * @param (null|string) $capa       A WordPress capability or role. "null" = secupress_get_capability()
+	 * @param (string)      $context    Two or three words describing the notice message.
 	 */
-	public function add_temporary( $message, $error_code = 'updated', $notice_id = false, $capa = null ) {
+	public function add_temporary( $message, $error_code = 'updated', $notice_id = false, $capa = null, $context = '' ) {
 		$notices               = secupress_get_transient( 'secupress-notices-' . get_current_user_id() );
 		$notices               = is_array( $notices ) ? $notices : array();
-		$notices[ $notice_id ] = compact( 'message', 'error_code', 'capa', 'notice_id' );
+		$notices[ $notice_id ] = compact( 'message', 'error_code', 'capa', 'notice_id', 'context' );
 		secupress_set_transient( 'secupress-notices-' . get_current_user_id(), $notices );
 	}
 
@@ -361,7 +380,8 @@ class SecuPress_Admin_Notices extends SecuPress_Singleton {
 			foreach ( $notices as $notice ) {
 				$notice_id = isset( $notice['notice_id'] ) ? $notice['notice_id'] : false;
 				$capa      = isset( $notice['capa'] ) ? $notice['capa'] : null;
-				$this->add( $notice['message'], $notice['error_code'], $notice_id , $capa);
+				$context   = isset( $notice['context'] ) ? $notice['context'] : '';
+				$this->add( $notice['message'], $notice['error_code'], $notice_id, $capa, $context );
 			}
 		}
 	}
